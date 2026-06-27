@@ -287,93 +287,6 @@ export type Database = {
         }
         Relationships: []
       }
-      email_send_log: {
-        Row: {
-          created_at: string
-          error_message: string | null
-          id: string
-          message_id: string | null
-          metadata: Json | null
-          recipient_email: string
-          status: string
-          template_name: string
-        }
-        Insert: {
-          created_at?: string
-          error_message?: string | null
-          id?: string
-          message_id?: string | null
-          metadata?: Json | null
-          recipient_email: string
-          status: string
-          template_name: string
-        }
-        Update: {
-          created_at?: string
-          error_message?: string | null
-          id?: string
-          message_id?: string | null
-          metadata?: Json | null
-          recipient_email?: string
-          status?: string
-          template_name?: string
-        }
-        Relationships: []
-      }
-      email_send_state: {
-        Row: {
-          auth_email_ttl_minutes: number
-          batch_size: number
-          id: number
-          retry_after_until: string | null
-          send_delay_ms: number
-          transactional_email_ttl_minutes: number
-          updated_at: string
-        }
-        Insert: {
-          auth_email_ttl_minutes?: number
-          batch_size?: number
-          id?: number
-          retry_after_until?: string | null
-          send_delay_ms?: number
-          transactional_email_ttl_minutes?: number
-          updated_at?: string
-        }
-        Update: {
-          auth_email_ttl_minutes?: number
-          batch_size?: number
-          id?: number
-          retry_after_until?: string | null
-          send_delay_ms?: number
-          transactional_email_ttl_minutes?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      email_unsubscribe_tokens: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          token: string
-          used_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          token: string
-          used_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          token?: string
-          used_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -482,30 +395,6 @@ export type Database = {
         }
         Relationships: []
       }
-      rate_limit_policies: {
-        Row: {
-          action: string
-          created_at: string
-          description: string | null
-          max_attempts: number
-          window_seconds: number
-        }
-        Insert: {
-          action: string
-          created_at?: string
-          description?: string | null
-          max_attempts: number
-          window_seconds: number
-        }
-        Update: {
-          action?: string
-          created_at?: string
-          description?: string | null
-          max_attempts?: number
-          window_seconds?: number
-        }
-        Relationships: []
-      }
       rate_limits: {
         Row: {
           action: string
@@ -523,27 +412,6 @@ export type Database = {
           action?: string
           count?: number
           user_id?: string
-          window_start?: string
-        }
-        Relationships: []
-      }
-      rate_limits_by_key: {
-        Row: {
-          action: string
-          count: number
-          key: string
-          window_start: string
-        }
-        Insert: {
-          action: string
-          count?: number
-          key: string
-          window_start?: string
-        }
-        Update: {
-          action?: string
-          count?: number
-          key?: string
           window_start?: string
         }
         Relationships: []
@@ -617,30 +485,6 @@ export type Database = {
           timeframe?: string | null
           updated_at?: string
           user_id?: string | null
-        }
-        Relationships: []
-      }
-      suppressed_emails: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          metadata: Json | null
-          reason: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          metadata?: Json | null
-          reason: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          metadata?: Json | null
-          reason?: string
         }
         Relationships: []
       }
@@ -764,52 +608,12 @@ export type Database = {
         Args: { p_action: string; p_max: number; p_user_id: string }
         Returns: boolean
       }
-      check_rate_limit_by_key: {
-        Args: {
-          p_action: string
-          p_key: string
-          p_max: number
-          p_window_seconds?: number
-        }
-        Returns: boolean
-      }
-      cleanup_old_user_notifications: {
-        Args: { dismissed_after_days?: number; max_age_days?: number }
-        Returns: number
-      }
-      cleanup_rate_limits: { Args: never; Returns: number }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
-      }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
-      purge_expired_copilot_history: { Args: never; Returns: number }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
     }
     Enums: {
