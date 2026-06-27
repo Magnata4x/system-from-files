@@ -1,0 +1,38 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      # Agrupar atualizações por ecossistema para reduzir ruído de PRs
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+      radix:
+        patterns:
+          - "@radix-ui/*"
+      dev-dependencies:
+        dependency-type: development
+    ignore:
+      # Nitro 3.x ainda não tem release estável (dist-tag `latest` é beta);
+      # atualizar manualmente quando o TanStack Start migrar.
+      - dependency-name: "nitro"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
+      - github-actions

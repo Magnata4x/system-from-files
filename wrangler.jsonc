@@ -1,0 +1,62 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tanstack-start-app",
+  "compatibility_date": "2025-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/server.ts",
+
+  // Observabilidade: habilita Workers Logs / Logpush com amostragem total.
+  // head_sampling_rate = 1 → 100% das invocações geram logs estruturados.
+  // Reduzir (ex.: 0.1) se o volume ficar alto demais e gerar custo.
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // Limite de CPU por invocação. Evita runaway (loops infinitos, regex
+  // catastrófica).
+  // FIX DEVOPS-01: 50ms era arriscado para SSR complexo (rotas com múltiplos
+  // server fns + hidratação de contexto). Aumentado para 200ms como baseline
+  // seguro após medir p99 real em staging — reduzir após otimizações de SSR.
+  "limits": {
+    "cpu_ms": 200
+  },
+
+  // Environments separados — cada um vira um Worker distinto no dashboard
+  // do Cloudflare. Use `wrangler deploy --env staging|production`.
+  // Secrets (chaves Supabase, EMAIL_QUEUE_CRON_SECRET etc.) NÃO ficam aqui;
+  // configure-os via `wrangler secret put <NAME> --env <env>`.
+  "env": {
+    "staging": {
+      "name": "signal-radar-staging",
+      "vars": {
+        "NODE_ENV": "staging"
+      },
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1
+      },
+      "limits": {
+        "cpu_ms": 50
+      }
+    },
+    "production": {
+      "name": "signal-radar-prod",
+      "vars": {
+        "NODE_ENV": "production"
+      },
+      // FIX OPS-03: reduzir sampling para 10% em produção (100% em staging).
+      // Com 10k usuários ativos, 100% de sampling gera milhões de log events/dia
+      // e custo elevado de Logpush. 10% cobre análise estatística; erros (4xx/5xx)
+      // são capturados pelo Sentry independentemente do sampling de Workers Logs.
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 0.1
+      },
+      // FIX DEVOPS-01: aumentado para 200ms (ver comentário acima).
+      "limits": {
+        "cpu_ms": 200
+      }
+    }
+  }
+}

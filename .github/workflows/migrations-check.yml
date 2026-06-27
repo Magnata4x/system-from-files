@@ -1,0 +1,16 @@
+name: migrations-check
+on:
+  push:
+    paths:
+      - "supabase/migrations/**"
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+
+jobs:
+  duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect duplicate migration files
+        run: bash scripts/check-duplicate-migrations.sh
