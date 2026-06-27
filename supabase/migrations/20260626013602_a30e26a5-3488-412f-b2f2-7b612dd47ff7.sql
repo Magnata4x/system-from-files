@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.check_rate_limit(uuid, text, integer) FROM authenticated;

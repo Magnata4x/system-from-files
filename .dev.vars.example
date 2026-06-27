@@ -1,0 +1,34 @@
+# =============================================================
+# Signal Radar — variáveis para `wrangler dev` (execução local
+# no runtime workerd, idêntico ao de produção).
+#
+# Copie para `.dev.vars` (NUNCA commitar) e preencha valores reais.
+# Apenas variáveis SERVER-SIDE entram aqui — variáveis com prefixo
+# VITE_ continuam em `.env` (bundle do cliente).
+#
+# Em produção/staging, registre cada uma com:
+#   wrangler secret put <NAME> --env <staging|production>
+# =============================================================
+
+# ----- Supabase (server-side) ---------------------------------
+# Service role key — bypassa RLS, NUNCA exponha no cliente.
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+
+# ----- Lovable / Email ----------------------------------------
+# Chave da API Lovable usada pelo worker para enviar e-mails.
+LOVABLE_API_KEY=<lovable-api-key>
+# Opcional: URL alternativa do endpoint de envio (default = produção).
+LOVABLE_SEND_URL=
+
+# Segredo do cron pg_cron → /lovable/email/queue/process.
+# Gerar: openssl rand -hex 32
+EMAIL_QUEUE_CRON_SECRET=<random-256-bit-hex>
+
+# ----- Cache TTLs (Cloudflare caches.default) -----------------
+CACHE_TTL_PRICES_SECONDS=5
+CACHE_TTL_SIGNALS_SECONDS=10
+CACHE_TTL_SENTIMENT_SECONDS=60
+
+# ----- Ambiente -----------------------------------------------
+# Sobrescrito automaticamente pelos envs do wrangler.jsonc em deploy.
+NODE_ENV=development

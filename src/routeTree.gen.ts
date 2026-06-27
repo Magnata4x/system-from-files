@@ -9,38 +9,423 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSignalsRouteImport } from './routes/_authenticated/signals'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSentimentRouteImport } from './routes/_authenticated/sentiment'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
+import { Route as AuthenticatedManipulationRouteImport } from './routes/_authenticated/manipulation'
+import { Route as AuthenticatedDnaTraderRouteImport } from './routes/_authenticated/dna-trader'
+import { Route as AuthenticatedDnaPairsRouteImport } from './routes/_authenticated/dna-pairs'
+import { Route as AuthenticatedDnaCorrectionsRouteImport } from './routes/_authenticated/dna-corrections'
+import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenticated/diagnostics'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCopyTradingRouteImport } from './routes/_authenticated/copy-trading'
+import { Route as AuthenticatedCalibratorRouteImport } from './routes/_authenticated/calibrator'
+import { Route as AuthenticatedBot4xRouteImport } from './routes/_authenticated/bot4x'
+import { Route as AuthenticatedApiRouteImport } from './routes/_authenticated/api'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
+import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSignalsRoute = AuthenticatedSignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSentimentRoute = AuthenticatedSentimentRouteImport.update({
+  id: '/sentiment',
+  path: '/sentiment',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPricingRoute = AuthenticatedPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMarketplaceRoute =
+  AuthenticatedMarketplaceRouteImport.update({
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedManipulationRoute =
+  AuthenticatedManipulationRouteImport.update({
+    id: '/manipulation',
+    path: '/manipulation',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDnaTraderRoute = AuthenticatedDnaTraderRouteImport.update({
+  id: '/dna-trader',
+  path: '/dna-trader',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDnaPairsRoute = AuthenticatedDnaPairsRouteImport.update({
+  id: '/dna-pairs',
+  path: '/dna-pairs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDnaCorrectionsRoute =
+  AuthenticatedDnaCorrectionsRouteImport.update({
+    id: '/dna-corrections',
+    path: '/dna-corrections',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDiagnosticsRoute =
+  AuthenticatedDiagnosticsRouteImport.update({
+    id: '/diagnostics',
+    path: '/diagnostics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCopyTradingRoute =
+  AuthenticatedCopyTradingRouteImport.update({
+    id: '/copy-trading',
+    path: '/copy-trading',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCalibratorRoute = AuthenticatedCalibratorRouteImport.update({
+  id: '/calibrator',
+  path: '/calibrator',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBot4xRoute = AuthenticatedBot4xRouteImport.update({
+  id: '/bot4x',
+  path: '/bot4x',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedApiRoute = AuthenticatedApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCalibratorHistoryRoute =
+  AuthenticatedCalibratorHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
+    getParentRoute: () => AuthenticatedCalibratorRoute,
+  } as any)
+const AuthenticatedBot4xOnboardingRoute =
+  AuthenticatedBot4xOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedBot4xRoute,
+  } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedCalibratorHistoryIdRoute =
+  AuthenticatedCalibratorHistoryIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedCalibratorHistoryRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/api': typeof AuthenticatedApiRoute
+  '/bot4x': typeof AuthenticatedBot4xRouteWithChildren
+  '/calibrator': typeof AuthenticatedCalibratorRouteWithChildren
+  '/copy-trading': typeof AuthenticatedCopyTradingRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diagnostics': typeof AuthenticatedDiagnosticsRoute
+  '/dna-corrections': typeof AuthenticatedDnaCorrectionsRoute
+  '/dna-pairs': typeof AuthenticatedDnaPairsRoute
+  '/dna-trader': typeof AuthenticatedDnaTraderRoute
+  '/manipulation': typeof AuthenticatedManipulationRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pricing': typeof AuthenticatedPricingRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/sentiment': typeof AuthenticatedSentimentRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/signals': typeof AuthenticatedSignalsRoute
+  '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
+  '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/api': typeof AuthenticatedApiRoute
+  '/bot4x': typeof AuthenticatedBot4xRouteWithChildren
+  '/calibrator': typeof AuthenticatedCalibratorRouteWithChildren
+  '/copy-trading': typeof AuthenticatedCopyTradingRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diagnostics': typeof AuthenticatedDiagnosticsRoute
+  '/dna-corrections': typeof AuthenticatedDnaCorrectionsRoute
+  '/dna-pairs': typeof AuthenticatedDnaPairsRoute
+  '/dna-trader': typeof AuthenticatedDnaTraderRoute
+  '/manipulation': typeof AuthenticatedManipulationRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pricing': typeof AuthenticatedPricingRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/sentiment': typeof AuthenticatedSentimentRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/signals': typeof AuthenticatedSignalsRoute
+  '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
+  '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
+  '/_authenticated/api': typeof AuthenticatedApiRoute
+  '/_authenticated/bot4x': typeof AuthenticatedBot4xRouteWithChildren
+  '/_authenticated/calibrator': typeof AuthenticatedCalibratorRouteWithChildren
+  '/_authenticated/copy-trading': typeof AuthenticatedCopyTradingRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/diagnostics': typeof AuthenticatedDiagnosticsRoute
+  '/_authenticated/dna-corrections': typeof AuthenticatedDnaCorrectionsRoute
+  '/_authenticated/dna-pairs': typeof AuthenticatedDnaPairsRoute
+  '/_authenticated/dna-trader': typeof AuthenticatedDnaTraderRoute
+  '/_authenticated/manipulation': typeof AuthenticatedManipulationRoute
+  '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/pricing': typeof AuthenticatedPricingRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/sentiment': typeof AuthenticatedSentimentRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/signals': typeof AuthenticatedSignalsRoute
+  '/_authenticated/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
+  '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/privacy'
+    | '/reset-password'
+    | '/terms'
+    | '/admin'
+    | '/alerts'
+    | '/api'
+    | '/bot4x'
+    | '/calibrator'
+    | '/copy-trading'
+    | '/dashboard'
+    | '/diagnostics'
+    | '/dna-corrections'
+    | '/dna-pairs'
+    | '/dna-trader'
+    | '/manipulation'
+    | '/marketplace'
+    | '/onboarding'
+    | '/pricing'
+    | '/profile'
+    | '/sentiment'
+    | '/settings'
+    | '/signals'
+    | '/bot4x/onboarding'
+    | '/calibrator/history'
+    | '/calibrator/history/$id'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/privacy'
+    | '/reset-password'
+    | '/terms'
+    | '/admin'
+    | '/alerts'
+    | '/api'
+    | '/bot4x'
+    | '/calibrator'
+    | '/copy-trading'
+    | '/dashboard'
+    | '/diagnostics'
+    | '/dna-corrections'
+    | '/dna-pairs'
+    | '/dna-trader'
+    | '/manipulation'
+    | '/marketplace'
+    | '/onboarding'
+    | '/pricing'
+    | '/profile'
+    | '/sentiment'
+    | '/settings'
+    | '/signals'
+    | '/bot4x/onboarding'
+    | '/calibrator/history'
+    | '/calibrator/history/$id'
+    | '/lovable/email/queue/process'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/privacy'
+    | '/reset-password'
+    | '/terms'
+    | '/_authenticated/admin'
+    | '/_authenticated/alerts'
+    | '/_authenticated/api'
+    | '/_authenticated/bot4x'
+    | '/_authenticated/calibrator'
+    | '/_authenticated/copy-trading'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/diagnostics'
+    | '/_authenticated/dna-corrections'
+    | '/_authenticated/dna-pairs'
+    | '/_authenticated/dna-trader'
+    | '/_authenticated/manipulation'
+    | '/_authenticated/marketplace'
+    | '/_authenticated/onboarding'
+    | '/_authenticated/pricing'
+    | '/_authenticated/profile'
+    | '/_authenticated/sentiment'
+    | '/_authenticated/settings'
+    | '/_authenticated/signals'
+    | '/_authenticated/bot4x/onboarding'
+    | '/_authenticated/calibrator/history'
+    | '/_authenticated/calibrator/history/$id'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +433,268 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/signals': {
+      id: '/_authenticated/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof AuthenticatedSignalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sentiment': {
+      id: '/_authenticated/sentiment'
+      path: '/sentiment'
+      fullPath: '/sentiment'
+      preLoaderRoute: typeof AuthenticatedSentimentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pricing': {
+      id: '/_authenticated/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof AuthenticatedPricingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/manipulation': {
+      id: '/_authenticated/manipulation'
+      path: '/manipulation'
+      fullPath: '/manipulation'
+      preLoaderRoute: typeof AuthenticatedManipulationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-trader': {
+      id: '/_authenticated/dna-trader'
+      path: '/dna-trader'
+      fullPath: '/dna-trader'
+      preLoaderRoute: typeof AuthenticatedDnaTraderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-pairs': {
+      id: '/_authenticated/dna-pairs'
+      path: '/dna-pairs'
+      fullPath: '/dna-pairs'
+      preLoaderRoute: typeof AuthenticatedDnaPairsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-corrections': {
+      id: '/_authenticated/dna-corrections'
+      path: '/dna-corrections'
+      fullPath: '/dna-corrections'
+      preLoaderRoute: typeof AuthenticatedDnaCorrectionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/diagnostics': {
+      id: '/_authenticated/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/diagnostics'
+      preLoaderRoute: typeof AuthenticatedDiagnosticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/copy-trading': {
+      id: '/_authenticated/copy-trading'
+      path: '/copy-trading'
+      fullPath: '/copy-trading'
+      preLoaderRoute: typeof AuthenticatedCopyTradingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calibrator': {
+      id: '/_authenticated/calibrator'
+      path: '/calibrator'
+      fullPath: '/calibrator'
+      preLoaderRoute: typeof AuthenticatedCalibratorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bot4x': {
+      id: '/_authenticated/bot4x'
+      path: '/bot4x'
+      fullPath: '/bot4x'
+      preLoaderRoute: typeof AuthenticatedBot4xRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/api': {
+      id: '/_authenticated/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof AuthenticatedApiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calibrator/history': {
+      id: '/_authenticated/calibrator/history'
+      path: '/history'
+      fullPath: '/calibrator/history'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryRouteImport
+      parentRoute: typeof AuthenticatedCalibratorRoute
+    }
+    '/_authenticated/bot4x/onboarding': {
+      id: '/_authenticated/bot4x/onboarding'
+      path: '/onboarding'
+      fullPath: '/bot4x/onboarding'
+      preLoaderRoute: typeof AuthenticatedBot4xOnboardingRouteImport
+      parentRoute: typeof AuthenticatedBot4xRoute
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/calibrator/history/$id': {
+      id: '/_authenticated/calibrator/history/$id'
+      path: '/$id'
+      fullPath: '/calibrator/history/$id'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryIdRouteImport
+      parentRoute: typeof AuthenticatedCalibratorHistoryRoute
+    }
   }
 }
 
+interface AuthenticatedBot4xRouteChildren {
+  AuthenticatedBot4xOnboardingRoute: typeof AuthenticatedBot4xOnboardingRoute
+}
+
+const AuthenticatedBot4xRouteChildren: AuthenticatedBot4xRouteChildren = {
+  AuthenticatedBot4xOnboardingRoute: AuthenticatedBot4xOnboardingRoute,
+}
+
+const AuthenticatedBot4xRouteWithChildren =
+  AuthenticatedBot4xRoute._addFileChildren(AuthenticatedBot4xRouteChildren)
+
+interface AuthenticatedCalibratorHistoryRouteChildren {
+  AuthenticatedCalibratorHistoryIdRoute: typeof AuthenticatedCalibratorHistoryIdRoute
+}
+
+const AuthenticatedCalibratorHistoryRouteChildren: AuthenticatedCalibratorHistoryRouteChildren =
+  {
+    AuthenticatedCalibratorHistoryIdRoute:
+      AuthenticatedCalibratorHistoryIdRoute,
+  }
+
+const AuthenticatedCalibratorHistoryRouteWithChildren =
+  AuthenticatedCalibratorHistoryRoute._addFileChildren(
+    AuthenticatedCalibratorHistoryRouteChildren,
+  )
+
+interface AuthenticatedCalibratorRouteChildren {
+  AuthenticatedCalibratorHistoryRoute: typeof AuthenticatedCalibratorHistoryRouteWithChildren
+}
+
+const AuthenticatedCalibratorRouteChildren: AuthenticatedCalibratorRouteChildren =
+  {
+    AuthenticatedCalibratorHistoryRoute:
+      AuthenticatedCalibratorHistoryRouteWithChildren,
+  }
+
+const AuthenticatedCalibratorRouteWithChildren =
+  AuthenticatedCalibratorRoute._addFileChildren(
+    AuthenticatedCalibratorRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
+  AuthenticatedApiRoute: typeof AuthenticatedApiRoute
+  AuthenticatedBot4xRoute: typeof AuthenticatedBot4xRouteWithChildren
+  AuthenticatedCalibratorRoute: typeof AuthenticatedCalibratorRouteWithChildren
+  AuthenticatedCopyTradingRoute: typeof AuthenticatedCopyTradingRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiagnosticsRoute: typeof AuthenticatedDiagnosticsRoute
+  AuthenticatedDnaCorrectionsRoute: typeof AuthenticatedDnaCorrectionsRoute
+  AuthenticatedDnaPairsRoute: typeof AuthenticatedDnaPairsRoute
+  AuthenticatedDnaTraderRoute: typeof AuthenticatedDnaTraderRoute
+  AuthenticatedManipulationRoute: typeof AuthenticatedManipulationRoute
+  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSentimentRoute: typeof AuthenticatedSentimentRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSignalsRoute: typeof AuthenticatedSignalsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
+  AuthenticatedApiRoute: AuthenticatedApiRoute,
+  AuthenticatedBot4xRoute: AuthenticatedBot4xRouteWithChildren,
+  AuthenticatedCalibratorRoute: AuthenticatedCalibratorRouteWithChildren,
+  AuthenticatedCopyTradingRoute: AuthenticatedCopyTradingRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiagnosticsRoute: AuthenticatedDiagnosticsRoute,
+  AuthenticatedDnaCorrectionsRoute: AuthenticatedDnaCorrectionsRoute,
+  AuthenticatedDnaPairsRoute: AuthenticatedDnaPairsRoute,
+  AuthenticatedDnaTraderRoute: AuthenticatedDnaTraderRoute,
+  AuthenticatedManipulationRoute: AuthenticatedManipulationRoute,
+  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPricingRoute: AuthenticatedPricingRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSentimentRoute: AuthenticatedSentimentRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSignalsRoute: AuthenticatedSignalsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

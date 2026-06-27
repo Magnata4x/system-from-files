@@ -1,0 +1,55 @@
+name: dependency-audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 9 * * 1' # toda segunda às 9h UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run npm audit (moderate+)
+        # Permite o job continuar se houver advisories — falha apenas em high/critical.
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Fail on high/critical vulnerabilities
+        run: npm audit --audit-level=high
+
+      # Bloqueia novas dependências de produção pinadas em pre-release
+      # (-alpha / -beta / -rc / -canary). Estas versões podem introduzir
+      # breaking changes silenciosos e não têm suporte de incidente.
+      #
+      # Allowlist (documentar SEMPRE o motivo em package.json via chave `//<dep>`):
+      #   - nitro: upstream publica apenas builds beta date-stamped no
+      #     dist-tag `latest`; o peerDependency de @lovable.dev/vite-tanstack-config
+      #     exige `>=3.0.260603-beta`, que o único release não-beta (3.0.0)
+      #     não satisfaz. Ver chave `//nitro` em package.json.
+      - name: Check for pre-release production dependencies
+        run: |
+          node -e "
+            const pkg = require('./package.json');
+            const ALLOW = new Set(['nitro']);
+            const preRelease = Object.entries(pkg.dependencies || {})
+              .filter(([name, v]) => !ALLOW.has(name) && /-(alpha|beta|rc|canary)(\.|$|\d)/i.test(v));
+            if (preRelease.length) {
+              console.error('Pre-release deps in production (not in allowlist):');
+              for (const [n, v] of preRelease) console.error('  ' + n + ': ' + v);
+              console.error('Either upgrade to a stable release or add to ALLOW with a documented reason in package.json (//<dep> key).');
+              process.exit(1);
+            }
+            console.log('OK: no disallowed pre-release production dependencies.');
+          "
