@@ -163,7 +163,7 @@ function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, lever
   };
 }
 
-let wsUnsub: (() => void) | null = null;
+let wsUnsubs: Array<() => void> = [];
 
 // ─── STORE ────────────────────────────────────────────────────────────────────
 
@@ -407,43 +407,52 @@ export const useBot4xStore = create<State>()(
             errorMsg: null,
           });
 
-          wsUnsub = backendWs.on("bot4x:update", (raw) => {
-            const event = raw as { type: string; [k: string]: unknown };
-            switch (event.type) {
-              case "EXECUTION": {
-                const ex = event.execution as BackendBot4xExecution;
-                const s = get();
-                const trade = executionToTrade(ex, s.profile, s.leverage);
-                set((prev) => ({
-                  history: [trade, ...prev.history].slice(0, 500),
-                }));
-                // REAL mode: persist via outbox to survive replication failures.
-                if (s.userId) {
-                  void saveTradeWithOutbox(s.userId, trade).catch((err) =>
-                    logger.error("[Bot4x] saveTradeWithOutbox failed", { error: err, tradeId: trade.id }),
-                  );
-                }
-                break;
+          // Backend real emite eventos separados em vez de um único "bot4x:update".
+          // Namespace /bot4x: shutdown (circuit breaker) e profit_lock (trava de lucro).
+          // Namespace /signals: bot4x:status (atualização geral do bot).
+          void backendWs.connect("/bot4x");
+          const offShutdown = backendWs.on("bot4x:shutdown", (raw) => {
+            const ev = (raw ?? {}) as { userId?: string; reason?: string };
+            set({
+              status: "STOPPED",
+              circuitBreaker: "emergency",
+              errorMsg: ev.reason ?? null,
+            });
+          });
+          const offProfitLock = backendWs.on("bot4x:profit_lock", (raw) => {
+            const ev = (raw ?? {}) as { userId?: string; pnlPct?: number; message?: string };
+            set({
+              circuitBreaker: "profitLock",
+              dailyPnlPct: typeof ev.pnlPct === "number" ? ev.pnlPct : get().dailyPnlPct,
+              errorMsg: ev.message ?? null,
+            });
+          });
+          void backendWs.connect("/signals");
+          const offStatus = backendWs.on("bot4x:status", (raw) => {
+            const ev = (raw ?? {}) as {
+              userId?: string;
+              status?: State["status"];
+              dailyPnL?: number;
+              circuitBreaker?: State["circuitBreaker"];
+              execution?: BackendBot4xExecution;
+            };
+            const patch: Partial<State> = {};
+            if (ev.status) patch.status = ev.status;
+            if (typeof ev.dailyPnL === "number") patch.dailyPnlPct = ev.dailyPnL;
+            if (ev.circuitBreaker) patch.circuitBreaker = ev.circuitBreaker;
+            if (Object.keys(patch).length > 0) set(patch as State);
+            if (ev.execution) {
+              const s = get();
+              const trade = executionToTrade(ev.execution, s.profile, s.leverage);
+              set((prev) => ({ history: [trade, ...prev.history].slice(0, 500) }));
+              if (s.userId) {
+                void saveTradeWithOutbox(s.userId, trade).catch((err) =>
+                  logger.error("[Bot4x] saveTradeWithOutbox failed", { error: err, tradeId: trade.id }),
+                );
               }
-              case "CIRCUIT_BREAKER": {
-                set({
-                  status: "STOPPED",
-                  circuitBreaker: (event.reason as State["circuitBreaker"]) ?? "emergency",
-                });
-                break;
-              }
-              case "STATUS": {
-                set({ status: event.status as State["status"] });
-                break;
-              }
-              case "CAPITAL_UPDATE": {
-                set({ dailyPnlPct: (event.dailyPnL as number) ?? 0 });
-                break;
-              }
-              default:
-                break;
             }
           });
+          wsUnsubs = [offShutdown, offProfitLock, offStatus];
         } catch (err) {
           logger.error("[Bot4x] init real failed", { error: err });
           set({
@@ -458,9 +467,9 @@ export const useBot4xStore = create<State>()(
       cleanup: () => {
         const t = get()._ticker;
         if (t) clearInterval(t);
-        if (wsUnsub) {
-          wsUnsub();
-          wsUnsub = null;
+        if (wsUnsubs.length > 0) {
+          wsUnsubs.forEach((fn) => fn());
+          wsUnsubs = [];
         }
         set({ _ticker: undefined });
       },

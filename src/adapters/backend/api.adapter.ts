@@ -16,8 +16,9 @@ export const endpoints = {
     profile: (userId: string) => `/dna/profile/${userId}`,
   },
   bot4x: {
-    config: (userId: string) => `/bot4x/config/${userId}`,
-    updateConfig: (userId: string) => `/bot4x/config/${userId}`,
+    // Backend identifica o usuário pelo JWT — sem userId no path.
+    config: "/bot4x/config",
+    updateConfig: "/bot4x/config",
     executions: "/bot4x/executions",
     start: "/bot4x/start",
     stop: "/bot4x/stop",
@@ -39,7 +40,8 @@ export const endpoints = {
   calibrator: {
     state: (userId: string) => `/calibrator/state/${userId}`,
     feedback: (userId: string) => `/calibrator/feedback/${userId}`,
-    simulate: (userId: string) => `/calibrator/simulate/${userId}`,
+    // /simulate foi descontinuado; o backend responde apenas em /run.
+    simulate: (userId: string) => `/calibrator/run/${userId}`,
   },
 } as const;
 
