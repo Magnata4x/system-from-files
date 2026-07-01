@@ -1,15 +1,15 @@
 // Hook de leitura do estado do Bot4x Calibration Engine (BCE).
 // - Fetch inicial via REST (calibratorAdapter.getState)
-// - Atualização contínua via WS no canal 'calibrator:state'
-// Não renderiza nada; apenas expõe o estado para componentes consumirem.
+// - Atualização por polling a cada 15s (o backend não tem gateway WS
+//   para 'calibrator:state').
 import { useEffect, useRef, useState } from "react";
-import { backendWs, type WsStatus } from "@/adapters/backend/ws-client";
 import {
   calibratorAdapter,
-  mapCalibratorState,
-  type BackendCalibratorPayload,
   type CalibratorStateUI,
 } from "@/adapters/backend/calibrator.adapter";
+
+export type WsStatus = "idle" | "connecting" | "open" | "closed" | "unauthenticated" | "error";
+const POLL_INTERVAL_MS = 15_000;
 
 export interface UseCalibratorStateResult {
   data: CalibratorStateUI | null;
@@ -22,7 +22,7 @@ export interface UseCalibratorStateResult {
 export function useCalibratorState(userId: string | undefined): UseCalibratorStateResult {
   const [data, setData] = useState<CalibratorStateUI | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [wsStatus, setWsStatus] = useState<WsStatus>(backendWs.getStatus());
+  const [wsStatus, setWsStatus] = useState<WsStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
   const mountedRef = useRef(true);
 
@@ -44,29 +44,15 @@ export function useCalibratorState(userId: string | undefined): UseCalibratorSta
     mountedRef.current = true;
     if (!userId) return;
 
+    setWsStatus("open");
     refetch();
-
-    const offStatus = backendWs.onStatus((s) => {
-      if (mountedRef.current) setWsStatus(s);
-    });
-
-    const offMsg = backendWs.on("calibrator:state", (payload) => {
-      if (!payload || typeof payload !== "object") return;
-      try {
-        const mapped = mapCalibratorState(payload as BackendCalibratorPayload);
-        if (mountedRef.current) setData(mapped);
-      } catch {
-        /* ignore malformed payload */
-      }
-    });
-
-    // Garante conexão (no-op se já conectado)
-    backendWs.connect("/copilot");
+    const pollId = window.setInterval(() => {
+      refetch();
+    }, POLL_INTERVAL_MS);
 
     return () => {
       mountedRef.current = false;
-      offStatus();
-      offMsg();
+      clearInterval(pollId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
