@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { AlertBanner } from "@/components/manipulation/alert-banner";
@@ -10,8 +10,13 @@ import { SmartMoney } from "@/components/manipulation/smart-money";
 import { LiquidityMap } from "@/components/manipulation/liquidity-map";
 import { AggressionAnalysis } from "@/components/manipulation/aggression-analysis";
 import { HistoricalLog } from "@/components/manipulation/historical-log";
-import { ALERTS as MOCK_ALERTS } from "@/lib/manipulation-data";
-import { manipulationAdapter } from "@/adapters/backend/manipulation.adapter";
+import { ALERTS as MOCK_ALERTS, type Alert } from "@/lib/manipulation-data";
+import {
+  manipulationAdapter,
+  mapAlert,
+  type BackendManipulationAlert,
+} from "@/adapters/backend/manipulation.adapter";
+import { backendWs } from "@/adapters/backend/ws-client";
 
 export const Route = createFileRoute("/_authenticated/manipulation")({
   head: () => ({
@@ -25,13 +30,31 @@ export const Route = createFileRoute("/_authenticated/manipulation")({
 
 function ManipulationPage() {
   const [dismissed, setDismissed] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: liveAlerts } = useQuery({
     queryKey: ["manipulation-alerts"],
-    queryFn: () => manipulationAdapter.getAlerts(20),
+    queryFn: () => manipulationAdapter.getAlerts({ limit: 20 }),
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
+
+  // Realtime: novos alertas chegam pelo mesmo socket dos sinais (namespace /signals).
+  useEffect(() => {
+    void backendWs.connect("/signals");
+    const off = backendWs.on("manipulation:alert", (payload) => {
+      const raw = payload as BackendManipulationAlert;
+      if (!raw?.id) return;
+      const mapped = mapAlert(raw);
+      queryClient.setQueryData<Alert[]>(["manipulation-alerts"], (prev) => {
+        const list = prev ?? [];
+        return [mapped, ...list.filter((a) => a.id !== mapped.id)].slice(0, 50);
+      });
+    });
+    return () => {
+      off();
+    };
+  }, [queryClient]);
 
   const alerts = liveAlerts?.length ? liveAlerts : MOCK_ALERTS;
   const activeAssets = Array.from(new Set(alerts.map((a) => a.asset)));
