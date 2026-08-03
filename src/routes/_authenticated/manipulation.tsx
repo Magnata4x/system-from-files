@@ -73,7 +73,7 @@ function ManipulationPage() {
     refetchInterval: 60_000,
     retry: 1,
     // Mantém a lista anterior enquanto novos filtros/limit carregam (sem "pular" o scroll).
-    placeholderData: (prev) => prev,
+    placeholderData: (prev: Alert[] | undefined) => prev,
   });
 
   const snapshotPair = symbol || "BTCUSDT";
