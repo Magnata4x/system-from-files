@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, retainSearchParams } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
@@ -47,10 +47,16 @@ function ManipulationPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const queryClient = useQueryClient();
 
-  const setFilters = (patch: Partial<ManipulationSearch>) =>
-    navigate({
-      search: (prev: ManipulationSearch): ManipulationSearch => ({ ...prev, ...patch }),
-    });
+  const setFilters = useCallback(
+    (patch: Partial<ManipulationSearch>, replace = false) =>
+      navigate({
+        search: (prev: ManipulationSearch): ManipulationSearch => ({ ...prev, ...patch }),
+        replace,
+        // Não rolar para o topo ao paginar/filtrar — preserva a posição atual.
+        resetScroll: false,
+      }),
+    [navigate],
+  );
 
   const alertsKey = useMemo(
     () => ["manipulation-alerts", symbol, riskLevel, limit] as const,
