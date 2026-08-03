@@ -70,23 +70,16 @@ export const manipulationAdapter = {
     if (opts.symbol) params.set("symbol", opts.symbol);
     if (opts.riskLevel) params.set("riskLevel", opts.riskLevel);
     params.set("limit", String(opts.limit ?? 20));
-    try {
-      const data = await api.get<BackendManipulationAlert[]>(
-        `/manipulation/alerts?${params.toString()}`,
-      );
-      return (data ?? []).map(mapAlert);
-    } catch {
-      return [];
-    }
+    // Erros propagam para o React Query renderizar o estado de erro na UI.
+    const data = await api.get<BackendManipulationAlert[]>(
+      `/manipulation/alerts?${params.toString()}`,
+    );
+    return (data ?? []).map(mapAlert);
   },
 
   async getSnapshot(pair: string): Promise<BackendManipulationSnapshot | null> {
-    try {
-      return await api.get<BackendManipulationSnapshot>(
-        `/manipulation/snapshot/${pair}`,
-      );
-    } catch {
-      return null;
-    }
+    return await api.get<BackendManipulationSnapshot>(
+      `/manipulation/snapshot/${encodeURIComponent(pair)}`,
+    );
   },
 };
