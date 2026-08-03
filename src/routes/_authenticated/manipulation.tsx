@@ -48,7 +48,9 @@ function ManipulationPage() {
   const queryClient = useQueryClient();
 
   const setFilters = (patch: Partial<ManipulationSearch>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({
+      search: (prev: ManipulationSearch): ManipulationSearch => ({ ...prev, ...patch }),
+    });
 
   const alertsKey = useMemo(
     () => ["manipulation-alerts", symbol, riskLevel, limit] as const,
