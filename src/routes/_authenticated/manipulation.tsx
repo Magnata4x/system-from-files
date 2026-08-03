@@ -126,6 +126,27 @@ function ManipulationPage() {
   const activeAssets = Array.from(new Set(alerts.map((a) => a.asset)));
   const canLoadMore = hasBackendAlerts && liveAlerts!.length >= limit && limit < 200;
 
+  const loadMore = useCallback(() => {
+    const next = Math.min(200, PAGE_SIZES.find((n) => n > limit) ?? limit * 2);
+    if (next !== limit) setFilters({ limit: next }, true);
+  }, [limit, setFilters]);
+
+  // Infinite scroll: sentinela no fim da lista dispara o próximo "page size".
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !canLoadMore || alertsFetching) return;
+    if (typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) loadMore();
+      },
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [canLoadMore, alertsFetching, loadMore]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <TopBar />
@@ -251,22 +272,20 @@ function ManipulationPage() {
               ) : (
                 <>
                   <AlertsFeed alerts={alerts} />
-                  {canLoadMore && (
+                  <div ref={sentinelRef} aria-hidden className="h-px" />
+                  {canLoadMore ? (
                     <button
-                      onClick={() =>
-                        setFilters({
-                          limit: Math.min(
-                            200,
-                            PAGE_SIZES.find((n) => n > limit) ?? limit * 2,
-                          ),
-                        })
-                      }
+                      onClick={loadMore}
                       disabled={alertsFetching}
                       className="w-full h-10 rounded-lg border border-border text-xs text-muted-foreground hover:bg-foreground/5 disabled:opacity-50"
                     >
                       {alertsFetching ? "Carregando…" : "Carregar mais alertas"}
                     </button>
-                  )}
+                  ) : hasBackendAlerts ? (
+                    <p className="text-center text-[11px] text-muted-foreground py-2">
+                      Fim da lista de alertas.
+                    </p>
+                  ) : null}
                 </>
               )}
             </div>
