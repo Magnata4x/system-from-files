@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, retainSearchParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { TopBar } from "@/components/dashboard/top-bar";
@@ -18,7 +18,20 @@ import {
 } from "@/adapters/backend/manipulation.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 
+const PAGE_SIZES = [10, 20, 50, 100];
+
+type ManipulationSearch = { symbol: string; riskLevel: string; limit: number };
+
 export const Route = createFileRoute("/_authenticated/manipulation")({
+  validateSearch: (search: Record<string, unknown>): ManipulationSearch => {
+    const rawLimit = Number(search["limit"]);
+    return {
+      symbol: typeof search["symbol"] === "string" ? search["symbol"].toUpperCase() : "",
+      riskLevel: typeof search["riskLevel"] === "string" ? search["riskLevel"].toUpperCase() : "",
+      limit: Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(Math.floor(rawLimit), 200) : 20,
+    };
+  },
+  search: { middlewares: [retainSearchParams(["symbol", "riskLevel", "limit"])] },
   head: () => ({
     meta: [
       { title: "Manipulation Radar — AISignalRadar" },
@@ -30,17 +43,27 @@ export const Route = createFileRoute("/_authenticated/manipulation")({
 
 function ManipulationPage() {
   const [dismissed, setDismissed] = useState(false);
-  const [symbol, setSymbol] = useState<string>("");
-  const [riskLevel, setRiskLevel] = useState<string>("");
-  const [limit, setLimit] = useState<number>(20);
+  const { symbol, riskLevel, limit } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
   const queryClient = useQueryClient();
+
+  const setFilters = (patch: Partial<ManipulationSearch>) =>
+    navigate({
+      search: (prev: ManipulationSearch): ManipulationSearch => ({ ...prev, ...patch }),
+    });
 
   const alertsKey = useMemo(
     () => ["manipulation-alerts", symbol, riskLevel, limit] as const,
     [symbol, riskLevel, limit],
   );
 
-  const { data: liveAlerts } = useQuery({
+  const {
+    data: liveAlerts,
+    isPending: alertsPending,
+    isFetching: alertsFetching,
+    error: alertsError,
+    refetch: refetchAlerts,
+  } = useQuery({
     queryKey: alertsKey,
     queryFn: () =>
       manipulationAdapter.getAlerts({
@@ -50,14 +73,23 @@ function ManipulationPage() {
       }),
     staleTime: 30_000,
     refetchInterval: 60_000,
+    retry: 1,
+    // Mantém a lista anterior enquanto novos filtros/limit carregam (sem "pular" o scroll).
+    placeholderData: (prev: Alert[] | undefined) => prev,
   });
 
   const snapshotPair = symbol || "BTCUSDT";
-  const { data: snapshot } = useQuery({
+  const {
+    data: snapshot,
+    error: snapshotError,
+    isPending: snapshotPending,
+    refetch: refetchSnapshot,
+  } = useQuery({
     queryKey: ["manipulation-snapshot", snapshotPair],
     queryFn: () => manipulationAdapter.getSnapshot(snapshotPair),
     staleTime: 30_000,
     refetchInterval: 60_000,
+    retry: 1,
   });
 
   // Realtime: novos alertas chegam pelo mesmo socket dos sinais (namespace /signals).
@@ -82,8 +114,11 @@ function ManipulationPage() {
     };
   }, [queryClient, alertsKey, symbol, riskLevel, limit]);
 
-  const alerts = liveAlerts?.length ? liveAlerts : MOCK_ALERTS;
+  const hasBackendAlerts = Boolean(liveAlerts && liveAlerts.length > 0);
+  const isEmpty = Boolean(liveAlerts && liveAlerts.length === 0);
+  const alerts = hasBackendAlerts ? liveAlerts! : alertsError || isEmpty ? [] : MOCK_ALERTS;
   const activeAssets = Array.from(new Set(alerts.map((a) => a.asset)));
+  const canLoadMore = hasBackendAlerts && liveAlerts!.length >= limit && limit < 200;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -98,7 +133,7 @@ function ManipulationPage() {
             </p>
           </header>
 
-          {!dismissed && (
+          {!dismissed && alerts.length > 0 && (
             <AlertBanner count={alerts.length} assets={activeAssets} onDismiss={() => setDismissed(true)} />
           )}
 
@@ -107,7 +142,7 @@ function ManipulationPage() {
               Symbol
               <input
                 value={symbol}
-                onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                onChange={(e) => setFilters({ symbol: e.target.value.toUpperCase() })}
                 placeholder="BTCUSDT"
                 className="h-9 w-40 rounded-md border border-border bg-background px-2 text-sm text-foreground normal-case tracking-normal"
               />
@@ -116,7 +151,7 @@ function ManipulationPage() {
               Risk level
               <select
                 value={riskLevel}
-                onChange={(e) => setRiskLevel(e.target.value)}
+                onChange={(e) => setFilters({ riskLevel: e.target.value })}
                 className="h-9 w-36 rounded-md border border-border bg-background px-2 text-sm text-foreground normal-case tracking-normal"
               >
                 <option value="">All</option>
@@ -129,10 +164,10 @@ function ManipulationPage() {
               Limit
               <select
                 value={String(limit)}
-                onChange={(e) => setLimit(Number(e.target.value))}
+                onChange={(e) => setFilters({ limit: Number(e.target.value) })}
                 className="h-9 w-28 rounded-md border border-border bg-background px-2 text-sm text-foreground normal-case tracking-normal"
               >
-                {[10, 20, 50, 100].map((n) => (
+                {PAGE_SIZES.map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>
@@ -141,19 +176,26 @@ function ManipulationPage() {
             </label>
             {(symbol || riskLevel || limit !== 20) && (
               <button
-                onClick={() => {
-                  setSymbol("");
-                  setRiskLevel("");
-                  setLimit(20);
-                }}
+                onClick={() => setFilters({ symbol: "", riskLevel: "", limit: 20 })}
                 className="h-9 rounded-md border border-border px-3 text-xs text-muted-foreground hover:bg-foreground/5"
               >
                 Reset
               </button>
             )}
+            {alertsFetching && !alertsPending && (
+              <span className="text-[11px] text-muted-foreground">Atualizando…</span>
+            )}
           </div>
 
-          {snapshot && (
+          {snapshotError ? (
+            <ErrorPanel
+              title={`Não foi possível carregar o snapshot de ${snapshotPair}`}
+              message={(snapshotError as Error).message}
+              onRetry={() => void refetchSnapshot()}
+            />
+          ) : !snapshotPending && !snapshot ? (
+            <EmptyPanel message={`Sem snapshot disponível para ${snapshotPair}.`} />
+          ) : snapshot ? (
             <div className="rounded-xl border border-border bg-card/40 p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
@@ -180,13 +222,47 @@ function ManipulationPage() {
                 />
               </div>
             </div>
-          )}
+          ) : null}
 
           <InstitutionalHeatmap />
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3">
-              <AlertsFeed alerts={alerts} />
+            <div className="lg:col-span-3 space-y-3">
+              {alertsError ? (
+                <ErrorPanel
+                  title="Não foi possível carregar os alertas"
+                  message={(alertsError as Error).message}
+                  onRetry={() => void refetchAlerts()}
+                />
+              ) : isEmpty ? (
+                <EmptyPanel
+                  message={
+                    symbol || riskLevel
+                      ? "Nenhum alerta encontrado para os filtros aplicados."
+                      : "Nenhum alerta de manipulação no momento."
+                  }
+                />
+              ) : (
+                <>
+                  <AlertsFeed alerts={alerts} />
+                  {canLoadMore && (
+                    <button
+                      onClick={() =>
+                        setFilters({
+                          limit: Math.min(
+                            200,
+                            PAGE_SIZES.find((n) => n > limit) ?? limit * 2,
+                          ),
+                        })
+                      }
+                      disabled={alertsFetching}
+                      className="w-full h-10 rounded-lg border border-border text-xs text-muted-foreground hover:bg-foreground/5 disabled:opacity-50"
+                    >
+                      {alertsFetching ? "Carregando…" : "Carregar mais alertas"}
+                    </button>
+                  )}
+                </>
+              )}
             </div>
             <div className="lg:col-span-2">
               <SmartMoney />
@@ -210,6 +286,37 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg border border-border/60 bg-background/40 p-3">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="text-sm font-semibold mt-1 truncate">{value}</div>
+    </div>
+  );
+}
+
+function ErrorPanel({
+  title,
+  message,
+  onRetry,
+}: {
+  title: string;
+  message?: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4">
+      <div className="text-sm font-semibold text-destructive">{title}</div>
+      {message && <p className="text-xs text-muted-foreground mt-1 break-words">{message}</p>}
+      <button
+        onClick={onRetry}
+        className="mt-3 h-8 rounded-md border border-border px-3 text-xs hover:bg-foreground/5"
+      >
+        Tentar novamente
+      </button>
+    </div>
+  );
+}
+
+function EmptyPanel({ message }: { message: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-border bg-card/20 p-8 text-center">
+      <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );
 }
