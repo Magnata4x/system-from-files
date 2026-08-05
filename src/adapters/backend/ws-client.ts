@@ -66,9 +66,9 @@ export class BackendWsClient {
     if (this.socket && this.socket.readyState <= 1) return this.status;
     if (this.connecting) return this.status;
 
-    // CORREÇÃO: sem URL configurada em produção, não tentar conectar
+    // Sem URL configurada: backend interno usa polling, não WebSocket.
     if (!WS_URL) {
-      this.setStatus("error");
+      this.setStatus("closed");
       return this.status;
     }
 
