@@ -29,8 +29,8 @@ function stableId(pair: string, bucket: number): string {
 }
 
 export async function generateSignals(): Promise<BackendSignal[]> {
-  const results = await Promise.all(
-    TARGET_PAIRS.map(async (pair) => {
+  const results = await Promise.all<BackendSignal | null>(
+    TARGET_PAIRS.map(async (pair): Promise<BackendSignal | null> => {
       try {
         const [regime, candles] = await Promise.all([
           getMarketRegime(pair),
