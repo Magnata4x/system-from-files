@@ -41,6 +41,7 @@ import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
+import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
@@ -50,7 +51,11 @@ import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
 import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/manipulation/snapshot.$pair'
 import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
+import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
+import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
+import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -217,6 +222,11 @@ const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
   path: '/api/market-regime/current',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiManipulationAlertsRoute = ApiManipulationAlertsRouteImport.update({
+  id: '/api/manipulation/alerts',
+  path: '/api/manipulation/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
   id: '/api/copilot/history',
   path: '/api/copilot/history',
@@ -265,11 +275,34 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiManipulationSnapshotPairRoute =
+  ApiManipulationSnapshotPairRouteImport.update({
+    id: '/api/manipulation/snapshot/$pair',
+    path: '/api/manipulation/snapshot/$pair',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDnaProfileUserIdRoute = ApiDnaProfileUserIdRouteImport.update({
   id: '/api/dna/profile/$userId',
   path: '/api/dna/profile/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCalibratorStateUserIdRoute =
+  ApiCalibratorStateUserIdRouteImport.update({
+    id: '/api/calibrator/state/$userId',
+    path: '/api/calibrator/state/$userId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCalibratorRunUserIdRoute = ApiCalibratorRunUserIdRouteImport.update({
+  id: '/api/calibrator/run/$userId',
+  path: '/api/calibrator/run/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCalibratorFeedbackUserIdRoute =
+  ApiCalibratorFeedbackUserIdRouteImport.update({
+    id: '/api/calibrator/feedback/$userId',
+    path: '/api/calibrator/feedback/$userId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedCalibratorHistoryIdRoute =
   AuthenticatedCalibratorHistoryIdRouteImport.update({
     id: '/$id',
@@ -310,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -318,7 +352,11 @@ export interface FileRoutesByFullPath {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
+  '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
+  '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
@@ -354,6 +392,7 @@ export interface FileRoutesByTo {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -362,7 +401,11 @@ export interface FileRoutesByTo {
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
+  '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
+  '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -400,6 +443,7 @@ export interface FileRoutesById {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -408,7 +452,11 @@ export interface FileRoutesById {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
+  '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
+  '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -446,6 +494,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/copilot/history'
+    | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -454,7 +503,11 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/calibrator/history/$id'
+    | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/run/$userId'
+    | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
+    | '/api/manipulation/snapshot/$pair'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -490,6 +543,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/copilot/history'
+    | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -498,7 +552,11 @@ export interface FileRouteTypes {
     | '/api/prices'
     | '/api/signals'
     | '/calibrator/history/$id'
+    | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/run/$userId'
+    | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
+    | '/api/manipulation/snapshot/$pair'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -535,6 +593,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/copilot/history'
+    | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -543,7 +602,11 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/_authenticated/calibrator/history/$id'
+    | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/run/$userId'
+    | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
+    | '/api/manipulation/snapshot/$pair'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -560,6 +623,7 @@ export interface RootRouteChildren {
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
+  ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
   ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
   ApiRiskEvaluateRoute: typeof ApiRiskEvaluateRoute
@@ -567,7 +631,11 @@ export interface RootRouteChildren {
   ApiSignalsIdRoute: typeof ApiSignalsIdRoute
   ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
+  ApiCalibratorFeedbackUserIdRoute: typeof ApiCalibratorFeedbackUserIdRoute
+  ApiCalibratorRunUserIdRoute: typeof ApiCalibratorRunUserIdRoute
+  ApiCalibratorStateUserIdRoute: typeof ApiCalibratorStateUserIdRoute
   ApiDnaProfileUserIdRoute: typeof ApiDnaProfileUserIdRoute
+  ApiManipulationSnapshotPairRoute: typeof ApiManipulationSnapshotPairRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -797,6 +865,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMarketRegimeCurrentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/manipulation/alerts': {
+      id: '/api/manipulation/alerts'
+      path: '/api/manipulation/alerts'
+      fullPath: '/api/manipulation/alerts'
+      preLoaderRoute: typeof ApiManipulationAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/copilot/history': {
       id: '/api/copilot/history'
       path: '/api/copilot/history'
@@ -860,11 +935,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/manipulation/snapshot/$pair': {
+      id: '/api/manipulation/snapshot/$pair'
+      path: '/api/manipulation/snapshot/$pair'
+      fullPath: '/api/manipulation/snapshot/$pair'
+      preLoaderRoute: typeof ApiManipulationSnapshotPairRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/dna/profile/$userId': {
       id: '/api/dna/profile/$userId'
       path: '/api/dna/profile/$userId'
       fullPath: '/api/dna/profile/$userId'
       preLoaderRoute: typeof ApiDnaProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/state/$userId': {
+      id: '/api/calibrator/state/$userId'
+      path: '/api/calibrator/state/$userId'
+      fullPath: '/api/calibrator/state/$userId'
+      preLoaderRoute: typeof ApiCalibratorStateUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/run/$userId': {
+      id: '/api/calibrator/run/$userId'
+      path: '/api/calibrator/run/$userId'
+      fullPath: '/api/calibrator/run/$userId'
+      preLoaderRoute: typeof ApiCalibratorRunUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/feedback/$userId': {
+      id: '/api/calibrator/feedback/$userId'
+      path: '/api/calibrator/feedback/$userId'
+      fullPath: '/api/calibrator/feedback/$userId'
+      preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/calibrator/history/$id': {
@@ -979,6 +1082,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
+  ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
   ApiPricesSymbolRoute: ApiPricesSymbolRoute,
   ApiRiskEvaluateRoute: ApiRiskEvaluateRoute,
@@ -986,7 +1090,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSignalsIdRoute: ApiSignalsIdRoute,
   ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiSignalsIndexRoute: ApiSignalsIndexRoute,
+  ApiCalibratorFeedbackUserIdRoute: ApiCalibratorFeedbackUserIdRoute,
+  ApiCalibratorRunUserIdRoute: ApiCalibratorRunUserIdRoute,
+  ApiCalibratorStateUserIdRoute: ApiCalibratorStateUserIdRoute,
   ApiDnaProfileUserIdRoute: ApiDnaProfileUserIdRoute,
+  ApiManipulationSnapshotPairRoute: ApiManipulationSnapshotPairRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
