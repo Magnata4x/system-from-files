@@ -63,7 +63,7 @@ export function mapCalibratorState(p: BackendCalibratorPayload): CalibratorState
 export const calibratorEndpoints = {
   state: (userId: string) => `/calibrator/state/${userId}`,
   feedback: (userId: string) => `/calibrator/feedback/${userId}`,
-  simulate: (userId: string) => `/calibrator/simulate/${userId}`,
+  simulate: (userId: string) => `/calibrator/run/${userId}`,
 } as const;
 
 export type SimulationProfile =
