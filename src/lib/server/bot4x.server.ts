@@ -108,7 +108,7 @@ export async function updateConfig(
 
   const { data, error } = await supabase
     .from('bot4x_configs')
-    .update(update)
+    .update(update as Database['public']['Tables']['bot4x_configs']['Update'])
     .eq('user_id', userId)
     .select('*')
     .single()
