@@ -35,7 +35,13 @@ import { Route as AuthenticatedApiRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiSignalsIndexRouteImport } from './routes/api/signals/index'
+import { Route as ApiPricesIndexRouteImport } from './routes/api/prices/index'
 import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
+import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
+import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
+import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
+import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
+import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
 import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
@@ -177,9 +183,39 @@ const ApiSignalsIndexRoute = ApiSignalsIndexRouteImport.update({
   path: '/api/signals/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPricesIndexRoute = ApiPricesIndexRouteImport.update({
+  id: '/api/prices/',
+  path: '/api/prices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
   id: '/api/signals/$id',
   path: '/api/signals/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPricesSymbolRoute = ApiPricesSymbolRouteImport.update({
+  id: '/api/prices/$symbol',
+  path: '/api/prices/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
+  id: '/api/market-regime/current',
+  path: '/api/market-regime/current',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
+  id: '/api/bot4x/stop',
+  path: '/api/bot4x/stop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xStartRoute = ApiBot4xStartRouteImport.update({
+  id: '/api/bot4x/start',
+  path: '/api/bot4x/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xExecutionsRoute = ApiBot4xExecutionsRouteImport.update({
+  id: '/api/bot4x/executions',
+  path: '/api/bot4x/executions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
@@ -246,7 +282,13 @@ export interface FileRoutesByFullPath {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/start': typeof ApiBot4xStartRoute
+  '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -280,7 +322,13 @@ export interface FileRoutesByTo {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/start': typeof ApiBot4xStartRoute
+  '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -316,7 +364,13 @@ export interface FileRoutesById {
   '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/start': typeof ApiBot4xStartRoute
+  '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -352,7 +406,13 @@ export interface FileRouteTypes {
     | '/calibrator/history'
     | '/api/auth/me'
     | '/api/bot4x/config'
+    | '/api/bot4x/executions'
+    | '/api/bot4x/start'
+    | '/api/bot4x/stop'
+    | '/api/market-regime/current'
+    | '/api/prices/$symbol'
     | '/api/signals/$id'
+    | '/api/prices/'
     | '/api/signals/'
     | '/calibrator/history/$id'
     | '/lovable/email/queue/process'
@@ -386,7 +446,13 @@ export interface FileRouteTypes {
     | '/calibrator/history'
     | '/api/auth/me'
     | '/api/bot4x/config'
+    | '/api/bot4x/executions'
+    | '/api/bot4x/start'
+    | '/api/bot4x/stop'
+    | '/api/market-regime/current'
+    | '/api/prices/$symbol'
     | '/api/signals/$id'
+    | '/api/prices'
     | '/api/signals'
     | '/calibrator/history/$id'
     | '/lovable/email/queue/process'
@@ -421,7 +487,13 @@ export interface FileRouteTypes {
     | '/_authenticated/calibrator/history'
     | '/api/auth/me'
     | '/api/bot4x/config'
+    | '/api/bot4x/executions'
+    | '/api/bot4x/start'
+    | '/api/bot4x/stop'
+    | '/api/market-regime/current'
+    | '/api/prices/$symbol'
     | '/api/signals/$id'
+    | '/api/prices/'
     | '/api/signals/'
     | '/_authenticated/calibrator/history/$id'
     | '/lovable/email/queue/process'
@@ -436,7 +508,13 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
+  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRoute
+  ApiBot4xStartRoute: typeof ApiBot4xStartRoute
+  ApiBot4xStopRoute: typeof ApiBot4xStopRoute
+  ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
+  ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
   ApiSignalsIdRoute: typeof ApiSignalsIdRoute
+  ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
@@ -625,11 +703,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSignalsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/prices/': {
+      id: '/api/prices/'
+      path: '/api/prices'
+      fullPath: '/api/prices/'
+      preLoaderRoute: typeof ApiPricesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/signals/$id': {
       id: '/api/signals/$id'
       path: '/api/signals/$id'
       fullPath: '/api/signals/$id'
       preLoaderRoute: typeof ApiSignalsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/prices/$symbol': {
+      id: '/api/prices/$symbol'
+      path: '/api/prices/$symbol'
+      fullPath: '/api/prices/$symbol'
+      preLoaderRoute: typeof ApiPricesSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market-regime/current': {
+      id: '/api/market-regime/current'
+      path: '/api/market-regime/current'
+      fullPath: '/api/market-regime/current'
+      preLoaderRoute: typeof ApiMarketRegimeCurrentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/stop': {
+      id: '/api/bot4x/stop'
+      path: '/api/bot4x/stop'
+      fullPath: '/api/bot4x/stop'
+      preLoaderRoute: typeof ApiBot4xStopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/start': {
+      id: '/api/bot4x/start'
+      path: '/api/bot4x/start'
+      fullPath: '/api/bot4x/start'
+      preLoaderRoute: typeof ApiBot4xStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/executions': {
+      id: '/api/bot4x/executions'
+      path: '/api/bot4x/executions'
+      fullPath: '/api/bot4x/executions'
+      preLoaderRoute: typeof ApiBot4xExecutionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/bot4x/config': {
@@ -775,7 +895,13 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
+  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRoute,
+  ApiBot4xStartRoute: ApiBot4xStartRoute,
+  ApiBot4xStopRoute: ApiBot4xStopRoute,
+  ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
+  ApiPricesSymbolRoute: ApiPricesSymbolRoute,
   ApiSignalsIdRoute: ApiSignalsIdRoute,
+  ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiSignalsIndexRoute: ApiSignalsIndexRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
