@@ -22,24 +22,13 @@ export type WsEvent =
 // CORREÇÃO: fallback ws:// era usado em qualquer ambiente sem VITE_API_WS_URL,
 // incluindo staging/preview — JWT transmitido sem TLS.
 // Agora: produção sempre usa wss://, localhost usa ws:// apenas em dev explícito.
+// O backend interno (rotas /api/*) não expõe WebSocket: o tempo real é feito
+// por polling. Só conectamos quando VITE_API_WS_URL apontar para um serviço
+// externo com TLS; caso contrário o cliente fica inativo (sem erro nem token
+// trafegando em texto claro).
 function resolveWsUrl(): string {
-  const envUrl = import.meta.env.VITE_API_WS_URL as string | undefined;
-  if (envUrl) return envUrl;
-
-  // Em produção, nunca aceitar ws:// sem TLS — falhar explicitamente
-  // em vez de transmitir token em texto claro.
-  if (import.meta.env.PROD) {
-    console.error(
-      "[WS] VITE_API_WS_URL não definida em produção. " +
-        "Defina a variável de ambiente para habilitar WebSocket seguro (wss://).",
-    );
-    // Retorna string vazia — connect() vai cair em setStatus("error") sem tentar
-    // conectar sem TLS. Melhor do que transmitir JWT em texto claro.
-    return "";
-  }
-
-  // Desenvolvimento local: ws:// é aceitável
-  return "ws://localhost:3001";
+  const envUrl = (import.meta.env.VITE_API_WS_URL as string | undefined)?.trim();
+  return envUrl ? envUrl : "";
 }
 
 const WS_URL = resolveWsUrl();
