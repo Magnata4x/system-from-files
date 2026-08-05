@@ -34,6 +34,7 @@ import { Route as AuthenticatedBot4xRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedApiRouteImport } from './routes/_authenticated/api'
 import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
 import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -168,6 +169,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
+  id: '/api/auth/me',
+  path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCalibratorHistoryRoute =
   AuthenticatedCalibratorHistoryRouteImport.update({
     id: '/history',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/signals': typeof AuthenticatedSignalsRoute
   '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/auth/me': typeof ApiAuthMeRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/signals': typeof AuthenticatedSignalsRoute
   '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/auth/me': typeof ApiAuthMeRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/_authenticated/signals': typeof AuthenticatedSignalsRoute
   '/_authenticated/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/auth/me': typeof ApiAuthMeRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -314,6 +323,7 @@ export interface FileRouteTypes {
     | '/signals'
     | '/bot4x/onboarding'
     | '/calibrator/history'
+    | '/api/auth/me'
     | '/calibrator/history/$id'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/signals'
     | '/bot4x/onboarding'
     | '/calibrator/history'
+    | '/api/auth/me'
     | '/calibrator/history/$id'
     | '/lovable/email/queue/process'
   id:
@@ -375,6 +386,7 @@ export interface FileRouteTypes {
     | '/_authenticated/signals'
     | '/_authenticated/bot4x/onboarding'
     | '/_authenticated/calibrator/history'
+    | '/api/auth/me'
     | '/_authenticated/calibrator/history/$id'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  ApiAuthMeRoute: typeof ApiAuthMeRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -566,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/calibrator/history': {
       id: '/_authenticated/calibrator/history'
       path: '/history'
@@ -693,18 +713,9 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
+  ApiAuthMeRoute: ApiAuthMeRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
