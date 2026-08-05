@@ -7,21 +7,11 @@ import { generateTraceId, getTraceId, setTraceId } from "./trace-context";
 type TracedConfig = InternalAxiosRequestConfig & { _traceId?: string; _retry?: boolean };
 
 
-// Em produção, EXIGIR VITE_API_BASE_URL. Em dev, cair para localhost.
-// Sem esse fail-fast, o app começaria a enviar o JWT do usuário para
-// http://localhost:3001 no navegador final — risco real se houver qualquer
-// processo escutando essa porta na máquina do cliente.
+// O backend agora roda DENTRO do próprio app (rotas server em /api/*).
+// Sem VITE_API_BASE_URL definida usamos o mesmo origin — nada de host externo.
 function resolveApiBaseUrl(): string {
   const envUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  if (envUrl) return envUrl;
-  if (import.meta.env.PROD) {
-    console.error(
-      "[apiClient] VITE_API_BASE_URL não definida em produção. " +
-        "Bloqueando chamadas REST para evitar enviar o token a um host local.",
-    );
-    return "";
-  }
-  return "http://localhost:3001/api";
+  return envUrl && envUrl.trim() ? envUrl : "/api";
 }
 
 const BASE_URL = resolveApiBaseUrl();

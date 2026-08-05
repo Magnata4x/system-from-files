@@ -242,7 +242,7 @@ export function TopBar() {
                 <div className="font-medium text-foreground truncate">{name}</div>
                 <div className="text-xs text-muted-foreground truncate">{user?.email}</div>
               </div>
-              <Link to="/profile" onClick={() => setOpen(false)} className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary">
+              <Link to="/profile" search={{ tab: "profile" }} onClick={() => setOpen(false)} className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary">
                 <User className="size-4" /> Profile
               </Link>
               <Link to="/settings" onClick={() => setOpen(false)} className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary">
