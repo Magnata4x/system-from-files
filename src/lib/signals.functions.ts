@@ -39,9 +39,29 @@ export const getSignalsList = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SignalListItemDTO[]> => {
     const base = resolveApiBase();
-    if (!base) return [];
 
-    // Forward do bearer original — o backend valida o mesmo token.
+    // Sem backend externo configurado: usa o motor interno (rotas /api locais).
+    if (!base) {
+      return cachedJson(`signals:list:${context.userId}`, SIGNALS_TTL, async () => {
+        const { generateSignals } = await import("@/lib/server/engine.server");
+        const raw = await generateSignals();
+        return raw.map((s) => ({
+          id: String(s.id),
+          symbol: String(s.pair ?? ""),
+          direction: normalizeSide(String(s.side ?? "BUY")),
+          confidence: Number(s.aiScore ?? s.score ?? 0),
+          entry: Number(s.entryPrice ?? 0),
+          sl: s.stopLoss != null ? Number(s.stopLoss) : undefined,
+          tp: s.takeProfit1 != null ? Number(s.takeProfit1) : undefined,
+          state: ((s.status as string) ?? "active") as SignalListItemDTO["state"],
+          tf: s.tf as string | undefined,
+          exchange: s.exchange as string | undefined,
+          createdAt: s.createdAt as string | undefined,
+        }));
+      });
+    }
+
+    // Forward do bearer original — o backend externo valida o mesmo token.
     const authHeader = getRequestHeader("authorization");
     if (!authHeader) return [];
 
