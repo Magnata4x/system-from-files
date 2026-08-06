@@ -164,7 +164,8 @@ export const useSignalsStore = create<State>((set, get) => ({
         ].slice(0, 60),
         lastSyncAt: Date.now(),
       }));
-    } catch {
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
       // silencioso — mantém o que já estiver em memória
     }
   },
