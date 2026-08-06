@@ -5,6 +5,24 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "AISignalRadar — Radar de sinais e execução algorítmica" },
+      {
+        name: "description",
+        content:
+          "Plataforma de sinais institucionais com IA, detecção de manipulação, DNA do trader e execução automática Bot4x.",
+      },
+      { property: "og:title", content: "AISignalRadar — Radar de sinais e execução algorítmica" },
+      {
+        property: "og:description",
+        content:
+          "Sinais em tempo real, análise de manipulação e execução algorítmica calibrada pelo seu perfil de trader.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
