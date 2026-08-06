@@ -121,11 +121,10 @@ export const useSignalsStore = create<State>((set, get) => ({
   lastSyncAt: null,
   syncFromBackend: async () => {
     try {
-      // Server fn cacheada (caches.default, TTL 10s por usuário) em vez de
-      // chamar direto signalAdapter no browser — reduz carga sobre o backend
-      // NestJS quando o usuário tem várias abas/refresh rápido.
-      const { getSignalsList } = await import("@/lib/signals.functions");
-      const backendSignals = await getSignalsList();
+      // Backend interno: /api/signals (cache server-side de 10s na própria rota).
+      // O apiClient anexa o bearer do Supabase automaticamente.
+      const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
+      const backendSignals = await signalAdapter.list();
       if (!backendSignals?.length) return;
 
       const mapped: Signal[] = backendSignals.map((s) => ({
@@ -164,7 +163,8 @@ export const useSignalsStore = create<State>((set, get) => ({
         ].slice(0, 60),
         lastSyncAt: Date.now(),
       }));
-    } catch {
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
       // silencioso — mantém o que já estiver em memória
     }
   },
