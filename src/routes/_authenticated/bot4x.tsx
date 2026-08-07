@@ -80,20 +80,17 @@ function Bot4xPage() {
               })}
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={tab}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              >
-                {tab === "painel" && <TabPainel />}
-                {tab === "calibrador" && <TabCalibrador />}
-                {tab === "monitor" && <TabMonitor />}
-                {tab === "historico" && <TabHistorico />}
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            >
+              {tab === "painel" && <TabPainel />}
+              {tab === "calibrador" && <TabCalibrador />}
+              {tab === "monitor" && <TabMonitor />}
+              {tab === "historico" && <TabHistorico />}
+            </motion.div>
           </div>
         </main>
       </div>
