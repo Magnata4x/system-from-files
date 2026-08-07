@@ -12,6 +12,7 @@ import {
 } from "./bot4x-data";
 import { PROFILES } from "./bot4x-data";
 import { bot4xAdapter, type BackendBot4xExecution } from "@/adapters/backend/bot4x.adapter";
+import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
 import { saveTrade, loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
@@ -164,6 +165,15 @@ function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, lever
 }
 
 let wsUnsubs: Array<() => void> = [];
+let realPoller: ReturnType<typeof setInterval> | undefined;
+
+// Preços reais do backend interno (/api/prices) usados para semear o painel.
+async function fetchLivePrices(): Promise<Record<string, number>> {
+  const list = await api.get<Array<{ symbol: string; price: number }>>("/prices");
+  const map: Record<string, number> = {};
+  for (const t of list ?? []) if (t?.symbol) map[t.symbol] = Number(t.price);
+  return map;
+}
 
 // ─── STORE ────────────────────────────────────────────────────────────────────
 
@@ -453,6 +463,32 @@ export const useBot4xStore = create<State>()(
             }
           });
           wsUnsubs = [offShutdown, offProfitLock, offStatus];
+
+          // O backend interno não expõe WebSocket — mantemos o estado do bot
+          // em dia por polling (config + execuções) a cada 10s.
+          if (realPoller) clearInterval(realPoller);
+          realPoller = setInterval(() => {
+            void (async () => {
+              try {
+                const [cfg, execs] = await Promise.all([
+                  bot4xAdapter.getConfig(uid),
+                  bot4xAdapter.executions(),
+                ]);
+                if (!cfg) return;
+                const prof = mapBackendProfile(cfg.profile);
+                set({
+                  status: cfg.active ? "RUNNING" : "IDLE",
+                  profile: prof,
+                  circuitBreaker: (cfg.circuitBreaker as State["circuitBreaker"]) ?? "none",
+                  dailyPnlPct: cfg.dailyPnl ?? get().dailyPnlPct,
+                  history: (execs ?? []).map((e) => executionToTrade(e, prof, get().leverage)),
+                  errorMsg: null,
+                });
+              } catch (err) {
+                logger.error("[Bot4x] poll real failed", { error: err });
+              }
+            })();
+          }, 10_000);
         } catch (err) {
           logger.error("[Bot4x] init real failed", { error: err });
           set({
@@ -467,6 +503,10 @@ export const useBot4xStore = create<State>()(
       cleanup: () => {
         const t = get()._ticker;
         if (t) clearInterval(t);
+        if (realPoller) {
+          clearInterval(realPoller);
+          realPoller = undefined;
+        }
         if (wsUnsubs.length > 0) {
           wsUnsubs.forEach((fn) => fn());
           wsUnsubs = [];
@@ -527,40 +567,44 @@ export const useBot4xStore = create<State>()(
       },
 
       closeOrder: (id) => set((s) => ({ orders: s.orders.filter((o) => o.id !== id) })),
+      // Semeia ordens de demonstração a partir dos preços reais do backend
+      // interno (/api/prices). Nunca sobrescreve ordens já existentes.
       seedOrders: () => {
-        const sample: Order[] = [
-          {
-            id: "o1",
-            pair: "BTC/USDT",
-            side: "LONG",
-            entry: 43240,
-            sl: 43168,
-            tp: 43385,
-            openedAt: Date.now() - 1000 * 60 * 4,
-            pnlPct: +0.18,
-          },
-          {
-            id: "o2",
-            pair: "ETH/USDT",
-            side: "SHORT",
-            entry: 2251,
-            sl: 2257,
-            tp: 2239,
-            openedAt: Date.now() - 1000 * 60 * 12,
-            pnlPct: -0.09,
-          },
-          {
-            id: "o3",
-            pair: "SOL/USDT",
-            side: "LONG",
-            entry: 171.4,
-            sl: 170.5,
-            tp: 173.1,
-            openedAt: Date.now() - 1000 * 60 * 7,
-            pnlPct: +0.31,
-          },
+        if (get().orders.length > 0) return;
+        const specs: Array<{ id: string; pair: string; side: Side; ageMin: number; pnlPct: number }> = [
+          { id: "o1", pair: "BTC/USDT", side: "LONG", ageMin: 4, pnlPct: +0.18 },
+          { id: "o2", pair: "ETH/USDT", side: "SHORT", ageMin: 12, pnlPct: -0.09 },
+          { id: "o3", pair: "SOL/USDT", side: "LONG", ageMin: 7, pnlPct: +0.31 },
         ];
-        set({ orders: sample });
+
+        const build = (prices: Record<string, number>) => {
+          const s = get();
+          const slMult = s.slPct / 100;
+          const tpMult = s.tpPct / 100;
+          const orders: Order[] = specs
+            .filter((sp) => prices[sp.pair] && prices[sp.pair]! > 0)
+            .map((sp) => {
+              const entry = +prices[sp.pair]!.toFixed(2);
+              const long = sp.side === "LONG";
+              return {
+                id: sp.id,
+                pair: sp.pair,
+                side: sp.side,
+                entry,
+                sl: +(entry * (long ? 1 - slMult : 1 + slMult)).toFixed(2),
+                tp: +(entry * (long ? 1 + tpMult : 1 - tpMult)).toFixed(2),
+                openedAt: Date.now() - 1000 * 60 * sp.ageMin,
+                pnlPct: sp.pnlPct,
+              };
+            });
+          if (orders.length > 0 && get().orders.length === 0) set({ orders });
+        };
+
+        void fetchLivePrices()
+          .then(build)
+          .catch(() => {
+            /* sem preços — painel inicia sem ordens abertas */
+          });
       },
       setMonitorTab: (monitorTab) => set({ monitorTab }),
       toggleFeedPaused: () => set((s) => ({ feedPaused: !s.feedPaused })),
@@ -569,6 +613,18 @@ export const useBot4xStore = create<State>()(
     {
       name: "bot4x-store-v1",
       storage: createJSONStorage(() => makeUserStorage(() => _currentUserId)),
+      // v2: descarta as ordens de demonstração antigas (preços hardcoded)
+      // para que sejam re-semeadas com preços reais do backend.
+      version: 2,
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<State> | undefined;
+        if (!state) return persisted as State;
+        if (version < 2) {
+          const legacy = new Set(["o1", "o2", "o3"]);
+          return { ...state, orders: (state.orders ?? []).filter((o) => !legacy.has(o.id)) } as State;
+        }
+        return state as State;
+      },
       // Campos persistidos — ticks e _ticker são runtime
       partialize: (s) => ({
         userId: s.userId,
