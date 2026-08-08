@@ -31,6 +31,32 @@ export interface BackendBot4xExecution {
   createdAt?: string;
 }
 
+export interface BackendBot4xExecutionRich extends BackendBot4xExecution {
+  stopLoss?: number;
+  takeProfit?: number;
+  pnlPct?: number;
+  result?: string;
+  motivo?: string;
+}
+
+export interface ExecutionsPage {
+  items: BackendBot4xExecutionRich[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface Bot4xTelemetry {
+  serverTime: string;
+  active: boolean;
+  profile: string;
+  circuitBreaker: string;
+  dailyPnl: number;
+  openSlots: number;
+  today: { trades: number; wins: number; losses: number; open: number; pnl: number };
+  logs: Array<{ at: string; level: string; message: string; detail?: string }>;
+}
+
 export function mapBot4xConfig(c: BackendBot4xConfig): Bot4xConfigUI {
   return {
     userId: c.userId,
@@ -69,18 +95,29 @@ export const bot4xAdapter = {
       return [];
     }
   },
+  /** Página de execuções com filtros — erros são propagados para a UI tratar. */
+  async executionsPage(params: {
+    limit: number;
+    offset: number;
+    result?: string;
+    pair?: string;
+    side?: string;
+  }): Promise<ExecutionsPage> {
+    const qs = new URLSearchParams();
+    qs.set("limit", String(params.limit));
+    qs.set("offset", String(params.offset));
+    if (params.result && params.result !== "all") qs.set("result", params.result);
+    if (params.pair && params.pair !== "all") qs.set("pair", params.pair);
+    if (params.side && params.side !== "all") qs.set("side", params.side);
+    return api.get<ExecutionsPage>(`${endpoints.bot4x.executions}?${qs.toString()}`);
+  },
+  async telemetry(): Promise<Bot4xTelemetry> {
+    return api.get<Bot4xTelemetry>(endpoints.bot4x.telemetry);
+  },
   async start(userId: string) {
-    try {
-      return await api.post(endpoints.bot4x.start, { userId });
-    } catch {
-      return null;
-    }
+    return api.post(endpoints.bot4x.start, { userId });
   },
   async stop(userId: string) {
-    try {
-      return await api.post(endpoints.bot4x.stop, { userId });
-    } catch {
-      return null;
-    }
+    return api.post(endpoints.bot4x.stop, { userId });
   },
 };
