@@ -9,6 +9,7 @@ import { TabPainel } from "@/components/bot4x/tab-painel";
 import { TabCalibrador } from "@/components/bot4x/tab-calibrador";
 import { TabMonitor } from "@/components/bot4x/tab-monitor";
 import { TabHistorico } from "@/components/bot4x/tab-historico";
+import { TabExecucoes } from "@/components/bot4x/tab-execucoes";
 
 export const Route = createFileRoute("/_authenticated/bot4x")({
   head: () => ({
@@ -20,10 +21,11 @@ export const Route = createFileRoute("/_authenticated/bot4x")({
   component: Bot4xPage,
 });
 
-type Tab = "painel" | "calibrador" | "monitor" | "historico";
+type Tab = "painel" | "execucoes" | "calibrador" | "monitor" | "historico";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "painel", label: "Painel" },
+  { id: "execucoes", label: "Execuções" },
   { id: "calibrador", label: "Calibrador" },
   { id: "monitor", label: "Monitor" },
   { id: "historico", label: "Histórico" },
@@ -87,6 +89,7 @@ function Bot4xPage() {
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
             >
               {tab === "painel" && <TabPainel />}
+              {tab === "execucoes" && <TabExecucoes />}
               {tab === "calibrador" && <TabCalibrador />}
               {tab === "monitor" && <TabMonitor />}
               {tab === "historico" && <TabHistorico />}

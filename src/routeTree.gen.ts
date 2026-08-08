@@ -43,6 +43,7 @@ import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
+import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
@@ -232,6 +233,11 @@ const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
   path: '/api/copilot/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
+  id: '/api/bot4x/telemetry',
+  path: '/api/bot4x/telemetry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
   id: '/api/bot4x/stop',
   path: '/api/bot4x/stop',
@@ -342,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
@@ -391,6 +398,7 @@ export interface FileRoutesByTo {
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
@@ -442,6 +450,7 @@ export interface FileRoutesById {
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
+  '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
+    | '/api/bot4x/telemetry'
     | '/api/copilot/history'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
@@ -542,6 +552,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
+    | '/api/bot4x/telemetry'
     | '/api/copilot/history'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
@@ -592,6 +603,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
+    | '/api/bot4x/telemetry'
     | '/api/copilot/history'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
@@ -622,6 +634,7 @@ export interface RootRouteChildren {
   ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRoute
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
+  ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
@@ -879,6 +892,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCopilotHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/telemetry': {
+      id: '/api/bot4x/telemetry'
+      path: '/api/bot4x/telemetry'
+      fullPath: '/api/bot4x/telemetry'
+      preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/bot4x/stop': {
       id: '/api/bot4x/stop'
       path: '/api/bot4x/stop'
@@ -1081,6 +1101,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xExecutionsRoute: ApiBot4xExecutionsRoute,
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
+  ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,

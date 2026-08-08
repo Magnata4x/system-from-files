@@ -138,3 +138,92 @@ export async function listExecutions(supabase: Client, userId: string, limit = 5
     createdAt: t.created_at,
   }))
 }
+
+export interface ExecutionQuery {
+  limit?: number
+  offset?: number
+  result?: string
+  pair?: string
+  side?: string
+}
+
+/** Lista paginada + filtrada de execuções, com total para a UI. */
+export async function listExecutionsPaged(
+  supabase: Client,
+  userId: string,
+  query: ExecutionQuery = {},
+) {
+  const limit = Math.min(Math.max(Number(query.limit ?? 20) || 20, 1), 100)
+  const offset = Math.max(Number(query.offset ?? 0) || 0, 0)
+
+  let builder = supabase
+    .from('bot4x_trades')
+    .select('*', { count: 'exact' })
+    .eq('user_id', userId)
+
+  if (query.result && query.result !== 'all') builder = builder.eq('result', query.result)
+  if (query.pair && query.pair !== 'all') builder = builder.eq('pair', query.pair)
+  if (query.side && query.side !== 'all') builder = builder.eq('side', query.side)
+
+  const { data, error, count } = await builder
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
+  if (error) throw new ApiError(error.message, 500)
+
+  return {
+    items: (data ?? []).map((t) => ({
+      id: t.id,
+      pair: t.pair,
+      side: t.side as 'LONG' | 'SHORT',
+      entryPrice: Number(t.entry),
+      stopLoss: t.stop === null ? undefined : Number(t.stop),
+      takeProfit: t.target === null ? undefined : Number(t.target),
+      pnl: Number(t.pnl ?? 0),
+      pnlPct: Number(t.pnl_pct ?? 0),
+      status: t.result === 'open' ? 'open' : 'closed',
+      result: t.result,
+      motivo: t.motivo ?? '',
+      createdAt: t.created_at,
+    })),
+    total: count ?? 0,
+    limit,
+    offset,
+  }
+}
+
+/** Telemetria do bot: estado atual + agregados do dia, para polling da UI. */
+export async function getTelemetry(supabase: Client, userId: string) {
+  const config = await getOrCreateConfig(supabase, userId)
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data, error } = await supabase
+    .from('bot4x_trades')
+    .select('result, pnl, pair, side, created_at, motivo')
+    .eq('user_id', userId)
+    .eq('day', today)
+    .order('created_at', { ascending: false })
+    .limit(200)
+  if (error) throw new ApiError(error.message, 500)
+
+  const rows = data ?? []
+  const wins = rows.filter((r) => r.result === 'WIN').length
+  const losses = rows.filter((r) => r.result === 'LOSS').length
+  const open = rows.filter((r) => r.result === 'open').length
+  const pnl = rows.reduce((acc, r) => acc + Number(r.pnl ?? 0), 0)
+
+  return {
+    serverTime: new Date().toISOString(),
+    active: config.active,
+    profile: config.profile,
+    circuitBreaker: config.circuitBreaker,
+    dailyPnl: config.dailyPnl,
+    openSlots: config.openSlots,
+    today: { trades: rows.length, wins, losses, open, pnl: Number(pnl.toFixed(2)) },
+    logs: rows.slice(0, 20).map((r) => ({
+      at: r.created_at,
+      level: r.result === 'LOSS' ? 'warn' : 'info',
+      message: `${r.pair} ${r.side} · ${r.result} · ${Number(r.pnl ?? 0) >= 0 ? '+' : ''}${Number(r.pnl ?? 0).toFixed(2)}`,
+      detail: r.motivo ?? '',
+    })),
+  }
+}
