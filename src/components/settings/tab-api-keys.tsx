@@ -1,5 +1,6 @@
 import { SectionCard } from "./section-card";
 import { KeysManagement } from "@/components/api/keys-management";
+import { SettingsExchangeKeys } from "./exchange-keys";
 
 // SEG-07: a versão antiga desta aba gerava chaves de API apenas no estado do
 // React (crypto.getRandomValues + useState), sem backend, sem hashing e sem
@@ -10,8 +11,11 @@ import { KeysManagement } from "@/components/api/keys-management";
 // backend real (tabela api_keys + RPC de emissão + middleware) não existe.
 export function SettingsApiKeys() {
   return (
-    <SectionCard title="API Keys" description="Gestão de chaves de API.">
-      <KeysManagement />
-    </SectionCard>
+    <>
+      <SettingsExchangeKeys />
+      <SectionCard title="API Keys" description="Gestão de chaves de API.">
+        <KeysManagement />
+      </SectionCard>
+    </>
   );
 }
