@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { authenticate, toErrorResponse } from '@/lib/server/api-auth.server'
+import { ApiError, jsonResponse, requireApiUser } from '@/lib/server/api-auth.server'
 import { exportExecutionsCsv } from '@/lib/server/bot4x.server'
 
 export const Route = createFileRoute('/api/bot4x/executions/export')({
@@ -7,7 +7,7 @@ export const Route = createFileRoute('/api/bot4x/executions/export')({
     handlers: {
       GET: async ({ request }) => {
         try {
-          const user = await authenticate(request)
+          const user = await requireApiUser(request)
           const p = new URL(request.url).searchParams
           const csv = await exportExecutionsCsv(user.supabase, user.userId, {
             result: p.get('result') ?? undefined,
@@ -27,7 +27,9 @@ export const Route = createFileRoute('/api/bot4x/executions/export')({
             },
           })
         } catch (err) {
-          return toErrorResponse(err)
+          const status = err instanceof ApiError ? err.status : 500
+          const message = err instanceof Error ? err.message : 'Erro interno'
+          return jsonResponse({ statusCode: status, message }, status)
         }
       },
     },

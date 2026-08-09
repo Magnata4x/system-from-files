@@ -57,6 +57,7 @@ import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profil
 import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
 import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
 import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
+import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -309,6 +310,12 @@ const ApiCalibratorFeedbackUserIdRoute =
     path: '/api/calibrator/feedback/$userId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiBot4xExecutionsExportRoute =
+  ApiBot4xExecutionsExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => ApiBot4xExecutionsRoute,
+  } as any)
 const AuthenticatedCalibratorHistoryIdRoute =
   AuthenticatedCalibratorHistoryIdRouteImport.update({
     id: '/$id',
@@ -345,7 +352,7 @@ export interface FileRoutesByFullPath {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -395,7 +403,7 @@ export interface FileRoutesByTo {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
@@ -409,6 +417,7 @@ export interface FileRoutesByTo {
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -447,7 +456,7 @@ export interface FileRoutesById {
   '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
@@ -461,6 +470,7 @@ export interface FileRoutesById {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -513,6 +523,7 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -563,6 +574,7 @@ export interface FileRouteTypes {
     | '/api/prices'
     | '/api/signals'
     | '/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -614,6 +626,7 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/_authenticated/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -631,7 +644,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
-  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRoute
+  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
   ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
@@ -990,6 +1003,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/executions/export': {
+      id: '/api/bot4x/executions/export'
+      path: '/export'
+      fullPath: '/api/bot4x/executions/export'
+      preLoaderRoute: typeof ApiBot4xExecutionsExportRouteImport
+      parentRoute: typeof ApiBot4xExecutionsRoute
+    }
     '/_authenticated/calibrator/history/$id': {
       id: '/_authenticated/calibrator/history/$id'
       path: '/$id'
@@ -1089,6 +1109,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface ApiBot4xExecutionsRouteChildren {
+  ApiBot4xExecutionsExportRoute: typeof ApiBot4xExecutionsExportRoute
+}
+
+const ApiBot4xExecutionsRouteChildren: ApiBot4xExecutionsRouteChildren = {
+  ApiBot4xExecutionsExportRoute: ApiBot4xExecutionsExportRoute,
+}
+
+const ApiBot4xExecutionsRouteWithChildren =
+  ApiBot4xExecutionsRoute._addFileChildren(ApiBot4xExecutionsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1098,7 +1129,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
-  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRoute,
+  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
@@ -1121,13 +1152,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
