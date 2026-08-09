@@ -556,6 +556,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          bot4x_alerts: Json
           compact_pill: boolean
           onboarding_done: boolean
           updated_at: string
@@ -563,6 +564,7 @@ export type Database = {
           wishlist: string[]
         }
         Insert: {
+          bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
           updated_at?: string
@@ -570,6 +572,7 @@ export type Database = {
           wishlist?: string[]
         }
         Update: {
+          bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
           updated_at?: string
