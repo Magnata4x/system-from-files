@@ -1,5 +1,6 @@
 import { SectionCard } from "./section-card";
 import { useAlertsStore } from "@/lib/alerts-store";
+import { useBot4xPrefs } from "@/lib/bot4x-prefs-store";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Mail, MessageCircle, Smartphone, Hash, Phone } from "lucide-react";
@@ -19,8 +20,17 @@ const TYPES = [
   { id: "setup_confirmed" as const, label: "Setup confirmed" },
 ];
 
+const BOT4X_ALERTS = [
+  { id: "configChanged" as const, label: "Configuração alterada", desc: "Perfil, alavancagem, SL/TP ou alocação" },
+  { id: "slTpHit" as const, label: "SL / TP atingidos", desc: "Fechamento de operações no stop ou alvo" },
+  { id: "executionFailed" as const, label: "Execuções falhas", desc: "Erros de sincronização ou execução do motor" },
+  { id: "circuitBreaker" as const, label: "Disjuntor / lucro travado", desc: "Circuit breaker e profit lock" },
+];
+
 export function SettingsNotifications() {
   const s = useAlertsStore();
+  const bot4xAlerts = useBot4xPrefs((st) => st.bot4xAlerts);
+  const setBot4xAlert = useBot4xPrefs((st) => st.setBot4xAlert);
   return (
     <>
       <SectionCard title="Channels" description="Where you want to receive alerts.">
@@ -52,6 +62,26 @@ export function SettingsNotifications() {
             <label key={t.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-background/30">
               <span className="text-sm">{t.label}</span>
               <Switch checked={s.types[t.id]} onCheckedChange={() => s.toggleType(t.id)} />
+            </label>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Bot4x" description="Eventos do motor de execução que geram notificação.">
+        <div className="space-y-2">
+          {BOT4X_ALERTS.map((a) => (
+            <label
+              key={a.id}
+              className="flex items-center justify-between p-3 rounded-lg border border-border bg-background/30"
+            >
+              <span>
+                <span className="block text-sm font-medium">{a.label}</span>
+                <span className="block text-xs text-muted-foreground">{a.desc}</span>
+              </span>
+              <Switch
+                checked={bot4xAlerts[a.id]}
+                onCheckedChange={(v) => setBot4xAlert(a.id, v)}
+              />
             </label>
           ))}
         </div>
