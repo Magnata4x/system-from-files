@@ -1,5 +1,5 @@
 // Adaptador para configuração e execuções do Bot4x.
-import { api, endpoints } from "./api.adapter";
+import { api, apiClient, endpoints } from "./api.adapter";
 
 export interface BackendBot4xConfig {
   userId: string;
