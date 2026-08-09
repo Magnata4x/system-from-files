@@ -44,6 +44,10 @@ export const endpoints = {
     // /simulate foi descontinuado; o backend responde apenas em /run.
     simulate: (userId: string) => `/calibrator/run/${userId}`,
   },
+  exchange: {
+    credentials: "/exchange/credentials",
+    test: "/exchange/test",
+  },
 } as const;
 
 
