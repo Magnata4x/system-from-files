@@ -58,7 +58,9 @@ export async function savePrefs(userId: string, prefs: Partial<UserPrefsRow>): P
     ...(prefs.compactPill !== undefined && { compact_pill: prefs.compactPill }),
     ...(prefs.onboardingDone !== undefined && { onboarding_done: prefs.onboardingDone }),
     ...(prefs.wishlist !== undefined && { wishlist: prefs.wishlist }),
-    ...(prefs.bot4xAlerts !== undefined && { bot4x_alerts: prefs.bot4xAlerts }),
+    ...(prefs.bot4xAlerts !== undefined && {
+      bot4x_alerts: { ...prefs.bot4xAlerts } as Record<string, boolean>,
+    }),
   };
   const { error } = await supabase
     .from("user_preferences")
