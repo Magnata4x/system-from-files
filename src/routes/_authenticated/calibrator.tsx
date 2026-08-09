@@ -220,6 +220,8 @@ function CalibratorPage() {
             </Link>
           </header>
 
+          <CalibratorEnginePanel userId={user?.id} />
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* Form */}
             <Card className="p-5 lg:col-span-1 space-y-4">
