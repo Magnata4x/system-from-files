@@ -1,3 +1,4 @@
+import { CalibratorEnginePanel } from "@/components/calibrator/engine-state-panel";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/dashboard/top-bar";
