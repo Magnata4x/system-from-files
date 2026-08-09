@@ -21,8 +21,11 @@ function toB64(bytes: Uint8Array): string {
   return btoa(s)
 }
 
-function fromB64(value: string): Uint8Array {
-  return Uint8Array.from(atob(value), (c) => c.charCodeAt(0))
+function fromB64(value: string): Uint8Array<ArrayBuffer> {
+  const raw = atob(value)
+  const out = new Uint8Array(new ArrayBuffer(raw.length))
+  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i)
+  return out
 }
 
 export async function encryptSecret(plain: string): Promise<string> {
