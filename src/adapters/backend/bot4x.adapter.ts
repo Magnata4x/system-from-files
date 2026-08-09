@@ -102,6 +102,9 @@ export const bot4xAdapter = {
     result?: string;
     pair?: string;
     side?: string;
+    profile?: string;
+    from?: string;
+    to?: string;
   }): Promise<ExecutionsPage> {
     const qs = new URLSearchParams();
     qs.set("limit", String(params.limit));
@@ -109,7 +112,32 @@ export const bot4xAdapter = {
     if (params.result && params.result !== "all") qs.set("result", params.result);
     if (params.pair && params.pair !== "all") qs.set("pair", params.pair);
     if (params.side && params.side !== "all") qs.set("side", params.side);
+    if (params.profile && params.profile !== "all") qs.set("profile", params.profile);
+    if (params.from) qs.set("from", params.from);
+    if (params.to) qs.set("to", params.to);
     return api.get<ExecutionsPage>(`${endpoints.bot4x.executions}?${qs.toString()}`);
+  },
+  /** Baixa o histórico filtrado em CSV (autenticado via apiClient). */
+  async exportCsv(params: {
+    result?: string;
+    pair?: string;
+    side?: string;
+    profile?: string;
+    from?: string;
+    to?: string;
+  }): Promise<{ filename: string; csv: string }> {
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v && v !== "all") qs.set(k, v);
+    }
+    const res = await apiClient.get<string>(
+      `${endpoints.bot4x.executions}/export?${qs.toString()}`,
+      { responseType: "text", headers: { Accept: "text/csv" } },
+    );
+    return {
+      filename: `bot4x-execucoes-${new Date().toISOString().slice(0, 10)}.csv`,
+      csv: typeof res.data === "string" ? res.data : String(res.data),
+    };
   },
   async telemetry(): Promise<Bot4xTelemetry> {
     return api.get<Bot4xTelemetry>(endpoints.bot4x.telemetry);
