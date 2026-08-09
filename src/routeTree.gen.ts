@@ -42,6 +42,8 @@ import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
+import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
+import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
@@ -57,6 +59,7 @@ import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profil
 import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
 import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
 import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
+import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -228,6 +231,16 @@ const ApiManipulationAlertsRoute = ApiManipulationAlertsRouteImport.update({
   path: '/api/manipulation/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiExchangeTestRoute = ApiExchangeTestRouteImport.update({
+  id: '/api/exchange/test',
+  path: '/api/exchange/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExchangeCredentialsRoute = ApiExchangeCredentialsRouteImport.update({
+  id: '/api/exchange/credentials',
+  path: '/api/exchange/credentials',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
   id: '/api/copilot/history',
   path: '/api/copilot/history',
@@ -309,6 +322,12 @@ const ApiCalibratorFeedbackUserIdRoute =
     path: '/api/calibrator/feedback/$userId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiBot4xExecutionsExportRoute =
+  ApiBot4xExecutionsExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => ApiBot4xExecutionsRoute,
+  } as any)
 const AuthenticatedCalibratorHistoryIdRoute =
   AuthenticatedCalibratorHistoryIdRouteImport.update({
     id: '/$id',
@@ -345,11 +364,13 @@ export interface FileRoutesByFullPath {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
+  '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
@@ -359,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -395,11 +417,13 @@ export interface FileRoutesByTo {
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
+  '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
@@ -409,6 +433,7 @@ export interface FileRoutesByTo {
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -447,11 +472,13 @@ export interface FileRoutesById {
   '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
-  '/api/bot4x/executions': typeof ApiBot4xExecutionsRoute
+  '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
+  '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
@@ -461,6 +488,7 @@ export interface FileRoutesById {
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
+  '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
@@ -504,6 +532,8 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/exchange/credentials'
+    | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
@@ -513,6 +543,7 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -554,6 +585,8 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/exchange/credentials'
+    | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
@@ -563,6 +596,7 @@ export interface FileRouteTypes {
     | '/api/prices'
     | '/api/signals'
     | '/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -605,6 +639,8 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/exchange/credentials'
+    | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/prices/$symbol'
@@ -614,6 +650,7 @@ export interface FileRouteTypes {
     | '/api/prices/'
     | '/api/signals/'
     | '/_authenticated/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
@@ -631,11 +668,13 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
-  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRoute
+  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
   ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
+  ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
+  ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
   ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
@@ -885,6 +924,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiManipulationAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/exchange/test': {
+      id: '/api/exchange/test'
+      path: '/api/exchange/test'
+      fullPath: '/api/exchange/test'
+      preLoaderRoute: typeof ApiExchangeTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/exchange/credentials': {
+      id: '/api/exchange/credentials'
+      path: '/api/exchange/credentials'
+      fullPath: '/api/exchange/credentials'
+      preLoaderRoute: typeof ApiExchangeCredentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/copilot/history': {
       id: '/api/copilot/history'
       path: '/api/copilot/history'
@@ -990,6 +1043,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/executions/export': {
+      id: '/api/bot4x/executions/export'
+      path: '/export'
+      fullPath: '/api/bot4x/executions/export'
+      preLoaderRoute: typeof ApiBot4xExecutionsExportRouteImport
+      parentRoute: typeof ApiBot4xExecutionsRoute
+    }
     '/_authenticated/calibrator/history/$id': {
       id: '/_authenticated/calibrator/history/$id'
       path: '/$id'
@@ -1089,6 +1149,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface ApiBot4xExecutionsRouteChildren {
+  ApiBot4xExecutionsExportRoute: typeof ApiBot4xExecutionsExportRoute
+}
+
+const ApiBot4xExecutionsRouteChildren: ApiBot4xExecutionsRouteChildren = {
+  ApiBot4xExecutionsExportRoute: ApiBot4xExecutionsExportRoute,
+}
+
+const ApiBot4xExecutionsRouteWithChildren =
+  ApiBot4xExecutionsRoute._addFileChildren(ApiBot4xExecutionsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1098,11 +1169,13 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
-  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRoute,
+  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
+  ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
+  ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
   ApiPricesSymbolRoute: ApiPricesSymbolRoute,

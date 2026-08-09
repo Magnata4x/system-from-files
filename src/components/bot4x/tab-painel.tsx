@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Zap, Lock } from "lucide-react";
-import { useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT } from "@/lib/bot4x-store";
+import {
+  useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT,
+  REAL_MODE_ENABLED as REAL_MODE_FLAG, setExchangeVerified,
+} from "@/lib/bot4x-store";
+import { exchangeAdapter } from "@/adapters/backend/exchange.adapter";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { useEffect } from "react";
 
 const IS_DEV = import.meta.env.DEV;
-
-// Feature flag — keep false until backend Fase 1 is live.
-// To enable: set VITE_BOT4X_REAL_ENABLED=true in .env and redeploy.
-const REAL_MODE_ENABLED = import.meta.env.VITE_BOT4X_REAL_ENABLED === "true";
 
 export function TabPainel() {
   return (
@@ -36,6 +38,17 @@ function ExecutionMode() {
   const setMode = useBot4xStore((s) => s.setMode);
   const [confirm, setConfirm] = useState(false);
   const [text, setText] = useState("");
+
+  // O modo REAL depende de credenciais de exchange verificadas (não só da flag).
+  const exchange = useQuery({
+    queryKey: ["exchange", "status"],
+    queryFn: exchangeAdapter.status,
+    staleTime: 60_000,
+  });
+  const verified = Boolean(exchange.data?.verified);
+  const REAL_MODE_ENABLED = verified || REAL_MODE_FLAG;
+
+  useEffect(() => { setExchangeVerified(verified); }, [verified]);
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
@@ -81,14 +94,14 @@ function ExecutionMode() {
             )}
             {!REAL_MODE_ENABLED && (
               <span className="ml-auto text-[9px] font-semibold text-[#E24B4A55] uppercase tracking-wide">
-                Em breve
+                Bloqueado
               </span>
             )}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
             {REAL_MODE_ENABLED
               ? "Ordens reais na exchange. Requer confirmação."
-              : "Requer integração com exchange — disponível em breve."}
+              : "Conecte e verifique suas chaves da exchange em Configurações › API Keys."}
           </p>
         </button>
       </div>

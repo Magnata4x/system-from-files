@@ -25,9 +25,21 @@ import type { CalibProfile as CalibProfileType } from "./bot4x-data";
 // A UI deve refletir isso via getEffectiveMode(), nunca o `mode` cru do store.
 export const REAL_MODE_ENABLED = import.meta.env.VITE_BOT4X_REAL_ENABLED === "true";
 
+// Destrave em runtime: só há modo REAL com credenciais de exchange verificadas.
+let exchangeVerified = false;
+export function setExchangeVerified(value: boolean) {
+  exchangeVerified = value;
+  if (!value && useBot4xStore.getState().mode === "REAL") {
+    useBot4xStore.setState({ mode: "DEMO" });
+  }
+}
+export function isRealModeUnlocked(): boolean {
+  return REAL_MODE_ENABLED || exchangeVerified;
+}
+
 // Fonte de verdade única do modo efetivo. UI e lógica de init() devem usar isto.
 export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
-  return REAL_MODE_ENABLED ? persistedMode : "DEMO";
+  return isRealModeUnlocked() ? persistedMode : "DEMO";
 }
 
 // ─── RISK MODEL CONSTANTS ─────────────────────────────────────────────────────

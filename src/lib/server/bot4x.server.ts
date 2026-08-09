@@ -145,6 +145,28 @@ export interface ExecutionQuery {
   result?: string
   pair?: string
   side?: string
+  /** Data inicial (YYYY-MM-DD) — filtra pela coluna `day`. */
+  from?: string
+  /** Data final (YYYY-MM-DD) — filtra pela coluna `day`. */
+  to?: string
+  /** Perfil do bot no momento da execução. */
+  profile?: string
+}
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/
+
+function applyFilters<T extends { eq: (c: string, v: string) => T; gte: (c: string, v: string) => T; lte: (c: string, v: string) => T }>(
+  builder: T,
+  query: ExecutionQuery,
+): T {
+  let b = builder
+  if (query.result && query.result !== 'all') b = b.eq('result', query.result)
+  if (query.pair && query.pair !== 'all') b = b.eq('pair', query.pair)
+  if (query.side && query.side !== 'all') b = b.eq('side', query.side)
+  if (query.profile && query.profile !== 'all') b = b.eq('profile', query.profile)
+  if (query.from && ISO_DAY.test(query.from)) b = b.gte('day', query.from)
+  if (query.to && ISO_DAY.test(query.to)) b = b.lte('day', query.to)
+  return b
 }
 
 /** Lista paginada + filtrada de execuções, com total para a UI. */
@@ -161,9 +183,7 @@ export async function listExecutionsPaged(
     .select('*', { count: 'exact' })
     .eq('user_id', userId)
 
-  if (query.result && query.result !== 'all') builder = builder.eq('result', query.result)
-  if (query.pair && query.pair !== 'all') builder = builder.eq('pair', query.pair)
-  if (query.side && query.side !== 'all') builder = builder.eq('side', query.side)
+  builder = applyFilters(builder, query)
 
   const { data, error, count } = await builder
     .order('created_at', { ascending: false })
@@ -189,6 +209,41 @@ export async function listExecutionsPaged(
     limit,
     offset,
   }
+}
+
+function csvCell(value: unknown): string {
+  const s = value === null || value === undefined ? '' : String(value)
+  return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+const CSV_HEADERS = [
+  'data', 'par', 'lado', 'perfil', 'alavancagem', 'entrada', 'stop', 'alvo',
+  'resultado', 'pnl', 'pnl_pct', 'motivo',
+] as const
+
+/** Exporta o histórico de execuções filtrado como CSV (máx. 5000 linhas). */
+export async function exportExecutionsCsv(
+  supabase: Client,
+  userId: string,
+  query: ExecutionQuery = {},
+): Promise<string> {
+  let builder = supabase.from('bot4x_trades').select('*').eq('user_id', userId)
+  builder = applyFilters(builder, query)
+
+  const { data, error } = await builder.order('created_at', { ascending: false }).limit(5000)
+  if (error) throw new ApiError(error.message, 500)
+
+  const lines = [CSV_HEADERS.join(',')]
+  for (const t of data ?? []) {
+    lines.push(
+      [
+        t.created_at, t.pair, t.side, t.profile ?? '', t.leverage ?? '',
+        t.entry, t.stop ?? '', t.target ?? '', t.result,
+        Number(t.pnl ?? 0), Number(t.pnl_pct ?? 0), t.motivo ?? '',
+      ].map(csvCell).join(','),
+    )
+  }
+  return lines.join('\n')
 }
 
 /** Telemetria do bot: estado atual + agregados do dia, para polling da UI. */

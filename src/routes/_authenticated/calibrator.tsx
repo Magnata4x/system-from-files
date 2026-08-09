@@ -1,3 +1,4 @@
+import { CalibratorEnginePanel } from "@/components/calibrator/engine-state-panel";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/dashboard/top-bar";
@@ -219,6 +220,8 @@ function CalibratorPage() {
               </Button>
             </Link>
           </header>
+
+          <CalibratorEnginePanel userId={user?.id} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* Form */}

@@ -1,13 +1,33 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
-  AlertTriangle, Inbox, Loader2, Play, Square, RefreshCw, ChevronLeft, ChevronRight,
+  AlertTriangle, Inbox, Loader2, Play, Square, RefreshCw, ChevronLeft, ChevronRight, Download,
 } from "lucide-react";
 import { bot4xAdapter } from "@/adapters/backend/bot4x.adapter";
 import { useBackendAuth } from "@/hooks/useBackendAuth";
 import { fmt } from "@/lib/bot4x-data";
 
 const PAGE_SIZES = [10, 20, 50];
+
+const PROFILE_OPTIONS: [string, string][] = [
+  ["all", "Todos os perfis"],
+  ["conservador", "Conservador"],
+  ["calibradoRSI", "Calibrado RSI"],
+  ["calibradoAiScore", "Calibrado AI Score"],
+  ["agressivo", "Agressivo"],
+];
+
+function downloadCsv(filename: string, csv: string) {
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export function TabExecucoes() {
   const { userId, ready } = useBackendAuth();
@@ -18,16 +38,26 @@ export function TabExecucoes() {
   const [result, setResult] = useState("all");
   const [side, setSide] = useState("all");
   const [pair, setPair] = useState("");
+  const [profile, setProfile] = useState("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
+  const filters = {
+    result,
+    side,
+    profile,
+    from,
+    to,
+    pair: pair.trim() ? pair.trim().toUpperCase() : "all",
+  };
 
   const execQuery = useQuery({
-    queryKey: ["bot4x", "executions", { page, limit, result, side, pair }],
+    queryKey: ["bot4x", "executions", { page, limit, ...filters }],
     queryFn: () =>
       bot4xAdapter.executionsPage({
         limit,
         offset: page * limit,
-        result,
-        side,
-        pair: pair.trim() ? pair.trim().toUpperCase() : "all",
+        ...filters,
       }),
     enabled: ready && !!userId,
     placeholderData: keepPreviousData,
@@ -48,6 +78,11 @@ export function TabExecucoes() {
       void qc.invalidateQueries({ queryKey: ["bot4x", "telemetry"] });
       void qc.invalidateQueries({ queryKey: ["bot4x", "executions"] });
     },
+  });
+
+  const exportCsv = useMutation({
+    mutationFn: async () => bot4xAdapter.exportCsv(filters),
+    onSuccess: ({ filename, csv }) => downloadCsv(filename, csv),
   });
 
   if (!ready) return <PanelSkeleton />;
@@ -88,6 +123,25 @@ export function TabExecucoes() {
             onChange={(v) => { setSide(v); setPage(0); }}
             options={[["all", "Long & Short"], ["LONG", "LONG"], ["SHORT", "SHORT"]]}
           />
+          <Select
+            value={profile}
+            onChange={(v) => { setProfile(v); setPage(0); }}
+            options={PROFILE_OPTIONS}
+          />
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => { setFrom(e.target.value); setPage(0); }}
+            aria-label="Data inicial"
+            className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none focus:border-[var(--brand-cyan)]"
+          />
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => { setTo(e.target.value); setPage(0); }}
+            aria-label="Data final"
+            className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none focus:border-[var(--brand-cyan)]"
+          />
           <input
             value={pair}
             onChange={(e) => { setPair(e.target.value); setPage(0); }}
@@ -102,7 +156,23 @@ export function TabExecucoes() {
           <span className="ml-auto text-[11px] text-muted-foreground tabular-nums">
             {total} {total === 1 ? "registro" : "registros"}
           </span>
+          <button
+            onClick={() => exportCsv.mutate()}
+            disabled={exportCsv.isPending}
+            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-background text-[12px] text-foreground hover:bg-secondary disabled:opacity-60"
+          >
+            {exportCsv.isPending
+              ? <Loader2 className="size-3.5 animate-spin" />
+              : <Download className="size-3.5" />}
+            Exportar CSV
+          </button>
         </div>
+
+        {exportCsv.isError && (
+          <p className="text-[11px] text-[#E24B4A]">
+            Falha ao exportar: {(exportCsv.error as Error).message}
+          </p>
+        )}
 
         {execQuery.isLoading ? (
           <TableSkeleton />

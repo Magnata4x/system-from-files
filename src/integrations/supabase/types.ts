@@ -287,6 +287,45 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_credentials: {
+        Row: {
+          api_key_cipher: string
+          api_secret_cipher: string
+          created_at: string
+          exchange: string
+          key_preview: string
+          last_error: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+          verified_at: string | null
+        }
+        Insert: {
+          api_key_cipher: string
+          api_secret_cipher: string
+          created_at?: string
+          exchange?: string
+          key_preview: string
+          last_error?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Update: {
+          api_key_cipher?: string
+          api_secret_cipher?: string
+          created_at?: string
+          exchange?: string
+          key_preview?: string
+          last_error?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -556,6 +595,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          bot4x_alerts: Json
           compact_pill: boolean
           onboarding_done: boolean
           updated_at: string
@@ -563,6 +603,7 @@ export type Database = {
           wishlist: string[]
         }
         Insert: {
+          bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
           updated_at?: string
@@ -570,6 +611,7 @@ export type Database = {
           wishlist?: string[]
         }
         Update: {
+          bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
           updated_at?: string
