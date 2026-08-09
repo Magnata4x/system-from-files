@@ -287,6 +287,45 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_credentials: {
+        Row: {
+          api_key_cipher: string
+          api_secret_cipher: string
+          created_at: string
+          exchange: string
+          key_preview: string
+          last_error: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+          verified_at: string | null
+        }
+        Insert: {
+          api_key_cipher: string
+          api_secret_cipher: string
+          created_at?: string
+          exchange?: string
+          key_preview: string
+          last_error?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Update: {
+          api_key_cipher?: string
+          api_secret_cipher?: string
+          created_at?: string
+          exchange?: string
+          key_preview?: string
+          last_error?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
