@@ -25,9 +25,14 @@ export function AlertsFeed() {
     <div className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-[15px] font-medium text-foreground">Recent alerts</h3>
-        <Link to="/manipulation" className="text-[12px] text-[var(--brand-cyan)] hover:underline">
+        <Link
+          to="/manipulation"
+          search={{ symbol: undefined, riskLevel: undefined, limit: undefined }}
+          className="text-[12px] text-[var(--brand-cyan)] hover:underline"
+        >
           View all
         </Link>
+
       </div>
 
       {loading && alerts.length === 0 ? (
