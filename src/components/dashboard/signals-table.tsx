@@ -7,6 +7,8 @@ type Filter = "ALL" | "BUY" | "SELL" | "HIGH";
 
 export function SignalsTable() {
   const signals = useDashboardStore((s) => s.signals);
+  const loading = useDashboardStore((s) => s.signalsLoading);
+  const error = useDashboardStore((s) => s.signalsError);
   const setSelected = useDashboardStore((s) => s.setSelectedSignal);
   const [filter, setFilter] = useState<Filter>("ALL");
 
@@ -87,12 +89,24 @@ export function SignalsTable() {
                 </td>
               </tr>
             ))}
+            {filtered.length === 0 && (
+              <tr className="border-t border-border">
+                <td colSpan={10} className="py-6 px-4 text-center text-[12px] text-muted-foreground">
+                  {loading
+                    ? "Carregando sinais…"
+                    : error
+                      ? error
+                      : "Nenhum sinal disponível para este filtro."}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
     </div>
   );
 }
+
 
 function fmt(n: number) {
   return n >= 100 ? n.toLocaleString(undefined, { maximumFractionDigits: 1 }) : n.toFixed(2);
