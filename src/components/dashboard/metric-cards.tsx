@@ -3,23 +3,30 @@ import { motion } from "framer-motion";
 import { ScoreBadge } from "./score-badge";
 import { useCountUp } from "@/lib/use-count-up";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { useDashboardStore } from "@/lib/dashboard-store";
 
 export function MetricCards() {
   const { prices, global, loading } = useLivePrices();
+  const signals = useDashboardStore((s) => s.signals);
+  const signalsLoading = useDashboardStore((s) => s.signalsLoading);
+  const manipAlerts = useDashboardStore((s) => s.manipAlerts);
 
   const trendingUp = Object.values(prices).filter((p) => (p.change24h ?? 0) > 0).length;
   const totalTracked = Object.keys(prices).length || 20;
 
-  // Active signals derived from market volatility
-  const highVol = Object.values(prices).filter((p) => Math.abs(p.change24h ?? 0) >= 3).length;
-  const medVol = Object.values(prices).filter((p) => Math.abs(p.change24h ?? 0) >= 1.5).length;
-  const activeSignals = Math.min(40, highVol * 3 + medVol + 8);
-  const prevSignals = Math.max(4, activeSignals - (trendingUp > totalTracked / 2 ? 2 : -1));
-  const signalDiff = activeSignals - prevSignals;
+  // Métricas derivadas dos sinais reais servidos pelo backend interno.
+  const activeSignals = signals.length;
+  const highScore = signals.filter((s) => s.score >= 80).length;
+  const top = signals.reduce<(typeof signals)[number] | null>(
+    (best, s) => (!best || s.score > best.score ? s : best),
+    null,
+  );
 
   const marketTrend = global?.marketCapChange24h ?? 0;
   const trendLabel = marketTrend >= 1 ? "Bullish" : marketTrend <= -1 ? "Bearish" : "Neutral";
   const trendColor = marketTrend >= 1 ? "#1D9E75" : marketTrend <= -1 ? "#E24B4A" : "#888780";
+
+  const manipAssets = [...new Set(manipAlerts.map((a) => a.asset.replace("/USDT", "")))].slice(0, 3);
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -29,12 +36,8 @@ export function MetricCards() {
           icon={<Activity className="size-4" />}
           iconColor="#378ADD"
           label="Active Signals"
-          countTo={loading ? 0 : activeSignals}
-          trend={{
-            text: `${signalDiff >= 0 ? "+" : ""}${signalDiff} vs yesterday`,
-            color: signalDiff >= 0 ? "#1D9E75" : "#E24B4A",
-          }}
-          sub={`${Math.max(1, Math.floor(activeSignals / 4))} high score (≥80)`}
+          countTo={signalsLoading ? 0 : activeSignals}
+          sub={`${highScore} high score (≥80)`}
         />
       </div>
       <Card
@@ -42,16 +45,15 @@ export function MetricCards() {
         icon={<Trophy className="size-4" />}
         iconColor="#EF9F27"
         label="Top Signal Score"
-        valueNode={<ScoreBadge score={94} size="lg" />}
-        sub="BTC/USDT · BUY · 4H"
-        trend={{ text: "Institutional Premium", color: "#EF9F27" }}
+        valueNode={<ScoreBadge score={top?.score ?? 0} size="lg" />}
+        sub={top ? `${top.asset} · ${top.direction} · ${top.tf}` : "Sem sinais no momento"}
       />
       <Card
         index={2}
         icon={<TrendingUp className="size-4" />}
         iconColor={trendColor}
         label="Market Trend"
-        value={trendLabel}
+        value={loading ? "…" : trendLabel}
         valueColor={trendColor}
         sub={`${trendingUp} of ${totalTracked} assets trending up`}
       />
@@ -60,14 +62,15 @@ export function MetricCards() {
         icon={<AlertTriangle className="size-4" />}
         iconColor="#E24B4A"
         label="Manipulation Alerts"
-        countTo={3}
+        countTo={manipAlerts.length}
         valueColor="#E24B4A"
-        sub="BTC · ETH · SOL"
-        pulse
+        sub={manipAssets.length > 0 ? manipAssets.join(" · ") : "Nenhum alerta ativo"}
+        pulse={manipAlerts.length > 0}
       />
     </div>
   );
 }
+
 
 function Card({
   index, icon, iconColor, label, value, valueNode, valueColor, sub, trend, pulse, countTo,
