@@ -10,7 +10,7 @@ export function SignalsTable() {
   const loading = useDashboardStore((s) => s.signalsLoading);
   const error = useDashboardStore((s) => s.signalsError);
   const setSelected = useDashboardStore((s) => s.setSelectedSignal);
-
+  const [filter, setFilter] = useState<Filter>("ALL");
 
   const filtered = signals.filter((s) => {
     if (filter === "ALL") return true;
