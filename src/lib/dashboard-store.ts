@@ -115,26 +115,52 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const pullSignals = async () => {
       try {
         const list = await signalAdapter.list();
-        if (list.length > 0) {
-          const mapped: Signal[] = list.slice(0, 12).map((s) => ({
-            id: s.id,
-            asset: s.symbol,
-            direction: s.direction,
-            score: Math.round(s.confidence),
-            entry: s.entry,
-            stop: s.sl ?? s.entry,
-            target: s.tp ?? s.entry,
-            rr:
-              s.sl && s.tp && s.entry - s.sl !== 0
-                ? +(Math.abs((s.tp - s.entry) / (s.entry - s.sl))).toFixed(2)
-                : 0,
-            tf: s.tf ?? "1H",
-            time: s.createdAt ?? "",
-          }));
-          set({ signals: mapped });
+        const mapped: Signal[] = list.slice(0, 12).map((s) => ({
+          id: s.id,
+          asset: s.symbol,
+          direction: s.direction,
+          score: Math.round(s.confidence),
+          entry: s.entry,
+          stop: s.sl ?? s.entry,
+          target: s.tp ?? s.entry,
+          rr:
+            s.sl && s.tp && s.entry - s.sl !== 0
+              ? +(Math.abs((s.tp - s.entry) / (s.entry - s.sl))).toFixed(2)
+              : 0,
+          tf: s.tf ?? "1H",
+          time: s.createdAt ?? "",
+        }));
+        set({ signals: mapped, signalsLoading: false, signalsError: null });
+
+        // Toast apenas para sinais novos (nunca na primeira carga).
+        if (seenSignalIds === null) {
+          seenSignalIds = new Set(mapped.map((m) => m.id));
+        } else {
+          for (const m of mapped) {
+            if (!seenSignalIds.has(m.id)) {
+              seenSignalIds.add(m.id);
+              get().pushToast(m);
+            }
+          }
         }
       } catch (err) {
         logger.warn("[dashboard] signals falhou", { error: err });
+        set({
+          signalsLoading: false,
+          signalsError: err instanceof Error ? err.message : "Falha ao carregar sinais",
+        });
+      }
+    };
+    const pullManipulation = async () => {
+      try {
+        const list = await manipulationAdapter.getAlerts({ limit: 8 });
+        set({ manipAlerts: list, manipLoading: false, manipError: null });
+      } catch (err) {
+        logger.warn("[dashboard] manipulation/alerts falhou", { error: err });
+        set({
+          manipLoading: false,
+          manipError: err instanceof Error ? err.message : "Falha ao carregar alertas",
+        });
       }
     };
 
@@ -142,26 +168,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     void pullRisk();
     void pullRegime();
     void pullSignals();
+    void pullManipulation();
     const backendPoll = window.setInterval(() => {
       void pullRisk();
       void pullRegime();
       void pullSignals();
+      void pullManipulation();
     }, 10_000);
     ids.add(backendPoll);
 
-    const scheduleNext = () => {
-      const tid = window.setTimeout(function fire() {
-        const s = upcomingSignals[signalIndex % upcomingSignals.length];
-        signalIndex++;
-        get().pushToast(s);
-        // remove resolved id, schedule next
-        get()._intervalIds.delete(tid);
-        const nextId = window.setTimeout(fire, 22000);
-        get()._intervalIds.add(nextId);
-      }, 15000);
-      ids.add(tid);
-    };
-    scheduleNext();
+
 
     set({ _intervalIds: ids });
   },
