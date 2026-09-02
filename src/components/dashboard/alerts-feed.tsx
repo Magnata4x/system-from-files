@@ -27,7 +27,7 @@ export function AlertsFeed() {
         <h3 className="text-[15px] font-medium text-foreground">Recent alerts</h3>
         <Link
           to="/manipulation"
-          search={{ symbol: undefined, riskLevel: undefined, limit: undefined }}
+          search={{ symbol: "", riskLevel: "", limit: 20 }}
           className="text-[12px] text-[var(--brand-cyan)] hover:underline"
         >
           View all
