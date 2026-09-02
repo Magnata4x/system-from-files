@@ -7,8 +7,10 @@ type Filter = "ALL" | "BUY" | "SELL" | "HIGH";
 
 export function SignalsTable() {
   const signals = useDashboardStore((s) => s.signals);
+  const loading = useDashboardStore((s) => s.signalsLoading);
+  const error = useDashboardStore((s) => s.signalsError);
   const setSelected = useDashboardStore((s) => s.setSelectedSignal);
-  const [filter, setFilter] = useState<Filter>("ALL");
+
 
   const filtered = signals.filter((s) => {
     if (filter === "ALL") return true;
