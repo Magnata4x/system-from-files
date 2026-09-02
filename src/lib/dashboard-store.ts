@@ -1,7 +1,9 @@
 import { create } from "zustand";
-import { heatmap as initialHeatmap, initialSignals, upcomingSignals, type HeatmapAsset, type Signal } from "./dashboard-data";
+import { heatmap as initialHeatmap, initialSignals, type HeatmapAsset, type Signal } from "./dashboard-data";
 import { api, endpoints } from "@/adapters/backend/api.adapter";
 import { signalAdapter } from "@/adapters/backend/signal.adapter";
+import { manipulationAdapter } from "@/adapters/backend/manipulation.adapter";
+import type { Alert as ManipulationAlert } from "@/lib/manipulation-data";
 import { logger } from "./logger";
 
 type Toast = {
@@ -26,6 +28,12 @@ interface DashboardState {
   prices: Record<string, { price: number; change: number; pulse: number }>;
   heatmap: HeatmapAsset[];
   signals: Signal[];
+  /** true enquanto o primeiro pull de sinais não retornou. */
+  signalsLoading: boolean;
+  signalsError: string | null;
+  manipAlerts: ManipulationAlert[];
+  manipLoading: boolean;
+  manipError: string | null;
   toasts: Toast[];
   selectedSignal: Signal | null;
   cmdkOpen: boolean;
@@ -40,7 +48,8 @@ interface DashboardState {
   setCmdkOpen: (v: boolean) => void;
 }
 
-let signalIndex = 0;
+/** Ids de sinais já vistos — usados para emitir toast só de novidade real. */
+let seenSignalIds: Set<string> | null = null;
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
   prices: Object.fromEntries(
@@ -48,12 +57,18 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   ),
   heatmap: initialHeatmap,
   signals: initialSignals,
+  signalsLoading: true,
+  signalsError: null,
+  manipAlerts: [],
+  manipLoading: true,
+  manipError: null,
   toasts: [],
   selectedSignal: null,
   cmdkOpen: false,
   risk: null,
   regime: null,
   _intervalIds: new Set<number>(),
+
 
   init: () => {
     if (get()._intervalIds.size > 0) return;
