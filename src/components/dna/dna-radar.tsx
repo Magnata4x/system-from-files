@@ -18,9 +18,13 @@ export function DnaRadar() {
   const [compare, setCompare] = useState(false);
   const [animKey, setAnimKey] = useState(0);
 
+  const { data: stats } = useDnaStats();
+  const live = !!stats?.hasData && stats.radar.length > 0;
+
   const data = useMemo(
-    () => RADAR.map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
-    []
+    () =>
+      (live ? stats!.radar : RADAR).map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
+    [live, stats],
   );
 
   return (
