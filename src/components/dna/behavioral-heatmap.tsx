@@ -31,13 +31,13 @@ function statsFor(cell: Cell): CellStats {
 }
 
 export function BehavioralHeatmap() {
-  const { data: stats } = useDnaStats();
-  const live = !!stats?.hasData && stats.heatmap.length > 0;
+  const { data: dna } = useDnaStats();
+  const live = !!dna?.hasData && dna.heatmap.length > 0;
 
   const data = useMemo<Cell[]>(
     () =>
       live
-        ? stats!.heatmap.map((h) => ({
+        ? dna!.heatmap.map((h) => ({
             date: new Date(`${h.date}T00:00:00`),
             value: h.value,
             trades: h.trades,
@@ -45,7 +45,7 @@ export function BehavioralHeatmap() {
             live: true,
           }))
         : buildHeatmap(),
-    [live, stats],
+    [live, dna],
   );
   const [hover, setHover] = useState<{ cell: Cell; x: number; y: number } | null>(null);
 
@@ -61,6 +61,42 @@ export function BehavioralHeatmap() {
 
   const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
   const stats = hover ? statsFor(hover.cell) : null;
+
+  const summary = useMemo(() => {
+    if (!live) {
+      return [
+        { l: "Best day", v: "Tuesday" },
+        { l: "Worst day", v: "Monday" },
+        { l: "Most active", v: "Wednesday" },
+        { l: "Best session", v: "London Open" },
+        { l: "Avg trades / day", v: "3.2" },
+      ];
+    }
+    const names = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+    const byWeekday = new Map<number, { pnl: number; trades: number }>();
+    let activeDays = 0;
+    let totalTrades = 0;
+    for (const c of data) {
+      if ((c.trades ?? 0) === 0) continue;
+      activeDays += 1;
+      totalTrades += c.trades ?? 0;
+      const wd = c.date.getDay();
+      const cur = byWeekday.get(wd) ?? { pnl: 0, trades: 0 };
+      cur.pnl += c.pnl ?? 0;
+      cur.trades += c.trades ?? 0;
+      byWeekday.set(wd, cur);
+    }
+    const entries = [...byWeekday.entries()];
+    const byPnl = [...entries].sort((a, b) => b[1].pnl - a[1].pnl);
+    const byVol = [...entries].sort((a, b) => b[1].trades - a[1].trades);
+    return [
+      { l: "Melhor dia", v: byPnl.length ? names[byPnl[0][0]] : "—" },
+      { l: "Pior dia", v: byPnl.length ? names[byPnl[byPnl.length - 1][0]] : "—" },
+      { l: "Mais ativo", v: byVol.length ? names[byVol[0][0]] : "—" },
+      { l: "Dias operados", v: String(activeDays) },
+      { l: "Média trades / dia", v: activeDays ? (totalTrades / activeDays).toFixed(1) : "0" },
+    ];
+  }, [live, data]);
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5 relative">
@@ -142,13 +178,7 @@ export function BehavioralHeatmap() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-5 pt-4 border-t border-border">
-        {[
-          { l: "Best day", v: "Tuesday" },
-          { l: "Worst day", v: "Monday" },
-          { l: "Most active", v: "Wednesday" },
-          { l: "Best session", v: "London Open" },
-          { l: "Avg trades / day", v: "3.2" },
-        ].map((s) => (
+        {summary.map((s) => (
           <div key={s.l}>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.l}</div>
             <div className="text-sm font-medium mt-0.5">{s.v}</div>
