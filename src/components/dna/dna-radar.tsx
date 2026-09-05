@@ -1,5 +1,6 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
 import { RADAR } from "@/lib/dna-data";
+import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Trophy } from "lucide-react";
@@ -17,9 +18,13 @@ export function DnaRadar() {
   const [compare, setCompare] = useState(false);
   const [animKey, setAnimKey] = useState(0);
 
+  const { data: stats } = useDnaStats();
+  const live = !!stats?.hasData && stats.radar.length > 0;
+
   const data = useMemo(
-    () => RADAR.map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
-    []
+    () =>
+      (live ? stats!.radar : RADAR).map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
+    [live, stats],
   );
 
   return (
@@ -27,7 +32,9 @@ export function DnaRadar() {
       <div className="mb-2 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">DNA radar</h2>
-          <p className="text-xs text-muted-foreground">Your DNA vs Institutional Benchmark</p>
+          <p className="text-xs text-muted-foreground">
+            {live ? "Seu DNA real vs benchmark institucional" : "Exemplo demonstrativo vs benchmark institucional"}
+          </p>
         </div>
         <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
           <Trophy className="size-3.5 text-amber-400" />
