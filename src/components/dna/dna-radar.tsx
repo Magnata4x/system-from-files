@@ -1,5 +1,6 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
 import { RADAR } from "@/lib/dna-data";
+import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Trophy } from "lucide-react";
