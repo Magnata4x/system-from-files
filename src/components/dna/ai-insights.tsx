@@ -1,7 +1,28 @@
 import { INSIGHTS } from "@/lib/dna-data";
-import { TrendingUp, Scissors, Flame, CalendarClock, ShieldCheck, Newspaper } from "lucide-react";
+import { useDnaStats } from "@/hooks/useDnaStats";
+import {
+  TrendingUp,
+  TrendingDown,
+  Scissors,
+  Flame,
+  CalendarClock,
+  ShieldCheck,
+  Newspaper,
+  Sparkles,
+  Target,
+} from "lucide-react";
 
-const ICONS = { TrendingUp, Scissors, Flame, CalendarClock, ShieldCheck, Newspaper } as const;
+const ICONS = {
+  TrendingUp,
+  TrendingDown,
+  Scissors,
+  Flame,
+  CalendarClock,
+  ShieldCheck,
+  Newspaper,
+  Sparkles,
+  Target,
+} as const;
 
 const TONE = {
   good: { border: "border-l-emerald-500", icon: "text-emerald-400", bg: "bg-emerald-500/5" },
