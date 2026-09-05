@@ -31,14 +31,35 @@ const TONE = {
 };
 
 export function AiInsights() {
+  const { data, isLoading } = useDnaStats();
+  const live = data?.hasData && data.insights.length > 0;
+  const items = live ? data!.insights : INSIGHTS;
+
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5">
-      <div className="mb-4">
-        <h2 className="text-sm font-semibold">AI behavioral insights</h2>
-        <p className="text-xs text-muted-foreground">Patterns detected across your last 90 days of activity.</p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold">AI behavioral insights</h2>
+          <p className="text-xs text-muted-foreground">
+            {live
+              ? `Padrões detectados em ${data!.totalTrades} operações reais.`
+              : isLoading
+                ? "Analisando seu histórico…"
+                : "Sem histórico suficiente — exemplo demonstrativo."}
+          </p>
+        </div>
+        <span
+          className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+            live
+              ? "border-emerald-500/40 text-emerald-300 bg-emerald-500/10"
+              : "border-border text-muted-foreground bg-muted/20"
+          }`}
+        >
+          {live ? "ao vivo" : "demo"}
+        </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {INSIGHTS.map((ins) => {
+        {items.map((ins) => {
           const Icon = ICONS[ins.icon as keyof typeof ICONS] ?? TrendingUp;
           const t = TONE[ins.tone];
           return (
