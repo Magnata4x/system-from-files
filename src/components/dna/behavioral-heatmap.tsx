@@ -1,4 +1,5 @@
 import { buildHeatmap } from "@/lib/dna-data";
+import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
 
 function colorFor(v: number) {
@@ -8,10 +9,13 @@ function colorFor(v: number) {
   return shades[Math.min(v, 4) - 1];
 }
 
-type Cell = { date: Date; value: number };
+type Cell = { date: Date; value: number; trades?: number; pnl?: number; live?: boolean };
 type CellStats = { trades: number; pnl: number; winRate: number };
 
 function statsFor(cell: Cell): CellStats {
+  if (cell.live) {
+    return { trades: cell.trades ?? 0, pnl: Math.round(cell.pnl ?? 0), winRate: 0 };
+  }
   // deterministic pseudo-stats from value + date
   const seed = cell.date.getDate() + cell.date.getMonth() * 31;
   const rnd = (n: number) => ((seed * (n + 7)) % 100) / 100;
@@ -27,7 +31,22 @@ function statsFor(cell: Cell): CellStats {
 }
 
 export function BehavioralHeatmap() {
-  const data = useMemo(() => buildHeatmap(), []);
+  const { data: stats } = useDnaStats();
+  const live = !!stats?.hasData && stats.heatmap.length > 0;
+
+  const data = useMemo<Cell[]>(
+    () =>
+      live
+        ? stats!.heatmap.map((h) => ({
+            date: new Date(`${h.date}T00:00:00`),
+            value: h.value,
+            trades: h.trades,
+            pnl: h.pnl,
+            live: true,
+          }))
+        : buildHeatmap(),
+    [live, stats],
+  );
   const [hover, setHover] = useState<{ cell: Cell; x: number; y: number } | null>(null);
 
   const weeks: (Cell | null)[][] = [];
@@ -48,7 +67,9 @@ export function BehavioralHeatmap() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-sm font-semibold">Behavioral heatmap</h2>
-          <p className="text-xs text-muted-foreground">Last 90 days — green: profit · red: loss · gray: no trades</p>
+          <p className="text-xs text-muted-foreground">
+            {live ? "Últimos 90 dias — dados reais das suas operações" : "Últimos 90 dias — exemplo demonstrativo"}
+          </p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <span>Less</span>
@@ -107,10 +128,12 @@ export function BehavioralHeatmap() {
                       {stats.pnl >= 0 ? "+" : ""}{stats.pnl}u
                     </span>
                   </div>
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Win rate</span>
-                    <span className="font-medium">{stats.winRate}%</span>
-                  </div>
+                  {!hover.cell.live && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">Win rate</span>
+                      <span className="font-medium">{stats.winRate}%</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
