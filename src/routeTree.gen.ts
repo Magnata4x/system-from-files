@@ -44,6 +44,7 @@ import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
 import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
+import { Route as ApiDnaStatsRouteImport } from './routes/api/dna/stats'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
@@ -241,6 +242,11 @@ const ApiExchangeCredentialsRoute = ApiExchangeCredentialsRouteImport.update({
   path: '/api/exchange/credentials',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDnaStatsRoute = ApiDnaStatsRouteImport.update({
+  id: '/api/dna/stats',
+  path: '/api/dna/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
   id: '/api/copilot/history',
   path: '/api/copilot/history',
@@ -369,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
@@ -477,6 +485,7 @@ export interface FileRoutesById {
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
@@ -532,6 +541,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
@@ -585,6 +595,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
@@ -639,6 +650,7 @@ export interface FileRouteTypes {
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
     | '/api/copilot/history'
+    | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
@@ -673,6 +685,7 @@ export interface RootRouteChildren {
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
   ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
+  ApiDnaStatsRoute: typeof ApiDnaStatsRoute
   ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
   ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
@@ -938,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExchangeCredentialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/dna/stats': {
+      id: '/api/dna/stats'
+      path: '/api/dna/stats'
+      fullPath: '/api/dna/stats'
+      preLoaderRoute: typeof ApiDnaStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/copilot/history': {
       id: '/api/copilot/history'
       path: '/api/copilot/history'
@@ -1174,6 +1194,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
+  ApiDnaStatsRoute: ApiDnaStatsRoute,
   ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
   ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
