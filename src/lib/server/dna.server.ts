@@ -14,7 +14,7 @@ export interface DnaStatsResponse {
   totalPnl: number
   radar: { axis: string; you: number; bench: number }[]
   gauges: { label: string; value: number }[]
-  heatmap: { date: string; value: number }[]
+  heatmap: { date: string; value: number; trades: number; pnl: number }[]
   evolution: { month: string; overall: number; emotional: number; note?: string }[]
   insights: { tone: 'good' | 'bad' | 'warn'; icon: string; title: string; desc: string; action: string }[]
 }
@@ -160,7 +160,9 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   ]
 
   // Heatmap dos últimos 90 dias (intensidade -1..4)
-  const heatmap: { date: string; value: number }[] = []
+  const tradesByDay = new Map<string, number>()
+  for (const t of rows) tradesByDay.set(t.day, (tradesByDay.get(t.day) ?? 0) + 1)
+  const heatmap: { date: string; value: number; trades: number; pnl: number }[] = []
   const today = new Date()
   for (let i = 89; i >= 0; i--) {
     const d = new Date(today)
@@ -172,7 +174,12 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
       if (pnl < 0) value = -1
       else value = Math.min(4, Math.max(1, Math.ceil((Math.abs(pnl) / maxPerDay) * 4)))
     }
-    heatmap.push({ date: key, value })
+    heatmap.push({
+      date: key,
+      value,
+      trades: tradesByDay.get(key) ?? 0,
+      pnl: Number((pnl ?? 0).toFixed(2)),
+    })
   }
 
   // Evolução mensal (últimos 6 meses)

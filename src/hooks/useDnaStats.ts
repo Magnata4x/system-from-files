@@ -14,7 +14,7 @@ export interface DnaStats {
   totalPnl: number;
   radar: { axis: string; you: number; bench: number }[];
   gauges: { label: string; value: number }[];
-  heatmap: { date: string; value: number }[];
+  heatmap: { date: string; value: number; trades: number; pnl: number }[];
   evolution: { month: string; overall: number; emotional: number; note?: string }[];
   insights: { tone: "good" | "bad" | "warn"; icon: string; title: string; desc: string; action: string }[];
 }
