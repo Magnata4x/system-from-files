@@ -12,6 +12,7 @@ import { backendWs, type WsStatus } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
 import { buildChatMessage, buildInit, normalizeInbound } from "@/adapters/backend/copilot.adapter";
 import { logger } from "@/lib/logger";
+import { api } from "@/lib/apiClient";
 
 export type OrbState = "idle" | "listening" | "thinking" | "speaking" | "alert";
 export type MessageRole = "user" | "assistant" | "alert" | "system";
@@ -167,6 +168,7 @@ export function useCopilot(config: CopilotConfig) {
   const [isRecording, setIsRecording] = useState(false);
   const [latency, setLatency] = useState(0);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
 
   // Adiciona uma mensagem ao estado e persiste no banco quando aplicável.
   const addMessage = useCallback(
@@ -474,7 +476,10 @@ export function useCopilot(config: CopilotConfig) {
   return {
     messages,
     orbState,
-    isConnected,
+    // O painel sempre pode conversar: sem socket externo usamos o backend interno.
+    isConnected: true,
+    wsConnected: isConnected,
+    isThinking,
     isRecording,
     latency,
     historyLoaded,
