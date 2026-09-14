@@ -30,7 +30,7 @@ export function CopilotPanel({
   const [isRecordingActive, setIsRecordingActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, orbState, isConnected, wsConnected, isThinking, isRecording, latency,
+  const { messages, orbState, wsConnected, isThinking, isRecording, latency,
     sendMessage, startRecording, stopRecording, clearHistory, reconnect } =
     useCopilot({ userId, token, marketContext, traderProfile, onAlert });
 
