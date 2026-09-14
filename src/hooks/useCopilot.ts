@@ -12,6 +12,7 @@ import { backendWs, type WsStatus } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
 import { buildChatMessage, buildInit, normalizeInbound } from "@/adapters/backend/copilot.adapter";
 import { logger } from "@/lib/logger";
+import { api } from "@/lib/apiClient";
 
 export type OrbState = "idle" | "listening" | "thinking" | "speaking" | "alert";
 export type MessageRole = "user" | "assistant" | "alert" | "system";
@@ -167,6 +168,7 @@ export function useCopilot(config: CopilotConfig) {
   const [isRecording, setIsRecording] = useState(false);
   const [latency, setLatency] = useState(0);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
 
   // Adiciona uma mensagem ao estado e persiste no banco quando aplicável.
   const addMessage = useCallback(
@@ -355,43 +357,54 @@ export function useCopilot(config: CopilotConfig) {
     [userId, marketContext, traderProfile, addMessage],
   );
 
+  // Fallback interno: quando não há socket externo, conversa direto com o
+  // backend interno (/api/copilot/chat), que já persiste o histórico.
+  const sendViaInternal = useCallback(
+    async (text: string) => {
+      setMessages((p) => [...p, newMsg("user", text)]);
+      setOrbState("thinking");
+      setIsThinking(true);
+      const started = Date.now();
+      try {
+        const res = await api.post<{ reply: string; agent?: string; latency?: number }>(
+          "/copilot/chat",
+          {
+            message: text,
+            marketContext,
+            traderProfile,
+          },
+        );
+        setMessages((p) => [...p, newMsg("assistant", res.reply, { agent: res.agent ?? "copilot" })]);
+        setLatency(res.latency ?? Date.now() - started);
+      } catch (err) {
+        const anyErr = err as { response?: { data?: { message?: string } } };
+        setMessages((p) => [
+          ...p,
+          newMsg("system", anyErr?.response?.data?.message ?? "Não consegui responder agora. Tente novamente."),
+        ]);
+      } finally {
+        setIsThinking(false);
+        setOrbState("idle");
+      }
+    },
+    [marketContext, traderProfile],
+  );
+
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed) return;
 
-      const { data } = await supabase.auth.getSession();
-      let token = data.session?.access_token;
-      if (!token) {
-        const status = await tryRefreshAndReconnect();
-        if (status !== "open") {
-          pendingMessageRef.current = trimmed;
-          showUnauthMessage();
-          return;
-        }
-        token = (await supabase.auth.getSession()).data.session?.access_token;
+      if (backendWs.isAuthenticatedOpen()) {
+        const sent = doSend(trimmed);
+        if (sent) return;
       }
 
-      if (!backendWs.isAuthenticatedOpen()) {
-        const status = await backendWs.connect("/copilot");
-        if (status !== "open") {
-          const refreshed = await tryRefreshAndReconnect();
-          if (refreshed !== "open") {
-            pendingMessageRef.current = trimmed;
-            showUnauthMessage();
-            return;
-          }
-        }
-      }
-
-      const sent = doSend(trimmed);
-      if (!sent) {
-        pendingMessageRef.current = trimmed;
-        showUnauthMessage();
-      }
+      await sendViaInternal(trimmed);
     },
-    [doSend, showUnauthMessage, tryRefreshAndReconnect],
+    [doSend, sendViaInternal],
   );
+
 
   const reconnect = useCallback(async () => {
     setOrbState("thinking");
@@ -463,7 +476,10 @@ export function useCopilot(config: CopilotConfig) {
   return {
     messages,
     orbState,
-    isConnected,
+    // O painel sempre pode conversar: sem socket externo usamos o backend interno.
+    isConnected: true,
+    wsConnected: isConnected,
+    isThinking,
     isRecording,
     latency,
     historyLoaded,

@@ -40,12 +40,14 @@ import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
 import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
+import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketplace/products'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
 import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
 import { Route as ApiDnaStatsRouteImport } from './routes/api/dna/stats'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
+import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
@@ -222,6 +224,11 @@ const ApiPricesSymbolRoute = ApiPricesSymbolRouteImport.update({
   path: '/api/prices/$symbol',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketplaceProductsRoute = ApiMarketplaceProductsRouteImport.update({
+  id: '/api/marketplace/products',
+  path: '/api/marketplace/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
   id: '/api/market-regime/current',
   path: '/api/market-regime/current',
@@ -250,6 +257,11 @@ const ApiDnaStatsRoute = ApiDnaStatsRouteImport.update({
 const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
   id: '/api/copilot/history',
   path: '/api/copilot/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCopilotChatRoute = ApiCopilotChatRouteImport.update({
+  id: '/api/copilot/chat',
+  path: '/api/copilot/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
@@ -374,12 +386,14 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
+  '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
@@ -428,12 +442,14 @@ export interface FileRoutesByTo {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
+  '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
@@ -484,12 +500,14 @@ export interface FileRoutesById {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
+  '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
@@ -540,12 +558,14 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
+    | '/api/copilot/chat'
     | '/api/copilot/history'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
@@ -594,12 +614,14 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
+    | '/api/copilot/chat'
     | '/api/copilot/history'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
@@ -649,12 +671,14 @@ export interface FileRouteTypes {
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
     | '/api/bot4x/telemetry'
+    | '/api/copilot/chat'
     | '/api/copilot/history'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
@@ -684,12 +708,14 @@ export interface RootRouteChildren {
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
   ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
+  ApiCopilotChatRoute: typeof ApiCopilotChatRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
   ApiDnaStatsRoute: typeof ApiDnaStatsRoute
   ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
   ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
+  ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
   ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
   ApiRiskEvaluateRoute: typeof ApiRiskEvaluateRoute
   ApiRiskStatusRoute: typeof ApiRiskStatusRoute
@@ -923,6 +949,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPricesSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/marketplace/products': {
+      id: '/api/marketplace/products'
+      path: '/api/marketplace/products'
+      fullPath: '/api/marketplace/products'
+      preLoaderRoute: typeof ApiMarketplaceProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/market-regime/current': {
       id: '/api/market-regime/current'
       path: '/api/market-regime/current'
@@ -963,6 +996,13 @@ declare module '@tanstack/react-router' {
       path: '/api/copilot/history'
       fullPath: '/api/copilot/history'
       preLoaderRoute: typeof ApiCopilotHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copilot/chat': {
+      id: '/api/copilot/chat'
+      path: '/api/copilot/chat'
+      fullPath: '/api/copilot/chat'
+      preLoaderRoute: typeof ApiCopilotChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/bot4x/telemetry': {
@@ -1193,12 +1233,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
+  ApiCopilotChatRoute: ApiCopilotChatRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
   ApiDnaStatsRoute: ApiDnaStatsRoute,
   ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
   ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
+  ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
   ApiPricesSymbolRoute: ApiPricesSymbolRoute,
   ApiRiskEvaluateRoute: ApiRiskEvaluateRoute,
   ApiRiskStatusRoute: ApiRiskStatusRoute,

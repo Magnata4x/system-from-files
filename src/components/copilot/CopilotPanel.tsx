@@ -30,7 +30,7 @@ export function CopilotPanel({
   const [isRecordingActive, setIsRecordingActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, orbState, isConnected, isRecording, latency,
+  const { messages, orbState, wsConnected, isThinking, isRecording, latency,
     sendMessage, startRecording, stopRecording, clearHistory, reconnect } =
     useCopilot({ userId, token, marketContext, traderProfile, onAlert });
 
@@ -90,8 +90,8 @@ export function CopilotPanel({
             {latency > 0 && (
               <span style={{ fontSize: 9, color: '#5F5E5A', fontFamily: 'monospace' }}>{latency}ms</span>
             )}
-            <span style={{ fontSize: 9, color: isConnected ? '#3B6D11' : '#791F1F', fontFamily: 'monospace' }}>
-              {isConnected ? '● ON' : '○ OFF'}
+            <span style={{ fontSize: 9, color: wsConnected ? '#3B6D11' : '#8a6d1f', fontFamily: 'monospace' }}>
+              {wsConnected ? '● ON' : '● INTERNO'}
             </span>
             <button
               onClick={clearHistory}
@@ -126,6 +126,12 @@ export function CopilotPanel({
             </div>
           )}
           {messages.map(msg => <CopilotMessageBubble key={msg.id} msg={msg} onReconnect={reconnect} />)}
+          {isThinking && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 2px' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00e5a0', animation: 'copilot-pulse 1s infinite' }} />
+              <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#5F5E5A' }}>pensando…</span>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
@@ -140,13 +146,13 @@ export function CopilotPanel({
             onMouseLeave={() => isRecordingActive && handlePTTStop()}
             onTouchStart={(e) => { e.preventDefault(); handlePTTStart(); }}
             onTouchEnd={(e) => { e.preventDefault(); handlePTTStop(); }}
-            disabled={!isConnected}
+            disabled={!wsConnected}
             style={{
               width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
               border: `1px solid ${isRecording ? '#00c8f5' : '#1a1a1a'}`,
               background: isRecording ? '#00c8f511' : '#0a0a0a',
               boxShadow: isRecording ? '0 0 16px #00c8f544' : 'none',
-              cursor: isConnected ? 'pointer' : 'not-allowed',
+              cursor: wsConnected ? 'pointer' : 'not-allowed',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.15s',
             }}
@@ -164,7 +170,7 @@ export function CopilotPanel({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Pergunte ao Copilot..."
-            disabled={!isConnected}
+            disabled={isThinking}
             style={{
               flex: 1, background: '#0a0a0a',
               border: '1px solid #141414', color: '#cfcfcf',
@@ -175,13 +181,13 @@ export function CopilotPanel({
 
           <button
             onClick={handleSend}
-            disabled={!isConnected || !input.trim()}
+            disabled={isThinking || !input.trim()}
             style={{
               width: 38, height: 38, flexShrink: 0,
               border: '1px solid #00e5a033',
               background: '#00e5a011',
               color: '#00e5a0',
-              cursor: isConnected && input.trim() ? 'pointer' : 'not-allowed',
+              cursor: !isThinking && input.trim() ? 'pointer' : 'not-allowed',
               fontFamily: 'monospace', fontSize: 16,
             }}
             aria-label="Send"
