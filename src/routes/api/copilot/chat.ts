@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ApiError, handleApi } from '@/lib/server/api-auth.server'
 
 const GATEWAY = 'https://ai.gateway.lovable.dev/v1/chat/completions'
-const MODEL = 'google/gemini-2.5-flash'
+const MODEL = 'google/gemini-3.8-flash'
 
 interface ChatBody {
   message?: string
