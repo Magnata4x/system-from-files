@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MACRO } from "@/lib/sentiment-data";
+import { useSentiment } from "@/hooks/useSentiment";
 
 const ZONES = [
   { label: "Extreme Fear", color: "#E24B4A", from: 0, to: 20 },
@@ -24,7 +25,8 @@ function arc(cx: number, cy: number, r: number, start: number, end: number) {
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 export function SentimentGauge() {
-  const TARGET = MACRO.overall;
+  const { data } = useSentiment();
+  const TARGET = data?.overall ?? MACRO.overall;
   const [value, setValue] = useState(0);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export function SentimentGauge() {
     <div className="rounded-xl border border-border bg-card/40 p-4 h-full flex flex-col">
       <div className="flex items-baseline justify-between">
         <h3 className="text-[13px] font-medium text-foreground">Overall Sentiment</h3>
-        <span className="text-[10px] text-muted-foreground">Live</span>
+        <span className="text-[10px] text-muted-foreground">{data ? "ao vivo" : "demo"}</span>
       </div>
       <div className="relative flex-1 flex items-center justify-center">
         <svg viewBox="0 0 260 150" className="w-full max-w-[280px]">

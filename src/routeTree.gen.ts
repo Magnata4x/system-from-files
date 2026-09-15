@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as ApiSignalsIndexRouteImport } from './routes/api/signals/index'
 import { Route as ApiPricesIndexRouteImport } from './routes/api/prices/index'
 import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
+import { Route as ApiSentimentOverviewRouteImport } from './routes/api/sentiment/overview'
 import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
@@ -207,6 +208,11 @@ const ApiPricesIndexRoute = ApiPricesIndexRouteImport.update({
 const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
   id: '/api/signals/$id',
   path: '/api/signals/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSentimentOverviewRoute = ApiSentimentOverviewRouteImport.update({
+  id: '/api/sentiment/overview',
+  path: '/api/sentiment/overview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRiskStatusRoute = ApiRiskStatusRouteImport.update({
@@ -397,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
+  '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
+  '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
@@ -511,6 +519,7 @@ export interface FileRoutesById {
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
   '/api/risk/status': typeof ApiRiskStatusRoute
+  '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
@@ -569,6 +578,7 @@ export interface FileRouteTypes {
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
+    | '/api/sentiment/overview'
     | '/api/signals/$id'
     | '/api/prices/'
     | '/api/signals/'
@@ -625,6 +635,7 @@ export interface FileRouteTypes {
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
+    | '/api/sentiment/overview'
     | '/api/signals/$id'
     | '/api/prices'
     | '/api/signals'
@@ -682,6 +693,7 @@ export interface FileRouteTypes {
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
     | '/api/risk/status'
+    | '/api/sentiment/overview'
     | '/api/signals/$id'
     | '/api/prices/'
     | '/api/signals/'
@@ -719,6 +731,7 @@ export interface RootRouteChildren {
   ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
   ApiRiskEvaluateRoute: typeof ApiRiskEvaluateRoute
   ApiRiskStatusRoute: typeof ApiRiskStatusRoute
+  ApiSentimentOverviewRoute: typeof ApiSentimentOverviewRoute
   ApiSignalsIdRoute: typeof ApiSignalsIdRoute
   ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
@@ -926,6 +939,13 @@ declare module '@tanstack/react-router' {
       path: '/api/signals/$id'
       fullPath: '/api/signals/$id'
       preLoaderRoute: typeof ApiSignalsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sentiment/overview': {
+      id: '/api/sentiment/overview'
+      path: '/api/sentiment/overview'
+      fullPath: '/api/sentiment/overview'
+      preLoaderRoute: typeof ApiSentimentOverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/risk/status': {
@@ -1244,6 +1264,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPricesSymbolRoute: ApiPricesSymbolRoute,
   ApiRiskEvaluateRoute: ApiRiskEvaluateRoute,
   ApiRiskStatusRoute: ApiRiskStatusRoute,
+  ApiSentimentOverviewRoute: ApiSentimentOverviewRoute,
   ApiSignalsIdRoute: ApiSignalsIdRoute,
   ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiSignalsIndexRoute: ApiSignalsIndexRoute,

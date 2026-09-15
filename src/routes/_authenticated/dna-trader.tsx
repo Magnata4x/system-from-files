@@ -9,6 +9,7 @@ import { AiInsights } from "@/components/dna/ai-insights";
 import { EvolutionTimeline } from "@/components/dna/evolution-timeline";
 import { AiRecommendations } from "@/components/dna/ai-recommendations";
 import { DnaBot4xCompat } from "@/components/dna/dna-bot4x-compat";
+import { DnaOperations } from "@/components/dna/dna-operations";
 
 export const Route = createFileRoute("/_authenticated/dna-trader")({
   head: () => ({
@@ -41,6 +42,8 @@ function DnaTraderPage() {
               <StatsGrid />
             </div>
           </div>
+
+          <DnaOperations />
 
           <AiInsights />
           <EvolutionTimeline />

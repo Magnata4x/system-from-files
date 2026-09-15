@@ -12,6 +12,8 @@ import { ProductDetailModal } from "@/components/marketplace/product-detail-moda
 import { CreatorBanner } from "@/components/marketplace/creator-banner";
 import { CATEGORIES, PRODUCTS, type CategoryFilter, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
+import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
   head: () => ({
@@ -34,8 +36,12 @@ function MarketplacePage() {
   const [selected, setSelected] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
 
+  const { data: products, isPending, isError, refetch } = useMarketplaceProducts();
+  const catalog = products && products.length > 0 ? products : PRODUCTS;
+  const live = !!products && products.length > 0;
+
   const filtered = useMemo(() => {
-    let list = PRODUCTS;
+    let list = catalog;
     if (cat !== "All") list = list.filter((p) => p.category === cat);
     const q = query.trim().toLowerCase();
     if (q) {
@@ -53,7 +59,7 @@ function MarketplacePage() {
       return b.reviews - a.reviews;
     });
     return list;
-  }, [cat, query, sort]);
+  }, [catalog, cat, query, sort]);
 
   function openProduct(p: Product) {
     setSelected(p);
@@ -121,10 +127,25 @@ function MarketplacePage() {
                     <SelectItem value="price-desc">Maior preço</SelectItem>
                   </SelectContent>
                 </Select>
-                <span className="text-xs text-muted-foreground ml-auto">{filtered.length} produtos</span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  {filtered.length} produtos · {live ? "catálogo ao vivo" : "catálogo demo"}
+                </span>
               </div>
 
-              {filtered.length === 0 ? (
+              {isPending ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-44 rounded-lg" />
+                  ))}
+                </div>
+              ) : isError ? (
+                <div className="rounded-lg border border-dashed border-border bg-card/20 p-10 text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">Não foi possível carregar o catálogo.</p>
+                  <button onClick={() => void refetch()} className="text-xs underline text-foreground">
+                    Tentar de novo
+                  </button>
+                </div>
+              ) : filtered.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border bg-card/20 p-12 text-center text-sm text-muted-foreground">
                   Nenhum produto encontrado para os filtros atuais.
                 </div>

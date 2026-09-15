@@ -17,6 +17,7 @@ import {
   type BackendManipulationAlert,
 } from "@/adapters/backend/manipulation.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
+import { useBinanceManipulationStream } from "@/hooks/useBinanceManipulationStream";
 
 const PAGE_SIZES = [10, 20, 50, 100];
 
@@ -120,6 +121,20 @@ function ManipulationPage() {
     };
   }, [queryClient, alertsKey, symbol, riskLevel, limit]);
 
+  // Alertas ao vivo direto do fluxo público da Binance (sem esperar o polling).
+  const pushLive = useCallback(
+    (alert: Alert) => {
+      if (riskLevel && alert.severity !== riskLevel) return;
+      queryClient.setQueryData<Alert[]>(alertsKey, (prev) => {
+        const list = prev ?? [];
+        if (list.some((a) => a.id === alert.id)) return list;
+        return [alert, ...list].slice(0, limit);
+      });
+    },
+    [queryClient, alertsKey, riskLevel, limit],
+  );
+  const { liveConnected } = useBinanceManipulationStream(symbol || undefined, pushLive);
+
   const hasBackendAlerts = Boolean(liveAlerts && liveAlerts.length > 0);
   const isEmpty = Boolean(liveAlerts && liveAlerts.length === 0);
   const alerts = hasBackendAlerts ? liveAlerts! : alertsError || isEmpty ? [] : MOCK_ALERTS;
@@ -209,6 +224,13 @@ function ManipulationPage() {
                 Reset
               </button>
             )}
+            <span
+              className="ml-auto text-[11px]"
+              style={{ color: liveConnected ? "#1D9E75" : "#8a6d1f" }}
+              title="Fluxo público da Binance"
+            >
+              {liveConnected ? "● ao vivo" : "○ conectando…"}
+            </span>
             {alertsFetching && !alertsPending && (
               <span className="text-[11px] text-muted-foreground">Atualizando…</span>
             )}
