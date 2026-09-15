@@ -1,4 +1,6 @@
 import { ASSETS } from "@/lib/sentiment-data";
+import { useSentiment } from "@/hooks/useSentiment";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 const trendIcon: Record<string, string> = { up: "↑", upup: "↑↑", flat: "→", down: "↓" };
@@ -7,6 +9,23 @@ const trendColor: Record<string, string> = {
 };
 
 export function AssetSentimentTable() {
+  const { data, isPending, isError } = useSentiment();
+  const rows = data?.assets?.length ? data.assets : ASSETS;
+
+  if (isPending) {
+    return (
+      <div className="rounded-xl border border-border bg-card/40 p-4 space-y-2">
+        <div className="flex items-baseline justify-between mb-3">
+        <h3 className="text-sm font-semibold">Asset Sentiment</h3>
+        <span className="text-[10px] text-muted-foreground">
+          {isError ? "dados indisponíveis · demo" : data ? "ao vivo" : "demo"}
+        </span>
+      </div>
+        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-border bg-card/40 p-4">
       <h3 className="text-sm font-semibold mb-3">Asset Sentiment</h3>
@@ -24,7 +43,7 @@ export function AssetSentimentTable() {
             </tr>
           </thead>
           <tbody>
-            {ASSETS.map((a) => (
+            {rows.map((a) => (
               <tr key={a.asset} className="border-t border-border/60 hover:bg-secondary/30">
                 <td className="py-2.5 font-semibold">{a.asset}</td>
                 <td className="tabular-nums">{a.social}</td>
