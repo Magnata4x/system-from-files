@@ -326,6 +326,48 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_products: {
+        Row: {
+          category: string
+          created_at: string
+          creator_handle: string
+          creator_verified: boolean
+          description: string
+          featured: boolean
+          id: string
+          name: string
+          price: number
+          rating: number
+          reviews: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          creator_handle: string
+          creator_verified?: boolean
+          description?: string
+          featured?: boolean
+          id: string
+          name: string
+          price?: number
+          rating?: number
+          reviews?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          creator_handle?: string
+          creator_verified?: boolean
+          description?: string
+          featured?: boolean
+          id?: string
+          name?: string
+          price?: number
+          rating?: number
+          reviews?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
