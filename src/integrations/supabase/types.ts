@@ -287,6 +287,48 @@ export type Database = {
         }
         Relationships: []
       }
+      copy_follows: {
+        Row: {
+          active: boolean
+          config: Json
+          created_at: string
+          id: string
+          pnl: number
+          trader_handle: string | null
+          trader_id: string
+          trades: number
+          updated_at: string
+          user_id: string
+          win_rate: number
+        }
+        Insert: {
+          active?: boolean
+          config?: Json
+          created_at?: string
+          id?: string
+          pnl?: number
+          trader_handle?: string | null
+          trader_id: string
+          trades?: number
+          updated_at?: string
+          user_id: string
+          win_rate?: number
+        }
+        Update: {
+          active?: boolean
+          config?: Json
+          created_at?: string
+          id?: string
+          pnl?: number
+          trader_handle?: string | null
+          trader_id?: string
+          trades?: number
+          updated_at?: string
+          user_id?: string
+          win_rate?: number
+        }
+        Relationships: []
+      }
       exchange_credentials: {
         Row: {
           api_key_cipher: string
@@ -328,6 +370,7 @@ export type Database = {
       }
       marketplace_products: {
         Row: {
+          assets: string[]
           category: string
           created_at: string
           creator_handle: string
@@ -341,6 +384,7 @@ export type Database = {
           reviews: number
         }
         Insert: {
+          assets?: string[]
           category: string
           created_at?: string
           creator_handle: string
@@ -354,6 +398,7 @@ export type Database = {
           reviews?: number
         }
         Update: {
+          assets?: string[]
           category?: string
           created_at?: string
           creator_handle?: string
@@ -365,6 +410,27 @@ export type Database = {
           price?: number
           rating?: number
           reviews?: number
+        }
+        Relationships: []
+      }
+      marketplace_views: {
+        Row: {
+          id: string
+          product_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          user_id?: string
+          viewed_at?: string
         }
         Relationships: []
       }
@@ -637,6 +703,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          alert_settings: Json
           bot4x_alerts: Json
           compact_pill: boolean
           onboarding_done: boolean
@@ -645,6 +712,7 @@ export type Database = {
           wishlist: string[]
         }
         Insert: {
+          alert_settings?: Json
           bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
@@ -653,6 +721,7 @@ export type Database = {
           wishlist?: string[]
         }
         Update: {
+          alert_settings?: Json
           bot4x_alerts?: Json
           compact_pill?: boolean
           onboarding_done?: boolean
