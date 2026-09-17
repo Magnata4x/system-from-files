@@ -42,11 +42,13 @@ import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
 import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketplace/products'
+import { Route as ApiMarketplaceHistoryRouteImport } from './routes/api/marketplace/history'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
 import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
 import { Route as ApiDnaStatsRouteImport } from './routes/api/dna/stats'
+import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
@@ -55,9 +57,12 @@ import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
 import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
+import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
 import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
 import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiSentimentAssetSymbolRouteImport } from './routes/api/sentiment/asset.$symbol'
 import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/manipulation/snapshot.$pair'
 import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
 import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
@@ -235,6 +240,11 @@ const ApiMarketplaceProductsRoute = ApiMarketplaceProductsRouteImport.update({
   path: '/api/marketplace/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketplaceHistoryRoute = ApiMarketplaceHistoryRouteImport.update({
+  id: '/api/marketplace/history',
+  path: '/api/marketplace/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
   id: '/api/market-regime/current',
   path: '/api/market-regime/current',
@@ -258,6 +268,11 @@ const ApiExchangeCredentialsRoute = ApiExchangeCredentialsRouteImport.update({
 const ApiDnaStatsRoute = ApiDnaStatsRouteImport.update({
   id: '/api/dna/stats',
   path: '/api/dna/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCopyFollowsRoute = ApiCopyFollowsRouteImport.update({
+  id: '/api/copy/follows',
+  path: '/api/copy/follows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
@@ -300,6 +315,16 @@ const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
   path: '/api/auth/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAlertsSettingsRoute = ApiAlertsSettingsRouteImport.update({
+  id: '/api/alerts/settings',
+  path: '/api/alerts/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlertsFeedRoute = ApiAlertsFeedRouteImport.update({
+  id: '/api/alerts/feed',
+  path: '/api/alerts/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCalibratorHistoryRoute =
   AuthenticatedCalibratorHistoryRouteImport.update({
     id: '/history',
@@ -318,6 +343,11 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiSentimentAssetSymbolRoute = ApiSentimentAssetSymbolRouteImport.update({
+  id: '/api/sentiment/asset/$symbol',
+  path: '/api/sentiment/asset/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiManipulationSnapshotPairRoute =
   ApiManipulationSnapshotPairRouteImport.update({
     id: '/api/manipulation/snapshot/$pair',
@@ -386,6 +416,8 @@ export interface FileRoutesByFullPath {
   '/signals': typeof AuthenticatedSignalsRoute
   '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/alerts/feed': typeof ApiAlertsFeedRoute
+  '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
@@ -394,11 +426,13 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/copy/follows': typeof ApiCopyFollowsRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -414,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
@@ -443,6 +478,8 @@ export interface FileRoutesByTo {
   '/signals': typeof AuthenticatedSignalsRoute
   '/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/alerts/feed': typeof ApiAlertsFeedRoute
+  '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
@@ -451,11 +488,13 @@ export interface FileRoutesByTo {
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/copy/follows': typeof ApiCopyFollowsRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -471,6 +510,7 @@ export interface FileRoutesByTo {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -502,6 +542,8 @@ export interface FileRoutesById {
   '/_authenticated/signals': typeof AuthenticatedSignalsRoute
   '/_authenticated/bot4x/onboarding': typeof AuthenticatedBot4xOnboardingRoute
   '/_authenticated/calibrator/history': typeof AuthenticatedCalibratorHistoryRouteWithChildren
+  '/api/alerts/feed': typeof ApiAlertsFeedRoute
+  '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
@@ -510,11 +552,13 @@ export interface FileRoutesById {
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
   '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
+  '/api/copy/follows': typeof ApiCopyFollowsRoute
   '/api/dna/stats': typeof ApiDnaStatsRoute
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
   '/api/prices/$symbol': typeof ApiPricesSymbolRoute
   '/api/risk/evaluate': typeof ApiRiskEvaluateRoute
@@ -530,6 +574,7 @@ export interface FileRoutesById {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -561,6 +606,8 @@ export interface FileRouteTypes {
     | '/signals'
     | '/bot4x/onboarding'
     | '/calibrator/history'
+    | '/api/alerts/feed'
+    | '/api/alerts/settings'
     | '/api/auth/me'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
@@ -569,11 +616,13 @@ export interface FileRouteTypes {
     | '/api/bot4x/telemetry'
     | '/api/copilot/chat'
     | '/api/copilot/history'
+    | '/api/copy/follows'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/history'
     | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -589,6 +638,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -618,6 +668,8 @@ export interface FileRouteTypes {
     | '/signals'
     | '/bot4x/onboarding'
     | '/calibrator/history'
+    | '/api/alerts/feed'
+    | '/api/alerts/settings'
     | '/api/auth/me'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
@@ -626,11 +678,13 @@ export interface FileRouteTypes {
     | '/api/bot4x/telemetry'
     | '/api/copilot/chat'
     | '/api/copilot/history'
+    | '/api/copy/follows'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/history'
     | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -646,6 +700,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -676,6 +731,8 @@ export interface FileRouteTypes {
     | '/_authenticated/signals'
     | '/_authenticated/bot4x/onboarding'
     | '/_authenticated/calibrator/history'
+    | '/api/alerts/feed'
+    | '/api/alerts/settings'
     | '/api/auth/me'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
@@ -684,11 +741,13 @@ export interface FileRouteTypes {
     | '/api/bot4x/telemetry'
     | '/api/copilot/chat'
     | '/api/copilot/history'
+    | '/api/copy/follows'
     | '/api/dna/stats'
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/marketplace/history'
     | '/api/marketplace/products'
     | '/api/prices/$symbol'
     | '/api/risk/evaluate'
@@ -704,6 +763,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -714,6 +774,8 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  ApiAlertsFeedRoute: typeof ApiAlertsFeedRoute
+  ApiAlertsSettingsRoute: typeof ApiAlertsSettingsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
   ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
@@ -722,11 +784,13 @@ export interface RootRouteChildren {
   ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
   ApiCopilotChatRoute: typeof ApiCopilotChatRoute
   ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
+  ApiCopyFollowsRoute: typeof ApiCopyFollowsRoute
   ApiDnaStatsRoute: typeof ApiDnaStatsRoute
   ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
   ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
+  ApiMarketplaceHistoryRoute: typeof ApiMarketplaceHistoryRoute
   ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
   ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
   ApiRiskEvaluateRoute: typeof ApiRiskEvaluateRoute
@@ -740,6 +804,7 @@ export interface RootRouteChildren {
   ApiCalibratorStateUserIdRoute: typeof ApiCalibratorStateUserIdRoute
   ApiDnaProfileUserIdRoute: typeof ApiDnaProfileUserIdRoute
   ApiManipulationSnapshotPairRoute: typeof ApiManipulationSnapshotPairRoute
+  ApiSentimentAssetSymbolRoute: typeof ApiSentimentAssetSymbolRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -976,6 +1041,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMarketplaceProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/marketplace/history': {
+      id: '/api/marketplace/history'
+      path: '/api/marketplace/history'
+      fullPath: '/api/marketplace/history'
+      preLoaderRoute: typeof ApiMarketplaceHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/market-regime/current': {
       id: '/api/market-regime/current'
       path: '/api/market-regime/current'
@@ -1009,6 +1081,13 @@ declare module '@tanstack/react-router' {
       path: '/api/dna/stats'
       fullPath: '/api/dna/stats'
       preLoaderRoute: typeof ApiDnaStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copy/follows': {
+      id: '/api/copy/follows'
+      path: '/api/copy/follows'
+      fullPath: '/api/copy/follows'
+      preLoaderRoute: typeof ApiCopyFollowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/copilot/history': {
@@ -1067,6 +1146,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthMeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/alerts/settings': {
+      id: '/api/alerts/settings'
+      path: '/api/alerts/settings'
+      fullPath: '/api/alerts/settings'
+      preLoaderRoute: typeof ApiAlertsSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/feed': {
+      id: '/api/alerts/feed'
+      path: '/api/alerts/feed'
+      fullPath: '/api/alerts/feed'
+      preLoaderRoute: typeof ApiAlertsFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/calibrator/history': {
       id: '/_authenticated/calibrator/history'
       path: '/history'
@@ -1086,6 +1179,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/queue/process'
       fullPath: '/lovable/email/queue/process'
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sentiment/asset/$symbol': {
+      id: '/api/sentiment/asset/$symbol'
+      path: '/api/sentiment/asset/$symbol'
+      fullPath: '/api/sentiment/asset/$symbol'
+      preLoaderRoute: typeof ApiSentimentAssetSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/manipulation/snapshot/$pair': {
@@ -1247,6 +1347,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
+  ApiAlertsFeedRoute: ApiAlertsFeedRoute,
+  ApiAlertsSettingsRoute: ApiAlertsSettingsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
   ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
@@ -1255,11 +1357,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
   ApiCopilotChatRoute: ApiCopilotChatRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
+  ApiCopyFollowsRoute: ApiCopyFollowsRoute,
   ApiDnaStatsRoute: ApiDnaStatsRoute,
   ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
   ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
+  ApiMarketplaceHistoryRoute: ApiMarketplaceHistoryRoute,
   ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
   ApiPricesSymbolRoute: ApiPricesSymbolRoute,
   ApiRiskEvaluateRoute: ApiRiskEvaluateRoute,
@@ -1273,6 +1377,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCalibratorStateUserIdRoute: ApiCalibratorStateUserIdRoute,
   ApiDnaProfileUserIdRoute: ApiDnaProfileUserIdRoute,
   ApiManipulationSnapshotPairRoute: ApiManipulationSnapshotPairRoute,
+  ApiSentimentAssetSymbolRoute: ApiSentimentAssetSymbolRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
