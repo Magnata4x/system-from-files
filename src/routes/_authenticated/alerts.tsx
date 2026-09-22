@@ -1,5 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, KeyboardEvent } from "react";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import {
+  useAlertSettings,
+  useSaveAlertSettings,
+  useAlertFeed,
+  useMarkAlerts,
+} from "@/hooks/useAlertsBackend";
 import { Send, Mail, Bell, MessageSquare, Phone, X, Check, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { TopBar } from "@/components/dashboard/top-bar";
