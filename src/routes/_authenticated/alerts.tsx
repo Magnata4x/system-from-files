@@ -389,7 +389,13 @@ function AlertsPage() {
               <VolumeChart />
 
               {/* Section 5: Recent feed */}
-              <RecentFeed />
+              <RecentFeed
+                loading={feedLoading}
+                error={feedError}
+                live={!!serverFeed}
+                onMarkRead={(id) => markAlerts.mutate({ id })}
+                onMarkAll={() => markAlerts.mutate({ all: true })}
+              />
             </div>
 
             <aside className="hidden xl:block">

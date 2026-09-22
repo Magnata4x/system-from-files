@@ -18,15 +18,38 @@ function timeAgo(t: number) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-export function RecentFeed() {
+export function RecentFeed({
+  onMarkRead,
+  onMarkAll,
+  loading,
+  error,
+  live,
+}: {
+  onMarkRead?: (id: string) => void;
+  onMarkAll?: () => void;
+  loading?: boolean;
+  error?: boolean;
+  live?: boolean;
+} = {}) {
   const { feed, markRead, markAllRead, clearFeed } = useAlertsStore();
   const unread = feed.filter((f) => !f.read).length;
+  const handleRead = (id: string) => {
+    markRead(id);
+    onMarkRead?.(id);
+  };
+  const handleAll = () => {
+    markAllRead();
+    onMarkAll?.();
+  };
 
   return (
     <section className="rounded-xl border border-border bg-card/40">
       <header className="px-5 py-4 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-medium">Recent alerts</h2>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            {live ? "ao vivo" : "demo"}
+          </span>
           {unread > 0 && (
             <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--brand-cyan)] text-background">
               {unread}
@@ -35,7 +58,7 @@ export function RecentFeed() {
         </div>
         <div className="flex items-center gap-2 text-xs">
           <button
-            onClick={markAllRead}
+            onClick={handleAll}
             disabled={unread === 0}
             className="px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-40 disabled:hover:bg-transparent"
           >
@@ -53,8 +76,16 @@ export function RecentFeed() {
 
       <ul className="divide-y divide-border max-h-[480px] overflow-y-auto">
         <AnimatePresence initial={false}>
-          {feed.length === 0 && (
-            <li className="px-5 py-10 text-center text-sm text-muted-foreground">No alerts yet.</li>
+          {loading && feed.length === 0 && (
+            <li className="px-5 py-10 text-center text-sm text-muted-foreground">Carregando alertas…</li>
+          )}
+          {error && feed.length === 0 && (
+            <li className="px-5 py-10 text-center text-sm text-muted-foreground">
+              Não foi possível carregar os alertas agora.
+            </li>
+          )}
+          {!loading && !error && feed.length === 0 && (
+            <li className="px-5 py-10 text-center text-sm text-muted-foreground">Nenhum alerta ainda.</li>
           )}
           {feed.map((item) => {
             const meta = META[item.kind];
@@ -87,7 +118,7 @@ export function RecentFeed() {
                   <span className="text-[11px] text-muted-foreground tabular-nums">{timeAgo(item.at)}</span>
                   {!item.read && (
                     <button
-                      onClick={() => markRead(item.id)}
+                      onClick={() => handleRead(item.id)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity size-7 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground"
                       title="Mark read"
                     >
