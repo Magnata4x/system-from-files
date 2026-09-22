@@ -75,7 +75,7 @@ export async function saveAlertSettings(user: ApiUser, patch: unknown): Promise<
   const { error } = await user.supabase.from('user_preferences').upsert(
     {
       user_id: user.userId,
-      alert_settings: next as unknown as Record<string, unknown>,
+      alert_settings: JSON.parse(JSON.stringify(next)),
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },

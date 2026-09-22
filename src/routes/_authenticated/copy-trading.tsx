@@ -9,7 +9,8 @@ import { CopyConfigModal } from "@/components/copy-trading/copy-config-modal";
 import { MyCopies } from "@/components/copy-trading/my-copies";
 import { PerformanceChart } from "@/components/copy-trading/performance-chart";
 import { TopCopiers } from "@/components/copy-trading/top-copiers";
-import { INITIAL_COPIES, type ActiveCopy, type CopyConfig, type Trader } from "@/lib/copy-trading-data";
+import { type ActiveCopy, type CopyConfig, type Trader } from "@/lib/copy-trading-data";
+import { useCopyFollows, useFollowTrader, useUnfollowTrader } from "@/hooks/useCopyFollows";
 
 export const Route = createFileRoute("/_authenticated/copy-trading")({
   head: () => ({
@@ -24,9 +25,24 @@ export const Route = createFileRoute("/_authenticated/copy-trading")({
 });
 
 function CopyTradingPage() {
-  const [copies, setCopies] = useState<ActiveCopy[]>(INITIAL_COPIES);
+  const { data: follows, isPending, isError, refetch } = useCopyFollows();
+  const follow = useFollowTrader();
+  const unfollow = useUnfollowTrader();
   const [selected, setSelected] = useState<Trader | null>(null);
   const [open, setOpen] = useState(false);
+
+  const copies: ActiveCopy[] = useMemo(
+    () =>
+      (follows ?? []).map((f) => ({
+        traderId: f.traderId,
+        config: f.config as CopyConfig,
+        pnl: f.pnl,
+        trades: f.trades,
+        winRate: f.winRate,
+        since: (f.since ?? "").slice(0, 10),
+      })),
+    [follows],
+  );
 
   const copiedIds = useMemo(() => new Set(copies.map((c) => c.traderId)), [copies]);
 
@@ -37,26 +53,25 @@ function CopyTradingPage() {
 
   function confirmCopy(config: CopyConfig) {
     if (!selected) return;
-    setCopies((p) => [
-      ...p,
+    const trader = selected;
+    follow.mutate(
+      { traderId: trader.id, traderHandle: trader.handle, config },
       {
-        traderId: selected.id,
-        config,
-        pnl: 0,
-        trades: 0,
-        winRate: 0,
-        since: new Date().toISOString().slice(0, 10),
+        onSuccess: () =>
+          toast.success(`Copiando ${trader.handle}`, {
+            description: `Risco ${config.riskPerTrade.toFixed(2)}% · máx ${config.maxPositions} posições`,
+          }),
+        onError: () => toast.error("Não foi possível salvar essa cópia. Tente novamente."),
       },
-    ]);
-    toast.success(`Now copying ${selected.handle}`, {
-      description: `Risk ${config.riskPerTrade.toFixed(2)}% · max ${config.maxPositions} positions`,
-    });
+    );
     setOpen(false);
   }
 
   function stopCopy(traderId: string) {
-    setCopies((p) => p.filter((c) => c.traderId !== traderId));
-    toast("Stopped copying", { description: "Open positions will be closed at next opportunity." });
+    unfollow.mutate(traderId, {
+      onSuccess: () => toast("Cópia encerrada", { description: "As posições abertas serão fechadas na próxima oportunidade." }),
+      onError: () => toast.error("Não foi possível encerrar a cópia."),
+    });
   }
 
   return (
@@ -73,7 +88,20 @@ function CopyTradingPage() {
             <StatsRow />
             <Leaderboard onCopy={openCopy} copiedIds={copiedIds} />
             <PerformanceChart />
-            <MyCopies copies={copies} onStop={stopCopy} />
+            {isError ? (
+              <div className="rounded-lg border border-border bg-card/40 p-6 text-center space-y-3">
+                <p className="text-sm text-muted-foreground">Não foi possível carregar seus traders copiados.</p>
+                <button onClick={() => refetch()} className="text-sm text-[var(--brand-cyan)] hover:underline">
+                  Tentar de novo
+                </button>
+              </div>
+            ) : isPending ? (
+              <div className="rounded-lg border border-border bg-card/20 p-8 text-center text-sm text-muted-foreground">
+                Carregando seus traders copiados…
+              </div>
+            ) : (
+              <MyCopies copies={copies} onStop={stopCopy} />
+            )}
             <TopCopiers />
           </div>
         </main>

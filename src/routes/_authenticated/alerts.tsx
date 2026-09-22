@@ -1,5 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, KeyboardEvent } from "react";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import {
+  useAlertSettings,
+  useSaveAlertSettings,
+  useAlertFeed,
+  useMarkAlerts,
+} from "@/hooks/useAlertsBackend";
 import { Send, Mail, Bell, MessageSquare, Phone, X, Check, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { TopBar } from "@/components/dashboard/top-bar";
@@ -49,6 +55,50 @@ function AlertsPage() {
   const s = useAlertsStore();
   const [tgOpen, setTgOpen] = useState(false);
   const [assetInput, setAssetInput] = useState("");
+
+  // --- Backend interno: preferências + feed ---
+  const { data: settings } = useAlertSettings();
+  const saveSettings = useSaveAlertSettings();
+  const { data: serverFeed, isPending: feedLoading, isError: feedError } = useAlertFeed();
+  const markAlerts = useMarkAlerts();
+  const hydrated = useRef(false);
+  const hydrate = s.hydrate;
+  const setFeed = s.setFeed;
+
+  useEffect(() => {
+    if (!settings || hydrated.current) return;
+    hydrated.current = true;
+    hydrate({
+      channels: settings.channels as never,
+      types: settings.types as never,
+      minScore: settings.minScore,
+      frequency: settings.frequency,
+      quietHours: settings.quietHours,
+      assets: settings.assets,
+      bot4x: settings.bot4x,
+    });
+  }, [settings, hydrate]);
+
+  useEffect(() => {
+    if (serverFeed) setFeed(serverFeed);
+  }, [serverFeed, setFeed]);
+
+  const snapshot = JSON.stringify({
+    channels: s.channels,
+    types: s.types,
+    minScore: s.minScore,
+    frequency: s.frequency,
+    quietHours: s.quietHours,
+    assets: s.assets,
+    bot4x: s.bot4x,
+  });
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const t = setTimeout(() => saveSettings.mutate(JSON.parse(snapshot)), 800);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapshot]);
+
 
   const addAsset = (raw: string) => {
     const t = raw.trim().toUpperCase().replace(/[, ]+/g, "");
@@ -339,7 +389,13 @@ function AlertsPage() {
               <VolumeChart />
 
               {/* Section 5: Recent feed */}
-              <RecentFeed />
+              <RecentFeed
+                loading={feedLoading}
+                error={feedError}
+                live={!!serverFeed}
+                onMarkRead={(id) => markAlerts.mutate({ id })}
+                onMarkAll={() => markAlerts.mutate({ all: true })}
+              />
             </div>
 
             <aside className="hidden xl:block">
