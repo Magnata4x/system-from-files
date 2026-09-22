@@ -56,6 +56,8 @@ type Actions = {
   markAllRead: () => void;
   clearFeed: () => void;
   pushFeed: (i: FeedItem) => void;
+  hydrate: (patch: Partial<State>) => void;
+  setFeed: (f: FeedItem[]) => void;
 };
 
 const seed: FeedItem[] = [
@@ -107,4 +109,6 @@ export const useAlertsStore = create<State & Actions>((set) => ({
   markAllRead: () => set((s) => ({ feed: s.feed.map((f) => ({ ...f, read: true })) })),
   clearFeed: () => set({ feed: [] }),
   pushFeed: (i) => set((s) => ({ feed: [i, ...s.feed].slice(0, 50) })),
+  hydrate: (patch) => set((s) => ({ ...s, ...patch })),
+  setFeed: (f) => set({ feed: f }),
 }));
