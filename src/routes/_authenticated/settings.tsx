@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { Bell, Shield, Palette, CreditCard, KeyRound, Lock } from "lucide-react";
@@ -17,6 +16,9 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { name: "description", content: "Security, billing, API keys, privacy and notifications for your AISignalRadar account." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: tabs.some((item) => item.id === search.tab) ? (search.tab as TabId) : "notifications" as TabId,
+  }),
   component: SettingsPage,
 });
 
@@ -32,7 +34,8 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 function SettingsPage() {
-  const [active, setActive] = useState<TabId>("notifications");
+  const { tab: active } = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -53,7 +56,7 @@ function SettingsPage() {
                 return (
                   <button
                     key={t.id}
-                    onClick={() => setActive(t.id)}
+                    onClick={() => navigate({ search: { tab: t.id } })}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive
                         ? "bg-[var(--brand-blue-deep)] text-foreground"
