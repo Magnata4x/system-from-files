@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
@@ -10,6 +11,7 @@ import { TabCalibrador } from "@/components/bot4x/tab-calibrador";
 import { TabMonitor } from "@/components/bot4x/tab-monitor";
 import { TabHistorico } from "@/components/bot4x/tab-historico";
 import { TabExecucoes } from "@/components/bot4x/tab-execucoes";
+import { exchangeAdapter } from "@/adapters/backend/exchange.adapter";
 
 export const Route = createFileRoute("/_authenticated/bot4x")({
   head: () => ({
@@ -36,6 +38,12 @@ function Bot4xPage() {
   const cleanup = useBot4xStore((s) => s.cleanup);
   const breakerTriggered = useBot4xStore((s) => s.dailyPnlPct <= -1.5);
   const [tab, setTab] = useState<Tab>("painel");
+  const exchange = useQuery({
+    queryKey: ["exchange", "status"],
+    queryFn: exchangeAdapter.status,
+    staleTime: 60_000,
+  });
+  const exchangeVerified = Boolean(exchange.data?.verified);
 
   useEffect(() => {
     init();
@@ -49,7 +57,7 @@ function Bot4xPage() {
         <LeftSidebar />
         <main className="flex-1 min-w-0">
           <div className="max-w-[1200px] mx-auto p-5 space-y-5">
-            <Bot4xHeader />
+            <Bot4xHeader realModeUnlocked={exchangeVerified} />
             <div className="sticky top-0 z-10 bg-background/95 backdrop-blur flex items-center gap-1 border-b border-border -mx-5 px-5">
               {TABS.map((t) => {
                 const active = tab === t.id;
@@ -88,7 +96,7 @@ function Bot4xPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
             >
-              {tab === "painel" && <TabPainel />}
+              {tab === "painel" && <TabPainel exchangeVerified={exchangeVerified} />}
               {tab === "execucoes" && <TabExecucoes />}
               {tab === "calibrador" && <TabCalibrador />}
               {tab === "monitor" && <TabMonitor />}
