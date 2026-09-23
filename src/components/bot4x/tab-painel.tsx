@@ -1,15 +1,12 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Zap, Lock } from "lucide-react";
 import {
   useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT,
-  REAL_MODE_ENABLED as REAL_MODE_FLAG, setExchangeVerified,
+  REAL_MODE_ENABLED as REAL_MODE_FLAG,
 } from "@/lib/bot4x-store";
-import { exchangeAdapter } from "@/adapters/backend/exchange.adapter";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
 import { useLivePrices } from "@/hooks/useLivePrices";
-import { useEffect } from "react";
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -33,22 +30,14 @@ export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) 
 }
 
 // ----- Execution mode -----
-function ExecutionMode({ exchangeVerified }: { exchangeVerified?: boolean }) {
+function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
   const setMode = useBot4xStore((s) => s.setMode);
   const [confirm, setConfirm] = useState(false);
   const [text, setText] = useState("");
 
-  // O modo REAL depende de credenciais de exchange verificadas (não só da flag).
-  const exchange = useQuery({
-    queryKey: ["exchange", "status"],
-    queryFn: exchangeAdapter.status,
-    staleTime: 60_000,
-  });
-  const verified = exchangeVerified ?? Boolean(exchange.data?.verified);
-  const REAL_MODE_ENABLED = verified || REAL_MODE_FLAG;
-
-  useEffect(() => { setExchangeVerified(verified); }, [verified]);
+  // A rota consulta a exchange uma única vez e só libera o REAL após confirmação.
+  const REAL_MODE_ENABLED = exchangeVerified || REAL_MODE_FLAG;
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">

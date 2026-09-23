@@ -29,9 +29,6 @@ export const REAL_MODE_ENABLED = import.meta.env.VITE_BOT4X_REAL_ENABLED === "tr
 let exchangeVerified = false;
 export function setExchangeVerified(value: boolean) {
   exchangeVerified = value;
-  if (!value && useBot4xStore.getState().mode === "REAL") {
-    useBot4xStore.setState({ mode: "DEMO" });
-  }
 }
 export function isRealModeUnlocked(): boolean {
   return REAL_MODE_ENABLED || exchangeVerified;
@@ -277,7 +274,7 @@ export const useBot4xStore = create<State>()(
         const mode = s.mode;
 
         // ── DEMO MODE ────────────────────────────────────────────────────────
-        if (mode === "DEMO" || !REAL_MODE_ENABLED) {
+        if (getEffectiveMode(mode) === "DEMO") {
           // Guard explícito: setInterval pode retornar 0 em alguns runtimes,
           // então não basta `if (s._ticker)`.
           if (s._ticker !== undefined && s._ticker !== null) return;
@@ -527,7 +524,13 @@ export const useBot4xStore = create<State>()(
       },
 
       // ─── SETTERS ──────────────────────────────────────────────────────────
-      setMode: (mode) => set({ mode }),
+      setMode: (mode) => {
+        if (mode === "REAL" && !isRealModeUnlocked()) return;
+        if (get().mode === mode) return;
+        get().cleanup();
+        set({ mode, realInited: false, status: "IDLE", errorMsg: null });
+        queueMicrotask(() => get().init());
+      },
       setTotalCapital: (n) => {
         const v = Math.max(0, n);
         set({ totalCapital: v });
