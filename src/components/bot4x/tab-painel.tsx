@@ -13,10 +13,10 @@ import { useEffect } from "react";
 
 const IS_DEV = import.meta.env.DEV;
 
-export function TabPainel() {
+export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) {
   return (
     <div className="space-y-5">
-      <ExecutionMode />
+      <ExecutionMode exchangeVerified={exchangeVerified} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <CapitalConfig />
         <AllocationConfig />
@@ -33,7 +33,7 @@ export function TabPainel() {
 }
 
 // ----- Execution mode -----
-function ExecutionMode() {
+function ExecutionMode({ exchangeVerified }: { exchangeVerified?: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
   const setMode = useBot4xStore((s) => s.setMode);
   const [confirm, setConfirm] = useState(false);
@@ -45,7 +45,7 @@ function ExecutionMode() {
     queryFn: exchangeAdapter.status,
     staleTime: 60_000,
   });
-  const verified = Boolean(exchange.data?.verified);
+  const verified = exchangeVerified ?? Boolean(exchange.data?.verified);
   const REAL_MODE_ENABLED = verified || REAL_MODE_FLAG;
 
   useEffect(() => { setExchangeVerified(verified); }, [verified]);

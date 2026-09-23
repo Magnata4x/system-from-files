@@ -1,7 +1,7 @@
 import { Cpu } from "lucide-react";
-import { useBot4xStore, getEffectiveMode, isRealModeUnlocked } from "@/lib/bot4x-store";
+import { useBot4xStore, getEffectiveMode } from "@/lib/bot4x-store";
 
-export function Bot4xHeader() {
+export function Bot4xHeader({ realModeUnlocked }: { realModeUnlocked: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   // ARCH-01: usar SEMPRE o modo efetivo. Se o flag de build estiver off,
@@ -47,7 +47,7 @@ export function Bot4xHeader() {
           </span>
           {isDemo ? "DEMO MODE" : "REAL MODE"}
         </span>
-        {!isRealModeUnlocked() && (
+        {!realModeUnlocked && (
           <span className="text-[10px] text-muted-foreground" title="Conecte suas chaves de exchange em Configurações › API Keys">
             modo real bloqueado — conecte a exchange
           </span>
