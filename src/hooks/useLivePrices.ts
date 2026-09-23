@@ -37,6 +37,7 @@ interface UseLivePricesReturn {
 }
 
 const REFRESH_INTERVAL = 30_000; // 30 segundos
+const SERVER_FN_RECOVERY_KEY = "market-server-fn-recovery";
 
 export function useLivePrices(): UseLivePricesReturn {
   const [prices, setPrices] = useState<Record<string, CoinPrice>>({});
@@ -60,10 +61,21 @@ export function useLivePrices(): UseLivePricesReturn {
       if (Object.keys(map).length > 0) setPrices(map);
       if (snap.global) setGlobal(snap.global);
       if (snap.fearGreed) setFearGreed(snap.fearGreed);
+      sessionStorage.removeItem(SERVER_FN_RECOVERY_KEY);
       setError(null);
       setLastUpdate(now);
     } catch (err) {
       console.error("[useLivePrices] getMarketSnapshot falhou:", err);
+      // Durante uma atualização do servidor, uma aba já aberta pode manter o
+      // identificador anterior da server function. Uma única recarga recupera
+      // o manifesto novo sem criar um ciclo caso a origem esteja indisponível.
+      const message = err instanceof Error ? err.message : String(err);
+      const staleServerFn = /Invalid server function ID|Server function info not found|returned 500/i.test(message);
+      if (staleServerFn && sessionStorage.getItem(SERVER_FN_RECOVERY_KEY) !== "1") {
+        sessionStorage.setItem(SERVER_FN_RECOVERY_KEY, "1");
+        window.location.reload();
+        return;
+      }
       setError("Falha ao buscar preços. Usando cache.");
     } finally {
       setLoading(false);
