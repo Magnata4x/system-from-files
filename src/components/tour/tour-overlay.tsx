@@ -355,7 +355,7 @@ export function TourOverlay() {
               </Link>
             )}
             <Link
-              to="/settings"
+              to="/settings" search={{ tab: "notifications" }}
               onClick={() => setDone(false)}
               className="block text-[11px] text-muted-foreground hover:text-foreground mt-1"
             >
