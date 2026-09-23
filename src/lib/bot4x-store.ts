@@ -229,13 +229,22 @@ export const useBot4xStore = create<State>()(
         // antes de a sessão ficar disponível. Mesmo com o mesmo uid no state,
         // ainda precisamos trocar para a chave específica do usuário.
         if (prev === uid && _currentUserId === uid) return;
+        const userStorageKey = uid ? `bot4x-store-v1:${uid}` : "bot4x-store-v1";
+        const persistedForUser = typeof localStorage !== "undefined"
+          ? localStorage.getItem(userStorageKey)
+          : null;
         // Limpa tickers/WS antes de trocar de usuário para não vazar handles
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
         _currentUserId = uid;
         set({ userId: uid, realInited: false });
 
-        // Rehidrata o store com os dados do novo usuário
+        // O set acima passa a gravar na chave do usuário. Restaure o snapshot
+        // capturado antes dessa troca para não sobrescrever sua preferência.
+        if (persistedForUser && typeof localStorage !== "undefined") {
+          localStorage.setItem(userStorageKey, persistedForUser);
+        }
+        // Rehidrata o store com os dados do novo usuário.
         useBot4xStore.persist.rehydrate();
         // Carrega histórico real do banco ao logar
         if (uid) {
