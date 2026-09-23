@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
-import { useBot4xStore } from "@/lib/bot4x-store";
+import { setExchangeVerified, useBot4xStore } from "@/lib/bot4x-store";
 import { Bot4xHeader } from "@/components/bot4x/page-header";
 import { TabPainel } from "@/components/bot4x/tab-painel";
 import { TabCalibrador } from "@/components/bot4x/tab-calibrador";
@@ -43,12 +43,14 @@ function Bot4xPage() {
     queryFn: exchangeAdapter.status,
     staleTime: 60_000,
   });
-  const exchangeVerified = Boolean(exchange.data?.verified);
+  const exchangeVerified = exchange.isSuccess && Boolean(exchange.data?.verified);
 
   useEffect(() => {
+    if (!exchange.isSuccess) return;
+    setExchangeVerified(exchangeVerified);
     init();
     return () => cleanup();
-  }, [init, cleanup]);
+  }, [init, cleanup, exchange.isSuccess, exchangeVerified]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

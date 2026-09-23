@@ -1,15 +1,12 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Zap, Lock } from "lucide-react";
 import {
   useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT,
-  REAL_MODE_ENABLED as REAL_MODE_FLAG, setExchangeVerified,
+  REAL_MODE_ENABLED as REAL_MODE_FLAG,
 } from "@/lib/bot4x-store";
-import { exchangeAdapter } from "@/adapters/backend/exchange.adapter";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
 import { useLivePrices } from "@/hooks/useLivePrices";
-import { useEffect } from "react";
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -33,22 +30,14 @@ export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) 
 }
 
 // ----- Execution mode -----
-function ExecutionMode({ exchangeVerified }: { exchangeVerified?: boolean }) {
+function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
   const setMode = useBot4xStore((s) => s.setMode);
   const [confirm, setConfirm] = useState(false);
   const [text, setText] = useState("");
 
-  // O modo REAL depende de credenciais de exchange verificadas (não só da flag).
-  const exchange = useQuery({
-    queryKey: ["exchange", "status"],
-    queryFn: exchangeAdapter.status,
-    staleTime: 60_000,
-  });
-  const verified = exchangeVerified ?? Boolean(exchange.data?.verified);
-  const REAL_MODE_ENABLED = verified || REAL_MODE_FLAG;
-
-  useEffect(() => { setExchangeVerified(verified); }, [verified]);
+  // A rota consulta a exchange uma única vez e só libera o REAL após confirmação.
+  const REAL_MODE_ENABLED = exchangeVerified || REAL_MODE_FLAG;
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
@@ -225,21 +214,29 @@ function CapitalConfig() {
 
 function AllocationConfig() {
   const pct = useBot4xStore((s) => s.allocationPct);
+  const total = useBot4xStore((s) => s.totalCapital);
   const setPct = useBot4xStore((s) => s.setAllocationPct);
+  const usesFullCapital = total < 100;
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
+    <section className={`rounded-lg border border-border bg-card p-4 ${usesFullCapital ? "opacity-70" : ""}`}>
       <div className="flex justify-between items-baseline mb-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Allocation %</span>
-        <span className="text-[16px] font-semibold tabular-nums text-foreground">{pct}%</span>
+        <span className="text-[16px] font-semibold tabular-nums text-foreground">{usesFullCapital ? "100%" : `${pct}%`}</span>
       </div>
       <input
-        type="range" min={1} max={100} value={pct}
+        type="range" min={1} max={100} value={usesFullCapital ? 100 : pct}
         onChange={(e) => setPct(Number(e.target.value))}
-        className="w-full accent-[var(--brand-cyan)]"
+        disabled={usesFullCapital}
+        className="w-full accent-[var(--brand-cyan)] disabled:cursor-not-allowed"
       />
       <div className="flex justify-between text-[10px] text-muted-foreground mt-1 tabular-nums">
         <span>1%</span><span>50%</span><span>100%</span>
       </div>
+      {usesFullCapital && (
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Abaixo de 100 USDT, o capital disponível entra em uma única operação.
+        </p>
+      )}
     </section>
   );
 }
@@ -405,25 +402,34 @@ function CircuitBreakerProfit() {
 // ----- Orders -----
 function OrderGrid() {
   const orders = useBot4xStore((s) => s.orders);
+  const total = useBot4xStore((s) => s.totalCapital);
   const close = useBot4xStore((s) => s.closeOrder);
   const slot = useBot4xStore(selectSlotSize);
-  const slots = Array.from({ length: MAX_SLOTS }, (_, i) => i);
+  const usesSingleOperation = total < 100;
+  const slotCount = usesSingleOperation ? 1 : MAX_SLOTS;
+  const slots = Array.from({ length: slotCount }, (_, i) => i);
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Ordens ativas</span>
-        <span className="text-[11px] text-muted-foreground tabular-nums">{MAX_SLOTS} slots · {fmt(slot)} USDT cada</span>
+        <span className="text-[11px] text-muted-foreground tabular-nums">
+          {usesSingleOperation ? `1 operação · ${fmt(slot)} USDT` : `${MAX_SLOTS} slots · ${fmt(slot)} USDT cada`}
+        </span>
       </div>
       <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px]">
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Máx. simultâneas: <span className="text-foreground font-semibold">{MAX_SLOTS}</span>
+          Máx. simultâneas: <span className="text-foreground font-semibold">{slotCount}</span>
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Risco por slot: <span className="text-foreground font-semibold">{(RISK_PER_SLOT * 100).toFixed(0)}%</span> do capital ativo
+          {usesSingleOperation ? (
+            <>Capital por operação: <span className="text-foreground font-semibold">100%</span></>
+          ) : (
+            <>Risco por slot: <span className="text-foreground font-semibold">{(RISK_PER_SLOT * 100).toFixed(0)}%</span> do capital ativo</>
+          )}
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Exposição máx.: <span className="text-foreground font-semibold">{(MAX_SLOTS * RISK_PER_SLOT * 100).toFixed(0)}%</span>
+          Exposição máx.: <span className="text-foreground font-semibold">100%</span>
         </span>
       </div>
       <p className="mb-3 text-[10px] leading-snug text-muted-foreground/80 italic">

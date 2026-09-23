@@ -29,9 +29,6 @@ export const REAL_MODE_ENABLED = import.meta.env.VITE_BOT4X_REAL_ENABLED === "tr
 let exchangeVerified = false;
 export function setExchangeVerified(value: boolean) {
   exchangeVerified = value;
-  if (!value && useBot4xStore.getState().mode === "REAL") {
-    useBot4xStore.setState({ mode: "DEMO" });
-  }
 }
 export function isRealModeUnlocked(): boolean {
   return REAL_MODE_ENABLED || exchangeVerified;
@@ -228,14 +225,26 @@ export const useBot4xStore = create<State>()(
       // Ao trocar de usuário, força rehidratação do storage correto.
       setUserId: (uid) => {
         const prev = get().userId;
-        if (prev === uid) return;
+        // No primeiro carregamento, o persist pode ter lido a chave genérica
+        // antes de a sessão ficar disponível. Mesmo com o mesmo uid no state,
+        // ainda precisamos trocar para a chave específica do usuário.
+        if (prev === uid && _currentUserId === uid) return;
+        const userStorageKey = uid ? `bot4x-store-v1:${uid}` : "bot4x-store-v1";
+        const persistedForUser = typeof localStorage !== "undefined"
+          ? localStorage.getItem(userStorageKey)
+          : null;
         // Limpa tickers/WS antes de trocar de usuário para não vazar handles
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
         _currentUserId = uid;
         set({ userId: uid, realInited: false });
 
-        // Rehidrata o store com os dados do novo usuário
+        // O set acima passa a gravar na chave do usuário. Restaure o snapshot
+        // capturado antes dessa troca para não sobrescrever sua preferência.
+        if (persistedForUser && typeof localStorage !== "undefined") {
+          localStorage.setItem(userStorageKey, persistedForUser);
+        }
+        // Rehidrata o store com os dados do novo usuário.
         useBot4xStore.persist.rehydrate();
         // Carrega histórico real do banco ao logar
         if (uid) {
@@ -277,7 +286,7 @@ export const useBot4xStore = create<State>()(
         const mode = s.mode;
 
         // ── DEMO MODE ────────────────────────────────────────────────────────
-        if (mode === "DEMO" || !REAL_MODE_ENABLED) {
+        if (getEffectiveMode(mode) === "DEMO") {
           // Guard explícito: setInterval pode retornar 0 em alguns runtimes,
           // então não basta `if (s._ticker)`.
           if (s._ticker !== undefined && s._ticker !== null) return;
@@ -527,7 +536,13 @@ export const useBot4xStore = create<State>()(
       },
 
       // ─── SETTERS ──────────────────────────────────────────────────────────
-      setMode: (mode) => set({ mode }),
+      setMode: (mode) => {
+        if (mode === "REAL" && !isRealModeUnlocked()) return;
+        if (get().mode === mode) return;
+        get().cleanup();
+        set({ mode, realInited: false, status: "IDLE", errorMsg: null });
+        queueMicrotask(() => get().init());
+      },
       setTotalCapital: (n) => {
         const v = Math.max(0, n);
         set({ totalCapital: v });
@@ -667,13 +682,11 @@ export const useBot4xStore = create<State>()(
 // Aqui já inicializamos com o usuário atual se já estiver logado.
 supabase.auth.getSession().then(({ data }) => {
   const uid = data.session?.user?.id ?? null;
-  _currentUserId = uid;
   useBot4xStore.getState().setUserId(uid);
 });
 
 supabase.auth.onAuthStateChange((event, session) => {
   const uid = session?.user?.id ?? null;
-  _currentUserId = uid;
   useBot4xStore.getState().setUserId(uid);
 
   // Ao fazer logout: encerra ticker/WS antes de zerar o estado em memória
@@ -699,8 +712,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 // ─── SELECTORS ────────────────────────────────────────────────────────────────
 
 export function selectActiveCapital(s: State) {
+  if (s.totalCapital < 100) return +s.totalCapital.toFixed(2);
   return +(s.totalCapital * (s.allocationPct / 100)).toFixed(2);
 }
 export function selectSlotSize(s: State) {
+  if (s.totalCapital < 100) return +s.totalCapital.toFixed(2);
   return +(selectActiveCapital(s) * RISK_PER_SLOT).toFixed(2);
 }

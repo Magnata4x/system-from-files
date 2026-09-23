@@ -51,7 +51,13 @@ vi.mock("../bot4x-config-db", () => ({
   saveConfig: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { useBot4xStore, getEffectiveMode, REAL_MODE_ENABLED } from "../bot4x-store";
+import {
+  useBot4xStore,
+  getEffectiveMode,
+  REAL_MODE_ENABLED,
+  selectActiveCapital,
+  selectSlotSize,
+} from "../bot4x-store";
 import { supabase } from "@/integrations/supabase/client";
 
 type MockedAuth = typeof supabase.auth & {
@@ -121,6 +127,22 @@ describe("bot4x-store — limites de setters", () => {
     expect(useBot4xStore.getState().dnaMinSample).toBe(5);
     setDnaMinSample(500);
     expect(useBot4xStore.getState().dnaMinSample).toBe(100);
+  });
+});
+
+describe("bot4x-store — alocação por capital", () => {
+  it("usa todo o capital abaixo de US$ 100 em uma única operação", () => {
+    useBot4xStore.setState({ totalCapital: 5, allocationPct: 30 });
+    const state = useBot4xStore.getState();
+    expect(selectActiveCapital(state)).toBe(5);
+    expect(selectSlotSize(state)).toBe(5);
+  });
+
+  it("aplica Allocation % e divisão por slot a partir de US$ 100", () => {
+    useBot4xStore.setState({ totalCapital: 100, allocationPct: 30 });
+    const state = useBot4xStore.getState();
+    expect(selectActiveCapital(state)).toBe(30);
+    expect(selectSlotSize(state)).toBe(3);
   });
 });
 
