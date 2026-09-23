@@ -12,7 +12,7 @@ import { ProductDetailModal } from "@/components/marketplace/product-detail-moda
 import { CreatorBanner } from "@/components/marketplace/creator-banner";
 import { CATEGORIES, PRODUCTS, type CategoryFilter, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
-import { useMarketplaceHistory, useMarketplaceProducts, useTrackMarketplaceView } from "@/hooks/useMarketplaceProducts";
+import { useMarketplaceHistory, useMarketplaceProducts, useTrackMarketplaceView, type MarketplaceProduct } from "@/hooks/useMarketplaceProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
@@ -40,7 +40,7 @@ function MarketplacePage() {
   const { data: products, isPending, isError, refetch } = useMarketplaceProducts();
   const { data: history } = useMarketplaceHistory();
   const trackView = useTrackMarketplaceView();
-  const catalog = products && products.length > 0 ? products : PRODUCTS;
+  const catalog: MarketplaceProduct[] = products && products.length > 0 ? products : PRODUCTS;
   const live = !!products && products.length > 0;
 
   const filtered = useMemo(() => {
