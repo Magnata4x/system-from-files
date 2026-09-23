@@ -12,7 +12,7 @@ import { ProductDetailModal } from "@/components/marketplace/product-detail-moda
 import { CreatorBanner } from "@/components/marketplace/creator-banner";
 import { CATEGORIES, PRODUCTS, type CategoryFilter, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
-import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
+import { useMarketplaceHistory, useMarketplaceProducts, useTrackMarketplaceView } from "@/hooks/useMarketplaceProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
@@ -33,16 +33,20 @@ function MarketplacePage() {
   const [cat, setCat] = useState<CategoryFilter>("All");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("popular");
+  const [asset, setAsset] = useState("ALL");
   const [selected, setSelected] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
 
   const { data: products, isPending, isError, refetch } = useMarketplaceProducts();
+  const { data: history } = useMarketplaceHistory();
+  const trackView = useTrackMarketplaceView();
   const catalog = products && products.length > 0 ? products : PRODUCTS;
   const live = !!products && products.length > 0;
 
   const filtered = useMemo(() => {
     let list = catalog;
     if (cat !== "All") list = list.filter((p) => p.category === cat);
+    if (asset !== "ALL") list = list.filter((p) => (p.assets ?? []).includes(asset));
     const q = query.trim().toLowerCase();
     if (q) {
       list = list.filter(
@@ -59,12 +63,18 @@ function MarketplacePage() {
       return b.reviews - a.reviews;
     });
     return list;
-  }, [catalog, cat, query, sort]);
+  }, [catalog, cat, asset, query, sort]);
 
   function openProduct(p: Product) {
     setSelected(p);
     setOpen(true);
+    trackView.mutate(p.id);
   }
+
+  const recentProducts = (history ?? [])
+    .map((entry) => catalog.find((product) => product.id === entry.productId))
+    .filter((product): product is Product => !!product)
+    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -116,6 +126,13 @@ function MarketplacePage() {
                     className="pl-8 h-9 text-sm"
                   />
                 </div>
+                <Select value={asset} onValueChange={setAsset}>
+                  <SelectTrigger className="h-9 w-[130px] text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todos ativos</SelectItem>
+                    {['BTC', 'ETH', 'SOL', 'BNB'].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                  </SelectContent>
+                </Select>
                 <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
                   <SelectTrigger className="h-9 w-[160px] text-xs">
                     <SelectValue />
@@ -157,6 +174,19 @@ function MarketplacePage() {
                 </div>
               )}
             </section>
+
+            {recentProducts.length > 0 && (
+              <section className="space-y-3">
+                <h2 className="text-lg font-semibold">Vistos recentemente</h2>
+                <div className="flex flex-wrap gap-2">
+                  {recentProducts.map((product) => (
+                    <button key={product.id} onClick={() => openProduct(product)} className="rounded-md border border-border bg-card/40 px-3 py-2 text-sm hover:bg-secondary">
+                      {product.name}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <CreatorBanner />
           </div>

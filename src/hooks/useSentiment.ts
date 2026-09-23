@@ -33,3 +33,25 @@ export function useSentiment() {
     retry: 1,
   });
 }
+
+export interface SentimentAssetDetail {
+  asset: string;
+  pair: string;
+  price: number;
+  changePct: number;
+  high: number;
+  low: number;
+  quoteVolume: number;
+  series: { t: number; close: number }[];
+  updatedAt: string;
+}
+
+export function useSentimentAsset(symbol: string | null) {
+  return useQuery({
+    queryKey: ["sentiment", "asset", symbol],
+    queryFn: () => api.get<SentimentAssetDetail>(`/sentiment/asset/${encodeURIComponent(symbol ?? "")}`),
+    enabled: !!symbol,
+    staleTime: 30_000,
+    retry: 1,
+  });
+}

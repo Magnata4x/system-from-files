@@ -1,7 +1,9 @@
 import { ASSETS } from "@/lib/sentiment-data";
-import { useSentiment } from "@/hooks/useSentiment";
+import { useState } from "react";
+import { useSentiment, useSentimentAsset } from "@/hooks/useSentiment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const trendIcon: Record<string, string> = { up: "↑", upup: "↑↑", flat: "→", down: "↓" };
 const trendColor: Record<string, string> = {
@@ -10,6 +12,8 @@ const trendColor: Record<string, string> = {
 
 export function AssetSentimentTable() {
   const { data, isPending, isError } = useSentiment();
+  const [selected, setSelected] = useState<string | null>(null);
+  const detail = useSentimentAsset(selected);
   const rows = data?.assets?.length ? data.assets : ASSETS;
 
   if (isPending) {
@@ -44,7 +48,11 @@ export function AssetSentimentTable() {
           </thead>
           <tbody>
             {rows.map((a) => (
-              <tr key={a.asset} className="border-t border-border/60 hover:bg-secondary/30">
+              <tr
+                key={a.asset}
+                className="border-t border-border/60 hover:bg-secondary/30 cursor-pointer"
+                onClick={() => setSelected(a.asset)}
+              >
                 <td className="py-2.5 font-semibold">{a.asset}</td>
                 <td className="tabular-nums">{a.social}</td>
                 <td className="tabular-nums">{a.news}</td>
@@ -78,6 +86,39 @@ export function AssetSentimentTable() {
           </tbody>
         </table>
       </div>
+      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{selected}/USDT</DialogTitle>
+          </DialogHeader>
+          {detail.isPending ? (
+            <div className="space-y-3"><Skeleton className="h-20 w-full" /><Skeleton className="h-44 w-full" /></div>
+          ) : detail.isError || !detail.data ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">Não foi possível carregar os detalhes deste ativo.</p>
+          ) : (
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <Metric label="Preço" value={detail.data.price.toLocaleString("pt-BR", { maximumFractionDigits: 6 })} />
+                <Metric label="Variação 24h" value={`${detail.data.changePct >= 0 ? "+" : ""}${detail.data.changePct.toFixed(2)}%`} />
+                <Metric label="Máxima" value={detail.data.high.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
+                <Metric label="Mínima" value={detail.data.low.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
+              </div>
+              <div className="h-48 rounded-md border border-border p-3">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={detail.data.series}>
+                    <Line type="monotone" dataKey="close" stroke="var(--brand-cyan)" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-xs text-muted-foreground">Últimas 48 horas · atualização ao vivo pela exchange</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-md border border-border p-3"><div className="text-[10px] uppercase text-muted-foreground">{label}</div><div className="mt-1 text-sm font-semibold tabular-nums">{value}</div></div>;
 }
