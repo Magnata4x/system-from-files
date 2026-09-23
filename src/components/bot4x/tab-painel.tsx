@@ -214,21 +214,29 @@ function CapitalConfig() {
 
 function AllocationConfig() {
   const pct = useBot4xStore((s) => s.allocationPct);
+  const total = useBot4xStore((s) => s.totalCapital);
   const setPct = useBot4xStore((s) => s.setAllocationPct);
+  const usesFullCapital = total < 100;
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
+    <section className={`rounded-lg border border-border bg-card p-4 ${usesFullCapital ? "opacity-70" : ""}`}>
       <div className="flex justify-between items-baseline mb-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Allocation %</span>
-        <span className="text-[16px] font-semibold tabular-nums text-foreground">{pct}%</span>
+        <span className="text-[16px] font-semibold tabular-nums text-foreground">{usesFullCapital ? "100%" : `${pct}%`}</span>
       </div>
       <input
-        type="range" min={1} max={100} value={pct}
+        type="range" min={1} max={100} value={usesFullCapital ? 100 : pct}
         onChange={(e) => setPct(Number(e.target.value))}
-        className="w-full accent-[var(--brand-cyan)]"
+        disabled={usesFullCapital}
+        className="w-full accent-[var(--brand-cyan)] disabled:cursor-not-allowed"
       />
       <div className="flex justify-between text-[10px] text-muted-foreground mt-1 tabular-nums">
         <span>1%</span><span>50%</span><span>100%</span>
       </div>
+      {usesFullCapital && (
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Abaixo de 100 USDT, o capital disponível entra em uma única operação.
+        </p>
+      )}
     </section>
   );
 }

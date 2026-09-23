@@ -712,8 +712,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 // ─── SELECTORS ────────────────────────────────────────────────────────────────
 
 export function selectActiveCapital(s: State) {
+  if (s.totalCapital < 100) return +s.totalCapital.toFixed(2);
   return +(s.totalCapital * (s.allocationPct / 100)).toFixed(2);
 }
 export function selectSlotSize(s: State) {
+  if (s.totalCapital < 100) return +s.totalCapital.toFixed(2);
   return +(selectActiveCapital(s) * RISK_PER_SLOT).toFixed(2);
 }
