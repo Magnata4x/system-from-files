@@ -402,25 +402,34 @@ function CircuitBreakerProfit() {
 // ----- Orders -----
 function OrderGrid() {
   const orders = useBot4xStore((s) => s.orders);
+  const total = useBot4xStore((s) => s.totalCapital);
   const close = useBot4xStore((s) => s.closeOrder);
   const slot = useBot4xStore(selectSlotSize);
-  const slots = Array.from({ length: MAX_SLOTS }, (_, i) => i);
+  const usesSingleOperation = total < 100;
+  const slotCount = usesSingleOperation ? 1 : MAX_SLOTS;
+  const slots = Array.from({ length: slotCount }, (_, i) => i);
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Ordens ativas</span>
-        <span className="text-[11px] text-muted-foreground tabular-nums">{MAX_SLOTS} slots · {fmt(slot)} USDT cada</span>
+        <span className="text-[11px] text-muted-foreground tabular-nums">
+          {usesSingleOperation ? `1 operação · ${fmt(slot)} USDT` : `${MAX_SLOTS} slots · ${fmt(slot)} USDT cada`}
+        </span>
       </div>
       <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px]">
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Máx. simultâneas: <span className="text-foreground font-semibold">{MAX_SLOTS}</span>
+          Máx. simultâneas: <span className="text-foreground font-semibold">{slotCount}</span>
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Risco por slot: <span className="text-foreground font-semibold">{(RISK_PER_SLOT * 100).toFixed(0)}%</span> do capital ativo
+          {usesSingleOperation ? (
+            <>Capital por operação: <span className="text-foreground font-semibold">100%</span></>
+          ) : (
+            <>Risco por slot: <span className="text-foreground font-semibold">{(RISK_PER_SLOT * 100).toFixed(0)}%</span> do capital ativo</>
+          )}
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
-          Exposição máx.: <span className="text-foreground font-semibold">{(MAX_SLOTS * RISK_PER_SLOT * 100).toFixed(0)}%</span>
+          Exposição máx.: <span className="text-foreground font-semibold">100%</span>
         </span>
       </div>
       <p className="mb-3 text-[10px] leading-snug text-muted-foreground/80 italic">

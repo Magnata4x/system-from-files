@@ -8,7 +8,7 @@
 - [x] Sentiment com dados reais de mercado e detalhe por ativo
 
 ## Refinamento geral
-- [ ] Capital abaixo de US$ 100 usa 100% em uma única operação; Allocation % fica indisponível
+- [x] Capital abaixo de US$ 100 usa 100% em uma única operação; Allocation % fica indisponível
 - [x] Alertas com preferências e feed persistidos
 - [x] Copy Trading com follows persistidos
 - [x] Perfil com dados e foto persistidos
