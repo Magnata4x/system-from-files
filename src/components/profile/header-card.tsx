@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { AvatarCropper } from "@/components/profile/avatar-cropper";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const PLAN_COLORS: Record<string, string> = {
   Starter: "#6b7280",
@@ -17,6 +19,7 @@ export function HeaderCard() {
     useProfileStore();
   const [cropOpen, setCropOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { user } = useAuth();
 
   const initials = info.fullName
     .split(/\s+/)
@@ -141,9 +144,15 @@ export function HeaderCard() {
       <AvatarCropper
         open={cropOpen}
         onOpenChange={setCropOpen}
-        onSave={(dataUrl) => {
+        onSave={async (dataUrl) => {
           setInfo({ avatarDataUrl: dataUrl });
-          toast.success("Avatar updated");
+          if (!user?.id) {
+            toast.error("Você precisa estar autenticado para salvar a foto.");
+            return;
+          }
+          const { error } = await supabase.from("profiles").update({ avatar_url: dataUrl }).eq("id", user.id);
+          if (error) toast.error("Não foi possível salvar a foto.");
+          else toast.success("Foto do perfil atualizada");
         }}
       />
     </>

@@ -11,9 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ShieldAlert } from "lucide-react";
+import { TopBar } from "@/components/dashboard/top-bar";
+import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin — AISignalRadar" }] }),
+  head: () => ({ meta: [
+    { title: "Admin — AISignalRadar" },
+    { name: "description", content: "Gerenciamento seguro de usuários, planos e auditoria do AISignalRadar." },
+    { property: "og:title", content: "Admin — AISignalRadar" },
+    { property: "og:description", content: "Gerenciamento seguro de usuários, planos e auditoria." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (s: Record<string, unknown>) => ({ userId: typeof s.userId === "string" ? s.userId : undefined }),
   errorComponent: ({ error }) => (
     <div className="p-8 max-w-xl mx-auto">
@@ -44,7 +53,11 @@ function AdminPage() {
   if (error) throw error;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background text-foreground">
+      <TopBar />
+      <div className="flex">
+        <LeftSidebar />
+        <main className="flex-1 min-w-0 p-6 max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Painel Administrativo</h1>
         <p className="text-sm text-muted-foreground">Gerencie perfis e plano dos usuários. Todas as alterações são auditadas.</p>
@@ -83,6 +96,8 @@ function AdminPage() {
         </Card>
 
         <div>{userId ? <UserDetail userId={userId} /> : <EmptyDetail />}</div>
+      </div>
+        </main>
       </div>
     </div>
   );

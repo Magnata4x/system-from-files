@@ -54,7 +54,7 @@ export function ProfileForm() {
     (async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, email, username, phone_country, phone, country, timezone, bio, website")
+        .select("full_name, email, username, phone_country, phone, country, timezone, bio, website, avatar_url")
         .eq("id", user.id)
         .maybeSingle();
       if (cancelled) return;
@@ -76,6 +76,7 @@ export function ProfileForm() {
           timezone: data.timezone ?? info.timezone,
           bio: data.bio ?? info.bio,
           website: data.website ?? info.website,
+          avatarDataUrl: data.avatar_url ?? info.avatarDataUrl,
         };
         setInfo(merged);
         form.reset(merged);
