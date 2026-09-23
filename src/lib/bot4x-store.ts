@@ -225,7 +225,10 @@ export const useBot4xStore = create<State>()(
       // Ao trocar de usuário, força rehidratação do storage correto.
       setUserId: (uid) => {
         const prev = get().userId;
-        if (prev === uid) return;
+        // No primeiro carregamento, o persist pode ter lido a chave genérica
+        // antes de a sessão ficar disponível. Mesmo com o mesmo uid no state,
+        // ainda precisamos trocar para a chave específica do usuário.
+        if (prev === uid && _currentUserId === uid) return;
         // Limpa tickers/WS antes de trocar de usuário para não vazar handles
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
@@ -670,13 +673,11 @@ export const useBot4xStore = create<State>()(
 // Aqui já inicializamos com o usuário atual se já estiver logado.
 supabase.auth.getSession().then(({ data }) => {
   const uid = data.session?.user?.id ?? null;
-  _currentUserId = uid;
   useBot4xStore.getState().setUserId(uid);
 });
 
 supabase.auth.onAuthStateChange((event, session) => {
   const uid = session?.user?.id ?? null;
-  _currentUserId = uid;
   useBot4xStore.getState().setUserId(uid);
 
   // Ao fazer logout: encerra ticker/WS antes de zerar o estado em memória
