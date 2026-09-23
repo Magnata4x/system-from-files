@@ -60,6 +60,7 @@ export type Database = {
           daily_pnl: number | null
           emergency_triggered_at: string | null
           exchange: string | null
+          execution_mode: string
           fomo_limit: number | null
           id: string
           leverage: number | null
@@ -88,6 +89,7 @@ export type Database = {
           daily_pnl?: number | null
           emergency_triggered_at?: string | null
           exchange?: string | null
+          execution_mode?: string
           fomo_limit?: number | null
           id?: string
           leverage?: number | null
@@ -116,6 +118,7 @@ export type Database = {
           daily_pnl?: number | null
           emergency_triggered_at?: string | null
           exchange?: string | null
+          execution_mode?: string
           fomo_limit?: number | null
           id?: string
           leverage?: number | null
@@ -129,6 +132,60 @@ export type Database = {
           total_capital?: number | null
           total_trades_today?: number | null
           tp_pct?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bot4x_execution_intents: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          idempotency_key: string
+          mode: string
+          pair: string
+          processed_at: string | null
+          quote_amount: number
+          readings: Json
+          reason: string
+          side: string
+          signal_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          mode: string
+          pair: string
+          processed_at?: string | null
+          quote_amount: number
+          readings?: Json
+          reason?: string
+          side: string
+          signal_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          mode?: string
+          pair?: string
+          processed_at?: string | null
+          quote_amount?: number
+          readings?: Json
+          reason?: string
+          side?: string
+          signal_id?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
