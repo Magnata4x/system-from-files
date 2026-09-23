@@ -14,3 +14,5 @@
 - [x] Configurações com aba preservada na URL
 - [x] Admin com dados internos, auditoria e navegação padrão
 - [ ] Validar operação REAL e CSV com as chaves Binance do usuário
+
+- [ ] Confirmar e testar ordem REAL mínima de compra BTC/USDT com saldo de US$ 7 em USDT
