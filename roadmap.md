@@ -17,3 +17,7 @@
 - [ ] Validar operação REAL e CSV com as chaves Binance do usuário
 
 - [ ] Usuário envia manualmente ordem REAL de compra BTC/USDT de US$ 6; depois validar histórico e CSV
+
+## Modo REAL global
+- [ ] Unificar o modo REAL entre todos os módulos de leitura e o Bot4x
+- [ ] Exibir saldo USDT real da Binance no Bot4x
