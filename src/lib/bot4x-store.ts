@@ -541,6 +541,12 @@ export const useBot4xStore = create<State>()(
         if (get().mode === mode) return;
         get().cleanup();
         set({ mode, realInited: false, status: "IDLE", errorMsg: null });
+        const uid = get().userId;
+        if (uid) {
+          void saveConfig(uid, { executionMode: mode }).catch((error) =>
+            logger.error("[Bot4x] save execution mode failed", { error }),
+          );
+        }
         queueMicrotask(() => get().init());
       },
       setTotalCapital: (n) => {

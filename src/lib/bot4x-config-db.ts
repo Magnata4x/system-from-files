@@ -13,6 +13,7 @@ import { logger } from "./logger";
 export interface Bot4xConfigRow {
   userId: string;
   active: boolean;
+  executionMode: "DEMO" | "REAL";
   profile: string;
   leverage: number;
   activeCapital: number;
@@ -94,6 +95,7 @@ export async function loadConfig(userId: string): Promise<Bot4xConfigRow | null>
   return {
     userId: data.user_id,
     active: data.active,
+    executionMode: data.execution_mode === "REAL" ? "REAL" : "DEMO",
     profile: data.profile,
     leverage: data.leverage ?? 3,
     activeCapital: Number(data.active_capital ?? 0),
@@ -120,6 +122,7 @@ export async function saveConfig(userId: string, config: Partial<Bot4xConfigRow>
     user_id: userId,
     updated_at: new Date().toISOString(),
     ...(config.active !== undefined && { active: config.active }),
+    ...(config.executionMode !== undefined && { execution_mode: config.executionMode }),
     ...(config.profile !== undefined && { profile: config.profile }),
     ...(config.leverage !== undefined && { leverage: config.leverage }),
     ...(config.activeCapital !== undefined && { active_capital: config.activeCapital }),
