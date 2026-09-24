@@ -1,13 +1,12 @@
 import { Cpu } from "lucide-react";
-import { useBot4xStore, getEffectiveMode } from "@/lib/bot4x-store";
+import { useBot4xStore } from "@/lib/bot4x-store";
 
 export function Bot4xHeader({ realModeUnlocked }: { realModeUnlocked: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
   const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  // ARCH-01: usar SEMPRE o modo efetivo. Se o flag de build estiver off,
-  // o `mode` persistido pode estar "REAL" mas o motor que roda é o DEMO.
-  const effectiveMode = getEffectiveMode(mode);
-  const isDemo = effectiveMode === "DEMO";
+  // A verificação da exchange é reativa. Não dependa da variável de módulo,
+  // pois ela é atualizada depois do primeiro render da página.
+  const isDemo = mode !== "REAL" || !realModeUnlocked;
 
   return (
     <header className="flex items-start justify-between gap-3 flex-wrap">
