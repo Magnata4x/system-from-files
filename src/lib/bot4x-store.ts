@@ -261,7 +261,11 @@ export const useBot4xStore = create<State>()(
           loadConfig(uid)
             .then((cfg) => {
               if (!cfg) return;
+              // Preserve a previously selected REAL mode from the user's
+              // browser while backfilling the new account-level setting.
+              const executionMode = get().mode === "REAL" ? "REAL" : cfg.executionMode;
               set({
+                mode: executionMode,
                 profile: cfg.profile as CalibProfileType,
                 leverage: cfg.leverage,
                 slPct: cfg.slPct,
@@ -273,6 +277,9 @@ export const useBot4xStore = create<State>()(
                 circuitBreaker: cfg.circuitBreaker as State["circuitBreaker"],
                 dailyPnlPct: cfg.dailyPnl,
               });
+              if (executionMode !== cfg.executionMode) {
+                void saveConfig(uid, { executionMode });
+              }
             })
             .catch(() => {
               /* fallback para localStorage */
@@ -541,6 +548,12 @@ export const useBot4xStore = create<State>()(
         if (get().mode === mode) return;
         get().cleanup();
         set({ mode, realInited: false, status: "IDLE", errorMsg: null });
+        const uid = get().userId;
+        if (uid) {
+          void saveConfig(uid, { executionMode: mode }).catch((error) =>
+            logger.error("[Bot4x] save execution mode failed", { error }),
+          );
+        }
         queueMicrotask(() => get().init());
       },
       setTotalCapital: (n) => {

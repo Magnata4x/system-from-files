@@ -41,7 +41,10 @@ function Bot4xPage() {
   const exchange = useQuery({
     queryKey: ["exchange", "status"],
     queryFn: exchangeAdapter.status,
-    staleTime: 60_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    retry: 2,
   });
   const exchangeVerified = exchange.isSuccess && Boolean(exchange.data?.verified);
 
