@@ -21,3 +21,8 @@
 ## Modo REAL global
 - [ ] Unificar o modo REAL entre todos os módulos de leitura e o Bot4x
 - [ ] Exibir saldo USDT real da Binance no Bot4x
+
+## Refinamento de todos os módulos
+- [ ] Auditar telas, dados, navegação e estados de erro/vazio
+- [ ] Corrigir primeiro os fluxos críticos de modo REAL, saldo e execução segura
+- [ ] Refinar os módulos por prioridade e validar em desktop e celular
