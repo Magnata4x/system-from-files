@@ -80,7 +80,10 @@ export const bot4xAdapter = {
       return null;
     }
   },
-  async updateConfig(_userId: string | undefined, patch: Partial<BackendBot4xConfig>): Promise<Bot4xConfigUI | null> {
+  async updateConfig(
+    _userId: string | undefined,
+    patch: Partial<BackendBot4xConfig>,
+  ): Promise<Bot4xConfigUI | null> {
     try {
       const data = await api.patch<BackendBot4xConfig>(endpoints.bot4x.updateConfig, patch);
       return mapBot4xConfig(data);

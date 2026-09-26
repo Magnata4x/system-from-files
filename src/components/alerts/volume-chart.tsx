@@ -43,7 +43,9 @@ export function VolumeChart() {
         </div>
         <div className="text-right">
           <div className="text-lg font-semibold tabular-nums">{total}</div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">total alerts</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            total alerts
+          </div>
         </div>
       </header>
 

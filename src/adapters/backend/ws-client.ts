@@ -47,7 +47,6 @@ export class BackendWsClient {
   private readonly MAX_DELAY_MS = 30_000;
   private readonly MAX_ATTEMPTS = 10;
 
-
   getStatus(): WsStatus {
     return this.status;
   }
@@ -107,7 +106,6 @@ export class BackendWsClient {
       this.setStatus("open");
     };
 
-
     ws.onclose = (ev) => {
       this.connecting = false;
       this.socket = null;
@@ -162,7 +160,6 @@ export class BackendWsClient {
     void this.connect(this.currentPath);
   }
 
-
   on(event: WsEvent, handler: Handler): () => void {
     if (!this.handlers.has(event)) this.handlers.set(event, new Set());
     this.handlers.get(event)!.add(handler);
@@ -203,7 +200,6 @@ export class BackendWsClient {
     this.socket = null;
     this.setStatus("closed");
   }
-
 }
 
 // Escolhe a implementação compartilhada (SharedWorker, 1 conexão por usuário
@@ -215,6 +211,4 @@ export class BackendWsClient {
 type WsLike = BackendWsClient | BackendWsClientShared;
 
 export const backendWs: WsLike =
-  typeof SharedWorker !== "undefined"
-    ? new BackendWsClientShared()
-    : new BackendWsClient();
+  typeof SharedWorker !== "undefined" ? new BackendWsClientShared() : new BackendWsClient();

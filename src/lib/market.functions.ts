@@ -7,20 +7,49 @@ import { createServerFn } from "@tanstack/react-start";
 import { cachedJson } from "./cache";
 
 const COIN_IDS = [
-  "bitcoin", "ethereum", "tether", "binancecoin", "solana",
-  "usd-coin", "ripple", "cardano", "avalanche-2", "dogecoin",
-  "shiba-inu", "chainlink", "polkadot", "polygon", "bitcoin-cash",
-  "near", "litecoin", "uniswap", "toncoin", "staked-ether",
+  "bitcoin",
+  "ethereum",
+  "tether",
+  "binancecoin",
+  "solana",
+  "usd-coin",
+  "ripple",
+  "cardano",
+  "avalanche-2",
+  "dogecoin",
+  "shiba-inu",
+  "chainlink",
+  "polkadot",
+  "polygon",
+  "bitcoin-cash",
+  "near",
+  "litecoin",
+  "uniswap",
+  "toncoin",
+  "staked-ether",
 ].join(",");
 
 const SYMBOL_MAP: Record<string, string> = {
-  bitcoin: "BTC", ethereum: "ETH", tether: "USDT",
-  binancecoin: "BNB", solana: "SOL", "usd-coin": "USDC",
-  ripple: "XRP", cardano: "ADA", "avalanche-2": "AVAX",
-  dogecoin: "DOGE", "shiba-inu": "SHIB", chainlink: "LINK",
-  polkadot: "DOT", polygon: "MATIC", "bitcoin-cash": "BCH",
-  near: "NEAR", litecoin: "LTC", uniswap: "UNI",
-  toncoin: "TON", "staked-ether": "STETH",
+  bitcoin: "BTC",
+  ethereum: "ETH",
+  tether: "USDT",
+  binancecoin: "BNB",
+  solana: "SOL",
+  "usd-coin": "USDC",
+  ripple: "XRP",
+  cardano: "ADA",
+  "avalanche-2": "AVAX",
+  dogecoin: "DOGE",
+  "shiba-inu": "SHIB",
+  chainlink: "LINK",
+  polkadot: "DOT",
+  polygon: "MATIC",
+  "bitcoin-cash": "BCH",
+  near: "NEAR",
+  litecoin: "LTC",
+  uniswap: "UNI",
+  toncoin: "TON",
+  "staked-ether": "STETH",
 };
 
 export interface CoinPriceDTO {
@@ -97,8 +126,7 @@ async function loadPricesAndGlobal(): Promise<{
     const g = ((await globalRes.value.json()) as { data?: Record<string, unknown> }).data ?? {};
     const totalMarketCap = (g.total_market_cap as Record<string, number> | undefined)?.usd ?? 0;
     const totalVolume = (g.total_volume as Record<string, number> | undefined)?.usd ?? 0;
-    const btcDominance =
-      (g.market_cap_percentage as Record<string, number> | undefined)?.btc ?? 0;
+    const btcDominance = (g.market_cap_percentage as Record<string, number> | undefined)?.btc ?? 0;
     global = {
       totalMarketCap,
       totalVolume,
@@ -150,8 +178,9 @@ async function loadPricesAndGlobal(): Promise<{
 async function loadFearGreed(): Promise<FearGreedDTO | null> {
   const res = await fetch("https://api.alternative.me/fng/?limit=1");
   if (!res.ok) return null;
-  const fg = ((await res.json()) as { data?: Array<{ value: string; value_classification: string }> })
-    .data?.[0];
+  const fg = (
+    (await res.json()) as { data?: Array<{ value: string; value_classification: string }> }
+  ).data?.[0];
   if (!fg) return null;
   return { value: parseInt(fg.value, 10), label: fg.value_classification };
 }

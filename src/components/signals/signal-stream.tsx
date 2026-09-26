@@ -25,7 +25,9 @@ export function SignalStream() {
   return (
     <aside className="w-[200px] shrink-0 border-r border-border bg-[#070809] sticky top-12 self-start h-[calc(100vh-3rem)] overflow-hidden relative">
       <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-2 h-7 bg-[#070809]/95 border-b border-border">
-        <span className="text-[10px] uppercase tracking-[0.15em] text-[var(--brand-cyan)] font-semibold">Signal Stream</span>
+        <span className="text-[10px] uppercase tracking-[0.15em] text-[var(--brand-cyan)] font-semibold">
+          Signal Stream
+        </span>
         <span className="relative flex size-1.5">
           <span className="absolute inline-flex h-full w-full rounded-full bg-[#1D9E75] opacity-75 animate-ping" />
           <span className="relative inline-flex size-1.5 rounded-full bg-[#1D9E75]" />
@@ -36,7 +38,13 @@ export function SignalStream() {
         style={{ transform: `translateY(-${offset}px)` }}
       >
         {stream.map((s, i) => (
-          <StreamRow key={`${s.id}-${i}`} s={s} onHover={() => setHover(s.id)} onLeave={() => setHover(null)} onClick={() => pin(s.id)} />
+          <StreamRow
+            key={`${s.id}-${i}`}
+            s={s}
+            onHover={() => setHover(s.id)}
+            onLeave={() => setHover(null)}
+            onClick={() => pin(s.id)}
+          />
         ))}
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-7 h-10 bg-gradient-to-b from-[#070809] to-transparent z-10" />
@@ -45,7 +53,17 @@ export function SignalStream() {
   );
 }
 
-function StreamRow({ s, onHover, onLeave, onClick }: { s: Signal; onHover: () => void; onLeave: () => void; onClick: () => void }) {
+function StreamRow({
+  s,
+  onHover,
+  onLeave,
+  onClick,
+}: {
+  s: Signal;
+  onHover: () => void;
+  onLeave: () => void;
+  onClick: () => void;
+}) {
   const accent = s.direction === "BUY" ? "#1D9E75" : "#E24B4A";
   return (
     <div
@@ -56,10 +74,14 @@ function StreamRow({ s, onHover, onLeave, onClick }: { s: Signal; onHover: () =>
     >
       <div className="flex items-center justify-between">
         <span className="text-foreground font-semibold">{s.asset}</span>
-        <span className="font-bold" style={{ color: accent }}>{s.direction === "BUY" ? "▲" : "▼"}</span>
+        <span className="font-bold" style={{ color: accent }}>
+          {s.direction === "BUY" ? "▲" : "▼"}
+        </span>
       </div>
       <div className="flex items-center justify-between text-muted-foreground">
-        <span className="tabular-nums" style={{ color: accent }}>{formatPrice(s.entry)}</span>
+        <span className="tabular-nums" style={{ color: accent }}>
+          {formatPrice(s.entry)}
+        </span>
         <span className="tabular-nums">{s.score}</span>
       </div>
       <div className="flex items-center justify-between text-muted-foreground/70 text-[9px]">

@@ -30,7 +30,9 @@ export function LiveToasts() {
                   <span
                     className="px-1.5 py-0.5 rounded text-[10px] font-semibold"
                     style={{
-                      background: up ? "color-mix(in oklab, #1D9E75 18%, transparent)" : "color-mix(in oklab, #E24B4A 18%, transparent)",
+                      background: up
+                        ? "color-mix(in oklab, #1D9E75 18%, transparent)"
+                        : "color-mix(in oklab, #E24B4A 18%, transparent)",
                       color: up ? "#1D9E75" : "#E24B4A",
                     }}
                   >
@@ -47,7 +49,10 @@ export function LiveToasts() {
                   Entry <span className="text-foreground tabular-nums">${s.entry}</span> · TF {s.tf}
                 </div>
                 <button
-                  onClick={() => { setSelected(s); dismiss(t.id); }}
+                  onClick={() => {
+                    setSelected(s);
+                    dismiss(t.id);
+                  }}
                   className="w-full text-[12px] font-medium py-1.5 rounded-md text-[var(--brand-cyan)] bg-secondary hover:bg-secondary/70"
                 >
                   View signal

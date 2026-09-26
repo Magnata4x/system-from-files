@@ -8,16 +8,27 @@ export function DnaHeader() {
   const { session } = useAuth();
   const { data: dnaData } = useDnaProfile(session?.user?.id);
 
-  const hasLive =
-    !!dnaData && typeof dnaData === "object" && "dnaConsistency" in dnaData;
+  const hasLive = !!dnaData && typeof dnaData === "object" && "dnaConsistency" in dnaData;
 
   const gauges = hasLive
     ? [
-        { label: "Consistency",       value: Math.round((dnaData as any).dnaConsistency       ?? GAUGES[0].value) },
-        { label: "Discipline",        value: Math.round((dnaData as any).dnaDiscipline        ?? GAUGES[1].value) },
-        { label: "Risk Control",      value: Math.round((dnaData as any).dnaRiskControl       ?? GAUGES[2].value) },
-        { label: "Timing",            value: Math.round((dnaData as any).dnaTiming            ?? GAUGES[3].value) },
-        { label: "Emotional Control", value: Math.round((dnaData as any).dnaEmotionalControl  ?? GAUGES[4].value) },
+        {
+          label: "Consistency",
+          value: Math.round((dnaData as any).dnaConsistency ?? GAUGES[0].value),
+        },
+        {
+          label: "Discipline",
+          value: Math.round((dnaData as any).dnaDiscipline ?? GAUGES[1].value),
+        },
+        {
+          label: "Risk Control",
+          value: Math.round((dnaData as any).dnaRiskControl ?? GAUGES[2].value),
+        },
+        { label: "Timing", value: Math.round((dnaData as any).dnaTiming ?? GAUGES[3].value) },
+        {
+          label: "Emotional Control",
+          value: Math.round((dnaData as any).dnaEmotionalControl ?? GAUGES[4].value),
+        },
       ]
     : GAUGES;
 
@@ -40,7 +51,14 @@ export function DnaHeader() {
                   <stop offset="100%" stopColor="var(--brand-blue)" />
                 </linearGradient>
               </defs>
-              <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--border)" strokeWidth={stroke} fill="none" />
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                stroke="var(--border)"
+                strokeWidth={stroke}
+                fill="none"
+              />
               <motion.circle
                 cx={size / 2}
                 cy={size / 2}
@@ -61,7 +79,9 @@ export function DnaHeader() {
           </div>
 
           <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Trader archetype</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">
+              Trader archetype
+            </div>
             <div className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-[var(--brand-cyan)] to-purple-400 bg-clip-text text-transparent">
               MOMENTUM TRADER
             </div>

@@ -1,4 +1,12 @@
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { RADAR } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
@@ -8,9 +16,9 @@ import { Trophy } from "lucide-react";
 const TOP_TRADERS: Record<string, number> = {
   "Win Rate": 81,
   "Avg R/R": 90,
-  "Consistency": 92,
+  Consistency: 92,
   "Drawdown Ctrl": 94,
-  "Timing": 88,
+  Timing: 88,
   "Volume Disc.": 91,
 };
 
@@ -22,8 +30,7 @@ export function DnaRadar() {
   const live = !!stats?.hasData && stats.radar.length > 0;
 
   const data = useMemo(
-    () =>
-      (live ? stats!.radar : RADAR).map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
+    () => (live ? stats!.radar : RADAR).map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
     [live, stats],
   );
 
@@ -33,7 +40,9 @@ export function DnaRadar() {
         <div>
           <h2 className="text-sm font-semibold">DNA radar</h2>
           <p className="text-xs text-muted-foreground">
-            {live ? "Seu DNA real vs benchmark institucional" : "Exemplo demonstrativo vs benchmark institucional"}
+            {live
+              ? "Seu DNA real vs benchmark institucional"
+              : "Exemplo demonstrativo vs benchmark institucional"}
           </p>
         </div>
         <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
@@ -41,7 +50,10 @@ export function DnaRadar() {
           <span>Compare with top traders</span>
           <Switch
             checked={compare}
-            onCheckedChange={(v) => { setCompare(v); setAnimKey((k) => k + 1); }}
+            onCheckedChange={(v) => {
+              setCompare(v);
+              setAnimKey((k) => k + 1);
+            }}
           />
         </label>
       </div>
@@ -49,7 +61,10 @@ export function DnaRadar() {
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data} outerRadius="75%">
             <PolarGrid stroke="var(--border)" />
-            <PolarAngleAxis dataKey="axis" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+            <PolarAngleAxis
+              dataKey="axis"
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+            />
             <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
             <Radar
               name="Your DNA"

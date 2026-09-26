@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
-  AlertTriangle, Inbox, Loader2, Play, Square, RefreshCw, ChevronLeft, ChevronRight, Download,
+  AlertTriangle,
+  Inbox,
+  Loader2,
+  Play,
+  Square,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Download,
 } from "lucide-react";
 import { bot4xAdapter } from "@/adapters/backend/bot4x.adapter";
 import { useBackendAuth } from "@/hooks/useBackendAuth";
@@ -87,7 +95,12 @@ export function TabExecucoes() {
 
   if (!ready) return <PanelSkeleton />;
   if (!userId) {
-    return <ErrorPanel title="Sessão expirada" message="Faça login novamente para ver as execuções do Bot4x." />;
+    return (
+      <ErrorPanel
+        title="Sessão expirada"
+        message="Faça login novamente para ver as execuções do Bot4x."
+      />
+    );
   }
 
   const data = execQuery.data;
@@ -112,45 +125,77 @@ export function TabExecucoes() {
 
       <section className="rounded-lg border border-border bg-card p-4 space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Execuções</span>
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Execuções
+          </span>
           <Select
             value={result}
-            onChange={(v) => { setResult(v); setPage(0); }}
-            options={[["all", "Todos resultados"], ["WIN", "WIN"], ["LOSS", "LOSS"], ["open", "Abertas"]]}
+            onChange={(v) => {
+              setResult(v);
+              setPage(0);
+            }}
+            options={[
+              ["all", "Todos resultados"],
+              ["WIN", "WIN"],
+              ["LOSS", "LOSS"],
+              ["open", "Abertas"],
+            ]}
           />
           <Select
             value={side}
-            onChange={(v) => { setSide(v); setPage(0); }}
-            options={[["all", "Long & Short"], ["LONG", "LONG"], ["SHORT", "SHORT"]]}
+            onChange={(v) => {
+              setSide(v);
+              setPage(0);
+            }}
+            options={[
+              ["all", "Long & Short"],
+              ["LONG", "LONG"],
+              ["SHORT", "SHORT"],
+            ]}
           />
           <Select
             value={profile}
-            onChange={(v) => { setProfile(v); setPage(0); }}
+            onChange={(v) => {
+              setProfile(v);
+              setPage(0);
+            }}
             options={PROFILE_OPTIONS}
           />
           <input
             type="date"
             value={from}
-            onChange={(e) => { setFrom(e.target.value); setPage(0); }}
+            onChange={(e) => {
+              setFrom(e.target.value);
+              setPage(0);
+            }}
             aria-label="Data inicial"
             className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none focus:border-[var(--brand-cyan)]"
           />
           <input
             type="date"
             value={to}
-            onChange={(e) => { setTo(e.target.value); setPage(0); }}
+            onChange={(e) => {
+              setTo(e.target.value);
+              setPage(0);
+            }}
             aria-label="Data final"
             className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none focus:border-[var(--brand-cyan)]"
           />
           <input
             value={pair}
-            onChange={(e) => { setPair(e.target.value); setPage(0); }}
+            onChange={(e) => {
+              setPair(e.target.value);
+              setPage(0);
+            }}
             placeholder="Par (ex: BTC/USDT)"
             className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none focus:border-[var(--brand-cyan)]"
           />
           <Select
             value={String(limit)}
-            onChange={(v) => { setLimit(Number(v)); setPage(0); }}
+            onChange={(v) => {
+              setLimit(Number(v));
+              setPage(0);
+            }}
             options={PAGE_SIZES.map((s) => [String(s), `${s} / página`] as [string, string])}
           />
           <span className="ml-auto text-[11px] text-muted-foreground tabular-nums">
@@ -161,9 +206,11 @@ export function TabExecucoes() {
             disabled={exportCsv.isPending}
             className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-background text-[12px] text-foreground hover:bg-secondary disabled:opacity-60"
           >
-            {exportCsv.isPending
-              ? <Loader2 className="size-3.5 animate-spin" />
-              : <Download className="size-3.5" />}
+            {exportCsv.isPending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Download className="size-3.5" />
+            )}
             Exportar CSV
           </button>
         </div>
@@ -196,8 +243,14 @@ export function TabExecucoes() {
             <table className="w-full text-[12px]">
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <Th>Data</Th><Th>Par</Th><Th>Lado</Th><Th right>Entrada</Th>
-                  <Th right>SL</Th><Th right>TP</Th><Th>Status</Th><Th right>PnL</Th>
+                  <Th>Data</Th>
+                  <Th>Par</Th>
+                  <Th>Lado</Th>
+                  <Th right>Entrada</Th>
+                  <Th right>SL</Th>
+                  <Th right>TP</Th>
+                  <Th>Status</Th>
+                  <Th right>PnL</Th>
                 </tr>
               </thead>
               <tbody>
@@ -208,18 +261,23 @@ export function TabExecucoes() {
                       <Td>{e.createdAt ? new Date(e.createdAt).toLocaleString("pt-BR") : "—"}</Td>
                       <Td className="font-medium text-foreground">{e.pair}</Td>
                       <Td>
-                        <span style={{ color: e.side === "SHORT" ? "#E24B4A" : "#1D9E75" }}>{e.side}</span>
+                        <span style={{ color: e.side === "SHORT" ? "#E24B4A" : "#1D9E75" }}>
+                          {e.side}
+                        </span>
                       </Td>
                       <Td right>{fmt(e.entryPrice)}</Td>
                       <Td right>{e.stopLoss != null ? fmt(e.stopLoss) : "—"}</Td>
                       <Td right>{e.takeProfit != null ? fmt(e.takeProfit) : "—"}</Td>
-                      <Td><StatusBadge status={e.status} result={e.result} /></Td>
+                      <Td>
+                        <StatusBadge status={e.status} result={e.result} />
+                      </Td>
                       <Td right>
                         <span
                           className="tabular-nums font-medium"
                           style={{ color: pnl > 0 ? "#1D9E75" : pnl < 0 ? "#E24B4A" : undefined }}
                         >
-                          {pnl >= 0 ? "+" : ""}{fmt(pnl)}
+                          {pnl >= 0 ? "+" : ""}
+                          {fmt(pnl)}
                         </span>
                       </Td>
                     </tr>
@@ -235,7 +293,10 @@ export function TabExecucoes() {
             Página {page + 1} de {pages}
           </span>
           <div className="flex items-center gap-2">
-            <PagerButton disabled={page === 0 || execQuery.isFetching} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+            <PagerButton
+              disabled={page === 0 || execQuery.isFetching}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
               <ChevronLeft className="size-3.5" /> Anterior
             </PagerButton>
             <PagerButton
@@ -260,7 +321,14 @@ export function TabExecucoes() {
 
 // ---------- Control bar (start/stop + telemetria) ----------
 function ControlBar({
-  telemetry, loading, error, pending, toggleError, onToggle, onRefresh, refreshing,
+  telemetry,
+  loading,
+  error,
+  pending,
+  toggleError,
+  onToggle,
+  onRefresh,
+  refreshing,
 }: {
   telemetry?: import("@/adapters/backend/bot4x.adapter").Bot4xTelemetry;
   loading: boolean;
@@ -292,7 +360,9 @@ function ControlBar({
               border: `1px solid ${active ? "#1D9E75" : "var(--border)"}`,
             }}
           >
-            <span className={`size-1.5 rounded-full ${active ? "bg-[#1D9E75] animate-pulse" : "bg-muted-foreground"}`} />
+            <span
+              className={`size-1.5 rounded-full ${active ? "bg-[#1D9E75] animate-pulse" : "bg-muted-foreground"}`}
+            />
             {active ? "RUNNING" : "IDLE"}
           </span>
         )}
@@ -309,28 +379,44 @@ function ControlBar({
             onClick={() => onToggle(active ? "stop" : "start")}
             className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12px] font-semibold disabled:opacity-60"
             style={{
-              background: active ? "color-mix(in oklab,#E24B4A 22%,transparent)" : "color-mix(in oklab,#1D9E75 22%,transparent)",
+              background: active
+                ? "color-mix(in oklab,#E24B4A 22%,transparent)"
+                : "color-mix(in oklab,#1D9E75 22%,transparent)",
               border: `1px solid ${active ? "#E24B4A" : "#1D9E75"}`,
               color: active ? "#FF9B9A" : "#7AD9B4",
             }}
           >
-            {pending ? <Loader2 className="size-3.5 animate-spin" /> : active ? <Square className="size-3.5" /> : <Play className="size-3.5" />}
+            {pending ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : active ? (
+              <Square className="size-3.5" />
+            ) : (
+              <Play className="size-3.5" />
+            )}
             {active ? "Parar bot" : "Iniciar bot"}
           </button>
         </div>
       </div>
 
       {toggleError && (
-        <div className="text-[11px] text-[#E24B4A]">Falha ao alterar o estado do bot: {toggleError}</div>
+        <div className="text-[11px] text-[#E24B4A]">
+          Falha ao alterar o estado do bot: {toggleError}
+        </div>
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Stat label="Trades hoje" value={telemetry ? String(telemetry.today.trades) : "—"} />
         <Stat label="Wins" value={telemetry ? String(telemetry.today.wins) : "—"} color="#1D9E75" />
-        <Stat label="Losses" value={telemetry ? String(telemetry.today.losses) : "—"} color="#E24B4A" />
+        <Stat
+          label="Losses"
+          value={telemetry ? String(telemetry.today.losses) : "—"}
+          color="#E24B4A"
+        />
         <Stat
           label="PnL do dia"
-          value={telemetry ? `${telemetry.today.pnl >= 0 ? "+" : ""}${fmt(telemetry.today.pnl)}` : "—"}
+          value={
+            telemetry ? `${telemetry.today.pnl >= 0 ? "+" : ""}${fmt(telemetry.today.pnl)}` : "—"
+          }
           color={telemetry && telemetry.today.pnl < 0 ? "#E24B4A" : "#1D9E75"}
         />
         <Stat label="Circuit breaker" value={telemetry?.circuitBreaker ?? "—"} />
@@ -340,7 +426,10 @@ function ControlBar({
 }
 
 function LogsPanel({
-  logs, loading, error, serverTime,
+  logs,
+  loading,
+  error,
+  serverTime,
 }: {
   logs: Array<{ at: string; level: string; message: string; detail?: string }>;
   loading: boolean;
@@ -350,7 +439,9 @@ function LogsPanel({
   return (
     <section className="rounded-lg border border-border bg-card p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Logs & telemetria</span>
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          Logs & telemetria
+        </span>
         {serverTime && (
           <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
             servidor {new Date(serverTime).toLocaleTimeString("pt-BR")}
@@ -362,7 +453,10 @@ function LogsPanel({
       ) : error ? (
         <ErrorPanel title="Telemetria indisponível" message={error} />
       ) : logs.length === 0 ? (
-        <EmptyPanel title="Sem eventos hoje" message="Nenhum log registrado pelo motor nas últimas execuções." />
+        <EmptyPanel
+          title="Sem eventos hoje"
+          message="Nenhum log registrado pelo motor nas últimas execuções."
+        />
       ) : (
         <ul className="space-y-1.5 font-mono text-[11px]">
           {logs.map((l, i) => (
@@ -391,14 +485,22 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-md border border-border bg-background px-3 py-2">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="text-[15px] font-semibold tabular-nums mt-0.5" style={{ color }}>{value}</div>
+      <div className="text-[15px] font-semibold tabular-nums mt-0.5" style={{ color }}>
+        {value}
+      </div>
     </div>
   );
 }
 
 function Select({
-  value, onChange, options,
-}: { value: string; onChange: (v: string) => void; options: Array<[string, string]> }) {
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: Array<[string, string]>;
+}) {
   return (
     <select
       value={value}
@@ -406,7 +508,9 @@ function Select({
       className="h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground outline-none"
     >
       {options.map(([v, label]) => (
-        <option key={v} value={v}>{label}</option>
+        <option key={v} value={v}>
+          {label}
+        </option>
       ))}
     </select>
   );
@@ -427,12 +531,36 @@ function StatusBadge({ status, result }: { status: string; result?: string }) {
 }
 
 function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
-  return <th className={`py-2 px-2 font-medium ${right ? "text-right" : "text-left"}`}>{children}</th>;
+  return (
+    <th className={`py-2 px-2 font-medium ${right ? "text-right" : "text-left"}`}>{children}</th>
+  );
 }
-function Td({ children, right, className = "" }: { children: React.ReactNode; right?: boolean; className?: string }) {
-  return <td className={`py-2 px-2 text-muted-foreground ${right ? "text-right tabular-nums" : ""} ${className}`}>{children}</td>;
+function Td({
+  children,
+  right,
+  className = "",
+}: {
+  children: React.ReactNode;
+  right?: boolean;
+  className?: string;
+}) {
+  return (
+    <td
+      className={`py-2 px-2 text-muted-foreground ${right ? "text-right tabular-nums" : ""} ${className}`}
+    >
+      {children}
+    </td>
+  );
 }
-function PagerButton({ children, disabled, onClick }: { children: React.ReactNode; disabled?: boolean; onClick: () => void }) {
+function PagerButton({
+  children,
+  disabled,
+  onClick,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       disabled={disabled}
@@ -444,7 +572,15 @@ function PagerButton({ children, disabled, onClick }: { children: React.ReactNod
   );
 }
 
-export function ErrorPanel({ title, message, onRetry }: { title: string; message?: string; onRetry?: () => void }) {
+export function ErrorPanel({
+  title,
+  message,
+  onRetry,
+}: {
+  title: string;
+  message?: string;
+  onRetry?: () => void;
+}) {
   return (
     <div className="rounded-md border border-[#E24B4A55] bg-[color-mix(in_oklab,#E24B4A_10%,transparent)] p-4">
       <div className="flex items-center gap-2 text-[13px] font-medium text-[#FF9B9A]">

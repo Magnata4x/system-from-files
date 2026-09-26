@@ -5,7 +5,12 @@ import { useMemo, useState } from "react";
 function colorFor(v: number) {
   if (v === 0) return "var(--secondary)";
   if (v === -1) return "oklch(0.52 0.20 25)";
-  const shades = ["oklch(0.45 0.13 145)", "oklch(0.55 0.16 145)", "oklch(0.65 0.18 145)", "oklch(0.75 0.20 145)"];
+  const shades = [
+    "oklch(0.45 0.13 145)",
+    "oklch(0.55 0.16 145)",
+    "oklch(0.65 0.18 145)",
+    "oklch(0.75 0.20 145)",
+  ];
   return shades[Math.min(v, 4) - 1];
 }
 
@@ -55,9 +60,15 @@ export function BehavioralHeatmap() {
   for (let i = 0; i < first; i++) current.push(null);
   for (const d of data) {
     current.push(d);
-    if (current.length === 7) { weeks.push(current); current = []; }
+    if (current.length === 7) {
+      weeks.push(current);
+      current = [];
+    }
   }
-  if (current.length) { while (current.length < 7) current.push(null); weeks.push(current); }
+  if (current.length) {
+    while (current.length < 7) current.push(null);
+    weeks.push(current);
+  }
 
   const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
   const stats = hover ? statsFor(hover.cell) : null;
@@ -104,7 +115,9 @@ export function BehavioralHeatmap() {
         <div>
           <h2 className="text-sm font-semibold">Behavioral heatmap</h2>
           <p className="text-xs text-muted-foreground">
-            {live ? "Últimos 90 dias — dados reais das suas operações" : "Últimos 90 dias — exemplo demonstrativo"}
+            {live
+              ? "Últimos 90 dias — dados reais das suas operações"
+              : "Últimos 90 dias — exemplo demonstrativo"}
           </p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
@@ -120,7 +133,13 @@ export function BehavioralHeatmap() {
         <div className="flex gap-1.5 min-w-fit relative">
           <div className="flex flex-col gap-1 mr-1 text-[10px] text-muted-foreground pt-0.5">
             {dayLabels.map((d, i) => (
-              <span key={i} className="h-3 leading-3" style={{ visibility: i % 2 ? "visible" : "hidden" }}>{d}</span>
+              <span
+                key={i}
+                className="h-3 leading-3"
+                style={{ visibility: i % 2 ? "visible" : "hidden" }}
+              >
+                {d}
+              </span>
             ))}
           </div>
           {weeks.map((week, wi) => (
@@ -132,7 +151,9 @@ export function BehavioralHeatmap() {
                   style={{ background: d ? colorFor(d.value) : "transparent" }}
                   onMouseEnter={(e) => {
                     if (!d) return;
-                    const rect = (e.currentTarget.closest(".relative") as HTMLElement).getBoundingClientRect();
+                    const rect = (
+                      e.currentTarget.closest(".relative") as HTMLElement
+                    ).getBoundingClientRect();
                     const r = e.currentTarget.getBoundingClientRect();
                     setHover({ cell: d, x: r.left - rect.left + 16, y: r.top - rect.top + 16 });
                   }}
@@ -148,7 +169,11 @@ export function BehavioralHeatmap() {
               style={{ left: hover.x, top: hover.y }}
             >
               <div className="font-medium text-foreground">
-                {hover.cell.date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                {hover.cell.date.toLocaleDateString(undefined, {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
               </div>
               {stats.trades === 0 ? (
                 <div className="text-muted-foreground mt-1">No trades</div>
@@ -160,8 +185,11 @@ export function BehavioralHeatmap() {
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">PnL</span>
-                    <span className={`font-medium ${stats.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {stats.pnl >= 0 ? "+" : ""}{stats.pnl}u
+                    <span
+                      className={`font-medium ${stats.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                    >
+                      {stats.pnl >= 0 ? "+" : ""}
+                      {stats.pnl}u
                     </span>
                   </div>
                   {!hover.cell.live && (

@@ -23,7 +23,9 @@ export function ChannelRow({
   children?: React.ReactNode;
 }) {
   return (
-    <div className={`rounded-lg border border-border bg-card/40 p-4 ${disabled ? "opacity-60" : ""}`}>
+    <div
+      className={`rounded-lg border border-border bg-card/40 p-4 ${disabled ? "opacity-60" : ""}`}
+    >
       <div className="flex items-center gap-3">
         <div
           className="size-9 rounded-md flex items-center justify-center shrink-0"

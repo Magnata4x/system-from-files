@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const CANONICAL = "https://signalsignin.company/privacy";
-const DESCRIPTION =
-  "How SignalSignin collects, uses, and protects your personal data.";
+const DESCRIPTION = "How SignalSignin collects, uses, and protects your personal data.";
 
 export const Route = createFileRoute("/privacy")({
   // Conteúdo 100% estático — sem loader, sem fetch. Pré-renderizado em
@@ -25,7 +24,9 @@ function PrivacyPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">← Back</Link>
+        <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
+          ← Back
+        </Link>
         <article className="mt-6">
           <header>
             <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
@@ -49,24 +50,25 @@ function PrivacyPage() {
             <section>
               <h2 className="text-base font-semibold text-foreground">2. How we use information</h2>
               <p>
-                We use the data to operate, secure, and improve the Service, to communicate with you,
-                and to comply with legal obligations.
+                We use the data to operate, secure, and improve the Service, to communicate with
+                you, and to comply with legal obligations.
               </p>
             </section>
 
             <section>
               <h2 className="text-base font-semibold text-foreground">3. Sharing</h2>
               <p>
-                We do not sell personal information. We share data only with processors needed to run
-                the Service (hosting, analytics, payments) under contracts that require confidentiality.
+                We do not sell personal information. We share data only with processors needed to
+                run the Service (hosting, analytics, payments) under contracts that require
+                confidentiality.
               </p>
             </section>
 
             <section>
               <h2 className="text-base font-semibold text-foreground">4. Your rights</h2>
               <p>
-                Depending on your jurisdiction you may have rights to access, correct, or delete your
-                personal data. Contact us to exercise these rights.
+                Depending on your jurisdiction you may have rights to access, correct, or delete
+                your personal data. Contact us to exercise these rights.
               </p>
             </section>
 

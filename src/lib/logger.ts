@@ -20,7 +20,11 @@ const isProd = import.meta.env.PROD;
 
 type Context = Record<string, unknown>;
 
-function emit(level: "debug" | "log" | "info" | "warn" | "error", message: string, context?: Context) {
+function emit(
+  level: "debug" | "log" | "info" | "warn" | "error",
+  message: string,
+  context?: Context,
+) {
   // FIX OBS-01: enriquecer automaticamente com trace_id quando disponível.
   const traceId = getTraceId();
   const enriched: Context = {

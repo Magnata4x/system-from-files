@@ -4,7 +4,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { PLANS, COMPARISON, FAQS, type CompareCell } from "@/lib/pricing-data";
 import { cn } from "@/lib/utils";
 
@@ -31,11 +36,21 @@ function Header({ annual, setAnnual }: { annual: boolean; setAnnual: (v: boolean
         Comece gratuitamente por 7 dias. Cancele quando quiser.
       </p>
       <div className="inline-flex items-center gap-3 rounded-full bg-card border border-border px-4 py-2">
-        <span className={cn("text-xs font-medium transition-colors", !annual ? "text-foreground" : "text-muted-foreground")}>
+        <span
+          className={cn(
+            "text-xs font-medium transition-colors",
+            !annual ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
           Mensal
         </span>
         <Switch checked={annual} onCheckedChange={setAnnual} />
-        <span className={cn("text-xs font-medium transition-colors", annual ? "text-foreground" : "text-muted-foreground")}>
+        <span
+          className={cn(
+            "text-xs font-medium transition-colors",
+            annual ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
           Anual
         </span>
         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 uppercase tracking-wider">
@@ -61,7 +76,7 @@ function PlanGrid({ annual }: { annual: boolean }) {
               "relative rounded-2xl bg-card/50 p-6 flex flex-col transition-all",
               p.featured
                 ? "border-2 border-[#378ADD] shadow-[0_0_40px_-10px_rgba(55,138,221,0.5)] md:-translate-y-2"
-                : "border border-border"
+                : "border border-border",
             )}
           >
             {p.featured && (
@@ -84,12 +99,15 @@ function PlanGrid({ annual }: { annual: boolean }) {
                 <>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-semibold tabular-nums">
-                      R$<TweenNumber value={price} />
+                      R$
+                      <TweenNumber value={price} />
                     </span>
                     <span className="text-sm text-muted-foreground">/mês</span>
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-1">
-                    {annual ? `Cobrado R$${annualBilled.toLocaleString("pt-BR")}/ano` : "Cobrado mensalmente"}
+                    {annual
+                      ? `Cobrado R$${annualBilled.toLocaleString("pt-BR")}/ano`
+                      : "Cobrado mensalmente"}
                   </p>
                   {annual && (
                     <p className="text-[11px] text-emerald-300 mt-0.5">
@@ -115,7 +133,11 @@ function PlanGrid({ annual }: { annual: boolean }) {
                   ) : (
                     <X className="size-4 text-muted-foreground/40 mt-0.5 shrink-0" />
                   )}
-                  <span className={cn(f.included ? "text-foreground/90" : "text-muted-foreground/50 line-through")}>
+                  <span
+                    className={cn(
+                      f.included ? "text-foreground/90" : "text-muted-foreground/50 line-through",
+                    )}
+                  >
                     {f.label}
                   </span>
                 </li>
@@ -126,7 +148,7 @@ function PlanGrid({ annual }: { annual: boolean }) {
               variant={p.ctaVariant === "primary" ? "default" : "outline"}
               className={cn(
                 "w-full",
-                p.ctaVariant === "primary" && "bg-[#378ADD] hover:bg-[#378ADD]/90 text-white"
+                p.ctaVariant === "primary" && "bg-[#378ADD] hover:bg-[#378ADD]/90 text-white",
               )}
             >
               {p.cta}
@@ -185,33 +207,50 @@ function ComparisonTable() {
     <section>
       <div className="text-center mb-6">
         <h2 className="text-xl font-semibold">Compare todos os recursos</h2>
-        <p className="text-sm text-muted-foreground mt-1">Veja em detalhe o que cada plano entrega.</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Veja em detalhe o que cada plano entrega.
+        </p>
       </div>
       <div className="rounded-xl border border-border overflow-hidden bg-card/40">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[640px]">
             <thead>
               <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Recurso</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
+                  Recurso
+                </th>
                 <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">Starter</th>
-                <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider bg-[#378ADD]/10 text-[#7BB5F0]">Pro</th>
-                <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">Institutional</th>
+                <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider bg-[#378ADD]/10 text-[#7BB5F0]">
+                  Pro
+                </th>
+                <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">
+                  Institutional
+                </th>
               </tr>
             </thead>
             <tbody>
               {COMPARISON.map((group) => (
                 <Fragment key={group.group}>
                   <tr className="bg-secondary/20">
-                    <td colSpan={4} className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+                    >
                       {group.group}
                     </td>
                   </tr>
                   {group.rows.map((r) => (
                     <tr key={r.feature} className="border-t border-border/60 hover:bg-secondary/10">
                       <td className="px-4 py-3 text-foreground/90">{r.feature}</td>
-                      <td className="px-4 py-3 text-center"><Cell v={r.starter} /></td>
-                      <td className="px-4 py-3 text-center bg-[#378ADD]/5"><Cell v={r.pro} highlight /></td>
-                      <td className="px-4 py-3 text-center"><Cell v={r.institutional} /></td>
+                      <td className="px-4 py-3 text-center">
+                        <Cell v={r.starter} />
+                      </td>
+                      <td className="px-4 py-3 text-center bg-[#378ADD]/5">
+                        <Cell v={r.pro} highlight />
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <Cell v={r.institutional} />
+                      </td>
                     </tr>
                   ))}
                 </Fragment>
@@ -222,9 +261,7 @@ function ComparisonTable() {
                 <td className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Veredito
                 </td>
-                <td className="px-4 py-3 text-center text-[11px] text-muted-foreground">
-                  Entrada
-                </td>
+                <td className="px-4 py-3 text-center text-[11px] text-muted-foreground">Entrada</td>
                 <td className="px-4 py-3 text-center bg-gradient-to-b from-[#378ADD]/15 to-[#378ADD]/5 relative">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#378ADD] text-white text-[10px] font-semibold uppercase tracking-wider shadow-[0_0_18px_-4px_rgba(55,138,221,0.7)]">
                     <Award className="size-3" /> Best value
@@ -243,9 +280,18 @@ function ComparisonTable() {
 }
 
 function Cell({ v, highlight }: { v: CompareCell; highlight?: boolean }) {
-  if (v === true) return <Check className={cn("size-4 mx-auto", highlight ? "text-[#7BB5F0]" : "text-emerald-400")} />;
+  if (v === true)
+    return (
+      <Check className={cn("size-4 mx-auto", highlight ? "text-[#7BB5F0]" : "text-emerald-400")} />
+    );
   if (v === false) return <Minus className="size-4 mx-auto text-muted-foreground/40" />;
-  return <span className={cn("text-xs", highlight ? "text-[#7BB5F0] font-medium" : "text-foreground/85")}>{v}</span>;
+  return (
+    <span
+      className={cn("text-xs", highlight ? "text-[#7BB5F0] font-medium" : "text-foreground/85")}
+    >
+      {v}
+    </span>
+  );
 }
 
 function Faq() {
@@ -254,11 +300,19 @@ function Faq() {
       <div className="text-center mb-6">
         <h2 className="text-xl font-semibold">Perguntas frequentes</h2>
       </div>
-      <Accordion type="single" collapsible className="rounded-xl border border-border bg-card/40 px-4">
+      <Accordion
+        type="single"
+        collapsible
+        className="rounded-xl border border-border bg-card/40 px-4"
+      >
         {FAQS.map((f, i) => (
           <AccordionItem key={i} value={`q-${i}`} className="border-border">
-            <AccordionTrigger className="text-sm text-left hover:no-underline">{f.q}</AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground leading-relaxed">{f.a}</AccordionContent>
+            <AccordionTrigger className="text-sm text-left hover:no-underline">
+              {f.q}
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+              {f.a}
+            </AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
@@ -271,11 +325,14 @@ function MrrSimulator({ annual }: { annual: boolean }) {
   const [pro, setPro] = useState(8);
   const [inst, setInst] = useState(1);
 
-  const prices = useMemo(() => ({
-    starter: annual ? 77 : 97,
-    pro: annual ? 197 : 247,
-    inst: annual ? 557 : 697,
-  }), [annual]);
+  const prices = useMemo(
+    () => ({
+      starter: annual ? 77 : 97,
+      pro: annual ? 197 : 247,
+      inst: annual ? 557 : 697,
+    }),
+    [annual],
+  );
 
   const mrr = starter * prices.starter + pro * prices.pro + inst * prices.inst;
   const arr = mrr * 12;
@@ -295,9 +352,28 @@ function MrrSimulator({ annual }: { annual: boolean }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="rounded-xl border border-border bg-card/40 p-5 space-y-5">
-          <SliderRow label="Clientes Starter" value={starter} max={500} onChange={setStarter} price={prices.starter} />
-          <SliderRow label="Clientes Pro" value={pro} max={300} onChange={setPro} price={prices.pro} accent />
-          <SliderRow label="Clientes Institutional" value={inst} max={50} onChange={setInst} price={prices.inst} />
+          <SliderRow
+            label="Clientes Starter"
+            value={starter}
+            max={500}
+            onChange={setStarter}
+            price={prices.starter}
+          />
+          <SliderRow
+            label="Clientes Pro"
+            value={pro}
+            max={300}
+            onChange={setPro}
+            price={prices.pro}
+            accent
+          />
+          <SliderRow
+            label="Clientes Institutional"
+            value={inst}
+            max={50}
+            onChange={setInst}
+            price={prices.inst}
+          />
         </div>
 
         <div className="rounded-xl border border-border bg-gradient-to-br from-[#378ADD]/10 to-card/40 p-5 space-y-4">
@@ -308,11 +384,13 @@ function MrrSimulator({ annual }: { annual: boolean }) {
             <Metric label="Clientes totais" value={totalClients.toString()} />
           </div>
           <div className="rounded-lg bg-secondary/40 px-3 py-2.5 text-xs text-muted-foreground">
-            <span className="text-foreground font-medium">Breakeven estimado:</span> {breakeven} clientes Pro para cobrir R$12k/mês de custo fixo.
+            <span className="text-foreground font-medium">Breakeven estimado:</span> {breakeven}{" "}
+            clientes Pro para cobrir R$12k/mês de custo fixo.
           </div>
           {!annual && (
             <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-2.5 text-xs text-emerald-200">
-              Ative o ciclo anual e economize 20% — receita projetada permanece, custo do cliente cai.
+              Ative o ciclo anual e economize 20% — receita projetada permanece, custo do cliente
+              cai.
             </div>
           )}
         </div>
@@ -321,7 +399,21 @@ function MrrSimulator({ annual }: { annual: boolean }) {
   );
 }
 
-function SliderRow({ label, value, max, onChange, price, accent }: { label: string; value: number; max: number; onChange: (v: number) => void; price: number; accent?: boolean }) {
+function SliderRow({
+  label,
+  value,
+  max,
+  onChange,
+  price,
+  accent,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  onChange: (v: number) => void;
+  price: number;
+  accent?: boolean;
+}) {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -339,7 +431,9 @@ function Metric({ label, value, accent }: { label: string; value: string; accent
   return (
     <div className="rounded-lg bg-background/40 border border-border px-3 py-2.5">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={cn("text-xl font-semibold mt-0.5 tabular-nums", accent && "text-[#7BB5F0]")}>{value}</div>
+      <div className={cn("text-xl font-semibold mt-0.5 tabular-nums", accent && "text-[#7BB5F0]")}>
+        {value}
+      </div>
     </div>
   );
 }

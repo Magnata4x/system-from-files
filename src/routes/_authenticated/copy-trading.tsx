@@ -16,9 +16,17 @@ export const Route = createFileRoute("/_authenticated/copy-trading")({
   head: () => ({
     meta: [
       { title: "Copy Trading — AISignalRadar" },
-      { name: "description", content: "Follow top-performing traders, configure risk parameters and mirror their signals with full control." },
+      {
+        name: "description",
+        content:
+          "Follow top-performing traders, configure risk parameters and mirror their signals with full control.",
+      },
       { property: "og:title", content: "AISignalRadar Copy Trading" },
-      { property: "og:description", content: "Leaderboard, risk-aware copy config and performance comparison vs manual trading." },
+      {
+        property: "og:description",
+        content:
+          "Leaderboard, risk-aware copy config and performance comparison vs manual trading.",
+      },
     ],
   }),
   component: CopyTradingPage,
@@ -69,7 +77,10 @@ function CopyTradingPage() {
 
   function stopCopy(traderId: string) {
     unfollow.mutate(traderId, {
-      onSuccess: () => toast("Cópia encerrada", { description: "As posições abertas serão fechadas na próxima oportunidade." }),
+      onSuccess: () =>
+        toast("Cópia encerrada", {
+          description: "As posições abertas serão fechadas na próxima oportunidade.",
+        }),
       onError: () => toast.error("Não foi possível encerrar a cópia."),
     });
   }
@@ -82,16 +93,25 @@ function CopyTradingPage() {
         <main className="flex-1 min-w-0">
           <div className="max-w-6xl mx-auto px-5 py-8 space-y-10">
             <header>
-              <h1 className="text-[26px] md:text-[30px] font-semibold tracking-tight">Copy Trading</h1>
-              <p className="text-sm text-muted-foreground mt-1">Mirror signals from top performers — you stay in control of risk.</p>
+              <h1 className="text-[26px] md:text-[30px] font-semibold tracking-tight">
+                Copy Trading
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Mirror signals from top performers — you stay in control of risk.
+              </p>
             </header>
             <StatsRow />
             <Leaderboard onCopy={openCopy} copiedIds={copiedIds} />
             <PerformanceChart />
             {isError ? (
               <div className="rounded-lg border border-border bg-card/40 p-6 text-center space-y-3">
-                <p className="text-sm text-muted-foreground">Não foi possível carregar seus traders copiados.</p>
-                <button onClick={() => refetch()} className="text-sm text-[var(--brand-cyan)] hover:underline">
+                <p className="text-sm text-muted-foreground">
+                  Não foi possível carregar seus traders copiados.
+                </p>
+                <button
+                  onClick={() => refetch()}
+                  className="text-sm text-[var(--brand-cyan)] hover:underline"
+                >
                   Tentar de novo
                 </button>
               </div>
@@ -106,7 +126,12 @@ function CopyTradingPage() {
           </div>
         </main>
       </div>
-      <CopyConfigModal trader={selected} open={open} onOpenChange={setOpen} onConfirm={confirmCopy} />
+      <CopyConfigModal
+        trader={selected}
+        open={open}
+        onOpenChange={setOpen}
+        onConfirm={confirmCopy}
+      />
     </div>
   );
 }

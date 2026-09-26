@@ -135,7 +135,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (c: boolean) => void }) {
+function Check({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (c: boolean) => void;
+}) {
   return (
     <label className="flex items-center gap-2 text-[12px] text-foreground cursor-pointer">
       <input
@@ -149,7 +157,13 @@ function Check({ label, checked, onChange }: { label: string; checked: boolean; 
   );
 }
 
-function DualRange({ value, onChange }: { value: [number, number]; onChange: (v: [number, number]) => void }) {
+function DualRange({
+  value,
+  onChange,
+}: {
+  value: [number, number];
+  onChange: (v: [number, number]) => void;
+}) {
   return (
     <div className="flex gap-2">
       <input

@@ -32,14 +32,10 @@ export const Route = createFileRoute("/_authenticated/calibrator/history/$id")({
   }),
   component: CalibratorHistoryDetailPage,
   notFoundComponent: () => (
-    <div className="p-10 text-sm text-muted-foreground">
-      Simulação não encontrada.
-    </div>
+    <div className="p-10 text-sm text-muted-foreground">Simulação não encontrada.</div>
   ),
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-destructive">
-      Erro ao carregar simulação: {error.message}
-    </div>
+    <div className="p-10 text-sm text-destructive">Erro ao carregar simulação: {error.message}</div>
   ),
 });
 
@@ -160,10 +156,7 @@ function CalibratorHistoryDetailPage() {
               <KV k="Perfil" v={entry.params.profile} />
               <KV k="Símbolo" v={entry.params.symbol} />
               <KV k="Período" v={`${entry.params.periodDays} dias`} />
-              <KV
-                k="Saldo inicial"
-                v={`${entry.params.initialBalance.toLocaleString()} USDT`}
-              />
+              <KV k="Saldo inicial" v={`${entry.params.initialBalance.toLocaleString()} USDT`} />
               {entry.userId && <KV k="User ID" v={entry.userId} />}
               <KV k="Executado em" v={new Date(entry.createdAt).toLocaleString()} />
             </Card>
@@ -185,11 +178,7 @@ function CalibratorHistoryDetailPage() {
                   value={`${pos ? "+" : ""}${entry.result.pnl.toFixed(2)} (${entry.result.pnlPct.toFixed(2)}%)`}
                   tone={pos ? "pos" : "neg"}
                   icon={
-                    pos ? (
-                      <TrendingUp className="size-4" />
-                    ) : (
-                      <TrendingDown className="size-4" />
-                    )
+                    pos ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />
                   }
                 />
                 <Metric
@@ -202,11 +191,7 @@ function CalibratorHistoryDetailPage() {
                   <Metric label="Wins" value={String(entry.result.wins)} tone="pos" />
                 )}
                 {typeof entry.result.losses === "number" && (
-                  <Metric
-                    label="Losses"
-                    value={String(entry.result.losses)}
-                    tone="neg"
-                  />
+                  <Metric label="Losses" value={String(entry.result.losses)} tone="neg" />
                 )}
               </div>
 
@@ -222,8 +207,8 @@ function CalibratorHistoryDetailPage() {
                 </Card>
               ) : (
                 <Card className="p-5 text-xs text-muted-foreground">
-                  Equity curve indisponível para esta simulação (registro antigo).
-                  Reexecute para gerar novamente.
+                  Equity curve indisponível para esta simulação (registro antigo). Reexecute para
+                  gerar novamente.
                 </Card>
               )}
 
@@ -237,10 +222,7 @@ function CalibratorHistoryDetailPage() {
                     <Row k="Correção sugerida" v={full.dnaFeedback.correction} />
                   )}
                   {full.dnaFeedback.expectedImprovement && (
-                    <Row
-                      k="Melhoria esperada"
-                      v={full.dnaFeedback.expectedImprovement}
-                    />
+                    <Row k="Melhoria esperada" v={full.dnaFeedback.expectedImprovement} />
                   )}
                   {full.commentary && (
                     <p className="text-xs text-muted-foreground border-t border-border pt-3">
@@ -256,7 +238,11 @@ function CalibratorHistoryDetailPage() {
                   <h3 className="text-sm font-semibold">Log bruto</h3>
                 </div>
                 <pre className="text-[11px] leading-relaxed bg-muted/40 rounded-md p-3 overflow-auto max-h-96 text-muted-foreground">
-{JSON.stringify(full?.raw ?? { params: entry.params, result: entry.result }, null, 2)}
+                  {JSON.stringify(
+                    full?.raw ?? { params: entry.params, result: entry.result },
+                    null,
+                    2,
+                  )}
                 </pre>
               </Card>
             </div>
@@ -297,11 +283,7 @@ function Metric({
   icon?: React.ReactNode;
 }) {
   const color =
-    tone === "pos"
-      ? "text-emerald-500"
-      : tone === "neg"
-        ? "text-rose-500"
-        : "text-foreground";
+    tone === "pos" ? "text-emerald-500" : tone === "neg" ? "text-rose-500" : "text-foreground";
   return (
     <Card className="p-3">
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground flex items-center gap-1">

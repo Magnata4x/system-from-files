@@ -43,7 +43,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     blockings30d: 647,
     trades30d: 183,
     riskRank: 1,
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "warn", 5: "warn", 6: "warn", 7: "warn", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "warn",
+      5: "warn",
+      6: "warn",
+      7: "warn",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   rsi: {
     id: "rsi",
@@ -60,7 +71,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 221,
     riskRank: 2,
     warning: { level: "amber", text: "⚠ Monitorar disjuntores em lev 1:6 e 1:10" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "ok", 5: "warn", 6: "warn", 7: "warn", 8: "warn", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "ok",
+      5: "warn",
+      6: "warn",
+      7: "warn",
+      8: "warn",
+      9: "no",
+      10: "no",
+    },
   },
   aiscore: {
     id: "aiscore",
@@ -77,7 +99,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 208,
     riskRank: 3,
     warning: { level: "red", text: "⛔ Não usar com alavancagem 1:8 e 1:10" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "ok", 5: "warn", 6: "warn", 7: "warn", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "ok",
+      5: "warn",
+      6: "warn",
+      7: "warn",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   agressivo: {
     id: "agressivo",
@@ -94,7 +127,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 267,
     riskRank: 4,
     warning: { level: "red", text: "🚨 EXCLUSIVO para alavancagem 1:1 e 1:3" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "warn", 4: "warn", 5: "warn", 6: "warn", 7: "no", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "warn",
+      4: "warn",
+      5: "warn",
+      6: "warn",
+      7: "no",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   scalper: {
     id: "scalper" as CalibProfile,
@@ -111,7 +155,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 312,
     riskRank: 4,
     warning: { level: "amber", text: "⚠ Scalping de alta frequência — requer baixo spread" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "warn", 5: "warn", 6: "warn", 7: "no", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "warn",
+      5: "warn",
+      6: "warn",
+      7: "no",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   intraday: {
     id: "intraday" as CalibProfile,
@@ -128,7 +183,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 178,
     riskRank: 3,
     warning: { level: "amber", text: "⚠ Requer tendência clara e volume crescente" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "ok", 5: "warn", 6: "warn", 7: "warn", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "ok",
+      5: "warn",
+      6: "warn",
+      7: "warn",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   swing: {
     id: "swing" as CalibProfile,
@@ -145,7 +211,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 92,
     riskRank: 2,
     warning: { level: "amber", text: "⚠ Requer ADX favorável e tendência confirmada" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "ok", 5: "warn", 6: "warn", 7: "no", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "ok",
+      5: "warn",
+      6: "warn",
+      7: "no",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
   position: {
     id: "position" as CalibProfile,
@@ -162,7 +239,18 @@ export const PROFILES: Record<CalibProfile, ProfileSpec> = {
     trades30d: 32,
     riskRank: 2,
     warning: { level: "amber", text: "⚠ Tendência macro de longo prazo — exposição prolongada" },
-    levMatrix: { 1: "ok", 2: "ok", 3: "ok", 4: "warn", 5: "warn", 6: "no", 7: "no", 8: "no", 9: "no", 10: "no" },
+    levMatrix: {
+      1: "ok",
+      2: "ok",
+      3: "ok",
+      4: "warn",
+      5: "warn",
+      6: "no",
+      7: "no",
+      8: "no",
+      9: "no",
+      10: "no",
+    },
   },
 };
 
@@ -233,7 +321,12 @@ export const FILTER_NAMES: Record<FilterKey, string> = {
 
 export type ChannelZone = "BOTTOM" | "MIDDLE" | "TOP";
 export type TickSide = "BUY" | "SELL" | null;
-export type Verdict = "EXECUTE" | "IGNORE" | "FOMO_BLOCKED" | "GRID_SATURATED" | "EMERGENCY_SHUTDOWN";
+export type Verdict =
+  | "EXECUTE"
+  | "IGNORE"
+  | "FOMO_BLOCKED"
+  | "GRID_SATURATED"
+  | "EMERGENCY_SHUTDOWN";
 export type F5SubKey = "RSI" | "AISCORE" | "LIQGRAB";
 
 export type Tick = {
@@ -294,7 +387,7 @@ const PAIRS = [
 ];
 const MAX_SLOTS = 10; // keep in sync with bot4x-store.ts MAX_SLOTS
 const rand = (n: number) => Math.floor(Math.random() * n);
-const pick = <T,>(a: T[]) => a[rand(a.length)];
+const pick = <T>(a: T[]) => a[rand(a.length)];
 
 type MakeTickCtx = {
   profile: ProfileSpec;
@@ -313,11 +406,21 @@ export function makeTick(ctx: MakeTickCtx): Tick {
   const side: TickSide = channelZone === "BOTTOM" ? "BUY" : channelZone === "TOP" ? "SELL" : null;
 
   const rsi = +(Math.random() * 100).toFixed(1);
-  const aiScore = Math.random() < 0.55 ? +(85 + Math.random() * 15).toFixed(1) : +(60 + Math.random() * 25).toFixed(1);
+  const aiScore =
+    Math.random() < 0.55
+      ? +(85 + Math.random() * 15).toFixed(1)
+      : +(60 + Math.random() * 25).toFixed(1);
   const liquidityGrab = Math.random() < 0.65;
   const fomoDisplacement = +(Math.random() * 25).toFixed(1);
 
-  const filters: Record<FilterKey, boolean> = { F1: true, F2: true, F3: true, F4: true, F5: true, F6: true };
+  const filters: Record<FilterKey, boolean> = {
+    F1: true,
+    F2: true,
+    F3: true,
+    F4: true,
+    F5: true,
+    F6: true,
+  };
   const detail: Record<FilterKey, string> = {
     F1: `Top 10 USDT`,
     F2: `${slotsUsed}/${MAX_SLOTS} slots`,

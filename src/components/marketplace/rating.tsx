@@ -1,6 +1,14 @@
 import { Star } from "lucide-react";
 
-export function Rating({ value, count, size = 12 }: { value: number; count?: number; size?: number }) {
+export function Rating({
+  value,
+  count,
+  size = 12,
+}: {
+  value: number;
+  count?: number;
+  size?: number;
+}) {
   const full = Math.round(value);
   return (
     <div className="flex items-center gap-1 text-xs text-muted-foreground">

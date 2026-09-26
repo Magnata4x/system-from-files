@@ -62,8 +62,6 @@ export async function savePrefs(userId: string, prefs: Partial<UserPrefsRow>): P
       bot4x_alerts: { ...prefs.bot4xAlerts } as Record<string, boolean>,
     }),
   };
-  const { error } = await supabase
-    .from("user_preferences")
-    .upsert(row, { onConflict: "user_id" });
+  const { error } = await supabase.from("user_preferences").upsert(row, { onConflict: "user_id" });
   if (error) logger.error("[user-prefs-db] save", { error: error, message: error.message });
 }

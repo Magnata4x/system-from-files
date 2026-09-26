@@ -27,14 +27,16 @@ async function assertAdmin(context: { supabase: SupabaseClient<Database>; userId
 export const adminListUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { search?: string; limit?: number; cursor?: string }) =>
-    z.object({
-      search: z.string().trim().max(120).optional(),
-      // FIX SEG-01: reduzir limite máximo de 200 para 50 e adicionar paginação cursorial.
-      // Sem isso, um admin comprometido podia extrair toda a base de usuários em
-      // uma única request com limit=200, repetindo em loop.
-      limit: z.number().int().min(1).max(50).optional(),
-      cursor: z.string().optional(), // ISO timestamp para paginação por created_at
-    }).parse(d),
+    z
+      .object({
+        search: z.string().trim().max(120).optional(),
+        // FIX SEG-01: reduzir limite máximo de 200 para 50 e adicionar paginação cursorial.
+        // Sem isso, um admin comprometido podia extrair toda a base de usuários em
+        // uma única request com limit=200, repetindo em loop.
+        limit: z.number().int().min(1).max(50).optional(),
+        cursor: z.string().optional(), // ISO timestamp para paginação por created_at
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
@@ -44,8 +46,8 @@ export const adminListUsers = createServerFn({ method: "GET" })
     // Assinatura: check_rate_limit(p_user_id uuid, p_action text, p_max integer)
     const { data: allowed, error: rlErr } = await context.supabase.rpc("check_rate_limit", {
       p_user_id: context.userId,
-      p_action:  "admin_list_users",
-      p_max:     30,
+      p_action: "admin_list_users",
+      p_max: 30,
     });
     if (rlErr || !allowed) {
       throw new Error("Rate limit excedido: máximo de 30 listagens de usuários por minuto.");
@@ -92,7 +94,11 @@ export const adminGetUser = createServerFn({ method: "GET" })
     ]);
     if (pErr) throw new Error(pErr.message);
     if (!profile) throw new Error("Usuário não encontrado");
-    return { profile, roles: (roles ?? []).map((r: { role: string }) => r.role), audit: audit ?? [] };
+    return {
+      profile,
+      roles: (roles ?? []).map((r: { role: string }) => r.role),
+      audit: audit ?? [],
+    };
   });
 
 export const adminUpdateUser = createServerFn({ method: "POST" })

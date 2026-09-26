@@ -101,7 +101,12 @@ function ResetPasswordPage() {
         />
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--brand-cyan)]"
-          style={{ width: 420, height: 420, animation: "radar-pulse 6s ease-out infinite", animationDelay: "3s" }}
+          style={{
+            width: 420,
+            height: 420,
+            animation: "radar-pulse 6s ease-out infinite",
+            animationDelay: "3s",
+          }}
         />
       </div>
 
@@ -153,9 +158,7 @@ function ResetPasswordPage() {
                 <Check className="size-7" style={{ color: "var(--success)" }} />
               </div>
               <h2 className="text-lg font-medium text-foreground">Senha alterada com sucesso</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Redirecionando para o login…
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">Redirecionando para o login…</p>
             </div>
           )}
 

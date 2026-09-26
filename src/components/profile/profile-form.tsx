@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useProfileStore, type ProfileInfo } from "@/lib/profile-store";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +28,10 @@ const schema = z.object({
     .max(20, "Max 20 chars")
     .regex(/^[a-z0-9_]+$/, "Lowercase, numbers, underscore"),
   email: z.string().trim().email().max(255),
-  phoneCountry: z.string().trim().regex(/^\+\d{1,4}$/, "e.g. +1"),
+  phoneCountry: z
+    .string()
+    .trim()
+    .regex(/^\+\d{1,4}$/, "e.g. +1"),
   phone: z.string().trim().max(20),
   country: z.string().min(1),
   timezone: z.string().min(1),
@@ -32,13 +41,27 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const COUNTRIES = ["United States", "United Kingdom", "Brazil", "Portugal", "Germany", "France", "Spain", "Japan", "Singapore", "Canada", "Australia"];
+const COUNTRIES = [
+  "United States",
+  "United Kingdom",
+  "Brazil",
+  "Portugal",
+  "Germany",
+  "France",
+  "Spain",
+  "Japan",
+  "Singapore",
+  "Canada",
+  "Australia",
+];
 const TAKEN = new Set(["admin", "root", "lovable", "trader", "satoshi"]);
 
 export function ProfileForm() {
   const { info, setInfo } = useProfileStore();
   const { user } = useAuth();
-  const [unameStatus, setUnameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+  const [unameStatus, setUnameStatus] = useState<"idle" | "checking" | "available" | "taken">(
+    "idle",
+  );
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -54,7 +77,9 @@ export function ProfileForm() {
     (async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, email, username, phone_country, phone, country, timezone, bio, website, avatar_url")
+        .select(
+          "full_name, email, username, phone_country, phone, country, timezone, bio, website, avatar_url",
+        )
         .eq("id", user.id)
         .maybeSingle();
       if (cancelled) return;
@@ -116,27 +141,26 @@ export function ProfileForm() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: user.id,
-          full_name: values.fullName,
-          email: values.email,
-          username: values.username,
-          phone_country: values.phoneCountry,
-          phone: values.phone,
-          country: values.country,
-          timezone: values.timezone,
-          bio: values.bio,
-          website: values.website,
-        },
-        { onConflict: "id" },
-      );
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        full_name: values.fullName,
+        email: values.email,
+        username: values.username,
+        phone_country: values.phoneCountry,
+        phone: values.phone,
+        country: values.country,
+        timezone: values.timezone,
+        bio: values.bio,
+        website: values.website,
+      },
+      { onConflict: "id" },
+    );
     setSaving(false);
     if (error) {
       console.error("[profile-form] save error:", error);
-      const isUniqueViolation = error.code === "23505" || /duplicate key|unique/i.test(error.message);
+      const isUniqueViolation =
+        error.code === "23505" || /duplicate key|unique/i.test(error.message);
       toast.error(isUniqueViolation ? "Nome de usuário já está em uso" : "Falha ao salvar perfil", {
         description: error.message,
       });
@@ -152,10 +176,15 @@ export function ProfileForm() {
   const tzLabel = useMemo(() => info.timezone, [info.timezone]);
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="rounded-xl border border-border bg-card/40 p-5">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="rounded-xl border border-border bg-card/40 p-5"
+    >
       <header className="mb-4">
         <h2 className="text-sm font-medium">Profile information</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">Your public-facing identity and contact details.</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Your public-facing identity and contact details.
+        </p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,12 +196,12 @@ export function ProfileForm() {
           label="Username"
           hint="@handle"
           error={form.formState.errors.username?.message}
-          adornment={
-            <UsernameStatus status={unameStatus} />
-          }
+          adornment={<UsernameStatus status={unameStatus} />}
         >
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">@</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              @
+            </span>
             <Input className="pl-7" {...form.register("username")} />
           </div>
         </Field>
@@ -186,7 +215,10 @@ export function ProfileForm() {
                 <ShieldCheck className="size-3" /> Verified
               </span>
             ) : (
-              <button type="button" className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400"
+              >
                 <ShieldAlert className="size-3" /> Verify
               </button>
             )
@@ -203,10 +235,19 @@ export function ProfileForm() {
         </Field>
 
         <Field label="Country">
-          <Select value={form.watch("country")} onValueChange={(v) => form.setValue("country", v, { shouldDirty: true })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={form.watch("country")}
+            onValueChange={(v) => form.setValue("country", v, { shouldDirty: true })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              {COUNTRIES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Field>
@@ -217,7 +258,11 @@ export function ProfileForm() {
           </div>
         </Field>
 
-        <Field label="Website" error={form.formState.errors.website?.message} className="md:col-span-2">
+        <Field
+          label="Website"
+          error={form.formState.errors.website?.message}
+          className="md:col-span-2"
+        >
           <Input type="url" placeholder="https://" {...form.register("website")} />
         </Field>
 
@@ -225,17 +270,32 @@ export function ProfileForm() {
           label="Bio"
           className="md:col-span-2"
           error={form.formState.errors.bio?.message}
-          adornment={<span className={`text-[10px] tabular-nums ${bioLen > 160 ? "text-destructive" : "text-muted-foreground"}`}>{bioLen}/160</span>}
+          adornment={
+            <span
+              className={`text-[10px] tabular-nums ${bioLen > 160 ? "text-destructive" : "text-muted-foreground"}`}
+            >
+              {bioLen}/160
+            </span>
+          }
         >
           <Textarea rows={3} maxLength={160} {...form.register("bio")} />
         </Field>
       </div>
 
       <div className="flex items-center justify-end gap-2 mt-5 pt-4 border-t border-border">
-        <Button type="button" variant="ghost" onClick={() => form.reset(info)} disabled={!isDirty || saving}>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => form.reset(info)}
+          disabled={!isDirty || saving}
+        >
           Discard
         </Button>
-        <Button type="submit" disabled={!isDirty || saving || !loaded || !user?.id} className="gap-1.5">
+        <Button
+          type="submit"
+          disabled={!isDirty || saving || !loaded || !user?.id}
+          className="gap-1.5"
+        >
           {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
           {saving ? "Saving…" : "Save changes"}
         </Button>

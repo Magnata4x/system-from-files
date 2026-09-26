@@ -1,51 +1,69 @@
-import React, { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { useCopilot } from '@/hooks/useCopilot';
-import type { MarketContext, TraderProfile, CopilotMessage } from '@/hooks/useCopilot';
-import { CopilotOrb } from './CopilotOrb';
-import { CopilotMessageBubble } from './CopilotMessage';
-import { CopilotScoreBar } from './CopilotScoreBar';
-import { CopilotBot4xStatus } from './CopilotBot4xStatus';
-import { CopilotDNAStrip } from './CopilotDNAStrip';
-import { useCopilotUI } from '@/lib/copilot-ui-store';
+import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { useCopilot } from "@/hooks/useCopilot";
+import type { MarketContext, TraderProfile, CopilotMessage } from "@/hooks/useCopilot";
+import { CopilotOrb } from "./CopilotOrb";
+import { CopilotMessageBubble } from "./CopilotMessage";
+import { CopilotScoreBar } from "./CopilotScoreBar";
+import { CopilotBot4xStatus } from "./CopilotBot4xStatus";
+import { CopilotDNAStrip } from "./CopilotDNAStrip";
+import { useCopilotUI } from "@/lib/copilot-ui-store";
 
 export interface CopilotPanelProps {
   userId: string;
   token: string;
   marketContext?: MarketContext;
   traderProfile?: TraderProfile;
-  mode?: 'panel' | 'float';
+  mode?: "panel" | "float";
   onAlert?: (msg: CopilotMessage) => void;
   className?: string;
 }
 
 export function CopilotPanel({
-  userId, token, marketContext, traderProfile,
-  mode = 'panel', onAlert, className,
+  userId,
+  token,
+  marketContext,
+  traderProfile,
+  mode = "panel",
+  onAlert,
+  className,
 }: CopilotPanelProps) {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const uiOpen = useCopilotUI((s) => s.open);
   const setUiOpen = useCopilotUI((s) => s.setOpen);
-  const isExpanded = mode === 'panel' ? true : uiOpen;
+  const isExpanded = mode === "panel" ? true : uiOpen;
   const setIsExpanded = (v: boolean) => setUiOpen(v);
   const [isRecordingActive, setIsRecordingActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, orbState, wsConnected, isThinking, isRecording, latency,
-    sendMessage, startRecording, stopRecording, clearHistory, reconnect } =
-    useCopilot({ userId, token, marketContext, traderProfile, onAlert });
+  const {
+    messages,
+    orbState,
+    wsConnected,
+    isThinking,
+    isRecording,
+    latency,
+    sendMessage,
+    startRecording,
+    stopRecording,
+    clearHistory,
+    reconnect,
+  } = useCopilot({ userId, token, marketContext, traderProfile, onAlert });
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   function handleSend() {
     if (!input.trim()) return;
     sendMessage(input.trim());
-    setInput('');
+    setInput("");
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   }
 
   async function handlePTTStart() {
@@ -58,25 +76,34 @@ export function CopilotPanel({
     setIsRecordingActive(false);
   }
 
-  if (mode === 'float' && !isExpanded) {
+  if (mode === "float" && !isExpanded) {
     return <CopilotStyles />;
   }
 
-  const isFloat = mode === 'float';
+  const isFloat = mode === "float";
 
   const containerStyle: React.CSSProperties = isFloat
     ? {
-        position: 'fixed', top: 52, right: 12,
-        width: 380, height: 'min(560px, calc(100vh - 72px))', zIndex: 50,
-        display: 'flex', flexDirection: 'column',
-        background: '#050505', border: '1px solid #141414',
+        position: "fixed",
+        top: 52,
+        right: 12,
+        width: 380,
+        height: "min(560px, calc(100vh - 72px))",
+        zIndex: 50,
+        display: "flex",
+        flexDirection: "column",
+        background: "#050505",
+        border: "1px solid #141414",
         borderRadius: 8,
-        boxShadow: '0 12px 48px rgba(0,0,0,0.6)',
+        boxShadow: "0 12px 48px rgba(0,0,0,0.6)",
       }
     : {
-        display: 'flex', flexDirection: 'column',
-        height: '100%', width: '100%',
-        background: '#050505', borderLeft: '1px solid #141414',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        background: "#050505",
+        borderLeft: "1px solid #141414",
       };
 
   return (
@@ -84,52 +111,117 @@ export function CopilotPanel({
       <CopilotStyles />
       <div className={className} style={containerStyle}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderBottom: '1px solid #141414' }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: 10,
+            borderBottom: "1px solid #141414",
+          }}
+        >
           <CopilotOrb state={orbState} size={36} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {latency > 0 && (
-              <span style={{ fontSize: 9, color: '#5F5E5A', fontFamily: 'monospace' }}>{latency}ms</span>
+              <span style={{ fontSize: 9, color: "#5F5E5A", fontFamily: "monospace" }}>
+                {latency}ms
+              </span>
             )}
-            <span style={{ fontSize: 9, color: wsConnected ? '#3B6D11' : '#8a6d1f', fontFamily: 'monospace' }}>
-              {wsConnected ? '● ON' : '● INTERNO'}
+            <span
+              style={{
+                fontSize: 9,
+                color: wsConnected ? "#3B6D11" : "#8a6d1f",
+                fontFamily: "monospace",
+              }}
+            >
+              {wsConnected ? "● ON" : "● INTERNO"}
             </span>
             <button
               onClick={clearHistory}
               title="Limpar histórico"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3a3a3a', fontSize: 14, padding: 2 }}
-            >⊘</button>
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#3a3a3a",
+                fontSize: 14,
+                padding: 2,
+              }}
+            >
+              ⊘
+            </button>
             {isFloat && (
               <button
                 onClick={() => setIsExpanded(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2a2a2a', fontSize: 18, lineHeight: 1, padding: 2 }}
-              >×</button>
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#2a2a2a",
+                  fontSize: 18,
+                  lineHeight: 1,
+                  padding: 2,
+                }}
+              >
+                ×
+              </button>
             )}
           </div>
         </div>
 
         {/* AISignalRadar score bar */}
-        {marketContext?.aiScore !== undefined && (
-          <CopilotScoreBar context={marketContext} />
-        )}
+        {marketContext?.aiScore !== undefined && <CopilotScoreBar context={marketContext} />}
 
         {/* Bot4x status */}
-        {marketContext?.bot4xActive !== undefined && (
-          <CopilotBot4xStatus context={marketContext} />
-        )}
+        {marketContext?.bot4xActive !== undefined && <CopilotBot4xStatus context={marketContext} />}
 
         {/* Messages */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: 10 }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
           {messages.length === 0 && (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: 2, color: '#3a3a3a' }}>AI COPILOT</span>
-              <span style={{ fontSize: 9, fontFamily: 'monospace', letterSpacing: 1, color: '#2a2a2a' }}>AGUARDANDO</span>
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10,
+                  fontFamily: "monospace",
+                  letterSpacing: 2,
+                  color: "#3a3a3a",
+                }}
+              >
+                AI COPILOT
+              </span>
+              <span
+                style={{ fontSize: 9, fontFamily: "monospace", letterSpacing: 1, color: "#2a2a2a" }}
+              >
+                AGUARDANDO
+              </span>
             </div>
           )}
-          {messages.map(msg => <CopilotMessageBubble key={msg.id} msg={msg} onReconnect={reconnect} />)}
+          {messages.map((msg) => (
+            <CopilotMessageBubble key={msg.id} msg={msg} onReconnect={reconnect} />
+          ))}
           {isThinking && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 2px' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00e5a0', animation: 'copilot-pulse 1s infinite' }} />
-              <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#5F5E5A' }}>pensando…</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 2px" }}>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: "#00e5a0",
+                  animation: "copilot-pulse 1s infinite",
+                }}
+              />
+              <span style={{ fontSize: 10, fontFamily: "monospace", color: "#5F5E5A" }}>
+                pensando…
+              </span>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -139,26 +231,52 @@ export function CopilotPanel({
         {traderProfile && <CopilotDNAStrip profile={traderProfile} />}
 
         {/* Input */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 10, borderTop: '1px solid #141414' }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: 10,
+            borderTop: "1px solid #141414",
+          }}
+        >
           <button
             onMouseDown={handlePTTStart}
             onMouseUp={handlePTTStop}
             onMouseLeave={() => isRecordingActive && handlePTTStop()}
-            onTouchStart={(e) => { e.preventDefault(); handlePTTStart(); }}
-            onTouchEnd={(e) => { e.preventDefault(); handlePTTStop(); }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handlePTTStart();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              handlePTTStop();
+            }}
             disabled={!wsConnected}
             style={{
-              width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-              border: `1px solid ${isRecording ? '#00c8f5' : '#1a1a1a'}`,
-              background: isRecording ? '#00c8f511' : '#0a0a0a',
-              boxShadow: isRecording ? '0 0 16px #00c8f544' : 'none',
-              cursor: wsConnected ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.15s',
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              flexShrink: 0,
+              border: `1px solid ${isRecording ? "#00c8f5" : "#1a1a1a"}`,
+              background: isRecording ? "#00c8f511" : "#0a0a0a",
+              boxShadow: isRecording ? "0 0 16px #00c8f544" : "none",
+              cursor: wsConnected ? "pointer" : "not-allowed",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.15s",
             }}
             aria-label="Push to talk"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isRecording ? '#00c8f5' : '#5F5E5A'} strokeWidth="2">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={isRecording ? "#00c8f5" : "#5F5E5A"}
+              strokeWidth="2"
+            >
               <rect x="9" y="2" width="6" height="12" rx="3" />
               <path d="M5 10v2a7 7 0 0 0 14 0v-2" />
               <line x1="12" y1="19" x2="12" y2="22" />
@@ -172,10 +290,14 @@ export function CopilotPanel({
             placeholder="Pergunte ao Copilot..."
             disabled={isThinking}
             style={{
-              flex: 1, background: '#0a0a0a',
-              border: '1px solid #141414', color: '#cfcfcf',
-              padding: '9px 13px', fontSize: 12,
-              fontFamily: 'monospace', outline: 'none',
+              flex: 1,
+              background: "#0a0a0a",
+              border: "1px solid #141414",
+              color: "#cfcfcf",
+              padding: "9px 13px",
+              fontSize: 12,
+              fontFamily: "monospace",
+              outline: "none",
             }}
           />
 
@@ -183,15 +305,20 @@ export function CopilotPanel({
             onClick={handleSend}
             disabled={isThinking || !input.trim()}
             style={{
-              width: 38, height: 38, flexShrink: 0,
-              border: '1px solid #00e5a033',
-              background: '#00e5a011',
-              color: '#00e5a0',
-              cursor: !isThinking && input.trim() ? 'pointer' : 'not-allowed',
-              fontFamily: 'monospace', fontSize: 16,
+              width: 38,
+              height: 38,
+              flexShrink: 0,
+              border: "1px solid #00e5a033",
+              background: "#00e5a011",
+              color: "#00e5a0",
+              cursor: !isThinking && input.trim() ? "pointer" : "not-allowed",
+              fontFamily: "monospace",
+              fontSize: 16,
             }}
             aria-label="Send"
-          >↑</button>
+          >
+            ↑
+          </button>
         </div>
       </div>
     </>

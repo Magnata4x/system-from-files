@@ -61,11 +61,51 @@ type Actions = {
 };
 
 const seed: FeedItem[] = [
-  { id: "a1", kind: "signal", type: "New signal", asset: "BTC/USDT", description: "BUY 4H · Score 87 · Entry 43,240", at: Date.now() - 1000 * 60 * 2, read: false },
-  { id: "a2", kind: "manipulation", type: "Manipulation", asset: "ETH/USDT", description: "Spoofing wall detected at 2,418", at: Date.now() - 1000 * 60 * 11, read: false },
-  { id: "a3", kind: "volatility", type: "High volatility", asset: "SOL/USDT", description: "ATR jumped +180% in 15m", at: Date.now() - 1000 * 60 * 28, read: false },
-  { id: "a4", kind: "profit", type: "Target hit", asset: "BTC/USDT", description: "TP1 reached · +1.8% locked", at: Date.now() - 1000 * 60 * 64, read: true },
-  { id: "a5", kind: "signal", type: "Setup confirmed", asset: "BNB/USDT", description: "Breakout retest confirmed on 1H", at: Date.now() - 1000 * 60 * 120, read: true },
+  {
+    id: "a1",
+    kind: "signal",
+    type: "New signal",
+    asset: "BTC/USDT",
+    description: "BUY 4H · Score 87 · Entry 43,240",
+    at: Date.now() - 1000 * 60 * 2,
+    read: false,
+  },
+  {
+    id: "a2",
+    kind: "manipulation",
+    type: "Manipulation",
+    asset: "ETH/USDT",
+    description: "Spoofing wall detected at 2,418",
+    at: Date.now() - 1000 * 60 * 11,
+    read: false,
+  },
+  {
+    id: "a3",
+    kind: "volatility",
+    type: "High volatility",
+    asset: "SOL/USDT",
+    description: "ATR jumped +180% in 15m",
+    at: Date.now() - 1000 * 60 * 28,
+    read: false,
+  },
+  {
+    id: "a4",
+    kind: "profit",
+    type: "Target hit",
+    asset: "BTC/USDT",
+    description: "TP1 reached · +1.8% locked",
+    at: Date.now() - 1000 * 60 * 64,
+    read: true,
+  },
+  {
+    id: "a5",
+    kind: "signal",
+    type: "Setup confirmed",
+    asset: "BNB/USDT",
+    description: "Breakout retest confirmed on 1H",
+    at: Date.now() - 1000 * 60 * 120,
+    read: true,
+  },
 ];
 
 export const useAlertsStore = create<State & Actions>((set) => ({
@@ -105,7 +145,8 @@ export const useAlertsStore = create<State & Actions>((set) => ({
   setQuiet: (patch) => set((s) => ({ quietHours: { ...s.quietHours, ...patch } })),
   setAssets: (a) => set({ assets: a }),
   toggleBot4x: () => set((s) => ({ bot4x: !s.bot4x })),
-  markRead: (id) => set((s) => ({ feed: s.feed.map((f) => (f.id === id ? { ...f, read: true } : f)) })),
+  markRead: (id) =>
+    set((s) => ({ feed: s.feed.map((f) => (f.id === id ? { ...f, read: true } : f)) })),
   markAllRead: () => set((s) => ({ feed: s.feed.map((f) => ({ ...f, read: true })) })),
   clearFeed: () => set({ feed: [] }),
   pushFeed: (i) => set((s) => ({ feed: [i, ...s.feed].slice(0, 50) })),

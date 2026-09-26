@@ -50,5 +50,4 @@ export const endpoints = {
   },
 } as const;
 
-
 export { api, apiClient };

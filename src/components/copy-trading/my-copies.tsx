@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { TRADERS, type ActiveCopy } from "@/lib/copy-trading-data";
 import { cn } from "@/lib/utils";
 
-export function MyCopies({ copies, onStop }: { copies: ActiveCopy[]; onStop: (traderId: string) => void }) {
+export function MyCopies({
+  copies,
+  onStop,
+}: {
+  copies: ActiveCopy[];
+  onStop: (traderId: string) => void;
+}) {
   return (
     <section className="space-y-3">
       <header className="flex items-baseline justify-between">
@@ -20,7 +26,10 @@ export function MyCopies({ copies, onStop }: { copies: ActiveCopy[]; onStop: (tr
             const trader = TRADERS.find((t) => t.id === c.traderId);
             if (!trader) return null;
             return (
-              <div key={c.traderId} className="rounded-lg border border-border bg-card/40 p-4 space-y-3">
+              <div
+                key={c.traderId}
+                className="rounded-lg border border-border bg-card/40 p-4 space-y-3"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="font-medium">{trader.handle}</div>
@@ -38,7 +47,11 @@ export function MyCopies({ copies, onStop }: { copies: ActiveCopy[]; onStop: (tr
                   </Button>
                 </div>
                 <div className="grid grid-cols-3 gap-2 pt-1 border-t border-border/60">
-                  <Stat label="PnL" value={`${c.pnl > 0 ? "+" : ""}${c.pnl.toFixed(1)}%`} tone={c.pnl >= 0 ? "pos" : "neg"} />
+                  <Stat
+                    label="PnL"
+                    value={`${c.pnl > 0 ? "+" : ""}${c.pnl.toFixed(1)}%`}
+                    tone={c.pnl >= 0 ? "pos" : "neg"}
+                  />
                   <Stat label="Trades" value={String(c.trades)} />
                   <Stat label="Win rate" value={`${c.winRate}%`} />
                 </div>
@@ -55,7 +68,13 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "po
   return (
     <div className="pt-2">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={cn("text-base font-semibold tabular-nums mt-0.5", tone === "pos" && "text-emerald-400", tone === "neg" && "text-red-400")}>
+      <div
+        className={cn(
+          "text-base font-semibold tabular-nums mt-0.5",
+          tone === "pos" && "text-emerald-400",
+          tone === "neg" && "text-red-400",
+        )}
+      >
         {value}
       </div>
     </div>

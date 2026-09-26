@@ -6,7 +6,6 @@ import { generateTraceId, getTraceId, setTraceId } from "./trace-context";
 // InternalAxiosRequestConfig augmentado com nosso traceId para correlação.
 type TracedConfig = InternalAxiosRequestConfig & { _traceId?: string; _retry?: boolean };
 
-
 // O backend agora roda DENTRO do próprio app (rotas server em /api/*).
 // Sem VITE_API_BASE_URL definida usamos o mesmo origin — nada de host externo.
 function resolveApiBaseUrl(): string {
@@ -72,15 +71,17 @@ apiClient.interceptors.response.use(
       Sentry.captureException(error);
     });
     return Promise.reject(error);
-  }
+  },
 );
-
 
 // Helper compatível com o uso anterior (api.get/post/...)
 export const api = {
   get: <T = unknown>(path: string) => apiClient.get<T>(path).then((r) => r.data),
-  post: <T = unknown>(path: string, body: unknown) => apiClient.post<T>(path, body).then((r) => r.data),
-  patch: <T = unknown>(path: string, body: unknown) => apiClient.patch<T>(path, body).then((r) => r.data),
-  put: <T = unknown>(path: string, body: unknown) => apiClient.put<T>(path, body).then((r) => r.data),
+  post: <T = unknown>(path: string, body: unknown) =>
+    apiClient.post<T>(path, body).then((r) => r.data),
+  patch: <T = unknown>(path: string, body: unknown) =>
+    apiClient.patch<T>(path, body).then((r) => r.data),
+  put: <T = unknown>(path: string, body: unknown) =>
+    apiClient.put<T>(path, body).then((r) => r.data),
   delete: <T = unknown>(path: string) => apiClient.delete<T>(path).then((r) => r.data),
 };

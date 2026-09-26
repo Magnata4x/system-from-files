@@ -16,16 +16,22 @@ export function RateGauge({ used, limit, size = 44, stroke = 4 }: Props) {
     limit === null
       ? "stroke-[#5fa8ff]"
       : pct > 0.9
-      ? "stroke-red-400"
-      : pct > 0.7
-      ? "stroke-amber-400"
-      : "stroke-emerald-400";
+        ? "stroke-red-400"
+        : pct > 0.7
+          ? "stroke-amber-400"
+          : "stroke-emerald-400";
 
   return (
     <div className="inline-flex items-center gap-2">
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="stroke-border fill-none" />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            strokeWidth={stroke}
+            className="stroke-border fill-none"
+          />
           <circle
             cx={size / 2}
             cy={size / 2}

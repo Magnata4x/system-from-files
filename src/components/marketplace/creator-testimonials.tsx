@@ -13,21 +13,24 @@ const TESTIMONIALS: Testimonial[] = [
     handle: "InstitutionalFlow",
     verified: true,
     role: "Strategy creator",
-    quote: "Em 4 meses no marketplace, atingi 800 assinantes e meu LTV passou a financiar 100% da minha mesa de research.",
+    quote:
+      "Em 4 meses no marketplace, atingi 800 assinantes e meu LTV passou a financiar 100% da minha mesa de research.",
     metric: "R$ 38k MRR",
   },
   {
     handle: "OnChainPro",
     verified: true,
     role: "Indicators creator",
-    quote: "A audiência aqui realmente entende order flow. O feedback nas reviews subiu o nível dos meus indicadores em 2 versões.",
+    quote:
+      "A audiência aqui realmente entende order flow. O feedback nas reviews subiu o nível dos meus indicadores em 2 versões.",
     metric: "267 reviews · 4.9★",
   },
   {
     handle: "WhaleHunter",
     verified: true,
     role: "Bots creator",
-    quote: "Webhook nativo e split de pagamento automático. Lancei o bot na sexta, primeira venda em 11 minutos.",
+    quote:
+      "Webhook nativo e split de pagamento automático. Lancei o bot na sexta, primeira venda em 11 minutos.",
     metric: "312 vendas",
   },
   {
@@ -41,7 +44,8 @@ const TESTIMONIALS: Testimonial[] = [
     handle: "AlertsLab",
     verified: true,
     role: "Alerts creator",
-    quote: "O sistema de reviews verificadas filtrou clientes errados e dobrou minha taxa de retenção.",
+    quote:
+      "O sistema de reviews verificadas filtrou clientes errados e dobrou minha taxa de retenção.",
     metric: "92% retention",
   },
 ];
@@ -73,7 +77,9 @@ export function CreatorTestimonials() {
                   </div>
                   <div className="text-[10.5px] text-muted-foreground">{t.role}</div>
                 </div>
-                <span className="text-[10.5px] font-medium text-emerald-400 tabular-nums">{t.metric}</span>
+                <span className="text-[10.5px] font-medium text-emerald-400 tabular-nums">
+                  {t.metric}
+                </span>
               </div>
             </article>
           ))}

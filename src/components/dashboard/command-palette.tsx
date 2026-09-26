@@ -1,7 +1,16 @@
 import { useDashboardStore } from "@/lib/dashboard-store";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, Activity, Bell, Brain, Flame, BarChart3, Calendar, ArrowRight } from "lucide-react";
+import {
+  Search,
+  Activity,
+  Bell,
+  Brain,
+  Flame,
+  BarChart3,
+  Calendar,
+  ArrowRight,
+} from "lucide-react";
 
 const QUICK_ACTIONS = [
   { id: "qa1", icon: Bell, label: "Create new alert", hint: "Alerts" },
@@ -12,7 +21,16 @@ const QUICK_ACTIONS = [
   { id: "qa6", icon: Calendar, label: "Upcoming events", hint: "Calendar" },
 ];
 
-const ASSETS = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "LINK/USDT", "AVAX/USDT", "MATIC/USDT", "ARB/USDT"];
+const ASSETS = [
+  "BTC/USDT",
+  "ETH/USDT",
+  "SOL/USDT",
+  "BNB/USDT",
+  "LINK/USDT",
+  "AVAX/USDT",
+  "MATIC/USDT",
+  "ARB/USDT",
+];
 
 const RECENT = ["BTC liquidity sweep", "ETH 4H setup", "Funding rate", "Open interest"];
 
@@ -33,7 +51,9 @@ export function CommandPalette() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, setOpen]);
 
-  useEffect(() => { if (!open) setQ(""); }, [open]);
+  useEffect(() => {
+    if (!open) setQ("");
+  }, [open]);
 
   const term = q.toLowerCase();
   const filteredActions = QUICK_ACTIONS.filter((a) => a.label.toLowerCase().includes(term));
@@ -44,7 +64,9 @@ export function CommandPalette() {
       {open && (
         <motion.div
           className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-start justify-center pt-[12vh] px-4"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           onClick={() => setOpen(false)}
         >
           <motion.div
@@ -64,32 +86,54 @@ export function CommandPalette() {
                 placeholder="Search signals, assets, actions..."
                 className="flex-1 bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground outline-none"
               />
-              <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary text-[11px] text-muted-foreground">ESC</kbd>
+              <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary text-[11px] text-muted-foreground">
+                ESC
+              </kbd>
             </div>
             <div className="max-h-[60vh] overflow-y-auto py-2">
               {q === "" && (
                 <Group label="Recent">
                   {RECENT.map((r) => (
-                    <Row key={r} icon={<Search className="size-4 text-muted-foreground" />} label={r} />
+                    <Row
+                      key={r}
+                      icon={<Search className="size-4 text-muted-foreground" />}
+                      label={r}
+                    />
                   ))}
                 </Group>
               )}
               {filteredActions.length > 0 && (
                 <Group label="Quick actions">
                   {filteredActions.map((a) => (
-                    <Row key={a.id} icon={<a.icon className="size-4 text-[var(--brand-cyan)]" />} label={a.label} hint={a.hint} />
+                    <Row
+                      key={a.id}
+                      icon={<a.icon className="size-4 text-[var(--brand-cyan)]" />}
+                      label={a.label}
+                      hint={a.hint}
+                    />
                   ))}
                 </Group>
               )}
               {filteredAssets.length > 0 && (
                 <Group label="Assets">
                   {filteredAssets.map((a) => (
-                    <Row key={a} icon={<span className="text-[11px] font-semibold text-muted-foreground w-4">$</span>} label={a} hint="Open chart" />
+                    <Row
+                      key={a}
+                      icon={
+                        <span className="text-[11px] font-semibold text-muted-foreground w-4">
+                          $
+                        </span>
+                      }
+                      label={a}
+                      hint="Open chart"
+                    />
                   ))}
                 </Group>
               )}
               {filteredActions.length === 0 && filteredAssets.length === 0 && q !== "" && (
-                <div className="px-4 py-8 text-center text-[13px] text-muted-foreground">No results for "{q}"</div>
+                <div className="px-4 py-8 text-center text-[13px] text-muted-foreground">
+                  No results for "{q}"
+                </div>
               )}
             </div>
           </motion.div>
@@ -102,7 +146,9 @@ export function CommandPalette() {
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mb-1">
-      <div className="px-4 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="px-4 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
       {children}
     </div>
   );

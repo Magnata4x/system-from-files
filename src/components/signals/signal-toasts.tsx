@@ -12,7 +12,7 @@ export function SignalToasts() {
 
   useEffect(() => {
     const timers = toasts.map((t) =>
-      setTimeout(() => dismiss(t.id), 8000 - (Date.now() - t.createdAt))
+      setTimeout(() => dismiss(t.id), 8000 - (Date.now() - t.createdAt)),
     );
     return () => timers.forEach(clearTimeout);
   }, [toasts, dismiss]);
@@ -37,18 +37,33 @@ export function SignalToasts() {
                   <span className="text-[13px] font-semibold text-foreground">{s.asset}</span>
                   <span
                     className="px-1.5 py-0.5 rounded text-[10px] font-bold"
-                    style={{ background: `color-mix(in oklab, ${accent} 22%, transparent)`, color: accent }}
+                    style={{
+                      background: `color-mix(in oklab, ${accent} 22%, transparent)`,
+                      color: accent,
+                    }}
                   >
                     {s.direction}
                   </span>
-                  <button onClick={() => dismiss(t.id)} className="ml-auto text-muted-foreground hover:text-foreground">
+                  <button
+                    onClick={() => dismiss(t.id)}
+                    className="ml-auto text-muted-foreground hover:text-foreground"
+                  >
                     <X className="size-3.5" />
                   </button>
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1">
-                  Entry <span className="text-foreground tabular-nums">{formatPrice(s.entry)}</span> · {s.tf} · {s.exchange}
+                  Entry <span className="text-foreground tabular-nums">{formatPrice(s.entry)}</span>{" "}
+                  · {s.tf} · {s.exchange}
                 </div>
-                <button onClick={() => { openDetail(s.id); dismiss(t.id); }} className="mt-2 text-[11px] text-[var(--brand-cyan)] hover:underline">View signal →</button>
+                <button
+                  onClick={() => {
+                    openDetail(s.id);
+                    dismiss(t.id);
+                  }}
+                  className="mt-2 text-[11px] text-[var(--brand-cyan)] hover:underline"
+                >
+                  View signal →
+                </button>
               </div>
               <motion.div
                 initial={{ width: "100%" }}

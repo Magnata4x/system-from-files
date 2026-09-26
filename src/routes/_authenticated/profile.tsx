@@ -14,7 +14,10 @@ export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
       { title: "Profile — AISignalRadar" },
-      { name: "description", content: "Manage your AISignalRadar identity, trading preferences and connected accounts." },
+      {
+        name: "description",
+        content: "Manage your AISignalRadar identity, trading preferences and connected accounts.",
+      },
     ],
   }),
   validateSearch: (search: Record<string, unknown>) => ({
@@ -35,7 +38,9 @@ function ProfilePage() {
         <main className="flex-1 min-w-0 p-5 space-y-5 max-w-5xl">
           <header>
             <h1 className="text-xl font-semibold tracking-tight">Profile</h1>
-            <p className="text-sm text-muted-foreground mt-1">Your identity, preferences, and integrations.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Your identity, preferences, and integrations.
+            </p>
           </header>
 
           <Tabs
@@ -44,8 +49,12 @@ function ProfilePage() {
             className="space-y-5"
           >
             <TabsList>
-              <TabsTrigger value="profile" className="gap-2"><User className="size-3.5" /> Profile</TabsTrigger>
-              <TabsTrigger value="wishlist" className="gap-2"><Heart className="size-3.5" /> Wishlist</TabsTrigger>
+              <TabsTrigger value="profile" className="gap-2">
+                <User className="size-3.5" /> Profile
+              </TabsTrigger>
+              <TabsTrigger value="wishlist" className="gap-2">
+                <Heart className="size-3.5" /> Wishlist
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-5">

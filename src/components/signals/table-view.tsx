@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Bookmark, Download, EyeOff, Pin, PinOff, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+import {
+  Bell,
+  Bookmark,
+  Download,
+  EyeOff,
+  Pin,
+  PinOff,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
 import { ScoreBadge } from "@/components/dashboard/score-badge";
 import { type Signal, formatPrice, formatAge } from "@/lib/signals-data";
 import { useSignalsStore } from "@/lib/signals-store";
@@ -10,58 +20,151 @@ import { useLivePrices } from "@/hooks/useLivePrices";
 const PAGE = 20;
 
 type ColKey =
-  | "select" | "num" | "asset" | "price" | "dir" | "score" | "entry" | "stop" | "target"
-  | "rr" | "risk" | "tf" | "exchange" | "setup" | "confirms" | "dna" | "manip" | "bot4x" | "age" | "actions";
+  | "select"
+  | "num"
+  | "asset"
+  | "price"
+  | "dir"
+  | "score"
+  | "entry"
+  | "stop"
+  | "target"
+  | "rr"
+  | "risk"
+  | "tf"
+  | "exchange"
+  | "setup"
+  | "confirms"
+  | "dna"
+  | "manip"
+  | "bot4x"
+  | "age"
+  | "actions";
 
 type ColDef = {
   key: ColKey;
   label: string;
   fixed?: boolean; // can't hide / reorder
-  render: (s: Signal, ctx: { idx: number; checked: boolean; toggle: () => void }) => React.ReactNode;
+  render: (
+    s: Signal,
+    ctx: { idx: number; checked: boolean; toggle: () => void },
+  ) => React.ReactNode;
 };
 
 const COLUMNS: Record<ColKey, ColDef> = {
   select: {
-    key: "select", label: "", fixed: true,
+    key: "select",
+    label: "",
+    fixed: true,
     render: (_s, { checked, toggle }) => (
-      <input type="checkbox" checked={checked}
-        onChange={(e) => { e.stopPropagation(); toggle(); }}
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          e.stopPropagation();
+          toggle();
+        }}
         onClick={(e) => e.stopPropagation()}
-        className="accent-[var(--brand-cyan)]" />
+        className="accent-[var(--brand-cyan)]"
+      />
     ),
   },
-  num: { key: "num", label: "#", render: (_s, { idx }) => <span className="text-muted-foreground tabular-nums">{idx + 1}</span> },
-  asset: { key: "asset", label: "Asset", render: (s) => <span className="font-semibold text-foreground">{s.asset}</span> },
+  num: {
+    key: "num",
+    label: "#",
+    render: (_s, { idx }) => <span className="text-muted-foreground tabular-nums">{idx + 1}</span>,
+  },
+  asset: {
+    key: "asset",
+    label: "Asset",
+    render: (s) => <span className="font-semibold text-foreground">{s.asset}</span>,
+  },
   price: { key: "price", label: "Price", render: (s) => <LivePriceCell asset={s.asset} /> },
   dir: {
-    key: "dir", label: "Dir",
+    key: "dir",
+    label: "Dir",
     render: (s) => {
       const c = s.direction === "BUY" ? "#1D9E75" : "#E24B4A";
-      return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: `color-mix(in oklab, ${c} 22%, transparent)`, color: c }}>{s.direction}</span>;
+      return (
+        <span
+          className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+          style={{ background: `color-mix(in oklab, ${c} 22%, transparent)`, color: c }}
+        >
+          {s.direction}
+        </span>
+      );
     },
   },
   score: { key: "score", label: "Score", render: (s) => <ScoreBadge score={s.score} size="sm" /> },
-  entry: { key: "entry", label: "Entry", render: (s) => <span className="tabular-nums">{formatPrice(s.entry)}</span> },
-  stop: { key: "stop", label: "Stop", render: (s) => <span className="tabular-nums text-[#E24B4A]">{formatPrice(s.stop)}</span> },
-  target: { key: "target", label: "Target", render: (s) => <span className="tabular-nums text-[#1D9E75]">{formatPrice(s.target)}</span> },
-  rr: { key: "rr", label: "R/R", render: (s) => <span className="tabular-nums font-medium">{s.rr.toFixed(1)}</span> },
-  risk: { key: "risk", label: "Risk%", render: (s) => <span className="tabular-nums">{s.riskPct}%</span> },
+  entry: {
+    key: "entry",
+    label: "Entry",
+    render: (s) => <span className="tabular-nums">{formatPrice(s.entry)}</span>,
+  },
+  stop: {
+    key: "stop",
+    label: "Stop",
+    render: (s) => <span className="tabular-nums text-[#E24B4A]">{formatPrice(s.stop)}</span>,
+  },
+  target: {
+    key: "target",
+    label: "Target",
+    render: (s) => <span className="tabular-nums text-[#1D9E75]">{formatPrice(s.target)}</span>,
+  },
+  rr: {
+    key: "rr",
+    label: "R/R",
+    render: (s) => <span className="tabular-nums font-medium">{s.rr.toFixed(1)}</span>,
+  },
+  risk: {
+    key: "risk",
+    label: "Risk%",
+    render: (s) => <span className="tabular-nums">{s.riskPct}%</span>,
+  },
   tf: { key: "tf", label: "TF", render: (s) => s.tf },
-  exchange: { key: "exchange", label: "Exchange", render: (s) => <span className="text-muted-foreground">{s.exchange}</span> },
-  setup: { key: "setup", label: "Setup", render: (s) => <span className="text-muted-foreground">{s.setup}</span> },
-  confirms: { key: "confirms", label: "Confirms", render: (s) => <span className="tabular-nums">{Object.values(s.confirms).filter(Boolean).length}/5</span> },
-  dna: { key: "dna", label: "DNA%", render: (s) => <span className="tabular-nums">{s.dnaMatch}%</span> },
+  exchange: {
+    key: "exchange",
+    label: "Exchange",
+    render: (s) => <span className="text-muted-foreground">{s.exchange}</span>,
+  },
+  setup: {
+    key: "setup",
+    label: "Setup",
+    render: (s) => <span className="text-muted-foreground">{s.setup}</span>,
+  },
+  confirms: {
+    key: "confirms",
+    label: "Confirms",
+    render: (s) => (
+      <span className="tabular-nums">{Object.values(s.confirms).filter(Boolean).length}/5</span>
+    ),
+  },
+  dna: {
+    key: "dna",
+    label: "DNA%",
+    render: (s) => <span className="tabular-nums">{s.dnaMatch}%</span>,
+  },
   manip: {
-    key: "manip", label: "Manip",
+    key: "manip",
+    label: "Manip",
     render: (s) =>
-      s.manipRisk === "low" ? <ShieldCheck className="size-3.5 text-[#1D9E75]" /> :
-        s.manipRisk === "medium" ? <Shield className="size-3.5 text-[#EF9F27]" /> :
-          <ShieldAlert className="size-3.5 text-[#E24B4A]" />,
+      s.manipRisk === "low" ? (
+        <ShieldCheck className="size-3.5 text-[#1D9E75]" />
+      ) : s.manipRisk === "medium" ? (
+        <Shield className="size-3.5 text-[#EF9F27]" />
+      ) : (
+        <ShieldAlert className="size-3.5 text-[#E24B4A]" />
+      ),
   },
   bot4x: { key: "bot4x", label: "Bot4x", render: (s) => <Bot4xCell signal={s} /> },
-  age: { key: "age", label: "Age", render: (s) => <span className="text-muted-foreground">{formatAge(s.ageMin)}</span> },
+  age: {
+    key: "age",
+    label: "Age",
+    render: (s) => <span className="text-muted-foreground">{formatAge(s.ageMin)}</span>,
+  },
   actions: {
-    key: "actions", label: "Actions",
+    key: "actions",
+    label: "Actions",
     render: (s) => <ViewLink id={s.id} />,
   },
 };
@@ -70,7 +173,10 @@ function ViewLink({ id }: { id: string }) {
   const openDetail = useSignalsStore((st) => st.openDetail);
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); openDetail(id); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        openDetail(id);
+      }}
       className="text-[var(--brand-cyan)] hover:underline"
     >
       View →
@@ -106,7 +212,28 @@ function Bot4xCell({ signal }: { signal: Signal }) {
   );
 }
 
-const DEFAULT_ORDER: ColKey[] = ["select", "num", "asset", "price", "dir", "score", "entry", "stop", "target", "rr", "risk", "tf", "exchange", "setup", "confirms", "dna", "manip", "bot4x", "age", "actions"];
+const DEFAULT_ORDER: ColKey[] = [
+  "select",
+  "num",
+  "asset",
+  "price",
+  "dir",
+  "score",
+  "entry",
+  "stop",
+  "target",
+  "rr",
+  "risk",
+  "tf",
+  "exchange",
+  "setup",
+  "confirms",
+  "dna",
+  "manip",
+  "bot4x",
+  "age",
+  "actions",
+];
 const STORAGE_KEY = "signals.table.cols.v1";
 
 type ColState = { order: ColKey[]; hidden: ColKey[]; pinned: ColKey[] };
@@ -156,9 +283,13 @@ export function TableView({ signals }: { signals: Signal[] }) {
 
   const totalPages = Math.max(1, Math.ceil(signals.length / PAGE));
   const slice = signals.slice(page * PAGE, page * PAGE + PAGE);
-  const toggle = (id: string) => setSelected((s) => {
-    const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n;
-  });
+  const toggle = (id: string) =>
+    setSelected((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
 
   const visibleKeys: ColKey[] = (() => {
     const hidden = new Set(cols.hidden);
@@ -168,15 +299,21 @@ export function TableView({ signals }: { signals: Signal[] }) {
   })();
 
   const hideCol = (k: ColKey) => setCols((c) => ({ ...c, hidden: [...new Set([...c.hidden, k])] }));
-  const showCol = (k: ColKey) => setCols((c) => ({ ...c, hidden: c.hidden.filter((x) => x !== k) }));
-  const togglePin = (k: ColKey) => setCols((c) => ({
-    ...c, pinned: c.pinned.includes(k) ? c.pinned.filter((x) => x !== k) : [...c.pinned, k],
-  }));
+  const showCol = (k: ColKey) =>
+    setCols((c) => ({ ...c, hidden: c.hidden.filter((x) => x !== k) }));
+  const togglePin = (k: ColKey) =>
+    setCols((c) => ({
+      ...c,
+      pinned: c.pinned.includes(k) ? c.pinned.filter((x) => x !== k) : [...c.pinned, k],
+    }));
   const resetCols = () => setCols({ order: DEFAULT_ORDER, hidden: [], pinned: [] });
 
-  const onDragStart = (k: ColKey) => { dragKey.current = k; };
+  const onDragStart = (k: ColKey) => {
+    dragKey.current = k;
+  };
   const onDrop = (target: ColKey) => {
-    const src = dragKey.current; dragKey.current = null;
+    const src = dragKey.current;
+    dragKey.current = null;
     if (!src || src === target) return;
     setCols((c) => {
       const order = c.order.filter((x) => x !== src);
@@ -190,17 +327,27 @@ export function TableView({ signals }: { signals: Signal[] }) {
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       {(selected.size > 0 || cols.hidden.length > 0) && (
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-[color-mix(in_oklab,var(--brand-blue)_15%,transparent)] text-[12px]">
-          {selected.size > 0 && <span className="text-foreground font-medium">{selected.size} selected</span>}
+          {selected.size > 0 && (
+            <span className="text-foreground font-medium">{selected.size} selected</span>
+          )}
           {cols.hidden.length > 0 && (
             <div className="flex items-center gap-1.5">
               <span className="text-muted-foreground">Hidden:</span>
               {cols.hidden.map((k) => (
-                <button key={k} onClick={() => showCol(k)}
-                  className="px-1.5 py-0.5 rounded border border-border bg-card text-foreground hover:border-[var(--brand-cyan)] text-[11px]">
+                <button
+                  key={k}
+                  onClick={() => showCol(k)}
+                  className="px-1.5 py-0.5 rounded border border-border bg-card text-foreground hover:border-[var(--brand-cyan)] text-[11px]"
+                >
                   + {COLUMNS[k].label || k}
                 </button>
               ))}
-              <button onClick={resetCols} className="text-muted-foreground hover:text-foreground text-[11px] underline">reset</button>
+              <button
+                onClick={resetCols}
+                className="text-muted-foreground hover:text-foreground text-[11px] underline"
+              >
+                reset
+              </button>
             </div>
           )}
           {selected.size > 0 && (
@@ -226,7 +373,9 @@ export function TableView({ signals }: { signals: Signal[] }) {
                     key={k}
                     draggable={draggable}
                     onDragStart={() => draggable && onDragStart(k)}
-                    onDragOver={(e) => { if (draggable) e.preventDefault(); }}
+                    onDragOver={(e) => {
+                      if (draggable) e.preventDefault();
+                    }}
                     onDrop={() => draggable && onDrop(k)}
                     onContextMenu={(e) => {
                       if (col.fixed) return;
@@ -261,8 +410,15 @@ export function TableView({ signals }: { signals: Signal[] }) {
                   {visibleKeys.map((k) => {
                     const pinned = cols.pinned.includes(k);
                     return (
-                      <td key={k} className={`px-3 py-2 text-foreground ${pinned ? "bg-[color-mix(in_oklab,var(--brand-cyan)_6%,transparent)]" : ""}`}>
-                        {COLUMNS[k].render(s, { idx: page * PAGE + i, checked, toggle: () => toggle(s.id) })}
+                      <td
+                        key={k}
+                        className={`px-3 py-2 text-foreground ${pinned ? "bg-[color-mix(in_oklab,var(--brand-cyan)_6%,transparent)]" : ""}`}
+                      >
+                        {COLUMNS[k].render(s, {
+                          idx: page * PAGE + i,
+                          checked,
+                          toggle: () => toggle(s.id),
+                        })}
                       </td>
                     );
                   })}
@@ -274,10 +430,24 @@ export function TableView({ signals }: { signals: Signal[] }) {
       </div>
 
       <div className="flex items-center justify-between px-3 py-2 border-t border-border text-[12px] text-muted-foreground">
-        <span>Page {page + 1} of {totalPages} · {signals.length} signals</span>
+        <span>
+          Page {page + 1} of {totalPages} · {signals.length} signals
+        </span>
         <div className="flex gap-1">
-          <button disabled={page === 0} onClick={() => setPage((p) => p - 1)} className="h-7 px-2.5 rounded-md border border-border hover:text-foreground disabled:opacity-30">Prev</button>
-          <button disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)} className="h-7 px-2.5 rounded-md border border-border hover:text-foreground disabled:opacity-30">Next</button>
+          <button
+            disabled={page === 0}
+            onClick={() => setPage((p) => p - 1)}
+            className="h-7 px-2.5 rounded-md border border-border hover:text-foreground disabled:opacity-30"
+          >
+            Prev
+          </button>
+          <button
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage((p) => p + 1)}
+            className="h-7 px-2.5 rounded-md border border-border hover:text-foreground disabled:opacity-30"
+          >
+            Next
+          </button>
         </div>
       </div>
 
@@ -288,27 +458,57 @@ export function TableView({ signals }: { signals: Signal[] }) {
           onClick={(e) => e.stopPropagation()}
         >
           <MenuItem
-            icon={cols.pinned.includes(ctx.col) ? <PinOff className="size-3" /> : <Pin className="size-3" />}
+            icon={
+              cols.pinned.includes(ctx.col) ? (
+                <PinOff className="size-3" />
+              ) : (
+                <Pin className="size-3" />
+              )
+            }
             label={cols.pinned.includes(ctx.col) ? "Unpin column" : "Pin column"}
-            onClick={() => { togglePin(ctx.col); setCtx(null); }}
+            onClick={() => {
+              togglePin(ctx.col);
+              setCtx(null);
+            }}
           />
           <MenuItem
             icon={<EyeOff className="size-3" />}
             label="Hide column"
-            onClick={() => { hideCol(ctx.col); setCtx(null); }}
+            onClick={() => {
+              hideCol(ctx.col);
+              setCtx(null);
+            }}
           />
           <div className="border-t border-border my-1" />
-          <MenuItem label="Reset columns" onClick={() => { resetCols(); setCtx(null); }} />
+          <MenuItem
+            label="Reset columns"
+            onClick={() => {
+              resetCols();
+              setCtx(null);
+            }}
+          />
         </div>
       )}
     </div>
   );
 }
 
-function MenuItem({ icon, label, onClick }: { icon?: React.ReactNode; label: string; onClick: () => void }) {
+function MenuItem({
+  icon,
+  label,
+  onClick,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
   return (
-    <button onClick={onClick} className="w-full px-3 py-1.5 text-left text-foreground hover:bg-secondary inline-flex items-center gap-2">
-      {icon}{label}
+    <button
+      onClick={onClick}
+      className="w-full px-3 py-1.5 text-left text-foreground hover:bg-secondary inline-flex items-center gap-2"
+    >
+      {icon}
+      {label}
     </button>
   );
 }

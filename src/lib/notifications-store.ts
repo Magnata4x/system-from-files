@@ -67,7 +67,8 @@ export const useNotificationsStore = create<State>((set, get) => ({
           dismissed: false,
         })
         .then(({ error }) => {
-          if (error) logger.error("[notifications] insert", { error: error, message: error.message });
+          if (error)
+            logger.error("[notifications] insert", { error: error, message: error.message });
         });
 
       // Mantém também o log no profile (último evento crítico + contador)
@@ -85,7 +86,8 @@ export const useNotificationsStore = create<State>((set, get) => ({
         })
         .eq("id", uid)
         .then(({ error }) => {
-          if (error) logger.error("[notifications] profile log", { error: error, message: error.message });
+          if (error)
+            logger.error("[notifications] profile log", { error: error, message: error.message });
         });
     }
     return ev;
@@ -102,7 +104,8 @@ export const useNotificationsStore = create<State>((set, get) => ({
         .eq("user_id", uid)
         .eq("read", false)
         .then(({ error }) => {
-          if (error) logger.error("[notifications] markAllRead", { error: error, message: error.message });
+          if (error)
+            logger.error("[notifications] markAllRead", { error: error, message: error.message });
         });
     }
   },
@@ -118,7 +121,8 @@ export const useNotificationsStore = create<State>((set, get) => ({
         .eq("user_id", uid)
         .eq("id", id)
         .then(({ error }) => {
-          if (error) logger.error("[notifications] dismiss", { error: error, message: error.message });
+          if (error)
+            logger.error("[notifications] dismiss", { error: error, message: error.message });
         });
     }
   },
@@ -134,7 +138,8 @@ export const useNotificationsStore = create<State>((set, get) => ({
         .eq("user_id", uid)
         .eq("dismissed", false)
         .then(({ error }) => {
-          if (error) logger.error("[notifications] clear", { error: error, message: error.message });
+          if (error)
+            logger.error("[notifications] clear", { error: error, message: error.message });
         });
     }
   },

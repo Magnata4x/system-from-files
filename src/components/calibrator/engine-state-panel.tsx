@@ -64,14 +64,18 @@ export function CalibratorEnginePanel({ userId }: { userId: string | undefined }
           {data.behavioralFlags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {data.behavioralFlags.map((f) => (
-                <span key={f} className="px-2 py-0.5 rounded-md bg-secondary text-[11px]">{f}</span>
+                <span key={f} className="px-2 py-0.5 rounded-md bg-secondary text-[11px]">
+                  {f}
+                </span>
               ))}
             </div>
           )}
 
           {data.actions.length > 0 && (
             <ul className="list-disc pl-4 space-y-0.5 text-xs text-muted-foreground">
-              {data.actions.map((a) => <li key={a}>{a}</li>)}
+              {data.actions.map((a) => (
+                <li key={a}>{a}</li>
+              ))}
             </ul>
           )}
 

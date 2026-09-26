@@ -32,9 +32,16 @@ function Index() {
 
   useEffect(() => {
     if (loading) return;
-    if (!session) { navigate({ to: "/login" }); return; }
+    if (!session) {
+      navigate({ to: "/login" });
+      return;
+    }
     (async () => {
-      const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", session.user.id).maybeSingle();
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", session.user.id)
+        .maybeSingle();
       navigate({ to: data?.onboarding_completed ? "/dashboard" : "/onboarding" });
     })();
   }, [loading, session, navigate]);
