@@ -21,7 +21,13 @@ function Avatar({ handle }: { handle: string }) {
   );
 }
 
-export function Leaderboard({ onCopy, copiedIds }: { onCopy: (t: Trader) => void; copiedIds: Set<string> }) {
+export function Leaderboard({
+  onCopy,
+  copiedIds,
+}: {
+  onCopy: (t: Trader) => void;
+  copiedIds: Set<string>;
+}) {
   return (
     <section className="space-y-3">
       <header className="flex items-baseline justify-between">
@@ -50,9 +56,16 @@ export function Leaderboard({ onCopy, copiedIds }: { onCopy: (t: Trader) => void
               {TRADERS.map((t, i) => {
                 const copied = copiedIds.has(t.id);
                 return (
-                  <tr key={t.id} className="border-t border-border/60 hover:bg-secondary/20 transition-colors">
+                  <tr
+                    key={t.id}
+                    className="border-t border-border/60 hover:bg-secondary/20 transition-colors"
+                  >
                     <td className="px-3 py-3 text-center">
-                      {i < 3 ? <span className="text-base">{MEDALS[i]}</span> : <span className="text-muted-foreground tabular-nums">{i + 1}</span>}
+                      {i < 3 ? (
+                        <span className="text-base">{MEDALS[i]}</span>
+                      ) : (
+                        <span className="text-muted-foreground tabular-nums">{i + 1}</span>
+                      )}
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2.5">
@@ -64,24 +77,42 @@ export function Leaderboard({ onCopy, copiedIds }: { onCopy: (t: Trader) => void
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={cn("text-[11px] px-2 py-0.5 rounded border", STRATEGY_COLORS[t.strategy])}>
+                      <span
+                        className={cn(
+                          "text-[11px] px-2 py-0.5 rounded border",
+                          STRATEGY_COLORS[t.strategy],
+                        )}
+                      >
                         {t.strategy}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums">{t.winRate}%</td>
                     <td className="px-3 py-3 text-right tabular-nums">{t.rr.toFixed(1)}</td>
-                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">{t.signals30d}</td>
-                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">{t.followers.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-right tabular-nums text-emerald-400 font-medium">+{t.monthlyReturn}%</td>
-                    <td className="px-3 py-3"><Sparkline data={TRADER_SPARKS[t.id]} positive={t.monthlyReturn >= 0} /></td>
-                    <td className="px-3 py-3 text-right tabular-nums text-red-400/80">-{t.maxDrawdown}%</td>
+                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
+                      {t.signals30d}
+                    </td>
+                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
+                      {t.followers.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-3 text-right tabular-nums text-emerald-400 font-medium">
+                      +{t.monthlyReturn}%
+                    </td>
+                    <td className="px-3 py-3">
+                      <Sparkline data={TRADER_SPARKS[t.id]} positive={t.monthlyReturn >= 0} />
+                    </td>
+                    <td className="px-3 py-3 text-right tabular-nums text-red-400/80">
+                      -{t.maxDrawdown}%
+                    </td>
                     <td className="px-3 py-3 text-right">
                       <Button
                         size="sm"
                         variant={copied ? "outline" : "default"}
                         disabled={copied}
                         onClick={() => onCopy(t)}
-                        className={cn(!copied && "bg-[#378ADD] hover:bg-[#2d74bd] text-white", "h-7 text-xs")}
+                        className={cn(
+                          !copied && "bg-[#378ADD] hover:bg-[#2d74bd] text-white",
+                          "h-7 text-xs",
+                        )}
                       >
                         {copied ? "Copying" : "Copy"}
                       </Button>

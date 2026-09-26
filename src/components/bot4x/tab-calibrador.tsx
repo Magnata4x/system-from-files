@@ -1,7 +1,20 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Copy, Check, Sliders, ShieldCheck, Brain, Zap, ChevronDown, ArrowRight, X, TrendingUp, Activity, Mountain, Loader2, Wand2,
+  Copy,
+  Check,
+  Sliders,
+  ShieldCheck,
+  Brain,
+  Zap,
+  ChevronDown,
+  ArrowRight,
+  X,
+  TrendingUp,
+  Activity,
+  Mountain,
+  Loader2,
+  Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useBot4xStore } from "@/lib/bot4x-store";
@@ -9,9 +22,12 @@ import { PROFILES, type CalibProfile, type ProfileSpec } from "@/lib/bot4x-data"
 import { useCalibratorState } from "@/hooks/useCalibratorState";
 import { useAuth } from "@/lib/auth";
 import { calibratorAdapter, type SimulationResultUI } from "@/adapters/backend/calibrator.adapter";
-import { proposeSimCorrections, applySimCorrections, describeProposal, type SimProposal } from "@/lib/dna-sim-corrector";
-
-
+import {
+  proposeSimCorrections,
+  applySimCorrections,
+  describeProposal,
+  type SimProposal,
+} from "@/lib/dna-sim-corrector";
 
 const ICONS: Record<CalibProfile, typeof Sliders> = {
   conservador: ShieldCheck,
@@ -24,7 +40,16 @@ const ICONS: Record<CalibProfile, typeof Sliders> = {
   position: Mountain,
 };
 
-const ORDER: CalibProfile[] = ["conservador", "rsi", "aiscore", "agressivo", "scalper", "intraday", "swing", "position"];
+const ORDER: CalibProfile[] = [
+  "conservador",
+  "rsi",
+  "aiscore",
+  "agressivo",
+  "scalper",
+  "intraday",
+  "swing",
+  "position",
+];
 
 export function TabCalibrador() {
   // Ponte com o backend (BCE): sincroniza perfil ativo quando o Calibrador emite estado.
@@ -49,7 +74,6 @@ export function TabCalibrador() {
   );
 }
 
-
 // ----- Header -----
 function SectionHeader() {
   const active = useBot4xStore((s) => s.profile);
@@ -71,7 +95,8 @@ function SectionHeader() {
       </div>
       <motion.div
         key={active}
-        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         className="inline-flex items-center gap-2 h-9 px-3 rounded-md border"
         style={{
           background: `color-mix(in oklab, ${p.color} 16%, transparent)`,
@@ -148,7 +173,10 @@ function ProfileCard({ p, onOpenSim }: { p: ProfileSpec; onOpenSim: () => void }
                 <span className="text-[14px] font-semibold text-foreground">{p.name}</span>
                 <span
                   className="px-1.5 py-0.5 rounded text-[10px] font-bold"
-                  style={{ background: `color-mix(in oklab, ${p.color} 22%, transparent)`, color: p.color }}
+                  style={{
+                    background: `color-mix(in oklab, ${p.color} 22%, transparent)`,
+                    color: p.color,
+                  }}
                 >
                   {p.riskLabel}
                 </span>
@@ -160,9 +188,11 @@ function ProfileCard({ p, onOpenSim }: { p: ProfileSpec; onOpenSim: () => void }
         </div>
 
         <div className="mt-3 rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground/85 space-y-0.5">
-          <div>RSI threshold:  &lt; {p.rsiBuy} / &gt; {p.rsiSell}</div>
-          <div>aiScore mín.:   ≥ {p.aiScore}</div>
-          <div>FOMO limite:    ≤ {p.fomo}%</div>
+          <div>
+            RSI threshold: &lt; {p.rsiBuy} / &gt; {p.rsiSell}
+          </div>
+          <div>aiScore mín.: ≥ {p.aiScore}</div>
+          <div>FOMO limite: ≤ {p.fomo}%</div>
         </div>
 
         <div className="mt-3 grid grid-cols-3 gap-2">
@@ -272,12 +302,16 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
     <>
       <motion.div
         className="fixed inset-0 bg-black/70 z-[70]"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.div
         className="fixed inset-0 z-[71] flex items-center justify-center p-4"
-        initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
       >
         <div className="w-full max-w-2xl rounded-xl bg-[#111318] border border-border shadow-2xl overflow-hidden">
           <div className="px-5 pt-4 pb-3 border-b border-border flex items-start gap-3">
@@ -295,7 +329,10 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
                 BTCUSDT · Capital 1.000 USDT · Leverage {leverage}x · estratégia real (backtest)
               </p>
             </div>
-            <button onClick={onClose} className="size-7 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground">
+            <button
+              onClick={onClose}
+              className="size-7 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground"
+            >
               <X className="size-4" />
             </button>
           </div>
@@ -339,9 +376,24 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
                         <stop offset="100%" stopColor={profile.color} stopOpacity="0" />
                       </linearGradient>
                     </defs>
-                    <line x1="0" x2={W} y1={norm(1000)} y2={norm(1000)} stroke="currentColor" strokeOpacity="0.15" strokeDasharray="3 3" />
+                    <line
+                      x1="0"
+                      x2={W}
+                      y1={norm(1000)}
+                      y2={norm(1000)}
+                      stroke="currentColor"
+                      strokeOpacity="0.15"
+                      strokeDasharray="3 3"
+                    />
                     {area && <path d={area} fill={`url(#sim-${profile.id})`} />}
-                    <path d={d} fill="none" stroke={profile.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d={d}
+                      fill="none"
+                      stroke={profile.color}
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 {sim.commentary && (
@@ -349,11 +401,12 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
                 )}
                 <DnaCorrectionsPanel sim={sim} profileId={profile.id} color={profile.color} />
                 <p className="text-[10.5px] text-muted-foreground/80">
-                  Backtest executado sobre candles reais (Binance) com a estratégia do perfil <b style={{ color: profile.color }}>{profile.name}</b>. Resultados variam com slippage e condições de mercado.
+                  Backtest executado sobre candles reais (Binance) com a estratégia do perfil{" "}
+                  <b style={{ color: profile.color }}>{profile.name}</b>. Resultados variam com
+                  slippage e condições de mercado.
                 </p>
               </>
             )}
-
           </div>
         </div>
       </motion.div>
@@ -365,7 +418,12 @@ function SimStat({ label, value, color }: { label: string; value: string; color?
   return (
     <div className="rounded-md border border-border bg-background px-3 py-2">
       <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-[14px] font-semibold tabular-nums mt-0.5" style={{ color: color ?? undefined }}>{value}</div>
+      <div
+        className="text-[14px] font-semibold tabular-nums mt-0.5"
+        style={{ color: color ?? undefined }}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -377,7 +435,9 @@ function RiskMeter({ rank, color }: { rank: 1 | 2 | 3 | 4; color: string }) {
         <div
           key={n}
           className="w-1.5 h-5 rounded-sm transition-colors"
-          style={{ background: n <= rank ? color : "color-mix(in oklab, var(--border) 80%, transparent)" }}
+          style={{
+            background: n <= rank ? color : "color-mix(in oklab, var(--border) 80%, transparent)",
+          }}
         />
       ))}
     </div>
@@ -388,7 +448,12 @@ function Mini({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-md bg-background border border-border px-2 py-1.5">
       <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-[11.5px] font-semibold tabular-nums truncate" style={{ color: color ?? undefined }}>{value}</div>
+      <div
+        className="text-[11.5px] font-semibold tabular-nums truncate"
+        style={{ color: color ?? undefined }}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -430,15 +495,20 @@ function ImpactSummary() {
       {items.map((it) => {
         const positive = it.goodWhenNegative ? it.delta < 0 : it.delta > 0;
         const negative = it.goodWhenNegative ? it.delta > 0 : it.delta < 0;
-        const color = it.delta === 0 ? "#888780" : positive ? "#1D9E75" : negative ? "#E24B4A" : "#888780";
+        const color =
+          it.delta === 0 ? "#888780" : positive ? "#1D9E75" : negative ? "#E24B4A" : "#888780";
         return (
           <motion.div
             key={it.label}
             layout
             className="rounded-lg border border-border bg-card px-4 py-3"
           >
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{it.label}</div>
-            <div className="text-[18px] font-semibold tabular-nums mt-1 text-foreground">{it.value}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              {it.label}
+            </div>
+            <div className="text-[18px] font-semibold tabular-nums mt-1 text-foreground">
+              {it.value}
+            </div>
             <div className="text-[10px] text-muted-foreground mt-0.5">
               vs Conservador{" "}
               <span style={{ color }} className="font-semibold tabular-nums">
@@ -459,17 +529,26 @@ function LeverageMatrix() {
   const profiles: ProfileSpec[] = Object.values(PROFILES);
   const cols = [1, 3, 6, 10];
   const sym = (s: "ok" | "warn" | "no") =>
-    s === "ok" ? { ch: "✓", color: "#1D9E75" } : s === "warn" ? { ch: "⚠", color: "#EF9F27" } : { ch: "✗", color: "#E24B4A" };
+    s === "ok"
+      ? { ch: "✓", color: "#1D9E75" }
+      : s === "warn"
+        ? { ch: "⚠", color: "#EF9F27" }
+        : { ch: "✗", color: "#E24B4A" };
 
   // Closest highlight column for current leverage
-  const highlightCol = cols.reduce((a, b) => (Math.abs(b - activeLev) < Math.abs(a - activeLev) ? b : a));
+  const highlightCol = cols.reduce((a, b) =>
+    Math.abs(b - activeLev) < Math.abs(a - activeLev) ? b : a,
+  );
 
   return (
     <section className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-        <div className="text-[12px] font-semibold text-foreground">Compatibilidade perfil × alavancagem</div>
+        <div className="text-[12px] font-semibold text-foreground">
+          Compatibilidade perfil × alavancagem
+        </div>
         <div className="text-[10px] text-muted-foreground">
-          Coluna destacada: <span className="text-foreground font-semibold">{highlightCol}x</span> (lev atual)
+          Coluna destacada: <span className="text-foreground font-semibold">{highlightCol}x</span>{" "}
+          (lev atual)
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -481,7 +560,14 @@ function LeverageMatrix() {
                 <th
                   key={l}
                   className="px-3 py-2 font-medium tabular-nums text-center"
-                  style={l === highlightCol ? { background: "color-mix(in oklab, #378ADD 18%, transparent)", color: "#9CC6F0" } : undefined}
+                  style={
+                    l === highlightCol
+                      ? {
+                          background: "color-mix(in oklab, #378ADD 18%, transparent)",
+                          color: "#9CC6F0",
+                        }
+                      : undefined
+                  }
                 >
                   1:{l}
                 </th>
@@ -492,7 +578,15 @@ function LeverageMatrix() {
             {profiles.map((p) => {
               const rowActive = p.id === activeProfile;
               return (
-                <tr key={p.id} className="border-t border-border" style={rowActive ? { background: "color-mix(in oklab, var(--secondary) 50%, transparent)" } : undefined}>
+                <tr
+                  key={p.id}
+                  className="border-t border-border"
+                  style={
+                    rowActive
+                      ? { background: "color-mix(in oklab, var(--secondary) 50%, transparent)" }
+                      : undefined
+                  }
+                >
                   <td className="px-4 py-2 text-foreground">
                     <span className="inline-flex items-center gap-2">
                       <span className="size-2 rounded-full" style={{ background: p.color }} />
@@ -505,7 +599,11 @@ function LeverageMatrix() {
                       <td
                         key={l}
                         className="px-3 py-2 text-center text-[14px] font-semibold"
-                        style={l === highlightCol ? { background: "color-mix(in oklab, #378ADD 10%, transparent)" } : undefined}
+                        style={
+                          l === highlightCol
+                            ? { background: "color-mix(in oklab, #378ADD 10%, transparent)" }
+                            : undefined
+                        }
                       >
                         <span style={{ color: s.color }}>{s.ch}</span>
                       </td>
@@ -547,7 +645,11 @@ GUARDRAILS:
   - max 3 concurrent slots; slot = activeCapital / 3`;
 
   const copy = async () => {
-    try { await navigator.clipboard.writeText(block); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
+    try {
+      await navigator.clipboard.writeText(block);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
   };
 
   return (
@@ -557,23 +659,33 @@ GUARDRAILS:
         className="w-full flex items-center justify-between px-4 py-3 text-[12px] font-medium text-foreground hover:bg-secondary/30 transition-colors"
       >
         <span>Mostrar bloco de injeção para o system prompt</span>
-        <ChevronDown className={`size-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`size-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
             <div className="border-t border-border p-3">
               <div className="relative">
-                <pre className="font-mono text-[11px] leading-relaxed text-foreground/85 bg-[#0A0B0E] border border-border rounded-md p-3 overflow-x-auto whitespace-pre-wrap">{block}</pre>
+                <pre className="font-mono text-[11px] leading-relaxed text-foreground/85 bg-[#0A0B0E] border border-border rounded-md p-3 overflow-x-auto whitespace-pre-wrap">
+                  {block}
+                </pre>
                 <button
                   onClick={copy}
                   className="absolute top-2 right-2 inline-flex items-center gap-1 h-7 px-2 rounded-md bg-secondary text-foreground text-[11px] hover:bg-secondary/70 transition-colors"
                 >
-                  {copied ? <Check className="size-3.5 text-[#1D9E75]" /> : <Copy className="size-3.5" />}
+                  {copied ? (
+                    <Check className="size-3.5 text-[#1D9E75]" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
                   {copied ? "Copiado" : "Copiar"}
                 </button>
               </div>
@@ -586,7 +698,15 @@ GUARDRAILS:
 }
 
 // ----- DNA suggested corrections (from simulation) -----
-function DnaCorrectionsPanel({ sim, profileId, color }: { sim: SimulationResultUI; profileId: CalibProfile; color: string }) {
+function DnaCorrectionsPanel({
+  sim,
+  profileId,
+  color,
+}: {
+  sim: SimulationResultUI;
+  profileId: CalibProfile;
+  color: string;
+}) {
   // recompute when sim or store deps change
   const slPct = useBot4xStore((s) => s.slPct);
   const tpPct = useBot4xStore((s) => s.tpPct);
@@ -617,7 +737,10 @@ function DnaCorrectionsPanel({ sim, profileId, color }: { sim: SimulationResultU
       }}
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="text-[12px] font-semibold inline-flex items-center gap-1.5" style={{ color }}>
+        <div
+          className="text-[12px] font-semibold inline-flex items-center gap-1.5"
+          style={{ color }}
+        >
           <Brain className="size-3.5" />
           DNA · correções sugeridas ({proposals.length})
         </div>

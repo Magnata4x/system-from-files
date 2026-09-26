@@ -113,9 +113,7 @@ function CalibratorHistoryPage() {
             <div className="flex items-center gap-3">
               <History className="size-6 text-primary" />
               <div>
-                <h1 className="text-xl font-semibold tracking-tight">
-                  Histórico de simulações
-                </h1>
+                <h1 className="text-xl font-semibold tracking-tight">Histórico de simulações</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Backtests executados localmente, com filtros e reexecução rápida.
                 </p>

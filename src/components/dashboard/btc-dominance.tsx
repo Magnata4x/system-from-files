@@ -16,7 +16,9 @@ export function BtcDominance() {
           <p className="text-[11px] text-muted-foreground">Last 30 days</p>
         </div>
         <div className="text-right">
-          <div className="text-[22px] font-semibold tabular-nums text-foreground">{dom.toFixed(1)}%</div>
+          <div className="text-[22px] font-semibold tabular-nums text-foreground">
+            {dom.toFixed(1)}%
+          </div>
           <div className="text-[11px] font-medium" style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
             {up ? "↑" : "↓"} {Math.abs(change).toFixed(2)}% market cap 24h
           </div>
@@ -33,11 +35,22 @@ export function BtcDominance() {
             </defs>
             <YAxis hide domain={["dataMin - 0.5", "dataMax + 0.5"]} />
             <Tooltip
-              contentStyle={{ background: "#111318", border: "1px solid #1E2028", borderRadius: 8, fontSize: 12 }}
+              contentStyle={{
+                background: "#111318",
+                border: "1px solid #1E2028",
+                borderRadius: 8,
+                fontSize: 12,
+              }}
               labelFormatter={(l) => `Day ${l}`}
               formatter={(v: number) => [`${v.toFixed(2)}%`, "BTC Dom"]}
             />
-            <Area type="monotone" dataKey="value" stroke="#378ADD" strokeWidth={2} fill="url(#dom)" />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#378ADD"
+              strokeWidth={2}
+              fill="url(#dom)"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

@@ -1,7 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
-import { useProfileStore, type Market, type Timeframe, type RiskProfile, type Experience } from "@/lib/profile-store";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  useProfileStore,
+  type Market,
+  type Timeframe,
+  type RiskProfile,
+  type Experience,
+} from "@/lib/profile-store";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MARKETS: Market[] = ["Crypto", "Forex", "Stocks", "Indices", "Futures"];
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1H", "4H", "1D"];
@@ -43,11 +55,20 @@ export function TradingPreferences() {
 
       <div className="space-y-5">
         <Group label="Primary markets" hint="Multi-select">
-          <Pills items={MARKETS} active={prefs.markets} onToggle={(v) => toggleMarket(v as Market)} />
+          <Pills
+            items={MARKETS}
+            active={prefs.markets}
+            onToggle={(v) => toggleMarket(v as Market)}
+          />
         </Group>
 
         <Group label="Preferred timeframes" hint="Multi-select">
-          <Pills items={TFS} active={prefs.timeframes} onToggle={(v) => toggleTimeframe(v as Timeframe)} mono />
+          <Pills
+            items={TFS}
+            active={prefs.timeframes}
+            onToggle={(v) => toggleTimeframe(v as Timeframe)}
+            mono
+          />
         </Group>
 
         <Group label="Risk profile">
@@ -68,10 +89,19 @@ export function TradingPreferences() {
 
         <Group label="Default exchange">
           <div className="max-w-xs">
-            <Select value={prefs.defaultExchange} onValueChange={(v) => setPrefs({ defaultExchange: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={prefs.defaultExchange}
+              onValueChange={(v) => setPrefs({ defaultExchange: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {EXCHANGES.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                {EXCHANGES.map((e) => (
+                  <SelectItem key={e} value={e}>
+                    {e}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -81,7 +111,15 @@ export function TradingPreferences() {
   );
 }
 
-function Group({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Group({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="text-[12px] text-muted-foreground mb-2">

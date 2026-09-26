@@ -19,7 +19,10 @@ export function QuickActions() {
           >
             <div
               className="size-8 rounded-lg flex items-center justify-center"
-              style={{ background: `color-mix(in oklab, ${a.color} 18%, transparent)`, color: a.color }}
+              style={{
+                background: `color-mix(in oklab, ${a.color} 18%, transparent)`,
+                color: a.color,
+              }}
             >
               <a.icon className="size-4" />
             </div>

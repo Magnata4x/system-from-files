@@ -12,7 +12,10 @@ export function EndpointCards() {
     <section className="space-y-4">
       <header className="flex items-baseline justify-between">
         <h2 className="text-lg font-semibold">Endpoints</h2>
-        <span className="text-xs text-muted-foreground">Base URL: <span className="font-mono text-foreground/80">https://api.aisignalradar.io</span></span>
+        <span className="text-xs text-muted-foreground">
+          Base URL:{" "}
+          <span className="font-mono text-foreground/80">https://api.aisignalradar.io</span>
+        </span>
       </header>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {ENDPOINTS.map((e) => (
@@ -20,7 +23,12 @@ export function EndpointCards() {
             key={e.method + e.path}
             className="rounded-lg border border-border bg-card/40 hover:bg-card/70 transition-colors p-3.5 flex items-center gap-3"
           >
-            <span className={cn("inline-flex items-center justify-center text-[10.5px] font-semibold tracking-wide px-2 py-1 rounded border w-14", METHOD_STYLES[e.method])}>
+            <span
+              className={cn(
+                "inline-flex items-center justify-center text-[10.5px] font-semibold tracking-wide px-2 py-1 rounded border w-14",
+                METHOD_STYLES[e.method],
+              )}
+            >
               {e.method}
             </span>
             <div className="flex-1 min-w-0">

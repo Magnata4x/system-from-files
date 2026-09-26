@@ -4,7 +4,13 @@ import { Search } from "lucide-react";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FeaturedCarousel } from "@/components/marketplace/featured-carousel";
 import { CreatorTestimonials } from "@/components/marketplace/creator-testimonials";
 import { ProductCard } from "@/components/marketplace/product-card";
@@ -12,16 +18,28 @@ import { ProductDetailModal } from "@/components/marketplace/product-detail-moda
 import { CreatorBanner } from "@/components/marketplace/creator-banner";
 import { CATEGORIES, PRODUCTS, type CategoryFilter, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
-import { useMarketplaceHistory, useMarketplaceProducts, useTrackMarketplaceView, type MarketplaceProduct } from "@/hooks/useMarketplaceProducts";
+import {
+  useMarketplaceHistory,
+  useMarketplaceProducts,
+  useTrackMarketplaceView,
+  type MarketplaceProduct,
+} from "@/hooks/useMarketplaceProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
   head: () => ({
     meta: [
       { title: "Marketplace — AISignalRadar" },
-      { name: "description", content: "Estratégias, indicadores, bots, alerts e cursos criados pela comunidade AISignalRadar." },
+      {
+        name: "description",
+        content:
+          "Estratégias, indicadores, bots, alerts e cursos criados pela comunidade AISignalRadar.",
+      },
       { property: "og:title", content: "AISignalRadar Marketplace" },
-      { property: "og:description", content: "Descubra produtos de traders verificados — comece grátis ou assine recorrente." },
+      {
+        property: "og:description",
+        content: "Descubra produtos de traders verificados — comece grátis ou assine recorrente.",
+      },
     ],
   }),
   component: MarketplacePage,
@@ -53,7 +71,7 @@ function MarketplacePage() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.creator.handle.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q)
+          p.description.toLowerCase().includes(q),
       );
     }
     list = [...list].sort((a, b) => {
@@ -84,14 +102,17 @@ function MarketplacePage() {
         <main className="flex-1 min-w-0">
           <div className="max-w-6xl mx-auto px-5 py-8 space-y-10">
             <header className="space-y-1">
-              <h1 className="text-[26px] md:text-[30px] font-semibold tracking-tight">Marketplace</h1>
-              <p className="text-sm text-muted-foreground">Descubra estratégias, indicadores e bots criados pela comunidade.</p>
+              <h1 className="text-[26px] md:text-[30px] font-semibold tracking-tight">
+                Marketplace
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Descubra estratégias, indicadores e bots criados pela comunidade.
+              </p>
             </header>
 
             <FeaturedCarousel onOpen={openProduct} />
 
             <CreatorTestimonials />
-
 
             <section className="space-y-4">
               <div className="flex flex-wrap items-center gap-3 border-b border-border">
@@ -106,7 +127,7 @@ function MarketplacePage() {
                           "px-3.5 py-2 text-sm transition-colors border-b-2 -mb-px",
                           active
                             ? "border-[#378ADD] text-foreground font-medium"
-                            : "border-transparent text-muted-foreground hover:text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
                         )}
                       >
                         {c}
@@ -127,10 +148,16 @@ function MarketplacePage() {
                   />
                 </div>
                 <Select value={asset} onValueChange={setAsset}>
-                  <SelectTrigger className="h-9 w-[130px] text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-9 w-[130px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Todos ativos</SelectItem>
-                    {['BTC', 'ETH', 'SOL', 'BNB'].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                    {["BTC", "ETH", "SOL", "BNB"].map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
@@ -157,8 +184,13 @@ function MarketplacePage() {
                 </div>
               ) : isError ? (
                 <div className="rounded-lg border border-dashed border-border bg-card/20 p-10 text-center space-y-3">
-                  <p className="text-sm text-muted-foreground">Não foi possível carregar o catálogo.</p>
-                  <button onClick={() => void refetch()} className="text-xs underline text-foreground">
+                  <p className="text-sm text-muted-foreground">
+                    Não foi possível carregar o catálogo.
+                  </p>
+                  <button
+                    onClick={() => void refetch()}
+                    className="text-xs underline text-foreground"
+                  >
                     Tentar de novo
                   </button>
                 </div>
@@ -180,7 +212,11 @@ function MarketplacePage() {
                 <h2 className="text-lg font-semibold">Vistos recentemente</h2>
                 <div className="flex flex-wrap gap-2">
                   {recentProducts.map((product) => (
-                    <button key={product.id} onClick={() => openProduct(product)} className="rounded-md border border-border bg-card/40 px-3 py-2 text-sm hover:bg-secondary">
+                    <button
+                      key={product.id}
+                      onClick={() => openProduct(product)}
+                      className="rounded-md border border-border bg-card/40 px-3 py-2 text-sm hover:bg-secondary"
+                    >
                       {product.name}
                     </button>
                   ))}

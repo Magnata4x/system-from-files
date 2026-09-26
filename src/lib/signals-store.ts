@@ -4,7 +4,6 @@ import { createSelector } from "reselect";
 import { type Signal, type AssetClass } from "./signals-data";
 import { backendWs } from "@/adapters/backend/ws-client";
 
-
 export type ViewMode = "cards" | "table" | "radar";
 export type SortKey = "score" | "rr" | "age" | "volDelta";
 
@@ -61,7 +60,6 @@ type State = {
   init: () => void;
   cleanup: () => void;
 };
-
 
 export const useSignalsStore = create<State>((set, get) => ({
   // Em produção começa vazio — sinais reais chegam via syncFromBackend()/WS.
@@ -199,13 +197,14 @@ export const useSignalsStore = create<State>((set, get) => ({
       // carregamento de página busque dados frescos e não a lista stale
       // de até 10s atrás. Sem isso o usuário via WS vê o sinal no store
       // mas recarregar a aba devolve lista desatualizada do cache.
-      void Promise.all([
-        import("@/lib/cache"),
-        import("@/integrations/supabase/client"),
-      ]).then(async ([{ invalidate }, { supabase }]) => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.id) void invalidate(`signals:list:${user.id}`);
-      });
+      void Promise.all([import("@/lib/cache"), import("@/integrations/supabase/client")]).then(
+        async ([{ invalidate }, { supabase }]) => {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user?.id) void invalidate(`signals:list:${user.id}`);
+        },
+      );
     });
 
     // Fallback: re-sync a cada 60s se o WS não estiver autenticado/ativo.
@@ -227,22 +226,17 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
 }));
 
-
-
 // Núcleo da lógica, isolado para ser usado pelo seletor memoizado.
 // Recebe (signals, filters, sort) e devolve a lista filtrada+ordenada.
 // `createSelector` garante que esta função SÓ roda quando uma dessas três
 // referências muda — mudanças em `hoverId`, `detailId`, `flashIds`, etc.
 // retornam o array em cache (mesma referência) sem recomputar.
-function computeFilteredSorted(
-  signals: Signal[],
-  filters: Filters,
-  sort: SortKey,
-): Signal[] {
+function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKey): Signal[] {
   const exchSet = new Set(filters.exchanges);
   const setupKeys = Object.keys(filters.setups).filter((k) => filters.setups[k]);
   const list = signals.filter((s) => {
-    if (filters.search && !s.asset.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.search && !s.asset.toLowerCase().includes(filters.search.toLowerCase()))
+      return false;
     if (filters.assetClass !== "All" && s.assetClass !== filters.assetClass) return false;
     if (filters.timeframe !== "All" && s.tf !== filters.timeframe) return false;
     if (filters.direction !== "All" && s.direction !== filters.direction) return false;
@@ -267,11 +261,7 @@ function computeFilteredSorted(
 // Seletor memoizado com cache de 1 entrada (default do reselect).
 // Re-renderiza apenas quando uma das 3 fontes de entrada muda por referência.
 export const selectFilteredSorted = createSelector(
-  [
-    (state: State) => state.signals,
-    (state: State) => state.filters,
-    (state: State) => state.sort,
-  ],
+  [(state: State) => state.signals, (state: State) => state.filters, (state: State) => state.sort],
   (signals, filters, sort) => computeFilteredSorted(signals, filters, sort),
 );
 
@@ -291,4 +281,3 @@ export function selectStats(signals: Signal[]) {
   const expired = signals.filter((s) => s.status === "expired").length;
   return { total, buy, sell, avg, inst, high, expired };
 }
-

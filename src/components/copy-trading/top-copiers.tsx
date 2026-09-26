@@ -8,7 +8,9 @@ export function TopCopiers() {
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Crown className="size-4 text-amber-400" /> Top copiers
         </h2>
-        <span className="text-xs text-muted-foreground">Best returns from following top traders</span>
+        <span className="text-xs text-muted-foreground">
+          Best returns from following top traders
+        </span>
       </header>
       <div className="rounded-lg border border-border bg-card/40 overflow-hidden">
         <div className="overflow-x-auto">
@@ -27,8 +29,13 @@ export function TopCopiers() {
               {TOP_COPIERS.map((c, i) => {
                 const sampleTraders = TRADERS.slice(0, Math.min(c.followingCount, 3));
                 return (
-                  <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/20 transition-colors">
-                    <td className="px-3 py-3 text-center tabular-nums text-muted-foreground">{i + 1}</td>
+                  <tr
+                    key={c.id}
+                    className="border-t border-border/60 hover:bg-secondary/20 transition-colors"
+                  >
+                    <td className="px-3 py-3 text-center tabular-nums text-muted-foreground">
+                      {i + 1}
+                    </td>
                     <td className="px-3 py-3 font-medium">{c.handle}</td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1.5">
@@ -43,12 +50,18 @@ export function TopCopiers() {
                             </div>
                           ))}
                         </div>
-                        <span className="text-xs text-muted-foreground">{c.followingCount} traders</span>
+                        <span className="text-xs text-muted-foreground">
+                          {c.followingCount} traders
+                        </span>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">{c.capital}</td>
+                    <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
+                      {c.capital}
+                    </td>
                     <td className="px-3 py-3 text-right tabular-nums">{c.winRate}%</td>
-                    <td className="px-3 py-3 text-right tabular-nums text-emerald-400 font-medium">+{c.pnl30d}%</td>
+                    <td className="px-3 py-3 text-right tabular-nums text-emerald-400 font-medium">
+                      +{c.pnl30d}%
+                    </td>
                   </tr>
                 );
               })}

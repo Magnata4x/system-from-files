@@ -5,7 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Rating } from "./rating";
-import { CATEGORY_BADGES, CATEGORY_GRADIENTS, SAMPLE_REVIEWS, type Product } from "@/lib/marketplace-data";
+import {
+  CATEGORY_BADGES,
+  CATEGORY_GRADIENTS,
+  SAMPLE_REVIEWS,
+  type Product,
+} from "@/lib/marketplace-data";
 import { useWishlist } from "@/lib/wishlist-store";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +30,18 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
-        <div className={cn("relative h-32 bg-gradient-to-br border-b border-border/60", CATEGORY_GRADIENTS[product.category])}>
-          <span className={cn("absolute top-3 left-3 text-[10.5px] px-1.5 py-0.5 rounded border", CATEGORY_BADGES[product.category])}>
+        <div
+          className={cn(
+            "relative h-32 bg-gradient-to-br border-b border-border/60",
+            CATEGORY_GRADIENTS[product.category],
+          )}
+        >
+          <span
+            className={cn(
+              "absolute top-3 left-3 text-[10.5px] px-1.5 py-0.5 rounded border",
+              CATEGORY_BADGES[product.category],
+            )}
+          >
             {product.category}
           </span>
         </div>
@@ -52,20 +67,46 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
               <h3 className="text-sm font-semibold mb-2">Performance (30d)</h3>
               <div className="h-[140px] rounded-lg border border-border bg-card/40 p-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={product.performance} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                  <AreaChart
+                    data={product.performance}
+                    margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
+                  >
                     <defs>
                       <linearGradient id="perfGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.4} />
                         <stop offset="100%" stopColor="#22d3ee" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={9} tickLine={false} axisLine={false} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={9} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} />
+                    <XAxis
+                      dataKey="day"
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={9}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={9}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v) => `${v}%`}
+                    />
                     <Tooltip
-                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                      contentStyle={{
+                        background: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
                       formatter={(v: number) => [`${v.toFixed(2)}%`, "Return"]}
                     />
-                    <Area type="monotone" dataKey="value" stroke="#22d3ee" strokeWidth={1.8} fill="url(#perfGrad)" />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#22d3ee"
+                      strokeWidth={1.8}
+                      fill="url(#perfGrad)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -98,20 +139,28 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
               </div>
               <div className="text-xs text-muted-foreground">Creator · 12 products published</div>
             </div>
-            <Button variant="outline" size="sm" className="h-7 text-xs">View profile</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs">
+              View profile
+            </Button>
           </div>
 
           <div className="flex flex-col gap-3 pt-3 border-t border-border/60">
             {!free && (
               <button
                 type="button"
-                onClick={() => toast.success(`Trial de 7 dias iniciado em ${product.name}`, { description: "Sem cobrança até o fim do período. Cancele a qualquer momento." })}
+                onClick={() =>
+                  toast.success(`Trial de 7 dias iniciado em ${product.name}`, {
+                    description: "Sem cobrança até o fim do período. Cancele a qualquer momento.",
+                  })
+                }
                 className="w-full rounded-md border border-dashed border-[#378ADD]/40 bg-[#378ADD]/5 hover:bg-[#378ADD]/10 transition-colors px-3 py-2.5 text-left flex items-center gap-2.5"
               >
                 <Sparkles className="size-4 text-[#5fa8ff] shrink-0" />
                 <div className="flex-1">
                   <div className="text-xs font-medium text-foreground">Try free for 7 days</div>
-                  <div className="text-[11px] text-muted-foreground">Acesso total. Cobrança automática só após o trial, cancele a qualquer momento.</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Acesso total. Cobrança automática só após o trial, cancele a qualquer momento.
+                  </div>
                 </div>
               </button>
             )}
@@ -139,7 +188,10 @@ export function ProductDetailModal({ product, open, onOpenChange }: Props) {
                 >
                   <Heart className={cn("size-4", wishlisted && "fill-rose-400 text-rose-400")} />
                 </Button>
-                <Button className="bg-[#378ADD] hover:bg-[#2d74bd] text-white" onClick={() => toast.success(`Subscribed to ${product.name}`)}>
+                <Button
+                  className="bg-[#378ADD] hover:bg-[#2d74bd] text-white"
+                  onClick={() => toast.success(`Subscribed to ${product.name}`)}
+                >
                   {free ? "Obter agora" : "Subscribe"}
                 </Button>
               </div>

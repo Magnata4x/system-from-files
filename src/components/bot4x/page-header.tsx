@@ -17,7 +17,9 @@ export function Bot4xHeader({ realModeUnlocked }: { realModeUnlocked: boolean })
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-[20px] font-medium text-foreground leading-none">Bot4x</h1>
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[var(--brand-blue-deep)] text-foreground">v2.0</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[var(--brand-blue-deep)] text-foreground">
+              v2.0
+            </span>
             <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#1D9E75]">
               <span className="relative flex size-1.5">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-[#1D9E75] opacity-75 animate-ping" />
@@ -41,13 +43,20 @@ export function Bot4xHeader({ realModeUnlocked }: { realModeUnlocked: boolean })
           }`}
         >
           <span className={`relative flex size-1.5 ${isDemo ? "" : "animate-pulse"}`}>
-            <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${isDemo ? "bg-[#1D9E75]" : "bg-[#E24B4A]"}`} />
-            <span className={`relative inline-flex size-1.5 rounded-full ${isDemo ? "bg-[#1D9E75]" : "bg-[#E24B4A]"}`} />
+            <span
+              className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${isDemo ? "bg-[#1D9E75]" : "bg-[#E24B4A]"}`}
+            />
+            <span
+              className={`relative inline-flex size-1.5 rounded-full ${isDemo ? "bg-[#1D9E75]" : "bg-[#E24B4A]"}`}
+            />
           </span>
           {isDemo ? "DEMO MODE" : "REAL MODE"}
         </span>
         {!realModeUnlocked && (
-          <span className="text-[10px] text-muted-foreground" title="Conecte suas chaves de exchange em Configurações › API Keys">
+          <span
+            className="text-[10px] text-muted-foreground"
+            title="Conecte suas chaves de exchange em Configurações › API Keys"
+          >
             modo real bloqueado — conecte a exchange
           </span>
         )}

@@ -17,7 +17,10 @@ export function StatsBar() {
       {items.map((it, i) => (
         <div key={it.label} className="flex items-center gap-1.5">
           <span className="text-muted-foreground">{it.label}:</span>
-          <span className="font-semibold tabular-nums" style={{ color: it.color ?? "var(--foreground)" }}>
+          <span
+            className="font-semibold tabular-nums"
+            style={{ color: it.color ?? "var(--foreground)" }}
+          >
             {it.value}
           </span>
           {i < items.length - 1 && <span className="h-3 w-px bg-border ml-3" />}

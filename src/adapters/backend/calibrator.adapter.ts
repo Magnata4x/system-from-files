@@ -20,7 +20,15 @@ export interface BackendCalibratorPayload {
   };
   commentary?: string;
   // Mapeamento para o perfil local do tab-calibrador (opcional)
-  profile?: "conservador" | "rsi" | "aiscore" | "agressivo" | "scalper" | "intraday" | "swing" | "position";
+  profile?:
+    | "conservador"
+    | "rsi"
+    | "aiscore"
+    | "agressivo"
+    | "scalper"
+    | "intraday"
+    | "swing"
+    | "position";
   updatedAt?: string;
 }
 
@@ -171,7 +179,9 @@ export function mapSimulationResult(
 export const calibratorAdapter = {
   async getState(userId: string): Promise<CalibratorStateUI | null> {
     try {
-      const data = await api.get<BackendCalibratorPayload | null>(calibratorEndpoints.state(userId));
+      const data = await api.get<BackendCalibratorPayload | null>(
+        calibratorEndpoints.state(userId),
+      );
       return data ? mapCalibratorState(data) : null;
     } catch {
       return null;
@@ -186,7 +196,10 @@ export const calibratorAdapter = {
   },
   async simulate(userId: string, req: BackendSimulationRequest): Promise<SimulationResultUI> {
     try {
-      const data = await api.post<BackendSimulationResponse>(calibratorEndpoints.simulate(userId), req);
+      const data = await api.post<BackendSimulationResponse>(
+        calibratorEndpoints.simulate(userId),
+        req,
+      );
       return mapSimulationResult(data);
     } catch (e: any) {
       const isNetwork = !e?.response || e?.code === "ERR_NETWORK" || e?.message === "Network Error";

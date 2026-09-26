@@ -1,6 +1,16 @@
 import { STATS } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
-import { Target, Clock, Sparkles, Hourglass, Shield, TrendingDown, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import {
+  Target,
+  Clock,
+  Sparkles,
+  Hourglass,
+  Shield,
+  TrendingDown,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
 
 const ICONS = { Target, Clock, Sparkles, Hourglass, Shield, TrendingDown, TrendingUp } as const;
 
@@ -69,8 +79,14 @@ export function StatsGrid() {
                 <Icon className="size-4 text-[var(--brand-cyan)]" />
               </div>
               {s.trend && (
-                <span className={`flex items-center gap-0.5 text-[11px] font-medium ${s.trendUp ? "text-emerald-400" : "text-red-400"}`}>
-                  {s.trendUp ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
+                <span
+                  className={`flex items-center gap-0.5 text-[11px] font-medium ${s.trendUp ? "text-emerald-400" : "text-red-400"}`}
+                >
+                  {s.trendUp ? (
+                    <ArrowUpRight className="size-3" />
+                  ) : (
+                    <ArrowDownRight className="size-3" />
+                  )}
                   {s.trend}
                 </span>
               )}

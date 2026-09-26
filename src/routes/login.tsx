@@ -13,7 +13,10 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Sign in — AISignalRadar" },
-      { name: "description", content: "Sign in to AISignalRadar — the trading intelligence platform." },
+      {
+        name: "description",
+        content: "Sign in to AISignalRadar — the trading intelligence platform.",
+      },
     ],
   }),
   component: LoginPage,
@@ -58,7 +61,6 @@ function passwordStrength(pw: string): number {
   return s;
 }
 
-
 function LoginPage() {
   const navigate = useNavigate();
   const { session, loading } = useAuth();
@@ -74,7 +76,11 @@ function LoginPage() {
   async function routeAfterLogin() {
     const uid = (await supabase.auth.getUser()).data.user?.id;
     if (!uid) return;
-    const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", uid).maybeSingle();
+    const { data } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", uid)
+      .maybeSingle();
     navigate({ to: data?.onboarding_completed ? "/dashboard" : "/onboarding" });
   }
 
@@ -236,7 +242,9 @@ function Divider() {
   return (
     <div className="flex items-center gap-3 my-5">
       <div className="flex-1 h-px bg-border" />
-      <span className="text-[11px] uppercase tracking-wider text-muted-foreground">or continue with</span>
+      <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
+        or continue with
+      </span>
       <div className="flex-1 h-px bg-border" />
     </div>
   );
@@ -262,7 +270,10 @@ function SignInForm({ onForgot }: { onForgot: () => void }) {
 
   const onSubmit = async (v: z.infer<typeof signInSchema>) => {
     setFormErr(null);
-    const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: v.email,
+      password: v.password,
+    });
     if (error) setFormErr(error.message);
   };
 
@@ -298,11 +309,16 @@ function SignInForm({ onForgot }: { onForgot: () => void }) {
     }
   }
 
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <Field icon={<Mail className="size-4" />} error={errors.email?.message}>
-        <input type="email" placeholder="Email" autoComplete="email" className={inputCls} {...register("email")} />
+        <input
+          type="email"
+          placeholder="Email"
+          autoComplete="email"
+          className={inputCls}
+          {...register("email")}
+        />
       </Field>
       <Field icon={<Lock className="size-4" />} error={errors.password?.message}>
         <input
@@ -312,24 +328,38 @@ function SignInForm({ onForgot }: { onForgot: () => void }) {
           className={inputCls}
           {...register("password")}
         />
-        <button type="button" onClick={() => setShowPw((v) => !v)} className="text-muted-foreground hover:text-foreground">
+        <button
+          type="button"
+          onClick={() => setShowPw((v) => !v)}
+          className="text-muted-foreground hover:text-foreground"
+        >
           {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>
       </Field>
 
       <div className="flex items-center justify-between text-sm">
         <label className="flex items-center gap-2 text-muted-foreground cursor-pointer">
-          <input type="checkbox" {...register("remember")} className="size-4 rounded border-border bg-secondary accent-[var(--brand-blue)]" />
+          <input
+            type="checkbox"
+            {...register("remember")}
+            className="size-4 rounded border-border bg-secondary accent-[var(--brand-blue)]"
+          />
           Remember me
         </label>
-        <button type="button" onClick={onForgot} className="text-[var(--brand-cyan)] hover:underline">
+        <button
+          type="button"
+          onClick={onForgot}
+          className="text-[var(--brand-cyan)] hover:underline"
+        >
           Forgot password?
         </button>
       </div>
 
       {formErr && <p className="text-xs text-destructive">{formErr}</p>}
 
-      <PrimaryButton loading={isSubmitting} type="submit">Sign in</PrimaryButton>
+      <PrimaryButton loading={isSubmitting} type="submit">
+        Sign in
+      </PrimaryButton>
 
       <div className="text-center">
         <button
@@ -349,13 +379,21 @@ function SignInForm({ onForgot }: { onForgot: () => void }) {
         onClick={async () => {
           setGoogleLoading(true);
           const r = await signInWithGoogle();
-          if (r.error) { setFormErr(r.error.message ?? "Google sign-in failed"); setGoogleLoading(false); }
+          if (r.error) {
+            setFormErr(r.error.message ?? "Google sign-in failed");
+            setGoogleLoading(false);
+          }
         }}
       />
 
       <p className="text-[11px] text-muted-foreground text-center pt-2">
         By signing in you agree to our{" "}
-        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+        <a
+          href="/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-foreground"
+        >
           Terms of Service
         </a>
       </p>
@@ -386,7 +424,6 @@ function SignUpForm() {
     "var(--success)",
   ];
 
-
   const onSubmit = async (v: z.infer<typeof signUpSchema>) => {
     setFormErr(null);
     const { data, error } = await supabase.auth.signUp({
@@ -397,7 +434,10 @@ function SignUpForm() {
         data: { full_name: v.fullName },
       },
     });
-    if (error) { setFormErr(error.message); return; }
+    if (error) {
+      setFormErr(error.message);
+      return;
+    }
     // Supabase retorna session=null quando email confirmation está habilitado.
     // Quando session != null, o usuário já está logado (confirmação desativada)
     // e o onAuthStateChange do root cuida do redirecionamento.
@@ -414,16 +454,17 @@ function SignUpForm() {
           <Check className="size-7 text-emerald-400" />
         </div>
         <h2 className="text-lg font-medium">Verifique seu email</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Enviamos um link de confirmação para
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">Enviamos um link de confirmação para</p>
         <p className="text-sm font-medium mt-0.5">{signedUpEmail}</p>
         <p className="text-xs text-muted-foreground mt-3">
           Clique no link do email para ativar sua conta e fazer login.
         </p>
         <button
           type="button"
-          onClick={() => { setSignedUp(false); setSignedUpEmail(""); }}
+          onClick={() => {
+            setSignedUp(false);
+            setSignedUpEmail("");
+          }}
           className="mt-6 text-sm text-[var(--brand-cyan)] hover:underline"
         >
           Usar outro email
@@ -435,10 +476,21 @@ function SignUpForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <Field icon={<User className="size-4" />} error={errors.fullName?.message}>
-        <input placeholder="Full name" autoComplete="name" className={inputCls} {...register("fullName")} />
+        <input
+          placeholder="Full name"
+          autoComplete="name"
+          className={inputCls}
+          {...register("fullName")}
+        />
       </Field>
       <Field icon={<Mail className="size-4" />} error={errors.email?.message}>
-        <input type="email" placeholder="Email" autoComplete="email" className={inputCls} {...register("email")} />
+        <input
+          type="email"
+          placeholder="Email"
+          autoComplete="email"
+          className={inputCls}
+          {...register("email")}
+        />
       </Field>
       <Field icon={<Lock className="size-4" />} error={errors.password?.message}>
         <input
@@ -448,14 +500,17 @@ function SignUpForm() {
           className={inputCls}
           {...register("password")}
         />
-        <button type="button" onClick={() => setShowPw((v) => !v)} className="text-muted-foreground hover:text-foreground">
+        <button
+          type="button"
+          onClick={() => setShowPw((v) => !v)}
+          className="text-muted-foreground hover:text-foreground"
+        >
           {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>
       </Field>
 
       <div className="grid grid-cols-5 gap-1.5">
         {[0, 1, 2, 3, 4].map((i) => (
-
           <div
             key={i}
             className="h-1 rounded-full bg-secondary overflow-hidden"
@@ -475,14 +530,28 @@ function SignUpForm() {
       </Field>
 
       <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer pt-1">
-        <input type="checkbox" {...register("terms")} className="mt-0.5 size-4 rounded border-border bg-secondary accent-[var(--brand-blue)]" />
+        <input
+          type="checkbox"
+          {...register("terms")}
+          className="mt-0.5 size-4 rounded border-border bg-secondary accent-[var(--brand-blue)]"
+        />
         <span>
           I agree to the{" "}
-          <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-cyan)] hover:underline">
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--brand-cyan)] hover:underline"
+          >
             Terms of Service
           </a>{" "}
           and{" "}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-cyan)] hover:underline">
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--brand-cyan)] hover:underline"
+          >
             Privacy Policy
           </a>
         </span>
@@ -491,7 +560,9 @@ function SignUpForm() {
 
       {formErr && <p className="text-xs text-destructive">{formErr}</p>}
 
-      <PrimaryButton loading={isSubmitting} type="submit">Create account</PrimaryButton>
+      <PrimaryButton loading={isSubmitting} type="submit">
+        Create account
+      </PrimaryButton>
 
       <Divider />
       <GoogleButton
@@ -499,7 +570,10 @@ function SignUpForm() {
         onClick={async () => {
           setGoogleLoading(true);
           const r = await signInWithGoogle();
-          if (r.error) { setFormErr(r.error.message ?? "Google sign-in failed"); setGoogleLoading(false); }
+          if (r.error) {
+            setFormErr(r.error.message ?? "Google sign-in failed");
+            setGoogleLoading(false);
+          }
         }}
       />
     </form>
@@ -519,13 +593,19 @@ function ForgotForm({ onBack, onSent }: { onBack: () => void; onSent: (email: st
     const { error } = await supabase.auth.resetPasswordForEmail(v.email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
-    if (error) { setFormErr(error.message); return; }
+    if (error) {
+      setFormErr(error.message);
+      return;
+    }
     onSent(v.email);
   };
 
   return (
     <div>
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"
+      >
         <ArrowLeft className="size-4" /> Back
       </button>
       <h2 className="text-lg font-medium text-foreground">Reset your password</h2>
@@ -535,7 +615,9 @@ function ForgotForm({ onBack, onSent }: { onBack: () => void; onSent: (email: st
           <input type="email" placeholder="Email" className={inputCls} {...register("email")} />
         </Field>
         {formErr && <p className="text-xs text-destructive">{formErr}</p>}
-        <PrimaryButton loading={isSubmitting} type="submit">Send reset link</PrimaryButton>
+        <PrimaryButton loading={isSubmitting} type="submit">
+          Send reset link
+        </PrimaryButton>
       </form>
     </div>
   );
@@ -544,7 +626,10 @@ function ForgotForm({ onBack, onSent }: { onBack: () => void; onSent: (email: st
 function ForgotSent({ email, onBack }: { email: string; onBack: () => void }) {
   return (
     <div className="text-center py-4">
-      <div className="mx-auto size-14 rounded-full flex items-center justify-center mb-4" style={{ background: "color-mix(in oklab, var(--success) 20%, transparent)" }}>
+      <div
+        className="mx-auto size-14 rounded-full flex items-center justify-center mb-4"
+        style={{ background: "color-mix(in oklab, var(--success) 20%, transparent)" }}
+      >
         <Check className="size-7" style={{ color: "var(--success)" }} />
       </div>
       <h2 className="text-lg font-medium text-foreground">Check your inbox</h2>

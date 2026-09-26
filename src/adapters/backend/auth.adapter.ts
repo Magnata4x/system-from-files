@@ -3,7 +3,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { api } from "./api.adapter";
 
-
 export const authAdapter = {
   async getAccessToken(): Promise<string | null> {
     const { data } = await supabase.auth.getSession();

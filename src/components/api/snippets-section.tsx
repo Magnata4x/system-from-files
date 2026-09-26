@@ -3,7 +3,13 @@ import { Play, Terminal } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CodeBlock } from "./code-block";
 import { ENDPOINTS } from "@/lib/api-data";
 
@@ -14,7 +20,11 @@ const SDK_INSTALLS = {
   pip: "pip install aisignalradar",
 };
 
-function buildSnippet(lang: "javascript" | "python" | "curl", endpoint: string, params: Record<string, string>) {
+function buildSnippet(
+  lang: "javascript" | "python" | "curl",
+  endpoint: string,
+  params: Record<string, string>,
+) {
   const qs = Object.entries(params)
     .filter(([, v]) => v.trim())
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
@@ -46,7 +56,7 @@ function mockResponse(endpoint: string, params: Record<string, string>) {
 
   if (endpoint.startsWith("/v1/signals")) {
     const data = Array.from({ length: limit }, (_, i) => ({
-      id: `sig_${(Math.random().toString(36).slice(2, 8))}`,
+      id: `sig_${Math.random().toString(36).slice(2, 8)}`,
       asset,
       timeframe: tf,
       type: i % 2 === 0 ? "long" : "short",
@@ -59,13 +69,46 @@ function mockResponse(endpoint: string, params: Record<string, string>) {
     return JSON.stringify({ data, meta: { count: data.length, rate_remaining: 4982 } }, null, 2);
   }
   if (endpoint.startsWith("/v1/score")) {
-    return JSON.stringify({ asset, score: Math.floor(40 + Math.random() * 50), trend: "bullish", updated_at: new Date().toISOString() }, null, 2);
+    return JSON.stringify(
+      {
+        asset,
+        score: Math.floor(40 + Math.random() * 50),
+        trend: "bullish",
+        updated_at: new Date().toISOString(),
+      },
+      null,
+      2,
+    );
   }
   if (endpoint.startsWith("/v1/sentiment")) {
-    return JSON.stringify({ asset, sentiment: 0.62, sources: { twitter: 0.71, news: 0.54, reddit: 0.58 }, mentions_24h: 18420 }, null, 2);
+    return JSON.stringify(
+      {
+        asset,
+        sentiment: 0.62,
+        sources: { twitter: 0.71, news: 0.54, reddit: 0.58 },
+        mentions_24h: 18420,
+      },
+      null,
+      2,
+    );
   }
   if (endpoint.startsWith("/v1/manipulation")) {
-    return JSON.stringify({ data: [{ id: "mn_3a91", asset, type: "spoofing", severity: "high", confidence: 87, detected_at: new Date().toISOString() }] }, null, 2);
+    return JSON.stringify(
+      {
+        data: [
+          {
+            id: "mn_3a91",
+            asset,
+            type: "spoofing",
+            severity: "high",
+            confidence: 87,
+            detected_at: new Date().toISOString(),
+          },
+        ],
+      },
+      null,
+      2,
+    );
   }
   return JSON.stringify({ ok: true, endpoint, params }, null, 2);
 }
@@ -77,7 +120,9 @@ export function SnippetsSection() {
         <header className="flex items-baseline justify-between flex-wrap gap-2">
           <div>
             <h2 className="text-lg font-semibold">Quick start</h2>
-            <p className="text-xs text-muted-foreground mt-1">Example for <span className="font-mono text-foreground/80">GET /v1/signals</span></p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Example for <span className="font-mono text-foreground/80">GET /v1/signals</span>
+            </p>
           </div>
           <SdkInstall />
         </header>
@@ -88,13 +133,22 @@ export function SnippetsSection() {
             <TabsTrigger value="curl">curl</TabsTrigger>
           </TabsList>
           <TabsContent value="javascript" className="mt-3">
-            <CodeBlock code={buildSnippet("javascript", "/v1/signals", { asset: "BTC", tf: "4h" })} lang="javascript" />
+            <CodeBlock
+              code={buildSnippet("javascript", "/v1/signals", { asset: "BTC", tf: "4h" })}
+              lang="javascript"
+            />
           </TabsContent>
           <TabsContent value="python" className="mt-3">
-            <CodeBlock code={buildSnippet("python", "/v1/signals", { asset: "BTC", tf: "4h" })} lang="python" />
+            <CodeBlock
+              code={buildSnippet("python", "/v1/signals", { asset: "BTC", tf: "4h" })}
+              lang="python"
+            />
           </TabsContent>
           <TabsContent value="curl" className="mt-3">
-            <CodeBlock code={buildSnippet("curl", "/v1/signals", { asset: "BTC", tf: "4h" })} lang="curl" />
+            <CodeBlock
+              code={buildSnippet("curl", "/v1/signals", { asset: "BTC", tf: "4h" })}
+              lang="curl"
+            />
           </TabsContent>
         </Tabs>
       </div>
@@ -139,15 +193,19 @@ const DEFAULT_PARAMS: Record<string, Record<string, string>> = {
 
 function ApiExplorer() {
   const [endpoint, setEndpoint] = useState(REST_ENDPOINTS[0].path);
-  const [params, setParams] = useState<Record<string, string>>(DEFAULT_PARAMS[REST_ENDPOINTS[0].path] || {});
-  const [response, setResponse] = useState<string>("// Click \"Send request\" to see a live mock response");
+  const [params, setParams] = useState<Record<string, string>>(
+    DEFAULT_PARAMS[REST_ENDPOINTS[0].path] || {},
+  );
+  const [response, setResponse] = useState<string>(
+    '// Click "Send request" to see a live mock response',
+  );
   const [latency, setLatency] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   function onEndpointChange(path: string) {
     setEndpoint(path);
     setParams(DEFAULT_PARAMS[path] || {});
-    setResponse("// Click \"Send request\" to see a live mock response");
+    setResponse('// Click "Send request" to see a live mock response');
     setLatency(null);
   }
 
@@ -171,12 +229,16 @@ function ApiExplorer() {
       <header className="flex items-center gap-2">
         <Terminal className="size-4 text-[#5fa8ff]" />
         <h2 className="text-lg font-semibold">API explorer</h2>
-        <span className="text-[10.5px] uppercase tracking-wide text-muted-foreground bg-secondary/60 border border-border rounded px-1.5 py-0.5">interactive</span>
+        <span className="text-[10.5px] uppercase tracking-wide text-muted-foreground bg-secondary/60 border border-border rounded px-1.5 py-0.5">
+          interactive
+        </span>
       </header>
 
       <div className="rounded-lg border border-border bg-card/40 p-4 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-semibold tracking-wide px-2 py-1 rounded border bg-emerald-500/15 text-emerald-400 border-emerald-500/30">GET</span>
+          <span className="text-[11px] font-semibold tracking-wide px-2 py-1 rounded border bg-emerald-500/15 text-emerald-400 border-emerald-500/30">
+            GET
+          </span>
           <Select value={endpoint} onValueChange={onEndpointChange}>
             <SelectTrigger className="h-9 flex-1 min-w-[240px] font-mono text-xs">
               <SelectValue />
@@ -189,7 +251,11 @@ function ApiExplorer() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={send} disabled={loading} className="bg-[#378ADD] hover:bg-[#2d74bd] text-white">
+          <Button
+            onClick={send}
+            disabled={loading}
+            className="bg-[#378ADD] hover:bg-[#2d74bd] text-white"
+          >
             <Play className="size-3.5 mr-1.5" />
             {loading ? "Sending..." : "Send request"}
           </Button>

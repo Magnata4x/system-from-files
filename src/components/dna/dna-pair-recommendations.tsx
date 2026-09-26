@@ -4,7 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, TrendingDown, Minus, Sparkles, ShieldAlert, RefreshCcw, Check, Info } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Sparkles,
+  ShieldAlert,
+  RefreshCcw,
+  Check,
+  Info,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import {
@@ -39,7 +48,9 @@ export function DnaPairRecommendations() {
   }, [history, MIN_SAMPLE]);
 
   const applied = useMemo(
-    () => preferredPairs.join(",") === result.preferred.join(",") && avoidPairs.join(",") === result.avoid.join(","),
+    () =>
+      preferredPairs.join(",") === result.preferred.join(",") &&
+      avoidPairs.join(",") === result.avoid.join(","),
     [preferredPairs, avoidPairs, result],
   );
 
@@ -58,7 +69,8 @@ export function DnaPairRecommendations() {
   };
 
   // Verifica se todos os pares têm amostra insuficiente
-  const allInsufficient = result.analyses.length > 0 && result.analyses.every((a) => a.total < MIN_SAMPLE);
+  const allInsufficient =
+    result.analyses.length > 0 && result.analyses.every((a) => a.total < MIN_SAMPLE);
 
   // Total de trades fechados disponíveis
   const totalClosed = result.analyses.reduce((s, a) => s + a.total, 0);
@@ -74,12 +86,16 @@ export function DnaPairRecommendations() {
               <h2 className="text-sm font-semibold">Recomendações de Pares (DNA)</h2>
             </div>
             <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-              Classificação estatística via intervalo de confiança de Wilson com correção de Bonferroni. Veredito
-              (PREFER/AVOID) só é liberado a partir de{" "}
-              <span className="font-semibold text-foreground" title={`Configurável (${DNA_MIN_SAMPLE_BOUNDS.min}–${DNA_MIN_SAMPLE_BOUNDS.max})`}>
+              Classificação estatística via intervalo de confiança de Wilson com correção de
+              Bonferroni. Veredito (PREFER/AVOID) só é liberado a partir de{" "}
+              <span
+                className="font-semibold text-foreground"
+                title={`Configurável (${DNA_MIN_SAMPLE_BOUNDS.min}–${DNA_MIN_SAMPLE_BOUNDS.max})`}
+              >
                 {MIN_SAMPLE} trades fechados
               </span>{" "}
-              por par (padrão 10). Pares PREFER são priorizados pelo Bot4x; pares AVOID têm execução bloqueada.
+              por par (padrão 10). Pares PREFER são priorizados pelo Bot4x; pares AVOID têm execução
+              bloqueada.
             </p>
           </div>
           <div className="flex gap-2 flex-wrap items-end">
@@ -106,7 +122,9 @@ export function DnaPairRecommendations() {
               variant="outline"
               size="sm"
               onClick={() => {
-                const next = analyzePairs(useBot4xStore.getState().history, { minSample: MIN_SAMPLE });
+                const next = analyzePairs(useBot4xStore.getState().history, {
+                  minSample: MIN_SAMPLE,
+                });
                 setResult(next);
                 const closed = next.analyses.reduce((s, a) => s + a.total, 0);
                 toast.success("DNA recalculado", {
@@ -138,11 +156,13 @@ export function DnaPairRecommendations() {
           <div className="mb-4 flex items-start gap-2.5 rounded-md border border-amber-500/30 bg-amber-500/8 px-3 py-2.5">
             <Info className="size-4 text-amber-400 shrink-0 mt-0.5" />
             <div className="text-xs text-amber-300 leading-relaxed">
-              <span className="font-semibold">Amostra insuficiente em todos os pares.</span> São necessários ao menos{" "}
-              {MIN_SAMPLE} trades fechados (WIN ou LOSS) por par para emitir veredito estatístico. Histórico atual:{" "}
-              {totalClosed} trade{totalClosed !== 1 ? "s" : ""} fechados distribuídos entre {result.analyses.length} par
-              {result.analyses.length !== 1 ? "es" : ""}. Continue operando — as recomendações aparecerão
-              automaticamente quando a amostra for suficiente.
+              <span className="font-semibold">Amostra insuficiente em todos os pares.</span> São
+              necessários ao menos {MIN_SAMPLE} trades fechados (WIN ou LOSS) por par para emitir
+              veredito estatístico. Histórico atual: {totalClosed} trade
+              {totalClosed !== 1 ? "s" : ""} fechados distribuídos entre {result.analyses.length}{" "}
+              par
+              {result.analyses.length !== 1 ? "es" : ""}. Continue operando — as recomendações
+              aparecerão automaticamente quando a amostra for suficiente.
             </div>
           </div>
         )}
@@ -167,12 +187,14 @@ export function DnaPairRecommendations() {
 
         {/* Legenda do método */}
         <div className="mb-3 rounded-md border border-border bg-background/50 px-3 py-2 text-[10.5px] text-muted-foreground leading-relaxed">
-          <span className="font-medium text-foreground">Como funciona:</span> Cada par é comparado contra a taxa de
-          acerto global do sistema usando o intervalo de confiança de Wilson (IC95%). Um par recebe{" "}
-          <span className="text-emerald-400 font-medium">PREFER</span> somente se o limite inferior do IC estiver acima
-          da média — e <span className="text-red-400 font-medium">AVOID</span> somente se o limite superior estiver
-          abaixo. A correção de Bonferroni evita falsos positivos ao testar múltiplos pares simultaneamente. A coluna{" "}
-          <span className="font-medium text-foreground">streak</span> é apenas informativa e não afeta a classificação.
+          <span className="font-medium text-foreground">Como funciona:</span> Cada par é comparado
+          contra a taxa de acerto global do sistema usando o intervalo de confiança de Wilson
+          (IC95%). Um par recebe <span className="text-emerald-400 font-medium">PREFER</span>{" "}
+          somente se o limite inferior do IC estiver acima da média — e{" "}
+          <span className="text-red-400 font-medium">AVOID</span> somente se o limite superior
+          estiver abaixo. A correção de Bonferroni evita falsos positivos ao testar múltiplos pares
+          simultaneamente. A coluna <span className="font-medium text-foreground">streak</span> é
+          apenas informativa e não afeta a classificação.
         </div>
 
         {/* Tabela */}
@@ -201,10 +223,14 @@ export function DnaPairRecommendations() {
                   <td className="py-2 pr-3 font-medium">{a.pair}</td>
                   <td className="py-2 pr-3 tabular-nums">
                     <span className={a.total < MIN_SAMPLE ? "text-amber-400" : ""}>{a.total}</span>
-                    {a.total < MIN_SAMPLE && <span className="ml-1 text-[9px] text-amber-400/70">/{MIN_SAMPLE}</span>}
+                    {a.total < MIN_SAMPLE && (
+                      <span className="ml-1 text-[9px] text-amber-400/70">/{MIN_SAMPLE}</span>
+                    )}
                   </td>
                   <td className="py-2 pr-3 tabular-nums">{a.winRate}%</td>
-                  <td className={`py-2 pr-3 tabular-nums ${a.pnlSum >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <td
+                    className={`py-2 pr-3 tabular-nums ${a.pnlSum >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                  >
                     {a.pnlSum >= 0 ? "+" : ""}
                     {a.pnlSum}%
                   </td>
@@ -228,7 +254,8 @@ export function DnaPairRecommendations() {
               {result.analyses.length === 0 && (
                 <tr>
                   <td colSpan={10} className="py-8 text-center text-muted-foreground">
-                    Sem histórico suficiente ainda. Opere pelo menos {MIN_SAMPLE} trades para ver a análise.
+                    Sem histórico suficiente ainda. Opere pelo menos {MIN_SAMPLE} trades para ver a
+                    análise.
                   </td>
                 </tr>
               )}
@@ -238,8 +265,8 @@ export function DnaPairRecommendations() {
 
         {/* Rodapé */}
         <p className="mt-3 text-[10px] text-muted-foreground/60 leading-relaxed">
-          Análise gerada em {new Date(result.generatedAt).toLocaleTimeString("pt-BR")}. Simulação para fins
-          educacionais. Não constitui recomendação financeira ou de investimento.
+          Análise gerada em {new Date(result.generatedAt).toLocaleTimeString("pt-BR")}. Simulação
+          para fins educacionais. Não constitui recomendação financeira ou de investimento.
         </p>
       </Card>
     </div>
@@ -311,9 +338,15 @@ function TrendBadge({ trend }: { trend: "UP" | "DOWN" | "FLAT" }) {
 
 function RecoBadge({ reco }: { reco: "PREFER" | "AVOID" | "NEUTRAL" }) {
   if (reco === "PREFER")
-    return <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px] h-5">PREFER</Badge>;
+    return (
+      <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px] h-5">
+        PREFER
+      </Badge>
+    );
   if (reco === "AVOID")
-    return <Badge className="bg-red-500/15 text-red-300 border-red-500/30 text-[10px] h-5">AVOID</Badge>;
+    return (
+      <Badge className="bg-red-500/15 text-red-300 border-red-500/30 text-[10px] h-5">AVOID</Badge>
+    );
   return (
     <Badge variant="outline" className="text-[10px] h-5">
       NEUTRAL

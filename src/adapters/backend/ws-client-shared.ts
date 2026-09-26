@@ -29,7 +29,10 @@ const WS_URL = resolveWsUrl();
 
 type WorkerInbound =
   | { type: "status"; status: WsStatus }
-  | { type: "message"; data: { event?: WsEvent; type?: WsEvent; payload?: unknown; channel?: string } };
+  | {
+      type: "message";
+      data: { event?: WsEvent; type?: WsEvent; payload?: unknown; channel?: string };
+    };
 
 export class BackendWsClientShared {
   private worker: SharedWorker | null = null;

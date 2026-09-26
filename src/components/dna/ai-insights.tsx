@@ -63,7 +63,10 @@ export function AiInsights() {
           const Icon = ICONS[ins.icon as keyof typeof ICONS] ?? TrendingUp;
           const t = TONE[ins.tone];
           return (
-            <div key={ins.title} className={`rounded-lg border border-border border-l-4 ${t.border} ${t.bg} p-3.5`}>
+            <div
+              key={ins.title}
+              className={`rounded-lg border border-border border-l-4 ${t.border} ${t.bg} p-3.5`}
+            >
               <div className="flex items-start gap-3">
                 <Icon className={`size-4 mt-0.5 shrink-0 ${t.icon}`} />
                 <div className="min-w-0">

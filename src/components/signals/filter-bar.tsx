@@ -1,4 +1,15 @@
-import { Search, LayoutGrid, Table as TableIcon, Radar, SlidersHorizontal, ChevronDown, Play, Pause, Rss, Cpu } from "lucide-react";
+import {
+  Search,
+  LayoutGrid,
+  Table as TableIcon,
+  Radar,
+  SlidersHorizontal,
+  ChevronDown,
+  Play,
+  Pause,
+  Rss,
+  Cpu,
+} from "lucide-react";
 import { useSignalsStore } from "@/lib/signals-store";
 
 const assetClasses = ["All", "Crypto", "Forex", "Indices", "Stocks"] as const;
@@ -13,7 +24,20 @@ const scoreOptions = [
 const exchanges = ["Binance", "Bybit", "OKX", "Coinbase"];
 
 export function FilterBar() {
-  const { filters, view, sort, live, streamOpen, setView, setSort, setLive, setFilter, toggleAdv, toggleStream, toggleExchange } = useSignalsStore();
+  const {
+    filters,
+    view,
+    sort,
+    live,
+    streamOpen,
+    setView,
+    setSort,
+    setLive,
+    setFilter,
+    toggleAdv,
+    toggleStream,
+    toggleExchange,
+  } = useSignalsStore();
   const bot4xOnly = filters.bot4xOnly;
 
   return (
@@ -46,7 +70,9 @@ export function FilterBar() {
               key={v}
               onClick={() => setView(v)}
               className={`px-2.5 h-8 flex items-center justify-center transition-colors ${
-                view === v ? "bg-[var(--brand-blue-deep)] text-foreground" : "text-muted-foreground hover:text-foreground"
+                view === v
+                  ? "bg-[var(--brand-blue-deep)] text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
               title={v}
             >
@@ -88,8 +114,12 @@ export function FilterBar() {
           }`}
         >
           <Cpu className="size-3.5" /> Bot4x viáveis
-          <span className={`ml-1 inline-block w-7 h-3.5 rounded-full relative transition-colors ${bot4xOnly ? "bg-[#1D9E75]" : "bg-muted"}`}>
-            <span className={`absolute top-0.5 size-2.5 rounded-full bg-background transition-all ${bot4xOnly ? "left-3.5" : "left-0.5"}`} />
+          <span
+            className={`ml-1 inline-block w-7 h-3.5 rounded-full relative transition-colors ${bot4xOnly ? "bg-[#1D9E75]" : "bg-muted"}`}
+          >
+            <span
+              className={`absolute top-0.5 size-2.5 rounded-full bg-background transition-all ${bot4xOnly ? "left-3.5" : "left-0.5"}`}
+            />
           </span>
         </button>
 
@@ -139,7 +169,9 @@ export function FilterBar() {
           colorMap={{ BUY: "#1D9E75", SELL: "#E24B4A" }}
         />
         <Divider />
-        <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">Score</span>
+        <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">
+          Score
+        </span>
         <Pills
           options={scoreOptions.map((o) => o.label)}
           value={scoreOptions.find((o) => o.value === filters.scoreMin)?.label ?? "All"}

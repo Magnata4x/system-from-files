@@ -42,31 +42,35 @@ export function SentimentShiftAlert() {
   return (
     <div
       className={`rounded-xl border px-4 py-3 flex items-center gap-3 animate-fade-in ${
-        positive
-          ? "border-emerald-500/40 bg-emerald-500/5"
-          : "border-red-500/40 bg-red-500/5"
+        positive ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"
       }`}
     >
-      <div className={`size-9 rounded-full flex items-center justify-center ${
-        positive ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
-      }`}>
+      <div
+        className={`size-9 rounded-full flex items-center justify-center ${
+          positive ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+        }`}
+      >
         <Icon className="size-4" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-sm">
           <span className="font-semibold">Sentiment shift alert</span>
-          <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-semibold ${
-            positive ? "bg-emerald-500/20 text-emerald-200" : "bg-red-500/20 text-red-200"
-          }`}>
+          <span
+            className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-semibold ${
+              positive ? "bg-emerald-500/20 text-emerald-200" : "bg-red-500/20 text-red-200"
+            }`}
+          >
             {positive ? "Bullish swing" : "Bearish swing"}
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-0.5">
           <span className="font-semibold text-foreground">{active.asset}</span> moved{" "}
           <span className={positive ? "text-emerald-300" : "text-red-300"}>
-            {positive ? "+" : ""}{active.delta} pts
+            {positive ? "+" : ""}
+            {active.delta} pts
           </span>{" "}
-          in 1h ({active.before} → {active.after}). Push notification triggered for subscribed channels.
+          in 1h ({active.before} → {active.after}). Push notification triggered for subscribed
+          channels.
         </p>
       </div>
       <button

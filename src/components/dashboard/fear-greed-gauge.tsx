@@ -18,31 +18,58 @@ export function FearGreedGauge() {
   // semicircle 180° → angle = (value/100)*180 from the left
   const angle = (VALUE / 100) * 180;
   const rad = ((180 - angle) * Math.PI) / 180;
-  const cx = 110, cy = 110, r = 88;
+  const cx = 110,
+    cy = 110,
+    r = 88;
   const nx = cx + r * Math.cos(rad);
   const ny = cy - r * Math.sin(rad);
 
   const zoneColor = zones.find((z) => VALUE >= z.from && VALUE < z.to)?.color ?? "#1D9E75";
 
   return (
-    <div data-tour="fear-greed" className="rounded-xl border border-border bg-card p-4 h-full flex flex-col">
+    <div
+      data-tour="fear-greed"
+      className="rounded-xl border border-border bg-card p-4 h-full flex flex-col"
+    >
       <div className="flex items-baseline justify-between">
         <h3 className="text-[15px] font-medium text-foreground">Fear &amp; Greed Index</h3>
-        <span className="text-[11px] text-muted-foreground">{loading ? "Loading…" : "Updated live"}</span>
+        <span className="text-[11px] text-muted-foreground">
+          {loading ? "Loading…" : "Updated live"}
+        </span>
       </div>
       <div className="relative flex-1 flex items-center justify-center mt-2">
         <svg viewBox="0 0 220 130" className="w-full max-w-[260px]">
           {zones.map((z) => {
             const start = ((100 - z.to) / 100) * 180;
             const end = ((100 - z.from) / 100) * 180;
-            return <ArcSegment key={z.label} cx={cx} cy={cy} r={r} startAngle={start} endAngle={end} color={z.color} />;
+            return (
+              <ArcSegment
+                key={z.label}
+                cx={cx}
+                cy={cy}
+                r={r}
+                startAngle={start}
+                endAngle={end}
+                color={z.color}
+              />
+            );
           })}
           {/* Needle */}
-          <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="#E6F1FB" strokeWidth="2.5" strokeLinecap="round" />
+          <line
+            x1={cx}
+            y1={cy}
+            x2={nx}
+            y2={ny}
+            stroke="#E6F1FB"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
           <circle cx={cx} cy={cy} r="6" fill="#0A0B0E" stroke="#E6F1FB" strokeWidth="2" />
         </svg>
         <div className="absolute bottom-2 flex flex-col items-center">
-          <div className="text-[32px] font-semibold leading-none" style={{ color: zoneColor }}>{VALUE}</div>
+          <div className="text-[32px] font-semibold leading-none" style={{ color: zoneColor }}>
+            {VALUE}
+          </div>
           <div className="text-[12px] text-muted-foreground mt-0.5">{LABEL}</div>
         </div>
       </div>
@@ -60,12 +87,28 @@ export function FearGreedGauge() {
   );
 }
 
-function ArcSegment({ cx, cy, r, startAngle, endAngle, color }: { cx: number; cy: number; r: number; startAngle: number; endAngle: number; color: string }) {
+function ArcSegment({
+  cx,
+  cy,
+  r,
+  startAngle,
+  endAngle,
+  color,
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  startAngle: number;
+  endAngle: number;
+  color: string;
+}) {
   const start = polar(cx, cy, r, startAngle);
   const end = polar(cx, cy, r, endAngle);
   const large = endAngle - startAngle > 180 ? 1 : 0;
   const d = `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 1 ${end.x} ${end.y}`;
-  return <path d={d} stroke={color} strokeWidth="14" fill="none" strokeLinecap="butt" opacity="0.85" />;
+  return (
+    <path d={d} stroke={color} strokeWidth="14" fill="none" strokeLinecap="butt" opacity="0.85" />
+  );
 }
 
 function polar(cx: number, cy: number, r: number, angleDeg: number) {
