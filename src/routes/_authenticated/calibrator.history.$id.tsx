@@ -35,7 +35,9 @@ export const Route = createFileRoute("/_authenticated/calibrator/history/$id")({
     <div className="p-10 text-sm text-muted-foreground">Simulação não encontrada.</div>
   ),
   errorComponent: ({ error }) => (
-    <div className="p-10 text-sm text-destructive">Erro ao carregar simulação: {error.message}</div>
+    <div className="p-10 text-sm text-destructive">
+      Erro ao carregar simulação: {error instanceof Error ? error.message : "erro desconhecido"}
+    </div>
   ),
 });
 
