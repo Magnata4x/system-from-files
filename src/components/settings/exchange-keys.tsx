@@ -113,7 +113,8 @@ export function SettingsExchangeKeys() {
             />
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Use uma chave restrita a IP e sem permissão de saque.
+            Use uma chave HMAC da Binance.com com leitura ativa e sem permissão de saque. Se houver
+            restrição de IP, autorize o IP do servidor, não o IP do seu aparelho.
           </p>
           {save.isError && <p className="text-xs text-[#E24B4A]">{errMsg(save.error)}</p>}
           <Button size="sm" type="submit" disabled={busy || !apiKey || !apiSecret}>

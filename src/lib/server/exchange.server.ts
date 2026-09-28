@@ -102,6 +102,25 @@ async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
   });
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
+    const code = typeof body["code"] === "number" ? body["code"] : undefined;
+    if (code === -2015) {
+      throw new ApiError(
+        "A Binance recusou a chave. Use uma chave HMAC criada na Binance.com, mantenha a permissão de leitura ativa e autorize o IP do servidor — não o IP do seu celular ou computador. Não habilite saques.",
+        400,
+      );
+    }
+    if (code === -1022 || code === -2014) {
+      throw new ApiError(
+        "A assinatura da Binance é inválida. Confirme que a API key e o secret pertencem à mesma chave HMAC; chaves RSA ou Ed25519 não usam este formulário.",
+        400,
+      );
+    }
+    if (code === -1021) {
+      throw new ApiError(
+        "O relógio do servidor está fora da janela aceita pela Binance. Tente novamente em alguns instantes.",
+        400,
+      );
+    }
     throw new ApiError(String(body["msg"] ?? `Binance respondeu ${res.status}`), 400);
   }
   return body;
