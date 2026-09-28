@@ -47,7 +47,9 @@ export const Route = createFileRoute("/_authenticated/admin")({
           <ShieldAlert className="size-5 text-destructive" />
           <CardTitle>Acesso restrito</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">{error.message}</CardContent>
+        <CardContent className="text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : "Não foi possível carregar esta área."}
+        </CardContent>
       </Card>
     </div>
   ),
