@@ -48,30 +48,15 @@ export const SOURCES = {
   },
 };
 
-export type Narrative = {
-  tag: string;
-  weight: number;
-  tone: "bull" | "bear" | "neutral";
-  keywords: string[];
-};
+export type Narrative = { tag: string; weight: number; tone: "bull" | "bear" | "neutral"; keywords: string[] };
 export const NARRATIVES: Narrative[] = [
   { tag: "BTC Halving", weight: 100, tone: "bull", keywords: ["halving", "btc", "bitcoin"] },
   { tag: "ETF Inflows", weight: 95, tone: "bull", keywords: ["etf", "blackrock", "inflow"] },
   { tag: "Fed Pivot", weight: 88, tone: "bull", keywords: ["fed", "rate", "treasury", "cpi"] },
   { tag: "Layer 2", weight: 64, tone: "bull", keywords: ["l2", "layer", "tvl", "ethereum"] },
   { tag: "DeFi Revival", weight: 58, tone: "bull", keywords: ["defi", "tvl"] },
-  {
-    tag: "Regulatory Risk",
-    weight: 54,
-    tone: "bear",
-    keywords: ["regulator", "scrutiny", "probe", "eu"],
-  },
-  {
-    tag: "Altseason",
-    weight: 42,
-    tone: "bull",
-    keywords: ["altcoin", "solana", "sol", "chainlink", "link"],
-  },
+  { tag: "Regulatory Risk", weight: 54, tone: "bear", keywords: ["regulator", "scrutiny", "probe", "eu"] },
+  { tag: "Altseason", weight: 42, tone: "bull", keywords: ["altcoin", "solana", "sol", "chainlink", "link"] },
   { tag: "CBDC", weight: 36, tone: "bear", keywords: ["cbdc", "central bank"] },
   { tag: "Mining Difficulty", weight: 30, tone: "neutral", keywords: ["mining", "hashrate"] },
   { tag: "RWA", weight: 48, tone: "bull", keywords: ["rwa", "tokenization", "real-world"] },
@@ -97,66 +82,12 @@ const spark = (seed: number, dir: number) =>
   });
 
 export const ASSETS: AssetSent[] = [
-  {
-    asset: "BTC",
-    social: 82,
-    news: 78,
-    onchain: 72,
-    overall: 77,
-    trend: "up",
-    signal: "BULLISH",
-    spark: spark(1, 0.6),
-  },
-  {
-    asset: "ETH",
-    social: 71,
-    news: 74,
-    onchain: 68,
-    overall: 71,
-    trend: "flat",
-    signal: "BULLISH",
-    spark: spark(2, 0.1),
-  },
-  {
-    asset: "SOL",
-    social: 88,
-    news: 71,
-    onchain: 65,
-    overall: 75,
-    trend: "upup",
-    signal: "BULLISH",
-    spark: spark(3, 1.1),
-  },
-  {
-    asset: "BNB",
-    social: 54,
-    news: 58,
-    onchain: 61,
-    overall: 58,
-    trend: "flat",
-    signal: "NEUTRAL",
-    spark: spark(4, 0),
-  },
-  {
-    asset: "LINK",
-    social: 67,
-    news: 62,
-    onchain: 59,
-    overall: 63,
-    trend: "up",
-    signal: "BULLISH",
-    spark: spark(5, 0.4),
-  },
-  {
-    asset: "AVAX",
-    social: 49,
-    news: 52,
-    onchain: 55,
-    overall: 52,
-    trend: "down",
-    signal: "NEUTRAL",
-    spark: spark(6, -0.5),
-  },
+  { asset: "BTC", social: 82, news: 78, onchain: 72, overall: 77, trend: "up", signal: "BULLISH", spark: spark(1, 0.6) },
+  { asset: "ETH", social: 71, news: 74, onchain: 68, overall: 71, trend: "flat", signal: "BULLISH", spark: spark(2, 0.1) },
+  { asset: "SOL", social: 88, news: 71, onchain: 65, overall: 75, trend: "upup", signal: "BULLISH", spark: spark(3, 1.1) },
+  { asset: "BNB", social: 54, news: 58, onchain: 61, overall: 58, trend: "flat", signal: "NEUTRAL", spark: spark(4, 0) },
+  { asset: "LINK", social: 67, news: 62, onchain: 59, overall: 63, trend: "up", signal: "BULLISH", spark: spark(5, 0.4) },
+  { asset: "AVAX", social: 49, news: 52, onchain: 55, overall: 52, trend: "down", signal: "NEUTRAL", spark: spark(6, -0.5) },
 ];
 
 export const TIMELINE = Array.from({ length: 7 * 6 }, (_, i) => {
@@ -197,79 +128,12 @@ export type NewsItem = {
 };
 
 export const NEWS: NewsItem[] = [
-  {
-    time: "14:42",
-    source: "Bloomberg",
-    headline: "BlackRock spot ETF posts $420M daily inflow — record week",
-    tone: "POSITIVE",
-    stars: 5,
-    category: "Crypto",
-    assets: ["BTC"],
-    highImpact: true,
-  },
-  {
-    time: "13:18",
-    source: "Reuters",
-    headline: "Fed minutes signal rate pause likely in Q3",
-    tone: "POSITIVE",
-    stars: 4,
-    category: "Macro",
-    assets: ["BTC", "ETH"],
-    highImpact: true,
-  },
-  {
-    time: "12:05",
-    source: "CoinDesk",
-    headline: "Solana network records all-time-high active addresses",
-    tone: "POSITIVE",
-    stars: 4,
-    category: "Technical",
-    assets: ["SOL"],
-  },
-  {
-    time: "11:30",
-    source: "FT",
-    headline: "EU regulator opens probe into stablecoin reserves",
-    tone: "NEGATIVE",
-    stars: 3,
-    category: "Regulatory",
-    assets: ["USDT"],
-    highImpact: true,
-  },
-  {
-    time: "10:47",
-    source: "The Block",
-    headline: "Ethereum L2 TVL crosses $42B mark",
-    tone: "POSITIVE",
-    stars: 3,
-    category: "Crypto",
-    assets: ["ETH"],
-  },
-  {
-    time: "09:22",
-    source: "WSJ",
-    headline: "US Treasury yields slip ahead of CPI print",
-    tone: "NEUTRAL",
-    stars: 2,
-    category: "Macro",
-    assets: ["BTC"],
-  },
-  {
-    time: "08:10",
-    source: "Decrypt",
-    headline: "Chainlink CCIP integrates with major bank pilot",
-    tone: "POSITIVE",
-    stars: 3,
-    category: "Crypto",
-    assets: ["LINK"],
-  },
-  {
-    time: "07:34",
-    source: "Cointelegraph",
-    headline: "BNB Chain hard fork scheduled for next week",
-    tone: "NEUTRAL",
-    stars: 2,
-    category: "Technical",
-    assets: ["BNB"],
-  },
+  { time: "14:42", source: "Bloomberg", headline: "BlackRock spot ETF posts $420M daily inflow — record week", tone: "POSITIVE", stars: 5, category: "Crypto", assets: ["BTC"], highImpact: true },
+  { time: "13:18", source: "Reuters", headline: "Fed minutes signal rate pause likely in Q3", tone: "POSITIVE", stars: 4, category: "Macro", assets: ["BTC", "ETH"], highImpact: true },
+  { time: "12:05", source: "CoinDesk", headline: "Solana network records all-time-high active addresses", tone: "POSITIVE", stars: 4, category: "Technical", assets: ["SOL"] },
+  { time: "11:30", source: "FT", headline: "EU regulator opens probe into stablecoin reserves", tone: "NEGATIVE", stars: 3, category: "Regulatory", assets: ["USDT"], highImpact: true },
+  { time: "10:47", source: "The Block", headline: "Ethereum L2 TVL crosses $42B mark", tone: "POSITIVE", stars: 3, category: "Crypto", assets: ["ETH"] },
+  { time: "09:22", source: "WSJ", headline: "US Treasury yields slip ahead of CPI print", tone: "NEUTRAL", stars: 2, category: "Macro", assets: ["BTC"] },
+  { time: "08:10", source: "Decrypt", headline: "Chainlink CCIP integrates with major bank pilot", tone: "POSITIVE", stars: 3, category: "Crypto", assets: ["LINK"] },
+  { time: "07:34", source: "Cointelegraph", headline: "BNB Chain hard fork scheduled for next week", tone: "NEUTRAL", stars: 2, category: "Technical", assets: ["BNB"] },
 ];

@@ -16,11 +16,7 @@ export const Route = createFileRoute("/_authenticated/sentiment")({
   head: () => ({
     meta: [
       { title: "Sentiment AI — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Multi-source sentiment intelligence: social, news, on-chain and narrative tracking across major crypto assets.",
-      },
+      { name: "description", content: "Multi-source sentiment intelligence: social, news, on-chain and narrative tracking across major crypto assets." },
     ],
   }),
   component: SentimentPage,
@@ -45,12 +41,8 @@ function SentimentPage() {
           <SentimentShiftAlert />
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
-            <div className="lg:col-span-1">
-              <SentimentGauge />
-            </div>
-            <div className="lg:col-span-4">
-              <MacroCards />
-            </div>
+            <div className="lg:col-span-1"><SentimentGauge /></div>
+            <div className="lg:col-span-4"><MacroCards /></div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">

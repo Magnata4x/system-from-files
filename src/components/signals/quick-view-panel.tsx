@@ -39,23 +39,14 @@ export function QuickViewPanel() {
   return (
     <aside className="w-[320px] shrink-0 border-l border-border bg-card/40 sticky top-[140px] self-start h-[calc(100vh-140px)] overflow-y-auto">
       <div className="flex items-center justify-between p-3 border-b border-border sticky top-0 bg-card/95 backdrop-blur">
-        <span className="text-[12px] uppercase tracking-wide text-muted-foreground">
-          Quick view
-        </span>
+        <span className="text-[12px] uppercase tracking-wide text-muted-foreground">Quick view</span>
         <div className="flex gap-1">
           {pinnedId && (
-            <button
-              onClick={() => pin(null)}
-              className="size-6 rounded text-muted-foreground hover:text-foreground"
-              title="Unpin"
-            >
+            <button onClick={() => pin(null)} className="size-6 rounded text-muted-foreground hover:text-foreground" title="Unpin">
               <X className="size-3.5 mx-auto" />
             </button>
           )}
-          <button
-            onClick={() => setCollapsed(true)}
-            className="size-6 rounded text-muted-foreground hover:text-foreground"
-          >
+          <button onClick={() => setCollapsed(true)} className="size-6 rounded text-muted-foreground hover:text-foreground">
             <ChevronRight className="size-3.5 mx-auto" />
           </button>
         </div>
@@ -82,9 +73,7 @@ export function QuickViewPanel() {
               >
                 {signal.direction}
               </span>
-              <div className="ml-auto">
-                <ScoreBadge score={signal.score} />
-              </div>
+              <div className="ml-auto"><ScoreBadge score={signal.score} /></div>
             </div>
 
             <div className="text-[11px] text-muted-foreground">
@@ -100,9 +89,7 @@ export function QuickViewPanel() {
             </div>
 
             <div>
-              <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">
-                AI Reasoning
-              </div>
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">AI Reasoning</div>
               <ul className="space-y-1.5">
                 {reasonsByDir[signal.direction].map((r, i) => (
                   <li key={i} className="flex gap-2 text-[12px] text-foreground">
@@ -159,9 +146,7 @@ function Row({ label, value, color }: { label: string; value: string; color?: st
   return (
     <div className="flex items-center justify-between text-[12px]">
       <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums font-medium" style={{ color: color ?? "var(--foreground)" }}>
-        {value}
-      </span>
+      <span className="tabular-nums font-medium" style={{ color: color ?? "var(--foreground)" }}>{value}</span>
     </div>
   );
 }

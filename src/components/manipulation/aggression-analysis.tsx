@@ -1,16 +1,5 @@
 import { AGGRESSION } from "@/lib/manipulation-data";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceArea,
-  Cell,
-} from "recharts";
+import { Area, AreaChart, Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea, Cell } from "recharts";
 
 export function AggressionAnalysis() {
   const anomalies = AGGRESSION.filter((d) => d.anomaly).map((d) => d.t);
@@ -35,27 +24,9 @@ export function AggressionAnalysis() {
                 <stop offset="100%" stopColor="#22d3ee" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <XAxis
-              dataKey="t"
-              tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
-              axisLine={false}
-              tickLine={false}
-              interval={5}
-            />
-            <YAxis
-              tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-              width={28}
-            />
-            <Tooltip
-              contentStyle={{
-                background: "var(--popover)",
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-                fontSize: 12,
-              }}
-            />
+            <XAxis dataKey="t" tick={{ fill: "var(--muted-foreground)", fontSize: 9 }} axisLine={false} tickLine={false} interval={5} />
+            <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
+            <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
             {anomalies.map((t) => (
               <ReferenceArea
                 key={t}
@@ -67,13 +38,7 @@ export function AggressionAnalysis() {
                 label={{ value: "⚡ Anomaly", fill: "#fbbf24", fontSize: 9, position: "insideTop" }}
               />
             ))}
-            <Area
-              type="monotone"
-              dataKey="aggression"
-              stroke="#22d3ee"
-              strokeWidth={2}
-              fill="url(#aggFill)"
-            />
+            <Area type="monotone" dataKey="aggression" stroke="#22d3ee" strokeWidth={2} fill="url(#aggFill)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -81,34 +46,12 @@ export function AggressionAnalysis() {
       <div className="h-[100px] mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={AGGRESSION} margin={{ left: 0, right: 12 }}>
-            <XAxis
-              dataKey="t"
-              tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
-              axisLine={false}
-              tickLine={false}
-              interval={5}
-            />
-            <YAxis
-              tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-              width={28}
-            />
-            <Tooltip
-              contentStyle={{
-                background: "var(--popover)",
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-                fontSize: 12,
-              }}
-            />
+            <XAxis dataKey="t" tick={{ fill: "var(--muted-foreground)", fontSize: 9 }} axisLine={false} tickLine={false} interval={5} />
+            <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
+            <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
             <Bar dataKey="delta" radius={[2, 2, 0, 0]}>
               {AGGRESSION.map((d, i) => (
-                <Cell
-                  key={i}
-                  fill={d.delta >= 0 ? "#10b981" : "#ef4444"}
-                  fillOpacity={d.anomaly ? 1 : 0.75}
-                />
+                <Cell key={i} fill={d.delta >= 0 ? "#10b981" : "#ef4444"} fillOpacity={d.anomaly ? 1 : 0.75} />
               ))}
             </Bar>
           </BarChart>

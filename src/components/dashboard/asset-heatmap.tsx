@@ -19,18 +19,8 @@ function fmtPrice(price: number): string {
 }
 
 const HEATMAP_SYMBOLS = [
-  "BTC",
-  "ETH",
-  "SOL",
-  "BNB",
-  "XRP",
-  "AVAX",
-  "LINK",
-  "MATIC",
-  "DOT",
-  "UNI",
-  "ADA",
-  "NEAR",
+  "BTC", "ETH", "SOL", "BNB", "XRP", "AVAX",
+  "LINK", "MATIC", "DOT", "UNI", "ADA", "NEAR",
 ];
 
 export function AssetHeatmap() {
@@ -62,13 +52,7 @@ export function AssetHeatmap() {
       </div>
       <div className="grid grid-cols-4 gap-2">
         {assets.map((a, i) => (
-          <Cell
-            key={a.symbol}
-            asset={a}
-            pulseTick={pulseTick}
-            index={i}
-            loading={loading && !a.loaded}
-          />
+          <Cell key={a.symbol} asset={a} pulseTick={pulseTick} index={i} loading={loading && !a.loaded} />
         ))}
       </div>
     </div>
@@ -81,14 +65,7 @@ function Cell({
   index,
   loading,
 }: {
-  asset: {
-    symbol: string;
-    name: string;
-    price: number;
-    change: number;
-    volume: number;
-    loaded: boolean;
-  };
+  asset: { symbol: string; name: string; price: number; change: number; volume: number; loaded: boolean };
   pulseTick: number;
   index: number;
   loading: boolean;
@@ -108,12 +85,11 @@ function Cell({
     };
   }, [pulseTick, index]);
 
-  const volFormatted =
-    asset.volume >= 1e9
-      ? `$${(asset.volume / 1e9).toFixed(1)}B`
-      : asset.volume >= 1e6
-        ? `$${(asset.volume / 1e6).toFixed(1)}M`
-        : `$${asset.volume.toLocaleString()}`;
+  const volFormatted = asset.volume >= 1e9
+    ? `$${(asset.volume / 1e9).toFixed(1)}B`
+    : asset.volume >= 1e6
+      ? `$${(asset.volume / 1e6).toFixed(1)}M`
+      : `$${asset.volume.toLocaleString()}`;
 
   if (loading) {
     return (
@@ -134,24 +110,17 @@ function Cell({
         boxShadow: bright ? `0 0 16px color-mix(in oklab, ${bg} 70%, transparent)` : "none",
       }}
     >
-      <div className="text-[13px] font-semibold" style={{ color: text }}>
-        {asset.symbol}
-      </div>
+      <div className="text-[13px] font-semibold" style={{ color: text }}>{asset.symbol}</div>
       <div className="text-[11px] tabular-nums mt-0.5" style={{ color: text }}>
-        {up ? "+" : ""}
-        {asset.change.toFixed(2)}%
+        {up ? "+" : ""}{asset.change.toFixed(2)}%
       </div>
       <div className="text-[10px] text-foreground/60 tabular-nums mt-0.5">
         {fmtPrice(asset.price)}
       </div>
       <div className="absolute z-20 hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 rounded-lg border border-border bg-card p-2.5 shadow-xl text-left">
         <div className="text-[12px] font-medium text-foreground">{asset.name}</div>
-        <div className="text-[11px] text-muted-foreground">
-          Price <span className="text-foreground tabular-nums">{fmtPrice(asset.price)}</span>
-        </div>
-        <div className="text-[11px] text-muted-foreground">
-          24h Vol <span className="text-foreground">{volFormatted}</span>
-        </div>
+        <div className="text-[11px] text-muted-foreground">Price <span className="text-foreground tabular-nums">{fmtPrice(asset.price)}</span></div>
+        <div className="text-[11px] text-muted-foreground">24h Vol <span className="text-foreground">{volFormatted}</span></div>
       </div>
     </div>
   );

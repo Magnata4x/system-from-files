@@ -44,24 +44,17 @@ export const useTourStore = create<State>()(
       goToStep: (i) => set({ activeStep: Math.max(0, i) }),
       completeTour: (id) =>
         set((s) => ({
-          completedTours: s.completedTours.includes(id)
-            ? s.completedTours
-            : [...s.completedTours, id],
+          completedTours: s.completedTours.includes(id) ? s.completedTours : [...s.completedTours, id],
           activeTour: null,
           activeStep: 0,
           paused: false,
         })),
       setSkipAll: (v) => set({ skipAll: v, activeTour: v ? null : get().activeTour }),
       markWelcomeSeen: () => set({ welcomeSeen: true }),
-      resetTour: (id) => set((s) => ({ completedTours: s.completedTours.filter((c) => c !== id) })),
+      resetTour: (id) =>
+        set((s) => ({ completedTours: s.completedTours.filter((c) => c !== id) })),
       resetAll: () =>
-        set({
-          completedTours: [],
-          skipAll: false,
-          welcomeSeen: false,
-          activeTour: null,
-          activeStep: 0,
-        }),
+        set({ completedTours: [], skipAll: false, welcomeSeen: false, activeTour: null, activeStep: 0 }),
     }),
     {
       name: "aisignalradar_tour",

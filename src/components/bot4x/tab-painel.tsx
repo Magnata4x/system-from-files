@@ -2,11 +2,7 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Zap, Lock } from "lucide-react";
 import {
-  useBot4xStore,
-  selectActiveCapital,
-  selectSlotSize,
-  MAX_SLOTS,
-  RISK_PER_SLOT,
+  useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT,
   REAL_MODE_ENABLED as REAL_MODE_FLAG,
 } from "@/lib/bot4x-store";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
@@ -45,9 +41,7 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
-      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">
-        Modo de execução
-      </div>
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3">Modo de execução</div>
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => setMode("DEMO")}
@@ -60,13 +54,9 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
           <div className="flex items-center gap-2">
             <Shield className="size-4 text-[#1D9E75]" />
             <span className="text-[14px] font-semibold text-foreground">DEMO MODE</span>
-            {mode === "DEMO" && (
-              <span className="ml-auto text-[10px] font-bold text-[#1D9E75]">● ATIVO</span>
-            )}
+            {mode === "DEMO" && <span className="ml-auto text-[10px] font-bold text-[#1D9E75]">● ATIVO</span>}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Simulação. Nenhuma ordem real é enviada.
-          </p>
+          <p className="text-[11px] text-muted-foreground mt-1">Simulação. Nenhuma ordem real é enviada.</p>
         </button>
 
         <button
@@ -76,19 +66,16 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
             !REAL_MODE_ENABLED
               ? "opacity-50 cursor-not-allowed border border-[#E24B4A33] bg-transparent"
               : mode === "REAL"
-                ? "bg-[color-mix(in_oklab,#E24B4A_22%,transparent)] border border-[#E24B4A]"
-                : "bg-transparent border border-[#E24B4A55] hover:border-[#E24B4A]"
+              ? "bg-[color-mix(in_oklab,#E24B4A_22%,transparent)] border border-[#E24B4A]"
+              : "bg-transparent border border-[#E24B4A55] hover:border-[#E24B4A]"
           }`}
         >
           <div className="flex items-center gap-2">
-            {REAL_MODE_ENABLED ? (
-              <ShieldAlert className="size-4 text-[#E24B4A]" />
-            ) : (
-              <Lock className="size-4 text-[#E24B4A66]" />
-            )}
-            <span
-              className={`text-[14px] font-semibold ${REAL_MODE_ENABLED ? "text-[#E24B4A]" : "text-[#E24B4A66]"}`}
-            >
+            {REAL_MODE_ENABLED
+              ? <ShieldAlert className="size-4 text-[#E24B4A]" />
+              : <Lock className="size-4 text-[#E24B4A66]" />
+            }
+            <span className={`text-[14px] font-semibold ${REAL_MODE_ENABLED ? "text-[#E24B4A]" : "text-[#E24B4A66]"}`}>
               REAL MODE
             </span>
             {mode === "REAL" && REAL_MODE_ENABLED && (
@@ -113,15 +100,8 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
           <RealModeModal
             text={text}
             setText={setText}
-            onCancel={() => {
-              setConfirm(false);
-              setText("");
-            }}
-            onConfirm={() => {
-              setMode("REAL");
-              setConfirm(false);
-              setText("");
-            }}
+            onCancel={() => { setConfirm(false); setText(""); }}
+            onConfirm={() => { setMode("REAL"); setConfirm(false); setText(""); }}
           />
         )}
       </AnimatePresence>
@@ -129,32 +109,20 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
   );
 }
 
-function RealModeModal({
-  text,
-  setText,
-  onCancel,
-  onConfirm,
-}: {
-  text: string;
-  setText: (s: string) => void;
-  onCancel: () => void;
-  onConfirm: () => void;
+function RealModeModal({ text, setText, onCancel, onConfirm }: {
+  text: string; setText: (s: string) => void; onCancel: () => void; onConfirm: () => void;
 }) {
   const ok = text.trim().toUpperCase() === "ATIVAR REAL";
   return (
     <>
       <motion.div
         className="fixed inset-0 bg-black/70 z-[70]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onCancel}
       />
       <motion.div
         className="fixed inset-0 z-[71] flex items-center justify-center p-4"
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
       >
         <div className="w-full max-w-md rounded-xl bg-[#111318] border border-[#E24B4A] shadow-2xl">
           <div className="px-5 pt-4 pb-3 border-b border-border flex items-start gap-3">
@@ -163,14 +131,9 @@ function RealModeModal({
             </div>
             <div className="flex-1">
               <h3 className="text-[15px] font-semibold text-foreground">Ativar REAL MODE</h3>
-              <p className="text-[12px] text-muted-foreground mt-0.5">
-                Esta ação permite execução de ordens reais.
-              </p>
+              <p className="text-[12px] text-muted-foreground mt-0.5">Esta ação permite execução de ordens reais.</p>
             </div>
-            <button
-              onClick={onCancel}
-              className="size-7 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground"
-            >
+            <button onClick={onCancel} className="size-7 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground">
               <X className="size-4" />
             </button>
           </div>
@@ -185,9 +148,7 @@ function RealModeModal({
               </ul>
             </div>
             <div>
-              <label className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                Digite "ATIVAR REAL" para confirmar
-              </label>
+              <label className="text-[11px] uppercase tracking-wide text-muted-foreground">Digite "ATIVAR REAL" para confirmar</label>
               <input
                 autoFocus
                 value={text}
@@ -198,10 +159,7 @@ function RealModeModal({
             </div>
           </div>
           <div className="px-5 pb-4 flex gap-2 justify-end">
-            <button
-              onClick={onCancel}
-              className="h-9 px-4 rounded-md text-[13px] font-medium bg-secondary text-foreground hover:bg-secondary/70"
-            >
+            <button onClick={onCancel} className="h-9 px-4 rounded-md text-[13px] font-medium bg-secondary text-foreground hover:bg-secondary/70">
               Cancelar
             </button>
             <button
@@ -230,9 +188,7 @@ function CapitalConfig() {
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
-      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-        Capital total disponível
-      </div>
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Capital total disponível</div>
       <div className="relative">
         <input
           type="number"
@@ -240,20 +196,16 @@ function CapitalConfig() {
           onChange={(e) => setTotal(Number(e.target.value))}
           className="w-full h-10 px-3 pr-16 rounded-md bg-background border border-border text-[16px] font-semibold tabular-nums text-foreground focus:outline-none focus:border-[var(--brand-cyan)]"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">
-          USDT
-        </span>
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-muted-foreground">USDT</span>
       </div>
       <div className="mt-3 text-[12px] text-muted-foreground tabular-nums">
         activeCapital = <span className="text-foreground font-semibold">{fmt(active)} USDT</span>
-        {" · "}Slot size: <span className="text-foreground font-semibold">{fmt(slot)} USDT</span>{" "}
-        (÷3)
+        {" · "}Slot size: <span className="text-foreground font-semibold">{fmt(slot)} USDT</span> (÷3)
       </div>
       {btcPrice > 0 && (
         <div className="mt-2 text-[11px] text-muted-foreground tabular-nums">
           BTC @ <span className="text-foreground font-medium">${fmt(btcPrice)}</span>
-          {" → "}Equivalente:{" "}
-          <span className="text-foreground font-medium">{btcEq.toFixed(4)} BTC</span>
+          {" → "}Equivalente: <span className="text-foreground font-medium">{btcEq.toFixed(4)} BTC</span>
         </div>
       )}
     </section>
@@ -266,30 +218,19 @@ function AllocationConfig() {
   const setPct = useBot4xStore((s) => s.setAllocationPct);
   const usesFullCapital = total < 100;
   return (
-    <section
-      className={`rounded-lg border border-border bg-card p-4 ${usesFullCapital ? "opacity-70" : ""}`}
-    >
+    <section className={`rounded-lg border border-border bg-card p-4 ${usesFullCapital ? "opacity-70" : ""}`}>
       <div className="flex justify-between items-baseline mb-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-          Allocation %
-        </span>
-        <span className="text-[16px] font-semibold tabular-nums text-foreground">
-          {usesFullCapital ? "100%" : `${pct}%`}
-        </span>
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Allocation %</span>
+        <span className="text-[16px] font-semibold tabular-nums text-foreground">{usesFullCapital ? "100%" : `${pct}%`}</span>
       </div>
       <input
-        type="range"
-        min={1}
-        max={100}
-        value={usesFullCapital ? 100 : pct}
+        type="range" min={1} max={100} value={usesFullCapital ? 100 : pct}
         onChange={(e) => setPct(Number(e.target.value))}
         disabled={usesFullCapital}
         className="w-full accent-[var(--brand-cyan)] disabled:cursor-not-allowed"
       />
       <div className="flex justify-between text-[10px] text-muted-foreground mt-1 tabular-nums">
-        <span>1%</span>
-        <span>50%</span>
-        <span>100%</span>
+        <span>1%</span><span>50%</span><span>100%</span>
       </div>
       {usesFullCapital && (
         <p className="mt-2 text-[11px] text-muted-foreground">
@@ -326,19 +267,9 @@ function LeverageSelector() {
               animate={{ scale: active ? 1.06 : 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 20 }}
               className={`h-10 rounded-md text-[13px] font-semibold tabular-nums transition-[background,border-color,color,box-shadow] duration-300 ease-out ${
-                active
-                  ? "text-white"
-                  : "bg-background border border-border text-muted-foreground hover:text-foreground hover:border-border"
+                active ? "text-white" : "bg-background border border-border text-muted-foreground hover:text-foreground hover:border-border"
               }`}
-              style={
-                active
-                  ? {
-                      background: r.color,
-                      borderColor: r.color,
-                      boxShadow: `0 0 0 1px ${r.color}, 0 4px 14px -2px ${r.color}66`,
-                    }
-                  : undefined
-              }
+              style={active ? { background: r.color, borderColor: r.color, boxShadow: `0 0 0 1px ${r.color}, 0 4px 14px -2px ${r.color}66` } : undefined}
             >
               {n}
             </motion.button>
@@ -348,8 +279,7 @@ function LeverageSelector() {
 
       <motion.div
         key={lev}
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
         className={`mt-4 rounded-md p-3 border ${pulse ? "animate-pulse" : ""}`}
         style={{
           background: `color-mix(in oklab, ${risk.color} 16%, transparent)`,
@@ -357,18 +287,10 @@ function LeverageSelector() {
         }}
       >
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <span className="text-[12px] font-bold tracking-wide" style={{ color: risk.color }}>
-            {risk.label}
-          </span>
+          <span className="text-[12px] font-bold tracking-wide" style={{ color: risk.color }}>{risk.label}</span>
           <div className="text-[11px] tabular-nums text-foreground/85">
-            SL:{" "}
-            <span className="font-semibold" style={{ color: "#E24B4A" }}>
-              {sltp.sl}%
-            </span>
-            {" · "}TP:{" "}
-            <span className="font-semibold" style={{ color: "#1D9E75" }}>
-              {sltp.tp}%
-            </span>
+            SL: <span className="font-semibold" style={{ color: "#E24B4A" }}>{sltp.sl}%</span>
+            {" · "}TP: <span className="font-semibold" style={{ color: "#1D9E75" }}>{sltp.tp}%</span>
           </div>
         </div>
         <p className="text-[12px] text-foreground/80 mt-1.5">{risk.diagnosis}</p>
@@ -391,45 +313,34 @@ function CircuitBreakerLoss() {
           <div className="text-[12px] font-semibold text-foreground">Circuit Breaker · Perda</div>
           <div className="text-[10px] text-muted-foreground">Limite diário: -1.5% (≈ 3 SLs)</div>
         </div>
-        <span
-          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-            triggered
-              ? "bg-[color-mix(in_oklab,#E24B4A_25%,transparent)] text-[#FF9B9A] border border-[#E24B4A]"
-              : "bg-[color-mix(in_oklab,#1D9E75_22%,transparent)] text-[#7AD9B4] border border-[#1D9E75]"
-          }`}
-        >
+        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+          triggered
+            ? "bg-[color-mix(in_oklab,#E24B4A_25%,transparent)] text-[#FF9B9A] border border-[#E24B4A]"
+            : "bg-[color-mix(in_oklab,#1D9E75_22%,transparent)] text-[#7AD9B4] border border-[#1D9E75]"
+        }`}>
           {triggered ? "TRIGGERED" : "ARMED"}
         </span>
       </div>
       <div className="flex items-baseline justify-between mt-2">
         <span className="text-[11px] text-muted-foreground">dailyPnL</span>
-        <span
-          className="text-[16px] font-semibold tabular-nums"
-          style={{ color: pnl < 0 ? "#E24B4A" : "#1D9E75" }}
-        >
-          {pnl >= 0 ? "+" : ""}
-          {pnl.toFixed(2)}%
+        <span className="text-[16px] font-semibold tabular-nums" style={{ color: pnl < 0 ? "#E24B4A" : "#1D9E75" }}>
+          {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
         </span>
       </div>
       <div className="mt-2 h-2 rounded-full bg-secondary overflow-hidden">
         <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${fillPct}%` }}
+          initial={{ width: 0 }} animate={{ width: `${fillPct}%` }}
           transition={{ duration: 0.6 }}
-          className="h-full"
-          style={{ background: "#E24B4A" }}
+          className="h-full" style={{ background: "#E24B4A" }}
         />
       </div>
-      <div className="text-[10px] text-muted-foreground mt-1.5">
-        Equivale a 3 stop-losses consecutivos.
-      </div>
+      <div className="text-[10px] text-muted-foreground mt-1.5">Equivale a 3 stop-losses consecutivos.</div>
       {IS_DEV && (
         <button
           onClick={() => useBot4xStore.setState({ dailyPnlPct: triggered ? -0.42 : -1.6 })}
           className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium text-[#FF9B9A] hover:text-white border border-[#E24B4A55] hover:border-[#E24B4A] rounded px-2 py-1 transition-colors"
         >
-          <Zap className="size-3" /> {triggered ? "Resetar" : "Simular acionamento"}{" "}
-          <span className="opacity-50">· dev</span>
+          <Zap className="size-3" /> {triggered ? "Resetar" : "Simular acionamento"} <span className="opacity-50">· dev</span>
         </button>
       )}
     </section>
@@ -458,26 +369,19 @@ function CircuitBreakerProfit() {
           <div className="text-[12px] font-semibold text-foreground">Trailing Lock · Lucro</div>
           <div className="text-[10px] text-muted-foreground">Ativa em +4% · trava em +3%</div>
         </div>
-        <span
-          className="px-2 py-0.5 rounded text-[10px] font-bold border"
-          style={{ background: cur.bg, color: cur.color, borderColor: cur.color }}
-        >
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold border" style={{ background: cur.bg, color: cur.color, borderColor: cur.color }}>
           {state}
         </span>
       </div>
       <div className="flex items-baseline justify-between mt-2">
         <span className="text-[11px] text-muted-foreground">Peak hoje</span>
-        <span className="text-[16px] font-semibold tabular-nums text-[#1D9E75]">
-          +{peak.toFixed(2)}%
-        </span>
+        <span className="text-[16px] font-semibold tabular-nums text-[#1D9E75]">+{peak.toFixed(2)}%</span>
       </div>
       <div className="mt-2 h-2 rounded-full bg-secondary overflow-hidden">
         <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${fill}%` }}
+          initial={{ width: 0 }} animate={{ width: `${fill}%` }}
           transition={{ duration: 0.6 }}
-          className="h-full"
-          style={{ background: "#1D9E75" }}
+          className="h-full" style={{ background: "#1D9E75" }}
         />
       </div>
       <div className="text-[10px] text-muted-foreground mt-1.5">
@@ -485,13 +389,10 @@ function CircuitBreakerProfit() {
       </div>
       {IS_DEV && (
         <button
-          onClick={() =>
-            useBot4xStore.setState({ trailingPeakPct: state !== "INACTIVE" ? 0 : 4.2 })
-          }
+          onClick={() => useBot4xStore.setState({ trailingPeakPct: state !== "INACTIVE" ? 0 : 4.2 })}
           className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium text-[#7AD9B4] hover:text-white border border-[#1D9E7555] hover:border-[#1D9E75] rounded px-2 py-1 transition-colors"
         >
-          <Zap className="size-3" /> {state !== "INACTIVE" ? "Resetar" : "Simular acionamento"}{" "}
-          <span className="opacity-50">· dev</span>
+          <Zap className="size-3" /> {state !== "INACTIVE" ? "Resetar" : "Simular acionamento"} <span className="opacity-50">· dev</span>
         </button>
       )}
     </section>
@@ -511,13 +412,9 @@ function OrderGrid() {
   return (
     <section className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-          Ordens ativas
-        </span>
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Ordens ativas</span>
         <span className="text-[11px] text-muted-foreground tabular-nums">
-          {usesSingleOperation
-            ? `1 operação · ${fmt(slot)} USDT`
-            : `${MAX_SLOTS} slots · ${fmt(slot)} USDT cada`}
+          {usesSingleOperation ? `1 operação · ${fmt(slot)} USDT` : `${MAX_SLOTS} slots · ${fmt(slot)} USDT cada`}
         </span>
       </div>
       <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px]">
@@ -526,17 +423,9 @@ function OrderGrid() {
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
           {usesSingleOperation ? (
-            <>
-              Capital por operação: <span className="text-foreground font-semibold">100%</span>
-            </>
+            <>Capital por operação: <span className="text-foreground font-semibold">100%</span></>
           ) : (
-            <>
-              Risco por slot:{" "}
-              <span className="text-foreground font-semibold">
-                {(RISK_PER_SLOT * 100).toFixed(0)}%
-              </span>{" "}
-              do capital ativo
-            </>
+            <>Risco por slot: <span className="text-foreground font-semibold">{(RISK_PER_SLOT * 100).toFixed(0)}%</span> do capital ativo</>
           )}
         </span>
         <span className="rounded-md border border-border bg-background/50 px-2 py-1 tabular-nums text-muted-foreground">
@@ -544,18 +433,14 @@ function OrderGrid() {
         </span>
       </div>
       <p className="mb-3 text-[10px] leading-snug text-muted-foreground/80 italic">
-        Simulação para fins educacionais. Não constitui recomendação financeira, de investimento ou
-        de trading. Opere por sua conta e risco.
+        Simulação para fins educacionais. Não constitui recomendação financeira, de investimento ou de trading. Opere por sua conta e risco.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {slots.map((i) => {
           const o = orders[i];
           if (!o) {
             return (
-              <div
-                key={i}
-                className="h-28 rounded-md border border-dashed border-border flex items-center justify-center text-[11px] text-muted-foreground"
-              >
+              <div key={i} className="h-28 rounded-md border border-dashed border-border flex items-center justify-center text-[11px] text-muted-foreground">
                 Slot livre
               </div>
             );
@@ -564,10 +449,7 @@ function OrderGrid() {
           const pnlColor = o.pnlPct >= 0 ? "#1D9E75" : "#E24B4A";
           const min = Math.floor((Date.now() - o.openedAt) / 60000);
           return (
-            <div
-              key={o.id}
-              className="h-28 rounded-md border border-border bg-background p-2 relative"
-            >
+            <div key={o.id} className="h-28 rounded-md border border-border bg-background p-2 relative">
               <button
                 onClick={() => close(o.id)}
                 className="absolute top-2 right-2 size-6 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground"
@@ -576,38 +458,19 @@ function OrderGrid() {
               </button>
               <div className="flex items-center gap-2">
                 <span className="text-[13px] font-semibold text-foreground">{o.pair}</span>
-                <span
-                  className="px-1.5 py-0.5 rounded text-[10px] font-bold"
-                  style={{
-                    background: `color-mix(in oklab, ${sideColor} 22%, transparent)`,
-                    color: sideColor,
-                  }}
-                >
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: `color-mix(in oklab, ${sideColor} 22%, transparent)`, color: sideColor }}>
                   {o.side}
                 </span>
               </div>
               <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] tabular-nums">
-                <div>
-                  <div className="text-muted-foreground">Entry</div>
-                  <div className="text-foreground font-semibold">{fmt(o.entry)}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">SL</div>
-                  <div className="text-[#E24B4A]">{fmt(o.sl)}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">TP</div>
-                  <div className="text-[#1D9E75]">{fmt(o.tp)}</div>
-                </div>
+                <div><div className="text-muted-foreground">Entry</div><div className="text-foreground font-semibold">{fmt(o.entry)}</div></div>
+                <div><div className="text-muted-foreground">SL</div><div className="text-[#E24B4A]">{fmt(o.sl)}</div></div>
+                <div><div className="text-muted-foreground">TP</div><div className="text-[#1D9E75]">{fmt(o.tp)}</div></div>
               </div>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-[10px] text-muted-foreground">{min}m</span>
-                <span
-                  className="text-[13px] font-semibold tabular-nums"
-                  style={{ color: pnlColor }}
-                >
-                  {o.pnlPct >= 0 ? "+" : ""}
-                  {o.pnlPct.toFixed(2)}%
+                <span className="text-[13px] font-semibold tabular-nums" style={{ color: pnlColor }}>
+                  {o.pnlPct >= 0 ? "+" : ""}{o.pnlPct.toFixed(2)}%
                 </span>
               </div>
             </div>
@@ -644,17 +507,12 @@ function TodayPnlRow() {
       <div className="rounded-lg border border-border bg-card px-4 py-3 relative overflow-hidden">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Daily PnL
-            </div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Daily PnL</div>
             <div className="text-[16px] font-semibold tabular-nums mt-1" style={{ color }}>
-              {pnl >= 0 ? "+" : ""}
-              {pnl.toFixed(2)}%
+              {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
             </div>
           </div>
-          <span className="text-[9px] uppercase tracking-wider text-muted-foreground mt-0.5">
-            2h
-          </span>
+          <span className="text-[9px] uppercase tracking-wider text-muted-foreground mt-0.5">2h</span>
         </div>
         <Sparkline points={points} color={color} />
       </div>
@@ -666,16 +524,13 @@ function TodayPnlRow() {
 }
 
 function Sparkline({ points, color }: { points: number[]; color: string }) {
-  const W = 120,
-    H = 28;
+  const W = 120, H = 28;
   const min = Math.min(...points, 0);
   const max = Math.max(...points, 0);
   const range = max - min || 1;
   const step = W / (points.length - 1);
   const norm = (v: number) => H - ((v - min) / range) * H;
-  const d = points
-    .map((v, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${norm(v).toFixed(1)}`)
-    .join(" ");
+  const d = points.map((v, i) => `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${norm(v).toFixed(1)}`).join(" ");
   const area = `${d} L${W},${H} L0,${H} Z`;
   const zeroY = norm(0);
   const gid = `spark-${color.replace("#", "")}`;
@@ -687,24 +542,9 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <line
-        x1="0"
-        x2={W}
-        y1={zeroY}
-        y2={zeroY}
-        stroke="currentColor"
-        strokeOpacity="0.18"
-        strokeDasharray="2 2"
-      />
+      <line x1="0" x2={W} y1={zeroY} y2={zeroY} stroke="currentColor" strokeOpacity="0.18" strokeDasharray="2 2" />
       <path d={area} fill={`url(#${gid})`} />
-      <path
-        d={d}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d={d} fill="none" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={W} cy={norm(points[points.length - 1])} r="1.8" fill={color} />
     </svg>
   );
@@ -714,12 +554,7 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-lg border border-border bg-card px-4 py-3">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div
-        className="text-[16px] font-semibold tabular-nums mt-1"
-        style={{ color: color ?? undefined }}
-      >
-        {value}
-      </div>
+      <div className="text-[16px] font-semibold tabular-nums mt-1" style={{ color: color ?? undefined }}>{value}</div>
     </div>
   );
 }

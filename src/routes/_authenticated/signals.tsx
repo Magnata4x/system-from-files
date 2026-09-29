@@ -20,10 +20,7 @@ export const Route = createFileRoute("/_authenticated/signals")({
   head: () => ({
     meta: [
       { title: "Signal Radar — AISignalRadar" },
-      {
-        name: "description",
-        content: "Live institutional trading signals across crypto, forex, indices, and stocks.",
-      },
+      { name: "description", content: "Live institutional trading signals across crypto, forex, indices, and stocks." },
     ],
   }),
   component: SignalsPage,
@@ -45,12 +42,7 @@ function SignalsPage() {
   const filteredBase = useFilteredSignals();
   const filtered = bot4xOnly
     ? filteredBase.filter(
-        (sig) =>
-          bot4xEligibility(sig, {
-            mode: bot4xMode,
-            profile: bot4xProfile,
-            dailyPnlPct: bot4xPnl,
-          }) === "EXECUTAR",
+        (sig) => bot4xEligibility(sig, { mode: bot4xMode, profile: bot4xProfile, dailyPnlPct: bot4xPnl }) === "EXECUTAR",
       )
     : filteredBase;
 

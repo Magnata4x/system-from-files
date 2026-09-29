@@ -114,19 +114,18 @@ export function RsiCalibrationReport() {
           Off-by-one explicado
         </div>
         <p className="text-muted-foreground text-xs leading-relaxed">
-          A guarda anterior{" "}
-          <code className="font-mono text-foreground">if (i &lt; period) return null</code> permitia{" "}
-          <code className="font-mono text-foreground">i === period</code>, o que faz o loop iniciar
-          em <code className="font-mono text-foreground">k = 1</code> e acessar{" "}
-          <code className="font-mono text-foreground">values[k - 1] = values[0]</code> — OK em si,
-          mas a primeira iteração do índice{" "}
-          <code className="font-mono text-foreground">i = period</code> em séries com NaN/holes
+          A guarda anterior <code className="font-mono text-foreground">if (i &lt; period) return null</code>{" "}
+          permitia <code className="font-mono text-foreground">i === period</code>, o que faz o loop iniciar em{" "}
+          <code className="font-mono text-foreground">k = 1</code> e acessar{" "}
+          <code className="font-mono text-foreground">values[k - 1] = values[0]</code> — OK em si, mas a primeira
+          iteração do índice <code className="font-mono text-foreground">i = period</code> em séries com NaN/holes
           (gaps de candle) propaga <code className="font-mono text-foreground">NaN</code> para{" "}
           <code className="font-mono text-foreground">gains/losses</code>, e o RSI resultante vira{" "}
-          <code className="font-mono text-foreground">NaN</code> silencioso. A guarda corrigida{" "}
-          <code className="font-mono text-foreground">if (i &lt;= period) return null</code> exige
-          pelo menos <code className="font-mono text-foreground">period + 1</code> amostras com diff
-          válido antes de calcular, eliminando o índice de borda.
+          <code className="font-mono text-foreground">NaN</code> silencioso.
+          A guarda corrigida{" "}
+          <code className="font-mono text-foreground">if (i &lt;= period) return null</code> exige pelo menos{" "}
+          <code className="font-mono text-foreground">period + 1</code> amostras com diff válido antes de calcular,
+          eliminando o índice de borda.
         </p>
         <div className="text-xs grid sm:grid-cols-2 gap-2 mt-2">
           <div className="rounded border border-red-500/30 bg-red-500/5 p-2">
@@ -135,9 +134,7 @@ export function RsiCalibrationReport() {
             </div>
             <div className="font-mono mt-1">NaN ocorrências: {buggyNaNCount}</div>
             {firstBuggyNaN !== null && (
-              <div className="font-mono text-muted-foreground">
-                primeiro NaN em i={firstBuggyNaN}
-              </div>
+              <div className="font-mono text-muted-foreground">primeiro NaN em i={firstBuggyNaN}</div>
             )}
           </div>
           <div className="rounded border border-emerald-500/30 bg-emerald-500/5 p-2">
@@ -197,9 +194,7 @@ function Metric({ label, value, good }: { label: string; value: string; good?: b
   return (
     <div className="rounded-md border border-border bg-background/40 p-3">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={`text-base font-semibold ${good ? "text-emerald-400" : "text-foreground"}`}>
-        {value}
-      </div>
+      <div className={`text-base font-semibold ${good ? "text-emerald-400" : "text-foreground"}`}>{value}</div>
     </div>
   );
 }

@@ -1,14 +1,4 @@
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  ReferenceDot,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceDot, Tooltip, Legend } from "recharts";
 import { EVOLUTION } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { Badge } from "@/components/ui/badge";
@@ -40,8 +30,7 @@ export function EvolutionTimeline() {
           }
         >
           {up ? <TrendingUp className="size-3 mr-1" /> : <TrendingDown className="size-3 mr-1" />}
-          Score {up ? "+" : ""}
-          {delta} pts
+          Score {up ? "+" : ""}{delta} pts
         </Badge>
       </div>
       <div className="h-[260px]">
@@ -51,51 +40,24 @@ export function EvolutionTimeline() {
             <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
             <YAxis stroke="var(--muted-foreground)" fontSize={11} domain={[0, 100]} />
             <Tooltip
-              contentStyle={{
-                background: "var(--popover)",
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-                fontSize: 12,
-              }}
+              contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
               labelStyle={{ color: "var(--muted-foreground)" }}
             />
             <Legend wrapperStyle={{ fontSize: 11, color: "var(--muted-foreground)" }} />
-            <Line
-              type="monotone"
-              dataKey="overall"
-              name="Overall score"
-              stroke="#378ADD"
-              strokeWidth={2.5}
-              dot={{ r: 3 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="emotional"
-              name="Emotional control"
-              stroke="#7F77DD"
-              strokeWidth={2}
-              strokeDasharray="5 4"
-              dot={{ r: 3 }}
-            />
-            {series
-              .filter((p) => p.note)
-              .map((p) => (
-                <ReferenceDot
-                  key={p.month}
-                  x={p.month}
-                  y={p.overall}
-                  r={5}
-                  fill="var(--brand-cyan)"
-                  stroke="var(--background)"
-                  strokeWidth={2}
-                  label={{
-                    value: p.note,
-                    position: "top",
-                    fill: "var(--muted-foreground)",
-                    fontSize: 10,
-                  }}
-                />
-              ))}
+            <Line type="monotone" dataKey="overall" name="Overall score" stroke="#378ADD" strokeWidth={2.5} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="emotional" name="Emotional control" stroke="#7F77DD" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
+            {series.filter((p) => p.note).map((p) => (
+              <ReferenceDot
+                key={p.month}
+                x={p.month}
+                y={p.overall}
+                r={5}
+                fill="var(--brand-cyan)"
+                stroke="var(--background)"
+                strokeWidth={2}
+                label={{ value: p.note, position: "top", fill: "var(--muted-foreground)", fontSize: 10 }}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>

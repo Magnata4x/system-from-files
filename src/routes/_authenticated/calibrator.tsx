@@ -7,13 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/lib/auth";
 import {
   calibratorAdapter,
@@ -23,17 +17,7 @@ import {
 import { TOP_20_USDT_PAIRS, planFetch } from "@/lib/market-data";
 import { recordSimulation } from "@/lib/calibrator-history-store";
 import { Switch } from "@/components/ui/switch";
-import {
-  FlaskConical,
-  Loader2,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  AlertCircle,
-  History,
-  Zap,
-  Layers,
-} from "lucide-react";
+import { FlaskConical, Loader2, TrendingUp, TrendingDown, Activity, AlertCircle, History, Zap, Layers } from "lucide-react";
 
 interface MultiPairRow {
   symbol: string;
@@ -43,16 +27,7 @@ interface MultiPairRow {
   error?: string;
 }
 
-const VALID_PROFILES: SimulationProfile[] = [
-  "conservador",
-  "rsi",
-  "aiscore",
-  "agressivo",
-  "scalper",
-  "intraday",
-  "swing",
-  "position",
-];
+const VALID_PROFILES: SimulationProfile[] = ["conservador", "rsi", "aiscore", "agressivo", "scalper", "intraday", "swing", "position"];
 
 type CalibratorSearch = {
   profile?: SimulationProfile;
@@ -67,23 +42,17 @@ export const Route = createFileRoute("/_authenticated/calibrator")({
   head: () => ({
     meta: [
       { title: "Calibrator — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Run historical backtests to calibrate your trading DNA via the Bot4x Calibration Engine.",
-      },
+      { name: "description", content: "Run historical backtests to calibrate your trading DNA via the Bot4x Calibration Engine." },
     ],
   }),
   validateSearch: (search: Record<string, unknown>): CalibratorSearch => {
     const rawProfile = typeof search.profile === "string" ? search.profile : undefined;
-    const profile =
-      rawProfile && (VALID_PROFILES as string[]).includes(rawProfile)
-        ? (rawProfile as SimulationProfile)
-        : undefined;
+    const profile = rawProfile && (VALID_PROFILES as string[]).includes(rawProfile)
+      ? (rawProfile as SimulationProfile)
+      : undefined;
     const symbol = typeof search.symbol === "string" ? search.symbol : undefined;
     const periodDaysNum = Number(search.period_days);
-    const period_days =
-      Number.isFinite(periodDaysNum) && periodDaysNum > 0 ? periodDaysNum : undefined;
+    const period_days = Number.isFinite(periodDaysNum) && periodDaysNum > 0 ? periodDaysNum : undefined;
     const balanceNum = Number(search.initial_balance);
     const initial_balance = Number.isFinite(balanceNum) && balanceNum > 0 ? balanceNum : undefined;
     const leverageNum = Number(search.leverage);
@@ -169,17 +138,14 @@ function CalibratorPage() {
           symbols: TOP_20_USDT_PAIRS.map((p) => p.symbol),
         });
         setResult(res);
-        void recordSimulation(
-          user.id,
-          {
-            profile,
-            symbol: "PORTFOLIO_20",
-            periodDays: effectivePeriodDays,
-            initialBalance,
-            leverage,
-          },
-          res,
-        ).catch((err) => console.error("[calibrator] recordSimulation error:", err));
+        void recordSimulation(user.id, {
+          profile,
+          symbol: "PORTFOLIO_20",
+          periodDays: effectivePeriodDays,
+          initialBalance,
+          leverage,
+        }, res).catch((err) => console.error("[calibrator] recordSimulation error:", err));
+
       } catch (e: any) {
         setError(e?.message ?? "Falha ao executar simulação multi-par.");
       } finally {
@@ -187,6 +153,7 @@ function CalibratorPage() {
       }
       return;
     }
+
 
     const params = {
       profile,
@@ -202,9 +169,7 @@ function CalibratorPage() {
         symbol: params.symbol,
       });
       setResult(res);
-      void recordSimulation(user.id, params, res).catch((err) =>
-        console.error("[calibrator] recordSimulation error:", err),
-      );
+      void recordSimulation(user.id, params, res).catch((err) => console.error("[calibrator] recordSimulation error:", err));
     } catch (e: any) {
       setError(e?.response?.data?.message ?? e?.message ?? "Falha ao executar simulação.");
     } finally {
@@ -271,9 +236,7 @@ function CalibratorPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {PROFILES.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                        {p.label}
-                      </SelectItem>
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -300,9 +263,7 @@ function CalibratorPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {TOP_20_USDT_PAIRS.map((p) => (
-                        <SelectItem key={p.symbol} value={p.symbol}>
-                          {p.label}
-                        </SelectItem>
+                        <SelectItem key={p.symbol} value={p.symbol}>{p.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -352,17 +313,13 @@ function CalibratorPage() {
                       min={1}
                       max={365}
                       value={periodDays}
-                      onChange={(e) =>
-                        setPeriodDays(Math.max(1, Math.min(365, Number(e.target.value) || 1)))
-                      }
+                      onChange={(e) => setPeriodDays(Math.max(1, Math.min(365, Number(e.target.value) || 1)))}
                     />
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <div className="space-y-1">
-                      <Label htmlFor="dstart" className="text-[11px] text-muted-foreground">
-                        Início
-                      </Label>
+                      <Label htmlFor="dstart" className="text-[11px] text-muted-foreground">Início</Label>
                       <Input
                         id="dstart"
                         type="date"
@@ -372,9 +329,7 @@ function CalibratorPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="dend" className="text-[11px] text-muted-foreground">
-                        Fim
-                      </Label>
+                      <Label htmlFor="dend" className="text-[11px] text-muted-foreground">Fim</Label>
                       <Input
                         id="dend"
                         type="date"
@@ -385,16 +340,7 @@ function CalibratorPage() {
                       />
                     </div>
                     <p className="col-span-2 text-[11px] text-muted-foreground">
-                      Janela:{" "}
-                      {Math.max(
-                        1,
-                        Math.ceil(
-                          (Date.parse(`${customEnd}T23:59:59Z`) -
-                            Date.parse(`${customStart}T00:00:00Z`)) /
-                            86400000,
-                        ),
-                      ) || 0}{" "}
-                      dia(s).
+                      Janela: {Math.max(1, Math.ceil((Date.parse(`${customEnd}T23:59:59Z`) - Date.parse(`${customStart}T00:00:00Z`)) / 86400000)) || 0} dia(s).
                     </p>
                   </div>
                 )}
@@ -422,9 +368,7 @@ function CalibratorPage() {
                   max={125}
                   step={1}
                   value={leverage}
-                  onChange={(e) =>
-                    setLeverage(Math.max(1, Math.min(125, Number(e.target.value) || 1)))
-                  }
+                  onChange={(e) => setLeverage(Math.max(1, Math.min(125, Number(e.target.value) || 1)))}
                 />
                 <p className="text-[11px] text-muted-foreground">
                   1× a 125×. Alavancagem alta = liquidação possível.
@@ -464,23 +408,19 @@ function CalibratorPage() {
                     </div>
                     {clamped && (
                       <div className="text-amber-500">
-                        Limite da Binance: 1000 candles por requisição (de{" "}
-                        {theoretical.toLocaleString("pt-BR")} possíveis).
+                        Limite da Binance: 1000 candles por requisição (de {theoretical.toLocaleString("pt-BR")} possíveis).
                       </div>
                     )}
                   </div>
                 );
               })()}
 
+
               <Button onClick={runSimulation} disabled={loading} className="w-full">
                 {loading ? (
-                  <>
-                    <Loader2 className="size-4 mr-2 animate-spin" /> Executando…
-                  </>
+                  <><Loader2 className="size-4 mr-2 animate-spin" /> Executando…</>
                 ) : (
-                  <>
-                    <FlaskConical className="size-4 mr-2" /> Rodar simulação
-                  </>
+                  <><FlaskConical className="size-4 mr-2" /> Rodar simulação</>
                 )}
               </Button>
 
@@ -496,8 +436,7 @@ function CalibratorPage() {
             <div className="lg:col-span-2 space-y-5">
               {!result && !multiResults && !loading && (
                 <Card className="p-10 text-center text-sm text-muted-foreground">
-                  Configure os parâmetros à esquerda e execute uma simulação para visualizar os
-                  resultados.
+                  Configure os parâmetros à esquerda e execute uma simulação para visualizar os resultados.
                 </Card>
               )}
 
@@ -515,41 +454,21 @@ function CalibratorPage() {
               {result && !multiResults && !loading && (
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Metric
-                      label="Trades"
-                      value={String(result.trades)}
-                      icon={<Activity className="size-4" />}
-                    />
-                    <Metric
-                      label="Win Rate"
-                      value={`${(result.winRate * 100).toFixed(1)}%`}
-                      tone={result.winRate >= 0.5 ? "pos" : "neg"}
-                    />
+                    <Metric label="Trades" value={String(result.trades)} icon={<Activity className="size-4" />} />
+                    <Metric label="Win Rate" value={`${(result.winRate * 100).toFixed(1)}%`} tone={result.winRate >= 0.5 ? "pos" : "neg"} />
                     <Metric
                       label="PnL"
                       value={`${result.pnl >= 0 ? "+" : ""}${result.pnl.toFixed(2)} (${result.pnlPct.toFixed(2)}%)`}
                       tone={result.pnl >= 0 ? "pos" : "neg"}
-                      icon={
-                        result.pnl >= 0 ? (
-                          <TrendingUp className="size-4" />
-                        ) : (
-                          <TrendingDown className="size-4" />
-                        )
-                      }
+                      icon={result.pnl >= 0 ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />}
                     />
-                    <Metric
-                      label="Max Drawdown"
-                      value={`${(result.maxDrawdown * 100).toFixed(2)}%`}
-                      tone="neg"
-                    />
+                    <Metric label="Max Drawdown" value={`${(result.maxDrawdown * 100).toFixed(2)}%`} tone="neg" />
                   </div>
 
                   <Card className="p-5">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold">Equity curve</h3>
-                      <span className="text-xs text-muted-foreground">
-                        {result.equityCurve.length} pontos
-                      </span>
+                      <span className="text-xs text-muted-foreground">{result.equityCurve.length} pontos</span>
                     </div>
                     <EquitySparkline points={result.equityCurve} />
                   </Card>
@@ -558,25 +477,10 @@ function CalibratorPage() {
                     <Card className="p-5">
                       <h3 className="text-sm font-semibold mb-3">Gestão de risco</h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <RiskCell
-                          label="SL diários acionados"
-                          value={String(result.risk.dayStops)}
-                          tone={result.risk.dayStops > 0 ? "neg" : undefined}
-                        />
-                        <RiskCell
-                          label="TP diários acionados"
-                          value={String(result.risk.dayTakes)}
-                          tone={result.risk.dayTakes > 0 ? "pos" : undefined}
-                        />
-                        <RiskCell
-                          label="Dias em pausa (24h)"
-                          value={String(result.risk.haltedDays)}
-                        />
-                        <RiskCell
-                          label="Liquidado"
-                          value={result.risk.liquidated ? "Sim" : "Não"}
-                          tone={result.risk.liquidated ? "neg" : "pos"}
-                        />
+                        <RiskCell label="SL diários acionados" value={String(result.risk.dayStops)} tone={result.risk.dayStops > 0 ? "neg" : undefined} />
+                        <RiskCell label="TP diários acionados" value={String(result.risk.dayTakes)} tone={result.risk.dayTakes > 0 ? "pos" : undefined} />
+                        <RiskCell label="Dias em pausa (24h)" value={String(result.risk.haltedDays)} />
+                        <RiskCell label="Liquidado" value={result.risk.liquidated ? "Sim" : "Não"} tone={result.risk.liquidated ? "neg" : "pos"} />
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-3">
                         {profile === "scalper"
@@ -601,34 +505,23 @@ function CalibratorPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {[...result.byPair]
-                              .sort((a, b) => b.pnl - a.pnl)
-                              .map((r) => (
-                                <tr
-                                  key={r.symbol}
-                                  className="border-b border-border/50 hover:bg-muted/30"
-                                >
-                                  <td className="py-2">{r.symbol}</td>
-                                  <td className="text-right tabular-nums">{r.trades}</td>
-                                  <td className="text-right tabular-nums text-emerald-500">
-                                    {r.wins}
-                                  </td>
-                                  <td className="text-right tabular-nums text-rose-500">
-                                    {r.losses}
-                                  </td>
-                                  <td
-                                    className={`text-right tabular-nums ${r.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}
-                                  >
-                                    {r.pnl >= 0 ? "+" : ""}
-                                    {r.pnl.toFixed(2)}
-                                  </td>
-                                </tr>
-                              ))}
+                            {[...result.byPair].sort((a, b) => b.pnl - a.pnl).map((r) => (
+                              <tr key={r.symbol} className="border-b border-border/50 hover:bg-muted/30">
+                                <td className="py-2">{r.symbol}</td>
+                                <td className="text-right tabular-nums">{r.trades}</td>
+                                <td className="text-right tabular-nums text-emerald-500">{r.wins}</td>
+                                <td className="text-right tabular-nums text-rose-500">{r.losses}</td>
+                                <td className={`text-right tabular-nums ${r.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                                  {r.pnl >= 0 ? "+" : ""}{r.pnl.toFixed(2)}
+                                </td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
                     </Card>
                   )}
+
 
                   {(result.commentary || result.dnaFeedback.patternDetected) && (
                     <Card className="p-5 space-y-3">
@@ -643,9 +536,7 @@ function CalibratorPage() {
                         <Row k="Melhoria esperada" v={result.dnaFeedback.expectedImprovement} />
                       )}
                       {result.commentary && (
-                        <p className="text-xs text-muted-foreground border-t border-border pt-3">
-                          {result.commentary}
-                        </p>
+                        <p className="text-xs text-muted-foreground border-t border-border pt-3">{result.commentary}</p>
                       )}
                     </Card>
                   )}
@@ -660,8 +551,7 @@ function CalibratorPage() {
 }
 
 function RiskCell({ label, value, tone }: { label: string; value: string; tone?: "pos" | "neg" }) {
-  const color =
-    tone === "pos" ? "text-emerald-500" : tone === "neg" ? "text-rose-500" : "text-foreground";
+  const color = tone === "pos" ? "text-emerald-500" : tone === "neg" ? "text-rose-500" : "text-foreground";
   return (
     <div className="rounded-md border border-border bg-muted/20 p-2.5">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
@@ -681,13 +571,11 @@ function Metric({
   tone?: "pos" | "neg";
   icon?: React.ReactNode;
 }) {
-  const color =
-    tone === "pos" ? "text-emerald-500" : tone === "neg" ? "text-rose-500" : "text-foreground";
+  const color = tone === "pos" ? "text-emerald-500" : tone === "neg" ? "text-rose-500" : "text-foreground";
   return (
     <Card className="p-3">
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-        {icon}
-        {label}
+        {icon}{label}
       </div>
       <div className={`text-lg font-semibold mt-1 ${color}`}>{value}</div>
     </Card>
@@ -731,13 +619,7 @@ function EquitySparkline({ points }: { points: { t: string; equity: number }[] }
   );
 }
 
-function MultiPairPanel({
-  rows,
-  initialBalance,
-}: {
-  rows: MultiPairRow[];
-  initialBalance: number;
-}) {
+function MultiPairPanel({ rows, initialBalance }: { rows: MultiPairRow[]; initialBalance: number }) {
   const done = rows.filter((r) => r.status === "ok" && r.result);
   const errors = rows.filter((r) => r.status === "error");
   const pending = rows.filter((r) => r.status === "pending");
@@ -752,29 +634,21 @@ function MultiPairPanel({
   const worstDd = done.reduce((a, r) => Math.max(a, r.result?.maxDrawdown ?? 0), 0);
   const winners = done.filter((r) => (r.result?.pnl ?? 0) > 0).length;
 
-  const sorted = [...done].sort((a, b) => (b.result?.pnlPct ?? 0) - (a.result?.pnlPct ?? 0));
+  const sorted = [...done].sort(
+    (a, b) => (b.result?.pnlPct ?? 0) - (a.result?.pnlPct ?? 0),
+  );
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Metric
-          label="Pares OK"
-          value={`${done.length}/${rows.length}`}
-          icon={<Layers className="size-4" />}
-        />
+        <Metric label="Pares OK" value={`${done.length}/${rows.length}`} icon={<Layers className="size-4" />} />
         <Metric
           label="PnL agregado"
           value={`${totalPnl >= 0 ? "+" : ""}${totalPnl.toFixed(2)} (${aggPnlPct.toFixed(2)}%)`}
           tone={totalPnl >= 0 ? "pos" : "neg"}
-          icon={
-            totalPnl >= 0 ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />
-          }
+          icon={totalPnl >= 0 ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />}
         />
-        <Metric
-          label="Win rate médio"
-          value={`${(avgWinRate * 100).toFixed(1)}%`}
-          tone={avgWinRate >= 0.5 ? "pos" : "neg"}
-        />
+        <Metric label="Win rate médio" value={`${(avgWinRate * 100).toFixed(1)}%`} tone={avgWinRate >= 0.5 ? "pos" : "neg"} />
         <Metric label="Pior drawdown" value={`${(worstDd * 100).toFixed(2)}%`} tone="neg" />
       </div>
 
@@ -782,9 +656,7 @@ function MultiPairPanel({
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold">Resultados por par</h3>
           <span className="text-xs text-muted-foreground">
-            {winners} vencedores · {totalTrades} trades ·{" "}
-            {pending.length > 0 && `${pending.length} pendentes · `}
-            {errors.length} erros
+            {winners} vencedores · {totalTrades} trades · {pending.length > 0 && `${pending.length} pendentes · `}{errors.length} erros
           </span>
         </div>
         <div className="overflow-x-auto">
@@ -805,34 +677,23 @@ function MultiPairPanel({
                 <tr key={r.symbol} className="border-b border-border/50 hover:bg-muted/30">
                   <td className="py-2">{r.label}</td>
                   <td className="text-right tabular-nums">{r.result?.trades ?? 0}</td>
-                  <td className="text-right tabular-nums">
-                    {((r.result?.winRate ?? 0) * 100).toFixed(1)}%
+                  <td className="text-right tabular-nums">{((r.result?.winRate ?? 0) * 100).toFixed(1)}%</td>
+                  <td className={`text-right tabular-nums ${(r.result?.pnl ?? 0) >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                    {(r.result?.pnl ?? 0) >= 0 ? "+" : ""}{(r.result?.pnl ?? 0).toFixed(2)}
                   </td>
-                  <td
-                    className={`text-right tabular-nums ${(r.result?.pnl ?? 0) >= 0 ? "text-emerald-500" : "text-rose-500"}`}
-                  >
-                    {(r.result?.pnl ?? 0) >= 0 ? "+" : ""}
-                    {(r.result?.pnl ?? 0).toFixed(2)}
-                  </td>
-                  <td
-                    className={`text-right tabular-nums ${(r.result?.pnlPct ?? 0) >= 0 ? "text-emerald-500" : "text-rose-500"}`}
-                  >
+                  <td className={`text-right tabular-nums ${(r.result?.pnlPct ?? 0) >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
                     {(r.result?.pnlPct ?? 0).toFixed(2)}%
                   </td>
                   <td className="text-right tabular-nums text-rose-500">
                     {((r.result?.maxDrawdown ?? 0) * 100).toFixed(2)}%
                   </td>
-                  <td className="text-right tabular-nums">
-                    {r.result?.sharpe?.toFixed(2) ?? "0.00"}
-                  </td>
+                  <td className="text-right tabular-nums">{r.result?.sharpe?.toFixed(2) ?? "0.00"}</td>
                 </tr>
               ))}
               {errors.map((r) => (
                 <tr key={r.symbol} className="border-b border-border/50">
                   <td className="py-2">{r.label}</td>
-                  <td colSpan={6} className="text-right text-destructive">
-                    {r.error}
-                  </td>
+                  <td colSpan={6} className="text-right text-destructive">{r.error}</td>
                 </tr>
               ))}
               {pending.map((r) => (

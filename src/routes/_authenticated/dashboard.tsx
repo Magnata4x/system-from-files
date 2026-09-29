@@ -22,6 +22,7 @@ import { CommandPalette } from "@/components/dashboard/command-palette";
 import { AnnouncementBanner } from "@/components/dashboard/announcement-banner";
 import { IntegrationWidgets } from "@/components/dashboard/integration-widgets";
 
+
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [{ title: "Dashboard — AISignalRadar" }],
@@ -64,43 +65,27 @@ function Dashboard() {
           <MetricCards />
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3">
-              <SignalsTable />
-            </div>
-            <div className="lg:col-span-2">
-              <FearGreedGauge />
-            </div>
+            <div className="lg:col-span-3"><SignalsTable /></div>
+            <div className="lg:col-span-2"><FearGreedGauge /></div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3">
-              <AssetHeatmap />
-            </div>
-            <div className="lg:col-span-2">
-              <BtcDominance />
-            </div>
+            <div className="lg:col-span-3"><AssetHeatmap /></div>
+            <div className="lg:col-span-2"><BtcDominance /></div>
           </div>
 
           <DnaPanel />
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3">
-              <AlertsFeed />
-            </div>
-            <div className="lg:col-span-2">
-              <Sentiment />
-            </div>
+            <div className="lg:col-span-3"><AlertsFeed /></div>
+            <div className="lg:col-span-2"><Sentiment /></div>
           </div>
 
           <PerformanceChart />
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3">
-              <MarketCalendar />
-            </div>
-            <div className="lg:col-span-2">
-              <QuickActions />
-            </div>
+            <div className="lg:col-span-3"><MarketCalendar /></div>
+            <div className="lg:col-span-2"><QuickActions /></div>
           </div>
         </main>
       </div>

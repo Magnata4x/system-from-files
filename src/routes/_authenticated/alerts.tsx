@@ -25,10 +25,7 @@ export const Route = createFileRoute("/_authenticated/alerts")({
   head: () => ({
     meta: [
       { title: "Alerts — AISignalRadar" },
-      {
-        name: "description",
-        content: "Configure delivery channels, alert types, frequency and quiet hours.",
-      },
+      { name: "description", content: "Configure delivery channels, alert types, frequency and quiet hours." },
     ],
   }),
   component: AlertsPage,
@@ -102,6 +99,7 @@ function AlertsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snapshot]);
 
+
   const addAsset = (raw: string) => {
     const t = raw.trim().toUpperCase().replace(/[, ]+/g, "");
     if (!t || s.assets.includes(t)) return;
@@ -118,9 +116,7 @@ function AlertsPage() {
   };
 
   const sendTestAlert = () => {
-    const active = Object.entries(s.channels)
-      .filter(([, c]) => c.on)
-      .map(([k]) => k);
+    const active = Object.entries(s.channels).filter(([, c]) => c.on).map(([k]) => k);
     if (active.length === 0) {
       toast.error("No channels enabled", { description: "Turn on at least one delivery channel." });
       return;
@@ -148,9 +144,7 @@ function AlertsPage() {
           <header className="flex items-center justify-between gap-4">
             <div>
               <h1 className="text-xl font-semibold tracking-tight">Alerts</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Choose how and when AISignalRadar reaches you.
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">Choose how and when AISignalRadar reaches you.</p>
             </div>
             <Button onClick={sendTestAlert} variant="outline" className="gap-2">
               <Zap className="size-4 text-[var(--brand-cyan)]" />
@@ -184,12 +178,7 @@ function AlertsPage() {
                       <code className="px-2 py-1 rounded bg-secondary font-mono text-foreground">
                         {s.channels.telegram.username ?? "@AISignalRadarBot"}
                       </code>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setTgOpen(true)}
-                        className="h-7 text-xs"
-                      >
+                      <Button size="sm" variant="outline" onClick={() => setTgOpen(true)} className="h-7 text-xs">
                         Reconnect
                       </Button>
                     </div>
@@ -275,9 +264,7 @@ function AlertsPage() {
                       >
                         <span
                           className={`size-4 rounded border flex items-center justify-center shrink-0 ${
-                            on
-                              ? "bg-[var(--brand-cyan)] border-[var(--brand-cyan)]"
-                              : "border-border"
+                            on ? "bg-[var(--brand-cyan)] border-[var(--brand-cyan)]" : "border-border"
                           }`}
                         >
                           {on && <Check className="size-3 text-background" strokeWidth={3} />}
@@ -295,9 +282,7 @@ function AlertsPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-[13px] font-medium">Minimum score</label>
-                      <span className="text-xs font-mono text-[var(--brand-cyan)]">
-                        {s.minScore}
-                      </span>
+                      <span className="text-xs font-mono text-[var(--brand-cyan)]">{s.minScore}</span>
                     </div>
                     <Slider
                       value={[s.minScore]}
@@ -334,14 +319,9 @@ function AlertsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-[13px] font-medium">Quiet hours</div>
-                        <div className="text-xs text-muted-foreground">
-                          Silence non-critical alerts overnight.
-                        </div>
+                        <div className="text-xs text-muted-foreground">Silence non-critical alerts overnight.</div>
                       </div>
-                      <Switch
-                        checked={s.quietHours.on}
-                        onCheckedChange={(v) => s.setQuiet({ on: v })}
-                      />
+                      <Switch checked={s.quietHours.on} onCheckedChange={(v) => s.setQuiet({ on: v })} />
                     </div>
                     {s.quietHours.on && (
                       <div className="mt-3 flex items-center gap-2 text-sm">
@@ -398,9 +378,7 @@ function AlertsPage() {
                   <div className="rounded-md border border-border p-3 flex items-center justify-between">
                     <div>
                       <div className="text-[13px] font-medium">Include Bot4x execution alerts</div>
-                      <div className="text-xs text-muted-foreground">
-                        Fills, stops, circuit breakers, shutdowns.
-                      </div>
+                      <div className="text-xs text-muted-foreground">Fills, stops, circuit breakers, shutdowns.</div>
                     </div>
                     <Switch checked={s.bot4x} onCheckedChange={s.toggleBot4x} />
                   </div>
@@ -436,15 +414,7 @@ function AlertsPage() {
   );
 }
 
-function Section({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-border bg-card/40 p-5">
       <header className="mb-4">

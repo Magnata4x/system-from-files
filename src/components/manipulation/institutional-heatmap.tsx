@@ -14,10 +14,7 @@ function bg(v: number) {
 function miniSeries(asset: string, tf: string, v: number) {
   const seed = (asset.charCodeAt(0) + tf.charCodeAt(0) + v) >>> 0;
   let s = seed;
-  const rnd = () => {
-    s = (s * 1664525 + 1013904223) >>> 0;
-    return (s % 1000) / 1000;
-  };
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return (s % 1000) / 1000; };
   return Array.from({ length: 24 }, (_, i) => ({
     i,
     v: Math.max(0, Math.round(v * 0.5 + rnd() * v * 0.9 + Math.sin(i / 3) * 8)),
@@ -32,9 +29,7 @@ export function InstitutionalHeatmap() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-sm font-semibold">Institutional heatmap</h2>
-          <p className="text-xs text-muted-foreground">
-            Manipulation pressure score · click any cell
-          </p>
+          <p className="text-xs text-muted-foreground">Manipulation pressure score · click any cell</p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <span>Low</span>
@@ -51,10 +46,7 @@ export function InstitutionalHeatmap() {
             <tr>
               <th className="text-[10px] uppercase tracking-wider text-muted-foreground text-left w-14"></th>
               {TIMEFRAMES.map((tf) => (
-                <th
-                  key={tf}
-                  className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium"
-                >
+                <th key={tf} className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
                   {tf}
                 </th>
               ))}
@@ -70,19 +62,13 @@ export function InstitutionalHeatmap() {
                   const critical = v > 85;
                   const series = miniSeries(row.asset, tf, v);
                   const status =
-                    v >= 85
-                      ? { label: "Critical", color: "text-red-300" }
-                      : v >= 70
-                        ? { label: "Elevated", color: "text-red-300/80" }
-                        : v >= 40
-                          ? { label: "Watch", color: "text-amber-300" }
-                          : { label: "Normal", color: "text-emerald-300" };
+                    v >= 85 ? { label: "Critical", color: "text-red-300" }
+                    : v >= 70 ? { label: "Elevated", color: "text-red-300/80" }
+                    : v >= 40 ? { label: "Watch", color: "text-amber-300" }
+                    : { label: "Normal", color: "text-emerald-300" };
                   return (
                     <td key={i}>
-                      <Popover
-                        open={openKey === key}
-                        onOpenChange={(o) => setOpenKey(o ? key : null)}
-                      >
+                      <Popover open={openKey === key} onOpenChange={(o) => setOpenKey(o ? key : null)}>
                         <PopoverTrigger asChild>
                           <button
                             className={`relative w-full h-9 rounded-md text-[11px] font-medium text-foreground/90 transition-transform hover:scale-[1.04] ${
@@ -99,45 +85,23 @@ export function InstitutionalHeatmap() {
                         >
                           <div className="px-3.5 py-2.5 border-b border-border flex items-center justify-between">
                             <div>
-                              <div className="text-sm font-semibold">
-                                {row.asset} · {tf}
-                              </div>
+                              <div className="text-sm font-semibold">{row.asset} · {tf}</div>
                               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
                                 Manipulation pressure
                               </div>
                             </div>
                             <div className="text-right">
-                              <div
-                                className="text-xl font-bold tabular-nums"
-                                style={{ color: bg(v) }}
-                              >
-                                {v}
-                              </div>
-                              <div
-                                className={`text-[10px] font-semibold uppercase tracking-wider ${status.color}`}
-                              >
-                                {status.label}
-                              </div>
+                              <div className="text-xl font-bold tabular-nums" style={{ color: bg(v) }}>{v}</div>
+                              <div className={`text-[10px] font-semibold uppercase tracking-wider ${status.color}`}>{status.label}</div>
                             </div>
                           </div>
                           <div className="h-[80px] px-1">
                             <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart
-                                data={series}
-                                margin={{ top: 6, right: 6, left: 6, bottom: 0 }}
-                              >
+                              <AreaChart data={series} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
                                 <defs>
                                   <linearGradient id={`g-${key}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop
-                                      offset="0%"
-                                      stopColor={v > 70 ? "#ef4444" : "#22d3ee"}
-                                      stopOpacity={0.55}
-                                    />
-                                    <stop
-                                      offset="100%"
-                                      stopColor={v > 70 ? "#ef4444" : "#22d3ee"}
-                                      stopOpacity={0.02}
-                                    />
+                                    <stop offset="0%" stopColor={v > 70 ? "#ef4444" : "#22d3ee"} stopOpacity={0.55} />
+                                    <stop offset="100%" stopColor={v > 70 ? "#ef4444" : "#22d3ee"} stopOpacity={0.02} />
                                   </linearGradient>
                                 </defs>
                                 <YAxis hide domain={[0, "dataMax + 10"]} />
@@ -160,8 +124,8 @@ export function InstitutionalHeatmap() {
                               {v > 85
                                 ? "Critical: high probability of coordinated activity. Defensive posture recommended."
                                 : v > 60
-                                  ? "Elevated: watch for traps around key liquidity zones."
-                                  : "Normal institutional flow within expected range."}
+                                ? "Elevated: watch for traps around key liquidity zones."
+                                : "Normal institutional flow within expected range."}
                             </p>
                           </div>
                         </PopoverContent>

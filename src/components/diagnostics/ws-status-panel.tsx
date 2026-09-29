@@ -27,20 +27,15 @@ export function WsStatusPanel() {
   }, []);
 
   useEffect(() => {
-    const push = (e: AuthEvent) => setEvents((prev) => [e, ...prev].slice(0, 30));
+    const push = (e: AuthEvent) =>
+      setEvents((prev) => [e, ...prev].slice(0, 30));
 
     const unsub = backendWs.onStatus((s) => {
       setStatus(s);
-      if (s === "open")
-        push({
-          ts: Date.now(),
-          type: "auth-sent",
-          detail: "JSON {type:'auth', token} enviado como primeira mensagem",
-        });
+      if (s === "open") push({ ts: Date.now(), type: "auth-sent", detail: "JSON {type:'auth', token} enviado como primeira mensagem" });
       if (s === "open") push({ ts: Date.now(), type: "open" });
       if (s === "closed") push({ ts: Date.now(), type: "close", detail: "Conexão encerrada" });
-      if (s === "error")
-        push({ ts: Date.now(), type: "error", detail: "Erro de transporte (verifique URL/CORS)" });
+      if (s === "error") push({ ts: Date.now(), type: "error", detail: "Erro de transporte (verifique URL/CORS)" });
       if (s === "unauthenticated")
         push({
           ts: Date.now(),
@@ -76,22 +71,12 @@ export function WsStatusPanel() {
       </header>
 
       <div className="grid sm:grid-cols-2 gap-3">
-        <Check
-          label="URL sem ?token= na query"
-          ok={urlHasToken === false}
-          dot={dot(urlHasToken === false)}
-        />
-        <Check
-          label="Token enviado como primeira mensagem JSON"
-          ok={authFirstPayload === true}
-          dot={dot(authFirstPayload)}
-        />
+        <Check label="URL sem ?token= na query" ok={urlHasToken === false} dot={dot(urlHasToken === false)} />
+        <Check label="Token enviado como primeira mensagem JSON" ok={authFirstPayload === true} dot={dot(authFirstPayload)} />
       </div>
 
       <div className="text-xs text-muted-foreground space-y-1 font-mono">
-        <div>
-          endpoint: <span className="text-foreground">{WS_URL_BASE}/ws</span>
-        </div>
+        <div>endpoint: <span className="text-foreground">{WS_URL_BASE}/ws</span></div>
         <div>
           first frame on open:{" "}
           <span className="text-foreground">{`{"type":"auth","token":"<JWT>"}`}</span>
@@ -114,9 +99,7 @@ export function WsStatusPanel() {
       </div>
 
       <div>
-        <h3 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-          Eventos recentes
-        </h3>
+        <h3 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Eventos recentes</h3>
         <ul className="space-y-1 max-h-64 overflow-auto pr-1">
           {events.length === 0 && (
             <li className="text-xs text-muted-foreground">Nenhum evento. Tente reconectar.</li>
@@ -166,27 +149,19 @@ function StatusBadge({ status }: { status: WsStatus }) {
 }
 
 function EventIcon({ type }: { type: AuthEvent["type"] }) {
-  if (type === "open" || type === "auth-sent")
-    return <CheckCircle2 className="size-4 text-emerald-500 mt-0.5" />;
-  if (type === "error" || type === "unauthenticated")
-    return <XCircle className="size-4 text-red-500 mt-0.5" />;
+  if (type === "open" || type === "auth-sent") return <CheckCircle2 className="size-4 text-emerald-500 mt-0.5" />;
+  if (type === "error" || type === "unauthenticated") return <XCircle className="size-4 text-red-500 mt-0.5" />;
   if (type === "close") return <AlertTriangle className="size-4 text-amber-500 mt-0.5" />;
   return <Loader2 className="size-4 text-muted-foreground mt-0.5" />;
 }
 
 function labelFor(t: AuthEvent["type"]) {
   switch (t) {
-    case "auth-sent":
-      return "Auth payload enviado";
-    case "open":
-      return "Conexão aberta";
-    case "close":
-      return "Conexão fechada";
-    case "error":
-      return "Erro";
-    case "unauthenticated":
-      return "Falha de autenticação";
-    case "connecting":
-      return "Conectando";
+    case "auth-sent": return "Auth payload enviado";
+    case "open": return "Conexão aberta";
+    case "close": return "Conexão fechada";
+    case "error": return "Erro";
+    case "unauthenticated": return "Falha de autenticação";
+    case "connecting": return "Conectando";
   }
 }

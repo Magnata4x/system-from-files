@@ -15,11 +15,7 @@ export const Route = createFileRoute("/_authenticated/dna-trader")({
   head: () => ({
     meta: [
       { title: "DNA Trader — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Behavioral DNA of your trading: archetype, gauges, heatmap, radar vs institutional benchmark, and AI coaching.",
-      },
+      { name: "description", content: "Behavioral DNA of your trading: archetype, gauges, heatmap, radar vs institutional benchmark, and AI coaching." },
     ],
   }),
   component: DnaTraderPage,
@@ -34,9 +30,7 @@ function DnaTraderPage() {
         <main className="flex-1 min-w-0 p-5 space-y-5">
           <header>
             <h1 className="text-xl font-semibold tracking-tight">DNA Trader</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Your behavioral signature, scored and compared to institutional benchmark.
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">Your behavioral signature, scored and compared to institutional benchmark.</p>
           </header>
 
           <DnaHeader />

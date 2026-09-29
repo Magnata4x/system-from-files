@@ -2,18 +2,7 @@ import { LayoutDashboard, Activity, Bot, Brain, Menu, History } from "lucide-rea
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Radar,
-  Sparkles,
-  Bell,
-  Users,
-  Store,
-  Code2,
-  Tag,
-  Settings,
-  User,
-  LogOut,
-} from "lucide-react";
+import { Radar, Sparkles, Bell, Users, Store, Code2, Tag, Settings, User, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const primary = [
@@ -79,9 +68,7 @@ export function MobileBottomNav() {
                   to={it.to}
                   onClick={() => setMoreOpen(false)}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border ${
-                    active
-                      ? "bg-[var(--brand-blue-deep)] text-foreground"
-                      : "bg-card/40 text-muted-foreground"
+                    active ? "bg-[var(--brand-blue-deep)] text-foreground" : "bg-card/40 text-muted-foreground"
                   }`}
                 >
                   <Icon className="size-5" />
@@ -91,10 +78,7 @@ export function MobileBottomNav() {
             })}
           </div>
           <button
-            onClick={() => {
-              setMoreOpen(false);
-              supabase.auth.signOut();
-            }}
+            onClick={() => { setMoreOpen(false); supabase.auth.signOut(); }}
             className="mt-4 w-full h-10 rounded-lg border border-border text-[#E24B4A] inline-flex items-center justify-center gap-2 text-sm"
           >
             <LogOut className="size-4" /> Sign out

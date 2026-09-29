@@ -56,13 +56,14 @@ function readSnapshot(): Snapshot {
   const s = useBot4xStore.getState();
   const last5 = s.history.slice(0, 5);
   const recentLosses = last5.filter((t) => (t.pnlPct ?? 0) < 0).length;
-  const openLossPct = s.orders.filter((o) => o.pnlPct < 0).reduce((acc, o) => acc + o.pnlPct, 0);
+  const openLossPct = s.orders
+    .filter((o) => o.pnlPct < 0)
+    .reduce((acc, o) => acc + o.pnlPct, 0);
   return {
     dailyPnlPct: s.dailyPnlPct,
     recentLosses,
     openLossPct,
-    operationsToday: s.history.filter((t) => t.day === new Date().toISOString().slice(0, 10))
-      .length,
+    operationsToday: s.history.filter((t) => t.day === new Date().toISOString().slice(0, 10)).length,
   };
 }
 

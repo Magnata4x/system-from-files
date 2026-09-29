@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { SectionCard } from "./section-card";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Moon, Sun, Monitor, Cpu, RotateCcw, Check } from "lucide-react";
@@ -18,13 +12,7 @@ import { TOURS } from "@/lib/tour-content";
 const THEMES = [
   { id: "dark", label: "Dark", icon: Moon, bg: "bg-zinc-900", fg: "bg-zinc-700" },
   { id: "light", label: "Light", icon: Sun, bg: "bg-zinc-100", fg: "bg-zinc-300" },
-  {
-    id: "system",
-    label: "System",
-    icon: Monitor,
-    bg: "bg-gradient-to-br from-zinc-900 to-zinc-100",
-    fg: "bg-zinc-500",
-  },
+  { id: "system", label: "System", icon: Monitor, bg: "bg-gradient-to-br from-zinc-900 to-zinc-100", fg: "bg-zinc-500" },
 ];
 
 export function SettingsAppearance() {
@@ -76,10 +64,7 @@ export function SettingsAppearance() {
             { v: "default", label: "Default", h: "h-1.5" },
             { v: "comfortable", label: "Comfortable", h: "h-2.5" },
           ].map((d) => (
-            <label
-              key={d.v}
-              className={`rounded-lg border p-3 cursor-pointer flex flex-col gap-2 ${density === d.v ? "border-[var(--brand-cyan)]" : "border-border"}`}
-            >
+            <label key={d.v} className={`rounded-lg border p-3 cursor-pointer flex flex-col gap-2 ${density === d.v ? "border-[var(--brand-cyan)]" : "border-border"}`}>
               <div className="space-y-1">
                 <div className={`${d.h} bg-muted-foreground/30 rounded w-2/3`} />
                 <div className={`${d.h} bg-muted-foreground/30 rounded w-full`} />
@@ -98,9 +83,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Position</Label>
             <Select value={sidebarPos} onValueChange={setSidebarPos}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="left">Left</SelectItem>
                 <SelectItem value="right">Right</SelectItem>
@@ -110,9 +93,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Display</Label>
             <Select value={sidebarStyle} onValueChange={setSidebarStyle}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="icons">Icons only</SelectItem>
                 <SelectItem value="labels">Icons + labels</SelectItem>
@@ -127,9 +108,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Default landing page</Label>
             <Select value={landing} onValueChange={setLanding}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="/dashboard">Dashboard</SelectItem>
                 <SelectItem value="/signals">Signals</SelectItem>
@@ -141,24 +120,16 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Default timeframe</Label>
             <Select value={tf} onValueChange={setTf}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {["1m", "5m", "15m", "1h", "4h", "1d"].map((x) => (
-                  <SelectItem key={x} value={x}>
-                    {x}
-                  </SelectItem>
-                ))}
+                {["1m","5m","15m","1h","4h","1d"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div>
             <Label className="text-xs">Candle style</Label>
             <Select value={candle} onValueChange={setCandle}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="hollow">Hollow</SelectItem>
                 <SelectItem value="filled">Filled</SelectItem>
@@ -178,9 +149,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Language</Label>
             <Select value={lang} onValueChange={setLang}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="pt-BR">PT-BR</SelectItem>
                 <SelectItem value="en">EN</SelectItem>
@@ -191,9 +160,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Currency</Label>
             <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="BRL">BRL</SelectItem>
                 <SelectItem value="USD">USD</SelectItem>
@@ -204,9 +171,7 @@ export function SettingsAppearance() {
           <div>
             <Label className="text-xs">Date format</Label>
             <Select value={dateFmt} onValueChange={setDateFmt}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
                 <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
@@ -226,8 +191,7 @@ export function SettingsAppearance() {
             <div>
               <Label className="text-sm font-medium">Modo compacto</Label>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Mostra um pill fixo de 64px no canto inferior esquerdo em todas as páginas com modo
-                e PnL do dia.
+                Mostra um pill fixo de 64px no canto inferior esquerdo em todas as páginas com modo e PnL do dia.
               </p>
             </div>
           </div>
@@ -302,10 +266,7 @@ function TourSection() {
                   </a>
                 ) : (
                   <button
-                    onClick={() => {
-                      resetTour(t.id);
-                      startTour(t.id);
-                    }}
+                    onClick={() => { resetTour(t.id); startTour(t.id); }}
                     className="px-2.5 h-7 rounded-md text-[11px] bg-[var(--brand-blue-deep)] hover:bg-[var(--brand-blue)] text-foreground"
                   >
                     Reiniciar

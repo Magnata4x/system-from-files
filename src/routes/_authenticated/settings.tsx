@@ -13,17 +13,11 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Account Settings — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Security, billing, API keys, privacy and notifications for your AISignalRadar account.",
-      },
+      { name: "description", content: "Security, billing, API keys, privacy and notifications for your AISignalRadar account." },
     ],
   }),
   validateSearch: (search: Record<string, unknown>) => ({
-    tab: tabs.some((item) => item.id === search.tab)
-      ? (search.tab as TabId)
-      : ("notifications" as TabId),
+    tab: tabs.some((item) => item.id === search.tab) ? (search.tab as TabId) : "notifications" as TabId,
   }),
   component: SettingsPage,
 });
@@ -51,9 +45,7 @@ function SettingsPage() {
         <main className="flex-1 min-w-0 p-5">
           <header className="mb-5">
             <h1 className="text-xl font-semibold tracking-tight">Account Settings</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage your account, security and integrations.
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">Manage your account, security and integrations.</p>
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-5">

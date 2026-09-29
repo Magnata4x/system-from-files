@@ -36,11 +36,7 @@ export const Route = createFileRoute("/_authenticated/manipulation")({
   head: () => ({
     meta: [
       { title: "Manipulation Radar — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Institutional surveillance: stop hunts, liquidity grabs, spoofing and smart-money order flow detection in real time.",
-      },
+      { name: "description", content: "Institutional surveillance: stop hunts, liquidity grabs, spoofing and smart-money order flow detection in real time." },
     ],
   }),
   component: ManipulationPage,
@@ -175,17 +171,12 @@ function ManipulationPage() {
           <header>
             <h1 className="text-xl font-semibold tracking-tight">Manipulation Radar</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Real-time institutional surveillance — stop hunts, spoofing, liquidity sweeps, and
-              smart-money flow.
+              Real-time institutional surveillance — stop hunts, spoofing, liquidity sweeps, and smart-money flow.
             </p>
           </header>
 
           {!dismissed && alerts.length > 0 && (
-            <AlertBanner
-              count={alerts.length}
-              assets={activeAssets}
-              onDismiss={() => setDismissed(true)}
-            />
+            <AlertBanner count={alerts.length} assets={activeAssets} onDismiss={() => setDismissed(true)} />
           )}
 
           <div className="rounded-xl border border-border bg-card/40 p-4 flex flex-wrap items-end gap-3">
@@ -268,14 +259,8 @@ function ManipulationPage() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Stat label="Alerts 24h" value={String(snapshot.last24h?.alertCount ?? 0)} />
-                <Stat
-                  label="Avg score 24h"
-                  value={String(Math.round(snapshot.last24h?.avgScore ?? 0))}
-                />
-                <Stat
-                  label="Max score 24h"
-                  value={String(Math.round(snapshot.last24h?.maxScore ?? 0))}
-                />
+                <Stat label="Avg score 24h" value={String(Math.round(snapshot.last24h?.avgScore ?? 0))} />
+                <Stat label="Max score 24h" value={String(Math.round(snapshot.last24h?.maxScore ?? 0))} />
                 <Stat
                   label="Latest alert"
                   value={

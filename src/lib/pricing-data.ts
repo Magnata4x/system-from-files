@@ -82,30 +82,15 @@ export const PLANS: Plan[] = [
 ];
 
 export type CompareCell = boolean | string;
-export type CompareRow = {
-  feature: string;
-  starter: CompareCell;
-  pro: CompareCell;
-  institutional: CompareCell;
-};
+export type CompareRow = { feature: string; starter: CompareCell; pro: CompareCell; institutional: CompareCell };
 export type CompareGroup = { group: string; rows: CompareRow[] };
 
 export const COMPARISON: CompareGroup[] = [
   {
     group: "Sinais & Inteligência",
     rows: [
-      {
-        feature: "Ativos monitorados",
-        starter: "10",
-        pro: "Ilimitado",
-        institutional: "Ilimitado",
-      },
-      {
-        feature: "Score IA",
-        starter: "Básico",
-        pro: "Avançado + explicação",
-        institutional: "Avançado + custom",
-      },
+      { feature: "Ativos monitorados", starter: "10", pro: "Ilimitado", institutional: "Ilimitado" },
+      { feature: "Score IA", starter: "Básico", pro: "Avançado + explicação", institutional: "Avançado + custom" },
       { feature: "Sentiment AI", starter: false, pro: true, institutional: true },
       { feature: "Manipulation Radar", starter: false, pro: true, institutional: true },
       { feature: "DNA Trader", starter: false, pro: true, institutional: true },
@@ -114,12 +99,7 @@ export const COMPARISON: CompareGroup[] = [
   {
     group: "Alertas & Canais",
     rows: [
-      {
-        feature: "Alertas Telegram",
-        starter: "5/dia",
-        pro: "Ilimitado",
-        institutional: "Ilimitado",
-      },
+      { feature: "Alertas Telegram", starter: "5/dia", pro: "Ilimitado", institutional: "Ilimitado" },
       { feature: "Alertas Discord", starter: false, pro: true, institutional: true },
       { feature: "Webhooks", starter: false, pro: "Básico", institutional: "Avançado" },
       { feature: "Push mobile", starter: true, pro: true, institutional: true },
@@ -129,12 +109,7 @@ export const COMPARISON: CompareGroup[] = [
     group: "Execução",
     rows: [
       { feature: "Exchanges conectadas", starter: "1", pro: "5", institutional: "Ilimitado" },
-      {
-        feature: "Copy Trading",
-        starter: false,
-        pro: "Seguir",
-        institutional: "Seguir + ser seguido",
-      },
+      { feature: "Copy Trading", starter: false, pro: "Seguir", institutional: "Seguir + ser seguido" },
       { feature: "Bot4x automação", starter: false, pro: true, institutional: true },
     ],
   },
@@ -145,12 +120,7 @@ export const COMPARISON: CompareGroup[] = [
       { feature: "White label", starter: false, pro: false, institutional: true },
       { feature: "Usuários incluídos", starter: "1", pro: "1", institutional: "Até 10" },
       { feature: "SLA", starter: "—", pro: "99%", institutional: "99.9%" },
-      {
-        feature: "Suporte",
-        starter: "E-mail",
-        pro: "Chat prioritário",
-        institutional: "Gerente dedicado",
-      },
+      { feature: "Suporte", starter: "E-mail", pro: "Chat prioritário", institutional: "Gerente dedicado" },
     ],
   },
 ];

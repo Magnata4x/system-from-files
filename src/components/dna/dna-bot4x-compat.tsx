@@ -19,21 +19,16 @@ export function DnaBot4xCompat() {
         </div>
         <div>
           <h3 className="text-[14px] font-semibold">Compatibilidade Bot4x</h3>
-          <p className="text-[11.5px] text-muted-foreground">
-            Perfil ideal de execução baseado no seu DNA.
-          </p>
+          <p className="text-[11.5px] text-muted-foreground">Perfil ideal de execução baseado no seu DNA.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="md:col-span-2 rounded-lg border border-[#1D9E75]/30 bg-[#1D9E75]/8 p-4">
-          <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground">
-            Perfil recomendado
-          </div>
+          <div className="text-[10.5px] uppercase tracking-wide text-muted-foreground">Perfil recomendado</div>
           <div className="text-lg font-semibold text-foreground mt-0.5">AI Score</div>
           <p className="text-[12px] text-muted-foreground mt-1.5 leading-relaxed">
-            Seu DNA (Strategic Sniper) combina entradas seletivas com gestão de risco controlada. O
-            perfil
+            Seu DNA (Strategic Sniper) combina entradas seletivas com gestão de risco controlada. O perfil
             <span className="text-foreground font-medium"> Regular </span>
             equilibra score mínimo (82) e alavancagem moderada — alinhado ao seu padrão histórico.
           </p>
@@ -64,10 +59,7 @@ export function DnaBot4xCompat() {
               Aplicar no Bot4x <ArrowRight className="size-3.5" />
             </button>
           )}
-          <Link
-            to="/bot4x"
-            className="text-[11px] text-[var(--brand-cyan)] hover:underline text-center"
-          >
+          <Link to="/bot4x" className="text-[11px] text-[var(--brand-cyan)] hover:underline text-center">
             Abrir Bot4x →
           </Link>
         </div>

@@ -32,6 +32,7 @@ export function AlertsFeed() {
         >
           View all
         </Link>
+
       </div>
 
       {loading && alerts.length === 0 ? (
@@ -43,9 +44,7 @@ export function AlertsFeed() {
           <AlertTriangle className="size-3.5" /> {error}
         </p>
       ) : alerts.length === 0 ? (
-        <p className="text-[12px] text-muted-foreground">
-          Nenhum alerta de manipulação no momento.
-        </p>
+        <p className="text-[12px] text-muted-foreground">Nenhum alerta de manipulação no momento.</p>
       ) : (
         <div className="space-y-2">
           {alerts.map((a) => {

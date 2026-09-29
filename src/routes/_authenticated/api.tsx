@@ -11,16 +11,9 @@ export const Route = createFileRoute("/_authenticated/api")({
   head: () => ({
     meta: [
       { title: "API Access — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "REST & WebSocket API for AISignalRadar: signals, AI scores, sentiment, manipulation alerts and webhooks.",
-      },
+      { name: "description", content: "REST & WebSocket API for AISignalRadar: signals, AI scores, sentiment, manipulation alerts and webhooks." },
       { property: "og:title", content: "AISignalRadar API" },
-      {
-        property: "og:description",
-        content: "Integrate live AI trading signals into your stack via REST and WebSocket.",
-      },
+      { property: "og:description", content: "Integrate live AI trading signals into your stack via REST and WebSocket." },
     ],
   }),
   component: ApiPage,

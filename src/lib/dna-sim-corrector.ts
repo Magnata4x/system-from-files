@@ -29,10 +29,7 @@ function clamp(v: number, lo: number, hi: number) {
  * Build proposals from a simulation result vs current settings.
  * Heuristics target capital protection first, then performance.
  */
-export function proposeSimCorrections(
-  sim: SimulationResultUI,
-  simProfile: CalibProfile,
-): SimProposal[] {
+export function proposeSimCorrections(sim: SimulationResultUI, simProfile: CalibProfile): SimProposal[] {
   const s = useBot4xStore.getState();
   const sig = useSignalsStore.getState();
   const out: SimProposal[] = [];
@@ -62,44 +59,24 @@ export function proposeSimCorrections(
       reason: `Performance forte (PnL +${pnlPct.toFixed(1)}%, DD ${dd.toFixed(1)}%) — pode subir um nível`,
     });
   } else if (s.profile !== simProfile) {
-    out.push({
-      kind: "profile",
-      from: s.profile,
-      to: simProfile,
-      reason: "Adotar perfil simulado",
-    });
+    out.push({ kind: "profile", from: s.profile, to: simProfile, reason: "Adotar perfil simulado" });
   }
 
   // 2) Leverage
   if (dd >= 12 || pnlPct <= -1.5) {
     const to = clamp(s.leverage - 2, 1, 10);
     if (to !== s.leverage)
-      out.push({
-        kind: "leverage",
-        from: s.leverage,
-        to,
-        reason: `Drawdown ${dd.toFixed(1)}% — reduzir alavancagem`,
-      });
+      out.push({ kind: "leverage", from: s.leverage, to, reason: `Drawdown ${dd.toFixed(1)}% — reduzir alavancagem` });
   } else if (dd < 4 && pnlPct >= 6 && s.leverage < 5) {
     const to = clamp(s.leverage + 1, 1, 10);
-    out.push({
-      kind: "leverage",
-      from: s.leverage,
-      to,
-      reason: "Risco controlado — pode subir alavancagem",
-    });
+    out.push({ kind: "leverage", from: s.leverage, to, reason: "Risco controlado — pode subir alavancagem" });
   }
 
   // 3) Allocation
   if (pnlPct <= -2 || dd >= 15) {
     const to = clamp(s.allocationPct - 10, 10, 100);
     if (to !== s.allocationPct)
-      out.push({
-        kind: "allocation",
-        from: s.allocationPct,
-        to,
-        reason: "Reduzir exposição até recuperar",
-      });
+      out.push({ kind: "allocation", from: s.allocationPct, to, reason: "Reduzir exposição até recuperar" });
   }
 
   // 4) Stop loss — if drawdown too wide, tighten; if WR muito baixo, alargar para evitar SL prematuro
@@ -125,21 +102,11 @@ export function proposeSimCorrections(
   // 5) Take profit — se WR alto e PnL fraco, alvo provavelmente curto; se PnL bom mas WR baixo, encurtar alvo
   if (wr >= 60 && pnlPct < 3 && s.tpPct < 2.0) {
     const to = +clamp(s.tpPct + 0.3, 0.2, 20).toFixed(2);
-    out.push({
-      kind: "tp",
-      from: s.tpPct,
-      to,
-      reason: `WR alto (${wr.toFixed(0)}%) com PnL baixo — esticar alvo`,
-    });
+    out.push({ kind: "tp", from: s.tpPct, to, reason: `WR alto (${wr.toFixed(0)}%) com PnL baixo — esticar alvo` });
   } else if (wr < 45 && s.tpPct > 0.6) {
     const to = +clamp(s.tpPct - 0.2, 0.2, 20).toFixed(2);
     if (to !== s.tpPct)
-      out.push({
-        kind: "tp",
-        from: s.tpPct,
-        to,
-        reason: `WR baixo — encurtar alvo para travar lucro mais cedo`,
-      });
+      out.push({ kind: "tp", from: s.tpPct, to, reason: `WR baixo — encurtar alvo para travar lucro mais cedo` });
   }
 
   // 6) Signal filters — sob estresse, exigir score maior e priorizar Bot4x
@@ -148,20 +115,10 @@ export function proposeSimCorrections(
     const curIdx = tiers.indexOf(sig.filters.scoreMin);
     if (curIdx < tiers.length - 1) {
       const to = tiers[curIdx + 1];
-      out.push({
-        kind: "scoreMin",
-        from: sig.filters.scoreMin,
-        to,
-        reason: "Subir score mínimo dos sinais",
-      });
+      out.push({ kind: "scoreMin", from: sig.filters.scoreMin, to, reason: "Subir score mínimo dos sinais" });
     }
     if (!sig.filters.bot4xOnly) {
-      out.push({
-        kind: "bot4xOnly",
-        from: false,
-        to: true,
-        reason: "Restringir a sinais validados pelo Bot4x",
-      });
+      out.push({ kind: "bot4xOnly", from: false, to: true, reason: "Restringir a sinais validados pelo Bot4x" });
     }
   }
 

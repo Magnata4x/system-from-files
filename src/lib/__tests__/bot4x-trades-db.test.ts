@@ -60,10 +60,11 @@ hoisted.from = vi.fn(() => hoisted.builder);
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    from: (...args: unknown[]) =>
-      (hoisted.from as unknown as (...a: unknown[]) => unknown)(...args),
+    from: (...args: unknown[]) => (hoisted.from as unknown as (...a: unknown[]) => unknown)(...args),
   },
 }));
+
+
 
 vi.mock("../logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn(), log: vi.fn() },

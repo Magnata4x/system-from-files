@@ -99,25 +99,16 @@ export async function loadConfig(userId: string): Promise<Bot4xConfigRow | null>
     profile: data.profile,
     leverage: data.leverage ?? 3,
     activeCapital: Number(data.active_capital ?? 0),
-    slPct:
-      data.sl_pct != null
-        ? Number(data.sl_pct)
-        : data.rsi_threshold_low != null
-          ? Number(data.rsi_threshold_low)
-          : 0.5,
-    tpPct:
-      data.tp_pct != null
-        ? Number(data.tp_pct)
-        : data.rsi_threshold_high != null
-          ? Number(data.rsi_threshold_high)
-          : 1.0,
+    slPct: data.sl_pct != null
+      ? Number(data.sl_pct)
+      : data.rsi_threshold_low != null ? Number(data.rsi_threshold_low) : 0.5,
+    tpPct: data.tp_pct != null
+      ? Number(data.tp_pct)
+      : data.rsi_threshold_high != null ? Number(data.rsi_threshold_high) : 1.0,
     allocationPct: data.allocation_pct ?? data.ai_score_min ?? 30,
-    totalCapital:
-      data.total_capital != null
-        ? Number(data.total_capital)
-        : data.fomo_limit != null
-          ? Number(data.fomo_limit)
-          : 1000,
+    totalCapital: data.total_capital != null
+      ? Number(data.total_capital)
+      : data.fomo_limit != null ? Number(data.fomo_limit) : 1000,
     preferredPairs: legacy.preferred,
     avoidPairs: legacy.avoid,
     circuitBreaker: data.circuit_breaker ?? "none",
@@ -147,7 +138,8 @@ export async function saveConfig(userId: string, config: Partial<Bot4xConfigRow>
     ...(config.avoidPairs !== undefined && { avoid_pairs: config.avoidPairs }),
   };
 
-  const { error } = await supabase.from("bot4x_configs").upsert(row, { onConflict: "user_id" });
-  if (error)
-    logger.error("[bot4x-config-db] saveConfig error", { error: error, message: error.message });
+  const { error } = await supabase
+    .from("bot4x_configs")
+    .upsert(row, { onConflict: "user_id" });
+  if (error) logger.error("[bot4x-config-db] saveConfig error", { error: error, message: error.message });
 }

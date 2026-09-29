@@ -7,17 +7,9 @@ export const Route = createFileRoute("/_authenticated/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — AISignalRadar" },
-      {
-        name: "description",
-        content:
-          "Planos Starter, Pro e Institutional. Comece grátis por 7 dias e economize 20% no ciclo anual.",
-      },
+      { name: "description", content: "Planos Starter, Pro e Institutional. Comece grátis por 7 dias e economize 20% no ciclo anual." },
       { property: "og:title", content: "AISignalRadar Pricing" },
-      {
-        property: "og:description",
-        content:
-          "Sinais de IA, Sentiment, Manipulation Radar e DNA Trader em planos para traders e mesas institucionais.",
-      },
+      { property: "og:description", content: "Sinais de IA, Sentiment, Manipulation Radar e DNA Trader em planos para traders e mesas institucionais." },
     ],
   }),
   component: PricingPage,

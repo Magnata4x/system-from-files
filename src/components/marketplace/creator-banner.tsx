@@ -16,20 +16,15 @@ export function CreatorBanner() {
           <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#5fa8ff] bg-[#378ADD]/15 border border-[#378ADD]/30 rounded-full px-2 py-0.5 mb-3">
             <Sparkles className="size-3" /> Become a Creator
           </div>
-          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">
-            Crie e venda suas próprias estratégias
-          </h2>
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Crie e venda suas próprias estratégias</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-xl">
-            Monetize seu edge: publique indicadores, bots, alerts ou cursos e receba 80% de cada
-            venda recorrente.
+            Monetize seu edge: publique indicadores, bots, alerts ou cursos e receba 80% de cada venda recorrente.
           </p>
           <div className="flex flex-wrap gap-6 mt-5">
             {STATS.map((s) => (
               <div key={s.label}>
                 <div className="text-xl font-semibold tabular-nums">{s.value}</div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                  {s.label}
-                </div>
+                <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.label}</div>
               </div>
             ))}
           </div>

@@ -30,11 +30,9 @@ export function NarrativeRadar({
           const isActive = selected === n.tag;
           const isDimmed = selected !== null && !isActive;
           const color =
-            n.tone === "bull"
-              ? "text-emerald-300 hover:text-emerald-200"
-              : n.tone === "bear"
-                ? "text-red-300 hover:text-red-200"
-                : "text-muted-foreground hover:text-foreground";
+            n.tone === "bull" ? "text-emerald-300 hover:text-emerald-200"
+            : n.tone === "bear" ? "text-red-300 hover:text-red-200"
+            : "text-muted-foreground hover:text-foreground";
           return (
             <button
               key={n.tag}
@@ -54,8 +52,7 @@ export function NarrativeRadar({
           <TrendingDown className="size-3.5 text-emerald-300" />
         </div>
         <p className="text-xs text-foreground/85">
-          <span className="font-semibold text-emerald-300">'Regulatory Risk'</span> dropped{" "}
-          <span className="font-semibold">34%</span> in 48h — sentiment recovery signal.
+          <span className="font-semibold text-emerald-300">'Regulatory Risk'</span> dropped <span className="font-semibold">34%</span> in 48h — sentiment recovery signal.
         </p>
       </div>
     </div>

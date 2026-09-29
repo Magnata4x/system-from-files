@@ -26,10 +26,7 @@ export function MetricCards() {
   const trendLabel = marketTrend >= 1 ? "Bullish" : marketTrend <= -1 ? "Bearish" : "Neutral";
   const trendColor = marketTrend >= 1 ? "#1D9E75" : marketTrend <= -1 ? "#E24B4A" : "#888780";
 
-  const manipAssets = [...new Set(manipAlerts.map((a) => a.asset.replace("/USDT", "")))].slice(
-    0,
-    3,
-  );
+  const manipAssets = [...new Set(manipAlerts.map((a) => a.asset.replace("/USDT", "")))].slice(0, 3);
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -74,18 +71,9 @@ export function MetricCards() {
   );
 }
 
+
 function Card({
-  index,
-  icon,
-  iconColor,
-  label,
-  value,
-  valueNode,
-  valueColor,
-  sub,
-  trend,
-  pulse,
-  countTo,
+  index, icon, iconColor, label, value, valueNode, valueColor, sub, trend, pulse, countTo,
 }: {
   index: number;
   icon: React.ReactNode;
@@ -122,19 +110,14 @@ function Card({
       <div className="mt-3 text-[12px] text-muted-foreground">{label}</div>
       <div className="mt-1 flex items-center gap-2">
         {valueNode ?? (
-          <span
-            className="text-[28px] font-semibold tabular-nums"
-            style={{ color: valueColor ?? "var(--foreground)" }}
-          >
+          <span className="text-[28px] font-semibold tabular-nums" style={{ color: valueColor ?? "var(--foreground)" }}>
             {countTo !== undefined ? counted : value}
           </span>
         )}
       </div>
       <div className="mt-2 text-[12px] text-muted-foreground">{sub}</div>
       {trend && (
-        <div className="mt-1 text-[12px] font-medium" style={{ color: trend.color }}>
-          {trend.text}
-        </div>
+        <div className="mt-1 text-[12px] font-medium" style={{ color: trend.color }}>{trend.text}</div>
       )}
     </motion.div>
   );

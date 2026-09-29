@@ -27,8 +27,7 @@ export function ApiHero() {
         Integrate AISignalRadar signals into your own systems
       </h1>
       <p className="text-sm text-muted-foreground mt-2 max-w-xl">
-        REST + WebSocket access to live signals, AI scores, sentiment, and manipulation alerts
-        across 5 major exchanges.
+        REST + WebSocket access to live signals, AI scores, sentiment, and manipulation alerts across 5 major exchanges.
       </p>
       <div className="flex flex-wrap gap-2 mt-5">
         <Button className="bg-[#378ADD] hover:bg-[#2d74bd] text-white">
@@ -42,9 +41,7 @@ export function ApiHero() {
         {STATS.map((s) => (
           <div key={s.label}>
             <div className="text-xl font-semibold tabular-nums">{s.value}</div>
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground mt-0.5">
-              {s.label}
-            </div>
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>

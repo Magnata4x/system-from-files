@@ -44,7 +44,7 @@ export function WebhookConfig() {
     };
     setDeliveries((p) => [entry, ...p].slice(0, 8));
     toast[ok ? "success" : "error"](
-      ok ? `Webhook delivered (${entry.ms}ms)` : `Webhook failed: ${entry.status}`,
+      ok ? `Webhook delivered (${entry.ms}ms)` : `Webhook failed: ${entry.status}`
     );
     setTesting(false);
   }
@@ -53,9 +53,7 @@ export function WebhookConfig() {
     <section className="space-y-4">
       <header>
         <h2 className="text-lg font-semibold">Webhooks</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Receive real-time events on your own infrastructure.
-        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">Receive real-time events on your own infrastructure.</p>
       </header>
 
       <div className="rounded-lg border border-border bg-card/40 p-4 space-y-4">
@@ -78,12 +76,7 @@ export function WebhookConfig() {
             <Button variant="outline" size="icon" onClick={copySecret} title="Copy secret">
               {copied ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSecret(randomSecret())}
-              title="Regenerate"
-            >
+            <Button variant="outline" size="icon" onClick={() => setSecret(randomSecret())} title="Regenerate">
               <RefreshCw className="size-4" />
             </Button>
           </div>
@@ -94,7 +87,10 @@ export function WebhookConfig() {
           <div className="flex flex-wrap gap-4">
             {WEBHOOK_EVENTS.map((ev) => (
               <label key={ev.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                <Checkbox checked={events.includes(ev.id)} onCheckedChange={() => toggle(ev.id)} />
+                <Checkbox
+                  checked={events.includes(ev.id)}
+                  onCheckedChange={() => toggle(ev.id)}
+                />
                 <span>{ev.label}</span>
               </label>
             ))}
@@ -102,11 +98,7 @@ export function WebhookConfig() {
         </div>
 
         <div className="flex justify-end">
-          <Button
-            onClick={testWebhook}
-            disabled={testing}
-            className="bg-[#378ADD] hover:bg-[#2d74bd] text-white"
-          >
+          <Button onClick={testWebhook} disabled={testing} className="bg-[#378ADD] hover:bg-[#2d74bd] text-white">
             <Send className="size-3.5 mr-1.5" />
             {testing ? "Sending..." : "Test webhook"}
           </Button>
@@ -136,15 +128,13 @@ export function WebhookConfig() {
                         "text-[11px] font-mono px-1.5 py-0.5 rounded border",
                         d.status < 300
                           ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                          : "bg-red-500/10 text-red-400 border-red-500/30",
+                          : "bg-red-500/10 text-red-400 border-red-500/30"
                       )}
                     >
                       {d.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
-                    {d.ms}ms
-                  </td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{d.ms}ms</td>
                 </tr>
               ))}
             </tbody>

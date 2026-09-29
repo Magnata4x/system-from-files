@@ -43,34 +43,12 @@ export function MessagePreview() {
 
       <div className="px-4 py-3 border-t border-border space-y-1.5 text-xs text-muted-foreground">
         <Row label="Min score" value={`≥ ${minScore}`} />
-        <Row
-          label="Frequency"
-          value={
-            frequency === "realtime"
-              ? "Real-time"
-              : frequency === "15min"
-                ? "Every 15m"
-                : frequency === "hourly"
-                  ? "Hourly"
-                  : "Daily digest"
-          }
-        />
+        <Row label="Frequency" value={frequency === "realtime" ? "Real-time" : frequency === "15min" ? "Every 15m" : frequency === "hourly" ? "Hourly" : "Daily digest"} />
         <Row label="Alert types" value={`${enabledTypes} enabled`} />
         <Row label="Assets" value={assets.length ? assets.join(", ") : "All"} />
-        <Row
-          label="Quiet hours"
-          value={quietHours.on ? `${quietHours.from} – ${quietHours.to}` : "Off"}
-        />
+        <Row label="Quiet hours" value={quietHours.on ? `${quietHours.from} – ${quietHours.to}` : "Off"} />
         <Row label="Bot4x alerts" value={bot4x ? "Included" : "Excluded"} />
-        <Row
-          label="Channels"
-          value={
-            Object.entries(channels)
-              .filter(([, c]) => c.on)
-              .map(([k]) => k)
-              .join(", ") || "None"
-          }
-        />
+        <Row label="Channels" value={Object.entries(channels).filter(([, c]) => c.on).map(([k]) => k).join(", ") || "None"} />
       </div>
     </div>
   );

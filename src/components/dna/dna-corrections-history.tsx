@@ -40,8 +40,7 @@ export function DnaCorrectionsHistory() {
           <AlertCircle className="size-6 opacity-50" />
           <p className="text-sm">Nenhuma correção aplicada ainda.</p>
           <p className="text-xs max-w-md text-center">
-            O DNA monitora o desempenho do Bot4x e aplica ajustes automáticos quando detecta perda
-            de capital ou trajetória negativa.
+            O DNA monitora o desempenho do Bot4x e aplica ajustes automáticos quando detecta perda de capital ou trajetória negativa.
           </p>
         </div>
       ) : (
@@ -60,10 +59,7 @@ export function DnaCorrectionsHistory() {
                     {formatDistanceToNow(log.ts, { addSuffix: true, locale: ptBR })}
                   </div>
                 </div>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] h-5 border-amber-500/30 text-amber-400 bg-amber-500/10"
-                >
+                <Badge variant="outline" className="text-[10px] h-5 border-amber-500/30 text-amber-400 bg-amber-500/10">
                   Auto-correção
                 </Badge>
               </div>
@@ -74,9 +70,7 @@ export function DnaCorrectionsHistory() {
               </div>
 
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Mudanças aplicadas
-                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Mudanças aplicadas</div>
                 <ul className="space-y-1.5">
                   {log.changes.map((change, idx) => (
                     <li

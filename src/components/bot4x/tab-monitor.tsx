@@ -1,61 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Copy, Check, Pause, Play, Trash2, Zap, Rewind } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  Cell,
-  PieChart,
-  Pie,
-} from "recharts";
+  ChevronDown, Copy, Check, Pause, Play, Trash2, Zap, Rewind,
+} from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, PieChart, Pie } from "recharts";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { FILTER_NAMES, type FilterKey, type Tick, type Verdict } from "@/lib/bot4x-data";
 
 const FILTER_ORDER: FilterKey[] = ["F1", "F2", "F3", "F4", "F5", "F6"];
 
-const VERDICT_STYLE: Record<
-  Verdict,
-  { bg: string; color: string; label: string; pulse?: boolean }
-> = {
-  EXECUTE: {
-    bg: "color-mix(in oklab,#1D9E75 22%,transparent)",
-    color: "#7AD9B4",
-    label: "EXECUTE",
-    pulse: true,
-  },
+const VERDICT_STYLE: Record<Verdict, { bg: string; color: string; label: string; pulse?: boolean }> = {
+  EXECUTE: { bg: "color-mix(in oklab,#1D9E75 22%,transparent)", color: "#7AD9B4", label: "EXECUTE", pulse: true },
   IGNORE: { bg: "color-mix(in oklab,#888780 22%,transparent)", color: "#B5B4AD", label: "IGNORE" },
-  FOMO_BLOCKED: {
-    bg: "color-mix(in oklab,#EF9F27 22%,transparent)",
-    color: "#F2C46B",
-    label: "FOMO_BLOCKED",
-  },
-  GRID_SATURATED: {
-    bg: "color-mix(in oklab,#378ADD 22%,transparent)",
-    color: "#9CC6F0",
-    label: "GRID_SATURATED",
-  },
-  EMERGENCY_SHUTDOWN: {
-    bg: "color-mix(in oklab,#E24B4A 28%,transparent)",
-    color: "#FF9B9A",
-    label: "EMERGENCY_SHUTDOWN",
-  },
+  FOMO_BLOCKED: { bg: "color-mix(in oklab,#EF9F27 22%,transparent)", color: "#F2C46B", label: "FOMO_BLOCKED" },
+  GRID_SATURATED: { bg: "color-mix(in oklab,#378ADD 22%,transparent)", color: "#9CC6F0", label: "GRID_SATURATED" },
+  EMERGENCY_SHUTDOWN: { bg: "color-mix(in oklab,#E24B4A 28%,transparent)", color: "#FF9B9A", label: "EMERGENCY_SHUTDOWN" },
 };
 
 const PAIR_COLORS: Record<string, string> = {
-  "BTC/USDT": "#F7931A",
-  "ETH/USDT": "#627EEA",
-  "SOL/USDT": "#9945FF",
-  "BNB/USDT": "#F0B90B",
-  "XRP/USDT": "#23292F",
-  "ARB/USDT": "#28A0F0",
-  "AVAX/USDT": "#E84142",
-  "LINK/USDT": "#2A5ADA",
-  "DOGE/USDT": "#C2A633",
-  "MATIC/USDT": "#8247E5",
+  "BTC/USDT": "#F7931A", "ETH/USDT": "#627EEA", "SOL/USDT": "#9945FF",
+  "BNB/USDT": "#F0B90B", "XRP/USDT": "#23292F", "ARB/USDT": "#28A0F0",
+  "AVAX/USDT": "#E84142", "LINK/USDT": "#2A5ADA", "DOGE/USDT": "#C2A633", "MATIC/USDT": "#8247E5",
 };
 
 export function TabMonitor() {
@@ -63,12 +28,8 @@ export function TabMonitor() {
     <div className="space-y-5">
       <FilterPipeline />
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-3">
-          <TickFeed />
-        </div>
-        <div className="lg:col-span-2">
-          <JsonViewer />
-        </div>
+        <div className="lg:col-span-3"><TickFeed /></div>
+        <div className="lg:col-span-2"><JsonViewer /></div>
       </div>
       <FilterStats />
     </div>
@@ -102,14 +63,7 @@ function FilterPipeline() {
     for (const t of sample) {
       if (replayRef.current.cancel) break;
       // Step through filters one per second
-      const progressiveFilters: Record<FilterKey, boolean> = {
-        F1: false,
-        F2: false,
-        F3: false,
-        F4: false,
-        F5: false,
-        F6: false,
-      };
+      const progressiveFilters: Record<FilterKey, boolean> = { F1: false, F2: false, F3: false, F4: false, F5: false, F6: false };
       for (const k of FILTER_ORDER) {
         if (replayRef.current.cancel) break;
         const passed = t.filters[k] && t.blockedAt !== k;
@@ -145,9 +99,7 @@ function FilterPipeline() {
       <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
         <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
           Pipeline de filtros
-          {replayActive && (
-            <span className="ml-2 text-[#EF9F27] normal-case">· REPLAY em curso</span>
-          )}
+          {replayActive && <span className="ml-2 text-[#EF9F27] normal-case">· REPLAY em curso</span>}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -166,13 +118,7 @@ function FilterPipeline() {
           const passed = last ? last.filters[k] && last.blockedAt !== k : false;
           const blocked = last?.blockedAt === k;
           const notReached = last ? !last.filters[k] && !blocked : true;
-          const color = blocked
-            ? "#E24B4A"
-            : passed
-              ? "#1D9E75"
-              : notReached
-                ? "#3a3b40"
-                : "#888780";
+          const color = blocked ? "#E24B4A" : passed ? "#1D9E75" : notReached ? "#3a3b40" : "#888780";
           const pulse = blocked;
           return (
             <PipelineNode
@@ -197,25 +143,10 @@ function FilterPipeline() {
 }
 
 function PipelineNode({
-  k,
-  label,
-  color,
-  count,
-  pulse,
-  tickId,
-  showArrow,
-  arrowActive,
+  k, label, color, count, pulse, tickId, showArrow, arrowActive,
 }: {
-  k: FilterKey;
-  label: string;
-  color: string;
-  passed: boolean;
-  count: number;
-  pulse: boolean;
-  tickId?: string;
-  showArrow: boolean;
-  arrowActive: boolean;
-  executeAfter: boolean;
+  k: FilterKey; label: string; color: string; passed: boolean; count: number;
+  pulse: boolean; tickId?: string; showArrow: boolean; arrowActive: boolean; executeAfter: boolean;
 }) {
   return (
     <>
@@ -243,13 +174,8 @@ function PipelineNode({
             />
           )}
         </motion.div>
-        <div className="text-[10px] text-muted-foreground leading-tight text-center max-w-[70px] truncate">
-          {label}
-        </div>
-        <div
-          className="text-[9px] tabular-nums"
-          style={{ color: count > 0 ? "#E24B4A" : "#666560" }}
-        >
+        <div className="text-[10px] text-muted-foreground leading-tight text-center max-w-[70px] truncate">{label}</div>
+        <div className="text-[9px] tabular-nums" style={{ color: count > 0 ? "#E24B4A" : "#666560" }}>
           {count} hoje
         </div>
       </div>
@@ -285,10 +211,7 @@ function ExecuteNode({ last }: { last?: Tick }) {
           />
         )}
       </motion.div>
-      <div
-        className="text-[10px] font-semibold leading-tight text-center"
-        style={{ color: isExec ? "#7AD9B4" : "#888780" }}
-      >
+      <div className="text-[10px] font-semibold leading-tight text-center" style={{ color: isExec ? "#7AD9B4" : "#888780" }}>
         EXECUTAR
       </div>
       <div className="text-[9px] text-muted-foreground tabular-nums">—</div>
@@ -304,10 +227,7 @@ function ArrowConnector({ active, tickId }: { active: boolean; tickId?: string }
         <motion.div
           key={`${tickId}-arrow`}
           className="absolute inset-y-0 -top-px h-px"
-          style={{
-            background: "linear-gradient(90deg, transparent, #1D9E75, transparent)",
-            width: "60%",
-          }}
+          style={{ background: "linear-gradient(90deg, transparent, #1D9E75, transparent)", width: "60%" }}
           initial={{ x: "-60%", opacity: 0 }}
           animate={{ x: "120%", opacity: [0, 1, 0] }}
           transition={{ duration: 0.9 }}
@@ -329,34 +249,19 @@ function TickFeed() {
       <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span className="relative flex size-2 shrink-0">
-            {!paused && (
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[#1D9E75] opacity-75 animate-ping" />
-            )}
-            <span
-              className="relative inline-flex size-2 rounded-full"
-              style={{ background: paused ? "#888780" : "#1D9E75" }}
-            />
+            {!paused && <span className="absolute inline-flex h-full w-full rounded-full bg-[#1D9E75] opacity-75 animate-ping" />}
+            <span className="relative inline-flex size-2 rounded-full" style={{ background: paused ? "#888780" : "#1D9E75" }} />
           </span>
           <span className="text-[12px] font-semibold text-foreground truncate">Feed de Ticks</span>
           <span className="text-[10px] text-muted-foreground tabular-nums hidden sm:inline">
-            {processed === 0
-              ? "· Aguardando primeiro tick..."
-              : `· ${processed.toLocaleString()} processados`}
+            {processed === 0 ? "· Aguardando primeiro tick..." : `· ${processed.toLocaleString()} processados`}
           </span>
         </div>
         <button
           onClick={toggle}
           className="inline-flex items-center gap-1 h-7 px-2 rounded text-[11px] text-foreground hover:bg-secondary transition-colors"
         >
-          {paused ? (
-            <>
-              <Play className="size-3.5" /> Resumir
-            </>
-          ) : (
-            <>
-              <Pause className="size-3.5" /> Pausar
-            </>
-          )}
+          {paused ? <><Play className="size-3.5" /> Resumir</> : <><Pause className="size-3.5" /> Pausar</>}
         </button>
       </div>
       <div className="max-h-[520px] overflow-y-auto">
@@ -374,9 +279,7 @@ function TickFeed() {
             </motion.div>
           ))}
           {ticks.length === 0 && (
-            <div className="px-4 py-10 text-center text-[12px] text-muted-foreground">
-              Aguardando ticks…
-            </div>
+            <div className="px-4 py-10 text-center text-[12px] text-muted-foreground">Aguardando ticks…</div>
           )}
         </AnimatePresence>
       </div>
@@ -399,8 +302,7 @@ function TickRow({ tick }: { tick: Tick }) {
   const lines: { ok: boolean; label: string }[] = [];
   for (const k of FILTER_ORDER) {
     const ok = tick.filters[k];
-    const reached =
-      !tick.blockedAt || FILTER_ORDER.indexOf(k) <= FILTER_ORDER.indexOf(tick.blockedAt);
+    const reached = !tick.blockedAt || FILTER_ORDER.indexOf(k) <= FILTER_ORDER.indexOf(tick.blockedAt);
     if (!reached) continue;
     const text = `${k}: ${tick.detail[k]}${tick.blockedAt === k ? " → BLOQUEADO" : ""}`;
     lines.push({ ok, label: text });
@@ -417,18 +319,13 @@ function TickRow({ tick }: { tick: Tick }) {
         <div className="flex items-center gap-2 flex-wrap">
           <span
             className="px-1.5 py-0.5 rounded text-[10px] font-bold tabular-nums"
-            style={{
-              background: `color-mix(in oklab, ${pairColor} 28%, transparent)`,
-              color: pairColor === "#23292F" ? "#B5B4AD" : pairColor,
-            }}
+            style={{ background: `color-mix(in oklab, ${pairColor} 28%, transparent)`, color: pairColor === "#23292F" ? "#B5B4AD" : pairColor }}
           >
             {tick.pair}
           </span>
           <span
             className="text-[10px] font-bold"
-            style={{
-              color: tick.side === "BUY" ? "#1D9E75" : tick.side === "SELL" ? "#E24B4A" : "#888780",
-            }}
+            style={{ color: tick.side === "BUY" ? "#1D9E75" : tick.side === "SELL" ? "#E24B4A" : "#888780" }}
           >
             {tick.side ?? "—"}
           </span>
@@ -439,18 +336,12 @@ function TickRow({ tick }: { tick: Tick }) {
           >
             {v.label}
           </motion.span>
-          <ChevronDown
-            className={`size-3.5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-          />
+          <ChevronDown className={`size-3.5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
         </div>
         <div className="mt-2 space-y-0.5 font-mono text-[11px] leading-relaxed">
           {lines.map((l, i) => (
-            <div
-              key={i}
-              style={{ color: l.ok ? "#7AD9B4" : "#FF9B9A", fontWeight: l.ok ? 400 : 600 }}
-            >
-              {l.ok ? "✓ " : "✗ "}
-              {l.label}
+            <div key={i} style={{ color: l.ok ? "#7AD9B4" : "#FF9B9A", fontWeight: l.ok ? 400 : 600 }}>
+              {l.ok ? "✓ " : "✗ "}{l.label}
             </div>
           ))}
           {exec && (
@@ -461,9 +352,7 @@ function TickRow({ tick }: { tick: Tick }) {
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
@@ -489,12 +378,7 @@ function tickToJson(t: Tick) {
     liquidityGrab: t.liquidityGrab,
     fomoDisplacement: t.fomoDisplacement,
     profile: t.profileId,
-    thresholds: {
-      rsiBuy: t.rsiBuy,
-      rsiSell: t.rsiSell,
-      aiScoreMin: t.aiScoreMin,
-      fomoLimit: t.fomoLimit,
-    },
+    thresholds: { rsiBuy: t.rsiBuy, rsiSell: t.rsiSell, aiScoreMin: t.aiScoreMin, fomoLimit: t.fomoLimit },
     slotsUsed: t.slotsUsed,
     filters: t.filters,
     blockedAt: t.blockedAt ?? null,
@@ -517,10 +401,9 @@ function JsonViewer() {
   const data = useMemo(() => {
     if (cleared) return { info: "viewer limpo" };
     if (tab === "tick") return lastTick ? tickToJson(lastTick) : { info: "sem ticks ainda" };
-    if (tab === "order")
-      return lastOrder
-        ? { ...lastOrder, leverage: 3, profile: "conservador", mode: "DEMO" }
-        : { info: "sem ordens ativas" };
+    if (tab === "order") return lastOrder
+      ? { ...lastOrder, leverage: 3, profile: "conservador", mode: "DEMO" }
+      : { info: "sem ordens ativas" };
     return {
       reason: dailyPnl <= -1.5 ? "circuit_breaker_-1.5%" : "no_shutdown",
       ts: Date.now(),
@@ -533,22 +416,14 @@ function JsonViewer() {
 
   const actionColor =
     "action" in (data as Record<string, unknown>)
-      ? (data as { action?: string }).action?.startsWith("EXECUTE")
-        ? "#1D9E75"
-        : (data as { action?: string }).action === "EMERGENCY_SHUTDOWN"
-          ? "#E24B4A"
-          : (data as { action?: string }).action === "SKIP"
-            ? "#888780"
-            : "#378ADD"
+      ? (data as { action?: string }).action?.startsWith("EXECUTE") ? "#1D9E75"
+        : (data as { action?: string }).action === "EMERGENCY_SHUTDOWN" ? "#E24B4A"
+        : (data as { action?: string }).action === "SKIP" ? "#888780" : "#378ADD"
       : undefined;
 
   const json = JSON.stringify(data, null, 2);
   const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(json);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
+    try { await navigator.clipboard.writeText(json); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
   };
 
   const [glow, setGlow] = useState(false);
@@ -581,14 +456,9 @@ function JsonViewer() {
         {tabs.map((t) => (
           <button
             key={t.id}
-            onClick={() => {
-              setTab(t.id);
-              setCleared(false);
-            }}
+            onClick={() => { setTab(t.id); setCleared(false); }}
             className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-              tab === t.id && !cleared
-                ? "bg-[var(--brand-blue-deep)] text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              tab === t.id && !cleared ? "bg-[var(--brand-blue-deep)] text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {t.label}
@@ -613,7 +483,9 @@ function JsonViewer() {
         style={actionColor ? { boxShadow: `inset 4px 0 0 ${actionColor}` } : undefined}
       >
         {json.split("\n").map((line, i) => (
-          <div key={i}>{colorize(line)}</div>
+          <div key={i}>
+            {colorize(line)}
+          </div>
         ))}
       </pre>
     </motion.section>
@@ -628,26 +500,15 @@ function colorize(line: string) {
   let m: RegExpExecArray | null;
   while ((m = regex.exec(line)) !== null) {
     if (m.index > last) parts.push({ t: line.slice(last, m.index) });
-    if (m[1])
-      parts.push({ t: m[1], c: "#378ADD" }); // key
-    else if (m[2])
-      parts.push({ t: m[2], c: "#1D9E75" }); // string
-    else if (m[3])
-      parts.push({ t: m[3], c: "#EF9F27" }); // number
+    if (m[1]) parts.push({ t: m[1], c: "#378ADD" });           // key
+    else if (m[2]) parts.push({ t: m[2], c: "#1D9E75" });      // string
+    else if (m[3]) parts.push({ t: m[3], c: "#EF9F27" });      // number
     else if (m[4]) parts.push({ t: m[4], c: m[4] === "true" ? "#1D9E75" : "#E24B4A" });
     else if (m[5]) parts.push({ t: m[5], c: "#888780" });
     last = regex.lastIndex;
   }
   if (last < line.length) parts.push({ t: line.slice(last) });
-  return parts.map((p, i) =>
-    p.c ? (
-      <span key={i} style={{ color: p.c }}>
-        {p.t}
-      </span>
-    ) : (
-      <span key={i}>{p.t}</span>
-    ),
-  );
+  return parts.map((p, i) => p.c ? <span key={i} style={{ color: p.c }}>{p.t}</span> : <span key={i}>{p.t}</span>);
 }
 
 // ============= FILTER STATS =============
@@ -656,9 +517,7 @@ function FilterStats() {
   const processed = useBot4xStore((s) => s.ticksProcessed);
 
   const stats = useMemo(() => {
-    let exec = 0,
-      blockedCount = 0,
-      ignore = 0;
+    let exec = 0, blockedCount = 0, ignore = 0;
     const cat: Record<string, number> = {
       "F4 Zona central": 0,
       "F5 RSI": 0,
@@ -684,11 +543,7 @@ function FilterStats() {
       "F5 aiScore": "#534AB7",
       "F6 FOMO": "#E24B4A",
     };
-    const bars = Object.entries(cat).map(([name, blocks]) => ({
-      name,
-      blocks,
-      fill: colors[name],
-    }));
+    const bars = Object.entries(cat).map(([name, blocks]) => ({ name, blocks, fill: colors[name] }));
     const total = ticks.length;
     const donut = [
       { name: "EXECUTE", value: exec, fill: "#1D9E75" },
@@ -696,13 +551,7 @@ function FilterStats() {
       { name: "BLOCKED", value: blockedCount, fill: "#E24B4A" },
     ];
     return {
-      bars,
-      donut,
-      exec,
-      ignore,
-      blocked: blockedCount,
-      total,
-      processed,
+      bars, donut, exec, ignore, blocked: blockedCount, total, processed,
       blockedPct: total ? Math.round((blockedCount / total) * 100) : 0,
       execPct: total ? Math.round((exec / total) * 100) : 0,
       ignorePct: total ? Math.round((ignore / total) * 100) : 0,
@@ -712,57 +561,30 @@ function FilterStats() {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
       <div className="lg:col-span-2 rounded-lg border border-border bg-card p-4">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-          Bloqueios por filtro (sessão)
-        </div>
+        <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Bloqueios por filtro (sessão)</div>
         <div className="h-48">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stats.bars} margin={{ top: 6, right: 8, left: -16, bottom: 0 }}>
-              <XAxis
-                dataKey="name"
-                stroke="#888780"
-                tick={{ fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                stroke="#888780"
-                tick={{ fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-              />
+              <XAxis dataKey="name" stroke="#888780" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="#888780" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
-                contentStyle={{
-                  background: "#111318",
-                  border: "1px solid #1E2028",
-                  borderRadius: 6,
-                  fontSize: 12,
-                }}
+                contentStyle={{ background: "#111318", border: "1px solid #1E2028", borderRadius: 6, fontSize: 12 }}
                 cursor={{ fill: "color-mix(in oklab, #378ADD 8%, transparent)" }}
               />
               <Bar dataKey="blocks" radius={[4, 4, 0, 0]}>
-                {stats.bars.map((b) => (
-                  <Cell key={b.name} fill={b.fill} />
-                ))}
+                {stats.bars.map((b) => (<Cell key={b.name} fill={b.fill} />))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
       <div className="rounded-lg border border-border bg-card p-4 flex flex-col">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-          Distribuição hoje
-        </div>
+        <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Distribuição hoje</div>
         <div className="relative h-40">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={
-                  stats.donut.every((d) => d.value === 0)
-                    ? [{ name: "—", value: 1, fill: "#2a2b30" }]
-                    : stats.donut
-                }
+                data={stats.donut.every((d) => d.value === 0) ? [{ name: "—", value: 1, fill: "#2a2b30" }] : stats.donut}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={42}
@@ -771,28 +593,16 @@ function FilterStats() {
                 stroke="none"
                 isAnimationActive
               >
-                {stats.donut.map((d) => (
-                  <Cell key={d.name} fill={d.fill} />
-                ))}
+                {stats.donut.map((d) => (<Cell key={d.name} fill={d.fill} />))}
               </Pie>
               <Tooltip
-                contentStyle={{
-                  background: "#111318",
-                  border: "1px solid #1E2028",
-                  borderRadius: 6,
-                  fontSize: 12,
-                }}
-                formatter={(v: number, n: string) => [
-                  `${v} (${stats.total ? Math.round((v / stats.total) * 100) : 0}%)`,
-                  n,
-                ]}
+                contentStyle={{ background: "#111318", border: "1px solid #1E2028", borderRadius: 6, fontSize: 12 }}
+                formatter={(v: number, n: string) => [`${v} (${stats.total ? Math.round((v / stats.total) * 100) : 0}%)`, n]}
               />
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="text-[18px] font-semibold tabular-nums text-foreground">
-              {stats.total}
-            </div>
+            <div className="text-[18px] font-semibold tabular-nums text-foreground">{stats.total}</div>
             <div className="text-[9px] uppercase tracking-wider text-muted-foreground">ticks</div>
           </div>
         </div>
@@ -804,11 +614,7 @@ function FilterStats() {
       </div>
       <div className="grid grid-cols-2 gap-3 content-start">
         <SummaryCard label="Total ticks" value={`${stats.processed.toLocaleString()}`} />
-        <SummaryCard
-          label="Bloqueados"
-          value={`${stats.blocked} · ${stats.blockedPct}%`}
-          color="#E24B4A"
-        />
+        <SummaryCard label="Bloqueados" value={`${stats.blocked} · ${stats.blockedPct}%`} color="#E24B4A" />
         <SummaryCard label="Executados" value={`${stats.exec}`} color="#1D9E75" />
         <SummaryCard label="Win rate (exec)" value={`~62%`} color="#7AD9B4" />
       </div>
@@ -816,24 +622,12 @@ function FilterStats() {
   );
 }
 
-function LegendRow({
-  color,
-  label,
-  value,
-  pct,
-}: {
-  color: string;
-  label: string;
-  value: number;
-  pct: number;
-}) {
+function LegendRow({ color, label, value, pct }: { color: string; label: string; value: number; pct: number }) {
   return (
     <div className="flex items-center gap-2">
       <span className="inline-block size-2 rounded-sm" style={{ background: color }} />
       <span className="text-muted-foreground flex-1">{label}</span>
-      <span className="tabular-nums font-semibold" style={{ color }}>
-        {value}
-      </span>
+      <span className="tabular-nums font-semibold" style={{ color }}>{value}</span>
       <span className="tabular-nums text-muted-foreground w-9 text-right">{pct}%</span>
     </div>
   );
@@ -843,12 +637,7 @@ function SummaryCard({ label, value, color }: { label: string; value: string; co
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-3">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div
-        className="text-[18px] font-semibold tabular-nums mt-1"
-        style={{ color: color ?? undefined }}
-      >
-        {value}
-      </div>
+      <div className="text-[18px] font-semibold tabular-nums mt-1" style={{ color: color ?? undefined }}>{value}</div>
     </div>
   );
 }

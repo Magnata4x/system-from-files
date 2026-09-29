@@ -1,23 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { BadgeCheck, Calculator, Lock } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DEFAULT_CONFIG, type CopyConfig, type Trader } from "@/lib/copy-trading-data";
 import { cn } from "@/lib/utils";
 
@@ -110,9 +98,7 @@ export function CopyConfigModal({ trader, open, onOpenChange, onConfirm }: Props
             <label className="text-xs text-muted-foreground">Asset filter</label>
             <Select
               value={config.assetFilter}
-              onValueChange={(v) =>
-                setConfig((c) => ({ ...c, assetFilter: v as CopyConfig["assetFilter"] }))
-              }
+              onValueChange={(v) => setConfig((c) => ({ ...c, assetFilter: v as CopyConfig["assetFilter"] }))}
             >
               <SelectTrigger className="h-9 text-sm">
                 <SelectValue />
@@ -160,16 +146,14 @@ export function CopyConfigModal({ trader, open, onOpenChange, onConfirm }: Props
               </div>
               <div className="flex items-center justify-between text-[11px] pt-2 border-t border-border/60">
                 <span className="text-muted-foreground">Worst-case drawdown</span>
-                <span className="text-red-400 tabular-nums">
-                  -${sim.worstCase.toLocaleString()}
-                </span>
+                <span className="text-red-400 tabular-nums">-${sim.worstCase.toLocaleString()}</span>
               </div>
               <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-                Projection based on historical win rate & R/R. Past performance does not guarantee
-                future results.
+                Projection based on historical win rate & R/R. Past performance does not guarantee future results.
               </p>
             </div>
           )}
+
 
           <div className="flex items-start gap-3 rounded-md border border-border bg-secondary/30 p-3">
             <Lock className="size-4 text-muted-foreground mt-0.5 shrink-0" />
@@ -182,22 +166,15 @@ export function CopyConfigModal({ trader, open, onOpenChange, onConfirm }: Props
                 <span className="text-[10px] uppercase tracking-wide font-semibold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
                   Coming soon
                 </span>
-                <span className="text-[11px] text-muted-foreground">
-                  Real execution under audit.
-                </span>
+                <span className="text-[11px] text-muted-foreground">Real execution under audit.</span>
               </div>
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            className="bg-[#378ADD] hover:bg-[#2d74bd] text-white"
-            onClick={() => onConfirm(config)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button className="bg-[#378ADD] hover:bg-[#2d74bd] text-white" onClick={() => onConfirm(config)}>
             Start copying
           </Button>
         </DialogFooter>
@@ -206,15 +183,7 @@ export function CopyConfigModal({ trader, open, onOpenChange, onConfirm }: Props
   );
 }
 
-function Field({
-  label,
-  value,
-  children,
-}: {
-  label: string;
-  value: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, value, children }: { label: string; value: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -226,28 +195,11 @@ function Field({
   );
 }
 
-function SimStat({
-  label,
-  primary,
-  secondary,
-  tone,
-}: {
-  label: string;
-  primary: string;
-  secondary: string;
-  tone: "pos" | "neg";
-}) {
+function SimStat({ label, primary, secondary, tone }: { label: string; primary: string; secondary: string; tone: "pos" | "neg" }) {
   return (
     <div className="rounded bg-card/60 border border-border/60 px-2.5 py-2">
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div
-        className={cn(
-          "text-base font-semibold tabular-nums mt-0.5",
-          tone === "pos" ? "text-emerald-400" : "text-red-400",
-        )}
-      >
-        {primary}
-      </div>
+      <div className={cn("text-base font-semibold tabular-nums mt-0.5", tone === "pos" ? "text-emerald-400" : "text-red-400")}>{primary}</div>
       <div className="text-[10.5px] text-muted-foreground tabular-nums">{secondary}</div>
     </div>
   );

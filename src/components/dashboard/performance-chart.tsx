@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Cell,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
 import { scoreDistribution } from "@/lib/dashboard-data";
 import { scoreColor } from "./score-badge";
 
@@ -26,43 +17,22 @@ export function PerformanceChart() {
           <button
             onClick={() => setMode("asset")}
             className={`px-3 py-1 rounded-full text-[12px] font-medium ${mode === "asset" ? "bg-card text-foreground border border-border" : "text-muted-foreground"}`}
-          >
-            By Asset
-          </button>
+          >By Asset</button>
           <button
             onClick={() => setMode("tf")}
             className={`px-3 py-1 rounded-full text-[12px] font-medium ${mode === "tf" ? "bg-card text-foreground border border-border" : "text-muted-foreground"}`}
-          >
-            By Timeframe
-          </button>
+          >By Timeframe</button>
         </div>
       </div>
       <div className="h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <CartesianGrid stroke="#1E2028" vertical={false} />
-            <XAxis
-              dataKey="name"
-              stroke="#888780"
-              tick={{ fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              stroke="#888780"
-              tick={{ fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-              domain={[0, 100]}
-            />
+            <XAxis dataKey="name" stroke="#888780" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis stroke="#888780" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
             <Tooltip
               cursor={{ fill: "rgba(55,138,221,0.06)" }}
-              contentStyle={{
-                background: "#111318",
-                border: "1px solid #1E2028",
-                borderRadius: 8,
-                fontSize: 12,
-              }}
+              contentStyle={{ background: "#111318", border: "1px solid #1E2028", borderRadius: 8, fontSize: 12 }}
             />
             <Bar dataKey="avg" radius={[6, 6, 0, 0]}>
               {data.map((d, i) => (

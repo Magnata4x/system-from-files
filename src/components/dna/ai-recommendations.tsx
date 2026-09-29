@@ -24,17 +24,12 @@ export function AiRecommendations() {
           {RECS.map((r) => {
             const Icon = r.icon;
             return (
-              <li
-                key={r.label}
-                className="flex items-start gap-3 rounded-lg border border-border bg-background/30 p-3"
-              >
+              <li key={r.label} className="flex items-start gap-3 rounded-lg border border-border bg-background/30 p-3">
                 <div className="size-8 rounded-md bg-[var(--brand-blue-deep)]/50 flex items-center justify-center shrink-0">
                   <Icon className="size-4 text-[var(--brand-cyan)]" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {r.label}
-                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{r.label}</div>
                   <div className="text-sm mt-0.5">{r.value}</div>
                 </div>
               </li>
@@ -43,14 +38,8 @@ export function AiRecommendations() {
         </ul>
 
         <div className="mt-5 flex items-center justify-between flex-wrap gap-3">
-          <p className="text-xs text-muted-foreground">
-            Personalised guidance updates weekly based on your trade log.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-purple-500/40 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200"
-          >
+          <p className="text-xs text-muted-foreground">Personalised guidance updates weekly based on your trade log.</p>
+          <Button variant="outline" size="sm" className="border-purple-500/40 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200">
             <Sparkles className="size-3.5 mr-1.5" /> Unlock AI coaching mode
           </Button>
         </div>

@@ -31,9 +31,7 @@ export function SignalsTable() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1 rounded-full text-[12px] font-medium transition-colors ${
-                filter === f
-                  ? "bg-card text-foreground border border-border"
-                  : "text-muted-foreground hover:text-foreground"
+                filter === f ? "bg-card text-foreground border border-border" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {f === "HIGH" ? "≥80" : f}
@@ -59,28 +57,22 @@ export function SignalsTable() {
           </thead>
           <tbody className="text-foreground tabular-nums">
             {filtered.map((s) => (
-              <tr
-                key={s.id}
-                className="border-t border-border hover:bg-secondary/40 transition-colors"
-              >
+              <tr key={s.id} className="border-t border-border hover:bg-secondary/40 transition-colors">
                 <td className="py-3 px-4 font-medium">{s.asset}</td>
                 <td className="py-3 px-2">
                   <span
                     className="px-2 py-0.5 rounded text-[11px] font-semibold"
                     style={{
-                      background:
-                        s.direction === "BUY"
-                          ? "color-mix(in oklab, #1D9E75 18%, transparent)"
-                          : "color-mix(in oklab, #E24B4A 18%, transparent)",
+                      background: s.direction === "BUY"
+                        ? "color-mix(in oklab, #1D9E75 18%, transparent)"
+                        : "color-mix(in oklab, #E24B4A 18%, transparent)",
                       color: s.direction === "BUY" ? "#1D9E75" : "#E24B4A",
                     }}
                   >
                     {s.direction}
                   </span>
                 </td>
-                <td className="py-3 px-2">
-                  <ScoreBadge score={s.score} size="sm" />
-                </td>
+                <td className="py-3 px-2"><ScoreBadge score={s.score} size="sm" /></td>
                 <td className="py-3 px-2 text-right">{fmt(s.entry)}</td>
                 <td className="py-3 px-2 text-right text-muted-foreground">{fmt(s.stop)}</td>
                 <td className="py-3 px-2 text-right">{fmt(s.target)}</td>
@@ -99,10 +91,7 @@ export function SignalsTable() {
             ))}
             {filtered.length === 0 && (
               <tr className="border-t border-border">
-                <td
-                  colSpan={10}
-                  className="py-6 px-4 text-center text-[12px] text-muted-foreground"
-                >
+                <td colSpan={10} className="py-6 px-4 text-center text-[12px] text-muted-foreground">
                   {loading
                     ? "Carregando sinais…"
                     : error
@@ -117,6 +106,7 @@ export function SignalsTable() {
     </div>
   );
 }
+
 
 function fmt(n: number) {
   return n >= 100 ? n.toLocaleString(undefined, { maximumFractionDigits: 1 }) : n.toFixed(2);

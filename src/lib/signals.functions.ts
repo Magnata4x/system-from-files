@@ -2,7 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { cachedJson } from "./cache";
-import { type SignalListItemDTO, mapSignal, resolveApiBase, SIGNALS_TTL } from "./signals.mappers";
+import {
+  type SignalListItemDTO,
+  mapSignal,
+  resolveApiBase,
+  SIGNALS_TTL,
+} from "./signals.mappers";
 
 export type { SignalListItemDTO };
 

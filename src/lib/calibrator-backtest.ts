@@ -153,20 +153,8 @@ const STRATEGIES: Record<SimulationProfile, (c: Ctx) => Signal> = {
     if (a / price < 0.0005) return "FLAT";
 
     // Confluências LONG
-    const longChecks = [
-      e9 > e21,
-      price > vwap,
-      mom > 0.0015,
-      volAnom >= 1.3,
-      bullishCandle && bodyRatio >= 0.55,
-    ];
-    const shortChecks = [
-      e9 < e21,
-      price < vwap,
-      mom < -0.0015,
-      volAnom >= 1.3,
-      !bullishCandle && bodyRatio >= 0.55,
-    ];
+    const longChecks = [e9 > e21, price > vwap, mom > 0.0015, volAnom >= 1.3, bullishCandle && bodyRatio >= 0.55];
+    const shortChecks = [e9 < e21, price < vwap, mom < -0.0015, volAnom >= 1.3, !bullishCandle && bodyRatio >= 0.55];
     const longScore = longChecks.filter(Boolean).length / longChecks.length;
     const shortScore = shortChecks.filter(Boolean).length / shortChecks.length;
     if (longScore >= 0.8) return "LONG";
@@ -357,24 +345,8 @@ const STRATEGIES: Record<SimulationProfile, (c: Ctx) => Signal> = {
     const consUp = upDays >= 12;
     const consDown = downDays >= 12;
 
-    const longChecks = [
-      e200 > e400,
-      price > e200,
-      macroUp,
-      cycleRet > 0.05,
-      instFlow,
-      slopeUp,
-      consUp,
-    ];
-    const shortChecks = [
-      e200 < e400,
-      price < e200,
-      macroDown,
-      cycleRet < -0.05,
-      instFlow,
-      slopeDown,
-      consDown,
-    ];
+    const longChecks = [e200 > e400, price > e200, macroUp, cycleRet > 0.05, instFlow, slopeUp, consUp];
+    const shortChecks = [e200 < e400, price < e200, macroDown, cycleRet < -0.05, instFlow, slopeDown, consDown];
     const longScore = longChecks.filter(Boolean).length / longChecks.length;
     const shortScore = shortChecks.filter(Boolean).length / shortChecks.length;
     if (longScore >= 0.7) return "LONG";
@@ -539,9 +511,7 @@ export function runPortfolioBacktest(p: PortfolioParams): BacktestResponse {
       // Liquidação por alavancagem
       const worst = pos.side === "LONG" ? c.low : c.high;
       const adverse =
-        pos.side === "LONG"
-          ? (worst - pos.entryPrice) / pos.entryPrice
-          : (pos.entryPrice - worst) / pos.entryPrice;
+        pos.side === "LONG" ? (worst - pos.entryPrice) / pos.entryPrice : (pos.entryPrice - worst) / pos.entryPrice;
       if (adverse * lev <= -1) {
         const dir = pos.side === "LONG" ? 1 : -1;
         const ret = -1 - fee;
@@ -611,11 +581,7 @@ export function runPortfolioBacktest(p: PortfolioParams): BacktestResponse {
         if (heldSymbols.has(s.symbol)) continue;
         const cInfo = candleAt.get(s.symbol)!.get(ts);
         if (!cInfo) continue;
-        const sig = STRATEGIES[p.profile]({
-          closes: closesBySym.get(s.symbol)!,
-          i: cInfo.idx,
-          candles: s.candles,
-        });
+        const sig = STRATEGIES[p.profile]({ closes: closesBySym.get(s.symbol)!, i: cInfo.idx, candles: s.candles });
         if (sig === "FLAT") continue;
         if (eq <= 0 || cash <= 0) break;
         const notional = eq * FRAC;

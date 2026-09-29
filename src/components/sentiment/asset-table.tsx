@@ -7,10 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 const trendIcon: Record<string, string> = { up: "↑", upup: "↑↑", flat: "→", down: "↓" };
 const trendColor: Record<string, string> = {
-  up: "text-emerald-300",
-  upup: "text-emerald-300",
-  flat: "text-muted-foreground",
-  down: "text-red-300",
+  up: "text-emerald-300", upup: "text-emerald-300", flat: "text-muted-foreground", down: "text-red-300",
 };
 
 export function AssetSentimentTable() {
@@ -23,14 +20,12 @@ export function AssetSentimentTable() {
     return (
       <div className="rounded-xl border border-border bg-card/40 p-4 space-y-2">
         <div className="flex items-baseline justify-between mb-3">
-          <h3 className="text-sm font-semibold">Asset Sentiment</h3>
-          <span className="text-[10px] text-muted-foreground">
-            {isError ? "dados indisponíveis · demo" : data ? "ao vivo" : "demo"}
-          </span>
-        </div>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-8 w-full" />
-        ))}
+        <h3 className="text-sm font-semibold">Asset Sentiment</h3>
+        <span className="text-[10px] text-muted-foreground">
+          {isError ? "dados indisponíveis · demo" : data ? "ao vivo" : "demo"}
+        </span>
+      </div>
+        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
       </div>
     );
   }
@@ -70,17 +65,9 @@ export function AssetSentimentTable() {
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={a.spark.map((v, i) => ({ i, v }))}>
                           <Line
-                            type="monotone"
-                            dataKey="v"
-                            stroke={
-                              a.trend === "down"
-                                ? "#ef4444"
-                                : a.trend === "flat"
-                                  ? "#94a3b8"
-                                  : "#22d3ee"
-                            }
-                            strokeWidth={1.5}
-                            dot={false}
+                            type="monotone" dataKey="v"
+                            stroke={a.trend === "down" ? "#ef4444" : a.trend === "flat" ? "#94a3b8" : "#22d3ee"}
+                            strokeWidth={1.5} dot={false}
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -88,17 +75,11 @@ export function AssetSentimentTable() {
                   </div>
                 </td>
                 <td className="text-right">
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      a.signal === "BULLISH"
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : a.signal === "BEARISH"
-                          ? "bg-red-500/15 text-red-300"
-                          : "bg-secondary text-muted-foreground"
-                    }`}
-                  >
-                    {a.signal}
-                  </span>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    a.signal === "BULLISH" ? "bg-emerald-500/15 text-emerald-300"
+                    : a.signal === "BEARISH" ? "bg-red-500/15 text-red-300"
+                    : "bg-secondary text-muted-foreground"
+                  }`}>{a.signal}</span>
                 </td>
               </tr>
             ))}
@@ -111,50 +92,25 @@ export function AssetSentimentTable() {
             <DialogTitle>{selected}/USDT</DialogTitle>
           </DialogHeader>
           {detail.isPending ? (
-            <div className="space-y-3">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-44 w-full" />
-            </div>
+            <div className="space-y-3"><Skeleton className="h-20 w-full" /><Skeleton className="h-44 w-full" /></div>
           ) : detail.isError || !detail.data ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
-              Não foi possível carregar os detalhes deste ativo.
-            </p>
+            <p className="py-10 text-center text-sm text-muted-foreground">Não foi possível carregar os detalhes deste ativo.</p>
           ) : (
             <div className="space-y-5">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Metric
-                  label="Preço"
-                  value={detail.data.price.toLocaleString("pt-BR", { maximumFractionDigits: 6 })}
-                />
-                <Metric
-                  label="Variação 24h"
-                  value={`${detail.data.changePct >= 0 ? "+" : ""}${detail.data.changePct.toFixed(2)}%`}
-                />
-                <Metric
-                  label="Máxima"
-                  value={detail.data.high.toLocaleString("pt-BR", { maximumFractionDigits: 4 })}
-                />
-                <Metric
-                  label="Mínima"
-                  value={detail.data.low.toLocaleString("pt-BR", { maximumFractionDigits: 4 })}
-                />
+                <Metric label="Preço" value={detail.data.price.toLocaleString("pt-BR", { maximumFractionDigits: 6 })} />
+                <Metric label="Variação 24h" value={`${detail.data.changePct >= 0 ? "+" : ""}${detail.data.changePct.toFixed(2)}%`} />
+                <Metric label="Máxima" value={detail.data.high.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
+                <Metric label="Mínima" value={detail.data.low.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
               </div>
               <div className="h-48 rounded-md border border-border p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={detail.data.series}>
-                    <Line
-                      type="monotone"
-                      dataKey="close"
-                      stroke="var(--brand-cyan)"
-                      strokeWidth={2}
-                      dot={false}
-                    />
+                    <Line type="monotone" dataKey="close" stroke="var(--brand-cyan)" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Últimas 48 horas · atualização ao vivo pela exchange
-              </p>
+              <p className="text-xs text-muted-foreground">Últimas 48 horas · atualização ao vivo pela exchange</p>
             </div>
           )}
         </DialogContent>
@@ -164,10 +120,5 @@ export function AssetSentimentTable() {
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-border p-3">
-      <div className="text-[10px] uppercase text-muted-foreground">{label}</div>
-      <div className="mt-1 text-sm font-semibold tabular-nums">{value}</div>
-    </div>
-  );
+  return <div className="rounded-md border border-border p-3"><div className="text-[10px] uppercase text-muted-foreground">{label}</div><div className="mt-1 text-sm font-semibold tabular-nums">{value}</div></div>;
 }

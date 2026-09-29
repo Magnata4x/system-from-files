@@ -15,17 +15,8 @@ const PLAN_COLORS: Record<string, string> = {
 };
 
 export function HeaderCard() {
-  const {
-    info,
-    plan,
-    memberSince,
-    archetype,
-    daysActive,
-    signalsViewed,
-    setInfo,
-    publicProfile,
-    setPublicProfile,
-  } = useProfileStore();
+  const { info, plan, memberSince, archetype, daysActive, signalsViewed, setInfo, publicProfile, setPublicProfile } =
+    useProfileStore();
   const [cropOpen, setCropOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
@@ -37,10 +28,9 @@ export function HeaderCard() {
     .join("")
     .toUpperCase();
 
-  const shareUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/u/${info.username}`
-      : `/u/${info.username}`;
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/u/${info.username}`
+    : `/u/${info.username}`;
 
   const copyShare = async () => {
     await navigator.clipboard.writeText(shareUrl);
@@ -100,11 +90,7 @@ export function HeaderCard() {
                 <Crown className="size-3" /> {plan}
               </span>
               {plan === "Starter" && (
-                <Button
-                  size="sm"
-                  variant="link"
-                  className="h-auto p-0 text-[var(--brand-cyan)] text-xs"
-                >
+                <Button size="sm" variant="link" className="h-auto p-0 text-[var(--brand-cyan)] text-xs">
                   Upgrade to Pro →
                 </Button>
               )}
@@ -131,9 +117,7 @@ export function HeaderCard() {
             <div className="min-w-0">
               <div className="text-[13px] font-medium">Public profile</div>
               <p className="text-xs text-muted-foreground">
-                {publicProfile
-                  ? "Anyone with the link can view your stats."
-                  : "Off — your profile is private."}
+                {publicProfile ? "Anyone with the link can view your stats." : "Off — your profile is private."}
               </p>
             </div>
           </div>
@@ -148,11 +132,7 @@ export function HeaderCard() {
                 className="size-8 rounded-md bg-secondary hover:bg-secondary/70 flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
                 title="Copy link"
               >
-                {copied ? (
-                  <Check className="size-3.5 text-emerald-400" />
-                ) : (
-                  <Copy className="size-3.5" />
-                )}
+                {copied ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
               </button>
             </div>
           )}
@@ -170,10 +150,7 @@ export function HeaderCard() {
             toast.error("Você precisa estar autenticado para salvar a foto.");
             return;
           }
-          const { error } = await supabase
-            .from("profiles")
-            .update({ avatar_url: dataUrl })
-            .eq("id", user.id);
+          const { error } = await supabase.from("profiles").update({ avatar_url: dataUrl }).eq("id", user.id);
           if (error) toast.error("Não foi possível salvar a foto.");
           else toast.success("Foto do perfil atualizada");
         }}

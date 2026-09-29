@@ -44,9 +44,7 @@ export function SentimentGauge() {
 
   const angle = (value / 100) * 180;
   const rad = ((180 - angle) * Math.PI) / 180;
-  const cx = 130,
-    cy = 130,
-    r = 100;
+  const cx = 130, cy = 130, r = 100;
   const nx = cx + r * Math.cos(rad);
   const ny = cy - r * Math.sin(rad);
   const display = Math.round(value);
@@ -78,26 +76,16 @@ export function SentimentGauge() {
             );
           })}
           <line
-            x1={cx}
-            y1={cy}
-            x2={nx}
-            y2={ny}
-            stroke="#E6F1FB"
-            strokeWidth="2.5"
-            strokeLinecap="round"
+            x1={cx} y1={cy} x2={nx} y2={ny}
+            stroke="#E6F1FB" strokeWidth="2.5" strokeLinecap="round"
           />
           <circle cx={cx} cy={cy} r="7" fill="#0A0B0E" stroke="#E6F1FB" strokeWidth="2" />
         </svg>
         <div className="absolute bottom-1 flex flex-col items-center">
-          <div
-            className="text-[36px] font-semibold leading-none tabular-nums"
-            style={{ color: zone.color }}
-          >
+          <div className="text-[36px] font-semibold leading-none tabular-nums" style={{ color: zone.color }}>
             {display}
           </div>
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">
-            {zone.label}
-          </div>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">{zone.label}</div>
         </div>
       </div>
       <style>{`

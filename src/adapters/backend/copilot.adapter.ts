@@ -30,11 +30,7 @@ export interface CopilotInbound {
   metadata?: Record<string, unknown>;
 }
 
-export function buildInit(
-  userId: string,
-  marketContext: Record<string, unknown> = {},
-  traderProfile: Record<string, unknown> = {},
-): InitPayload {
+export function buildInit(userId: string, marketContext: Record<string, unknown> = {}, traderProfile: Record<string, unknown> = {}): InitPayload {
   return { type: "init", userId, marketContext, traderProfile };
 }
 

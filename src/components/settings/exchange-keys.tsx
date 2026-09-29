@@ -25,11 +25,7 @@ export function SettingsExchangeKeys() {
 
   const save = useMutation({
     mutationFn: () => exchangeAdapter.save({ apiKey, apiSecret }),
-    onSuccess: () => {
-      setApiKey("");
-      setApiSecret("");
-      invalidate();
-    },
+    onSuccess: () => { setApiKey(""); setApiSecret(""); invalidate(); },
   });
   const test = useMutation({ mutationFn: exchangeAdapter.test, onSuccess: invalidate });
   const remove = useMutation({ mutationFn: exchangeAdapter.remove, onSuccess: invalidate });
@@ -88,29 +84,15 @@ export function SettingsExchangeKeys() {
       ) : (
         <form
           className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            save.mutate();
-          }}
+          onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
         >
           <div className="space-y-1.5">
             <Label htmlFor="ex-key">API key</Label>
-            <Input
-              id="ex-key"
-              value={apiKey}
-              autoComplete="off"
-              onChange={(e) => setApiKey(e.target.value)}
-            />
+            <Input id="ex-key" value={apiKey} autoComplete="off" onChange={(e) => setApiKey(e.target.value)} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="ex-secret">API secret</Label>
-            <Input
-              id="ex-secret"
-              type="password"
-              value={apiSecret}
-              autoComplete="new-password"
-              onChange={(e) => setApiSecret(e.target.value)}
-            />
+            <Input id="ex-secret" type="password" value={apiSecret} autoComplete="new-password" onChange={(e) => setApiSecret(e.target.value)} />
           </div>
           <p className="text-[11px] text-muted-foreground">
             Use uma chave restrita a IP e sem permissão de saque.

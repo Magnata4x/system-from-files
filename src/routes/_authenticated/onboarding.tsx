@@ -37,11 +37,7 @@ function OnboardingPage() {
   useEffect(() => {
     (async () => {
       if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", user.id)
-        .maybeSingle();
+      const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", user.id).maybeSingle();
       if (data?.onboarding_completed) navigate({ to: "/dashboard" });
     })();
   }, [user, navigate]);
@@ -63,10 +59,8 @@ function OnboardingPage() {
   }
 
   const next = () => {
-    if (step < 2) {
-      setDirection(1);
-      setStep(step + 1);
-    } else finish();
+    if (step < 2) { setDirection(1); setStep(step + 1); }
+    else finish();
   };
   const skip = () => navigate({ to: "/dashboard" });
 
@@ -107,17 +101,10 @@ function OnboardingPage() {
             }}
           >
             {step === 0 && (
-              <StepWrapper
-                title="What's your trading experience?"
-                subtitle="We'll tailor signals to your level."
-              >
+              <StepWrapper title="What's your trading experience?" subtitle="We'll tailor signals to your level.">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {EXPERIENCE.map((o) => (
-                    <SelectCard
-                      key={o.id}
-                      active={experience === o.id}
-                      onClick={() => setExperience(o.id)}
-                    >
+                    <SelectCard key={o.id} active={experience === o.id} onClick={() => setExperience(o.id)}>
                       <div className="font-medium">{o.label}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">{o.hint}</div>
                     </SelectCard>
@@ -134,15 +121,11 @@ function OnboardingPage() {
                       <SelectCard
                         key={m}
                         active={active}
-                        onClick={() =>
-                          setMarkets(active ? markets.filter((x) => x !== m) : [...markets, m])
-                        }
+                        onClick={() => setMarkets(active ? markets.filter((x) => x !== m) : [...markets, m])}
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-medium">{m}</span>
-                          {active && (
-                            <Check className="size-4" style={{ color: "var(--brand-cyan)" }} />
-                          )}
+                          {active && <Check className="size-4" style={{ color: "var(--brand-cyan)" }} />}
                         </div>
                       </SelectCard>
                     );
@@ -151,10 +134,7 @@ function OnboardingPage() {
               </StepWrapper>
             )}
             {step === 2 && (
-              <StepWrapper
-                title="What's your main goal?"
-                subtitle="We'll prioritize insights toward this outcome."
-              >
+              <StepWrapper title="What's your main goal?" subtitle="We'll prioritize insights toward this outcome.">
                 <div className="grid grid-cols-1 gap-2.5">
                   {GOALS.map((g) => (
                     <SelectCard key={g} active={goal === g} onClick={() => setGoal(g)}>
@@ -171,30 +151,21 @@ function OnboardingPage() {
       <footer className="px-6 py-5 border-t border-border">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
-            onClick={() => {
-              if (step > 0) {
-                setDirection(-1);
-                setStep(step - 1);
-              }
-            }}
+            onClick={() => { if (step > 0) { setDirection(-1); setStep(step - 1); } }}
             disabled={step === 0}
             className="text-sm text-muted-foreground hover:text-foreground disabled:opacity-40"
           >
             ← Back
           </button>
           <div className="flex items-center gap-4">
-            <button onClick={skip} className="text-sm text-muted-foreground hover:text-foreground">
-              Skip
-            </button>
+            <button onClick={skip} className="text-sm text-muted-foreground hover:text-foreground">Skip</button>
             <button
               onClick={next}
               disabled={!canContinue || saving}
               className="h-11 px-6 rounded-lg text-sm font-medium text-primary-foreground flex items-center gap-2 disabled:opacity-50 transition-opacity hover:opacity-90"
               style={{ background: "var(--brand-blue)" }}
             >
-              {saving ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
+              {saving ? <Loader2 className="size-4 animate-spin" /> : (
                 <>
                   {step === 2 ? "Start using AISignalRadar" : "Continue"}
                   <ArrowRight className="size-4" />
@@ -208,15 +179,7 @@ function OnboardingPage() {
   );
 }
 
-function StepWrapper({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
+function StepWrapper({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
     <div>
       <h1 className="text-2xl font-medium text-foreground">{title}</h1>

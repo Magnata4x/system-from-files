@@ -35,10 +35,7 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       // QA-02: warn-level baseline; reduzir incrementalmente
       // (ver docs/lint-debt-baseline.md).
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
-      ],
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
       "no-console": ["warn", { allow: ["error"] }],
       // Proíbe dangerouslySetInnerHTML — vetor de XSS. Use textContent via

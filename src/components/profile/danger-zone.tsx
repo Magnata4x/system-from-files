@@ -3,14 +3,7 @@ import { AlertTriangle, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useProfileStore } from "@/lib/profile-store";
 import { toast } from "sonner";
 
@@ -49,13 +42,9 @@ export function DangerZone() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium">Export my data</div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                All signals, alerts, settings — JSON archive.
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">All signals, alerts, settings — JSON archive.</p>
             </div>
-            <Button size="sm" variant="outline" onClick={exportData}>
-              Request export
-            </Button>
+            <Button size="sm" variant="outline" onClick={exportData}>Request export</Button>
           </div>
 
           <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-card/40 p-3">
@@ -64,9 +53,7 @@ export function DangerZone() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium">Delete account</div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Permanent after 30 days. All data wiped.
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Permanent after 30 days. All data wiped.</p>
             </div>
             <Button
               size="sm"
@@ -80,21 +67,14 @@ export function DangerZone() {
         </div>
       </section>
 
-      <Dialog
-        open={open}
-        onOpenChange={(v) => {
-          setOpen(v);
-          if (!v) setTyped("");
-        }}
-      >
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setTyped(""); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="size-4" /> Delete account
             </DialogTitle>
             <DialogDescription>
-              This will permanently delete your AISignalRadar account, all signals, alerts and
-              exchange connections. You have 30 days to reverse this from your inbox.
+              This will permanently delete your AISignalRadar account, all signals, alerts and exchange connections. You have 30 days to reverse this from your inbox.
             </DialogDescription>
           </DialogHeader>
 
@@ -115,10 +95,12 @@ export function DangerZone() {
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" disabled={typed !== info.email} onClick={confirmDelete}>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button
+              variant="destructive"
+              disabled={typed !== info.email}
+              onClick={confirmDelete}
+            >
               Delete my account
             </Button>
           </DialogFooter>

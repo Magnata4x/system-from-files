@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { supabase } from "@/integrations/supabase/client";
-import { loadPrefs, savePrefs, DEFAULT_BOT4X_ALERTS, type Bot4xAlertPrefs } from "./user-prefs-db";
+import {
+  loadPrefs,
+  savePrefs,
+  DEFAULT_BOT4X_ALERTS,
+  type Bot4xAlertPrefs,
+} from "./user-prefs-db";
 
 type State = {
   compactPill: boolean;

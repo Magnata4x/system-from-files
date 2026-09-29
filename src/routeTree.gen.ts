@@ -9,85 +9,71 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
-import { Route as AuthenticatedApiRouteImport } from './routes/_authenticated/api'
-import { Route as AuthenticatedBot4xRouteImport } from './routes/_authenticated/bot4x'
-import { Route as AuthenticatedCalibratorRouteImport } from './routes/_authenticated/calibrator'
-import { Route as AuthenticatedCopyTradingRouteImport } from './routes/_authenticated/copy-trading'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenticated/diagnostics'
-import { Route as AuthenticatedDnaCorrectionsRouteImport } from './routes/_authenticated/dna-corrections'
-import { Route as AuthenticatedDnaPairsRouteImport } from './routes/_authenticated/dna-pairs'
-import { Route as AuthenticatedDnaTraderRouteImport } from './routes/_authenticated/dna-trader'
-import { Route as AuthenticatedManipulationRouteImport } from './routes/_authenticated/manipulation'
-import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedSentimentRouteImport } from './routes/_authenticated/sentiment'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSignalsRouteImport } from './routes/_authenticated/signals'
-import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
-import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
-import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
-import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
-import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
-import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
-import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
-import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
-import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
-import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
-import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
-import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
-import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
-import { Route as ApiDnaStatsRouteImport } from './routes/api/dna/stats'
-import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
-import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
-import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
-import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
-import { Route as ApiMarketplaceHistoryRouteImport } from './routes/api/marketplace/history'
-import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketplace/products'
-import { Route as ApiPricesIndexRouteImport } from './routes/api/prices/index'
-import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
-import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
-import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
-import { Route as ApiSentimentOverviewRouteImport } from './routes/api/sentiment/overview'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSentimentRouteImport } from './routes/_authenticated/sentiment'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
+import { Route as AuthenticatedManipulationRouteImport } from './routes/_authenticated/manipulation'
+import { Route as AuthenticatedDnaTraderRouteImport } from './routes/_authenticated/dna-trader'
+import { Route as AuthenticatedDnaPairsRouteImport } from './routes/_authenticated/dna-pairs'
+import { Route as AuthenticatedDnaCorrectionsRouteImport } from './routes/_authenticated/dna-corrections'
+import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenticated/diagnostics'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCopyTradingRouteImport } from './routes/_authenticated/copy-trading'
+import { Route as AuthenticatedCalibratorRouteImport } from './routes/_authenticated/calibrator'
+import { Route as AuthenticatedBot4xRouteImport } from './routes/_authenticated/bot4x'
+import { Route as AuthenticatedApiRouteImport } from './routes/_authenticated/api'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiSignalsIndexRouteImport } from './routes/api/signals/index'
+import { Route as ApiPricesIndexRouteImport } from './routes/api/prices/index'
 import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
-import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
-import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
-import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
-import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
-import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
-import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
-import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/manipulation/snapshot.$pair'
-import { Route as ApiSentimentAssetSymbolRouteImport } from './routes/api/sentiment/asset.$symbol'
+import { Route as ApiSentimentOverviewRouteImport } from './routes/api/sentiment/overview'
+import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
+import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
+import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
+import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketplace/products'
+import { Route as ApiMarketplaceHistoryRouteImport } from './routes/api/marketplace/history'
+import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
+import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
+import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
+import { Route as ApiExchangeCredentialsRouteImport } from './routes/api/exchange/credentials'
+import { Route as ApiDnaStatsRouteImport } from './routes/api/dna/stats'
+import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
+import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
+import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
+import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
+import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
+import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
+import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
+import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
+import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
+import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
+import { Route as AuthenticatedCalibratorHistoryRouteImport } from './routes/_authenticated/calibrator.history'
+import { Route as AuthenticatedBot4xOnboardingRouteImport } from './routes/_authenticated/bot4x.onboarding'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiSentimentAssetSymbolRouteImport } from './routes/api/sentiment/asset.$symbol'
+import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/manipulation/snapshot.$pair'
+import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
+import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
+import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
+import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
+import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
+import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -95,34 +81,92 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSignalsRoute = AuthenticatedSignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedApiRoute = AuthenticatedApiRouteImport.update({
-  id: '/api',
-  path: '/api',
+const AuthenticatedSentimentRoute = AuthenticatedSentimentRouteImport.update({
+  id: '/sentiment',
+  path: '/sentiment',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedBot4xRoute = AuthenticatedBot4xRouteImport.update({
-  id: '/bot4x',
-  path: '/bot4x',
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedCalibratorRoute = AuthenticatedCalibratorRouteImport.update({
-  id: '/calibrator',
-  path: '/calibrator',
+const AuthenticatedPricingRoute = AuthenticatedPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMarketplaceRoute =
+  AuthenticatedMarketplaceRouteImport.update({
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedManipulationRoute =
+  AuthenticatedManipulationRouteImport.update({
+    id: '/manipulation',
+    path: '/manipulation',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDnaTraderRoute = AuthenticatedDnaTraderRouteImport.update({
+  id: '/dna-trader',
+  path: '/dna-trader',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDnaPairsRoute = AuthenticatedDnaPairsRouteImport.update({
+  id: '/dna-pairs',
+  path: '/dna-pairs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDnaCorrectionsRoute =
+  AuthenticatedDnaCorrectionsRouteImport.update({
+    id: '/dna-corrections',
+    path: '/dna-corrections',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDiagnosticsRoute =
+  AuthenticatedDiagnosticsRouteImport.update({
+    id: '/diagnostics',
+    path: '/diagnostics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCopyTradingRoute =
@@ -131,175 +175,34 @@ const AuthenticatedCopyTradingRoute =
     path: '/copy-trading',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedCalibratorRoute = AuthenticatedCalibratorRouteImport.update({
+  id: '/calibrator',
+  path: '/calibrator',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedDiagnosticsRoute =
-  AuthenticatedDiagnosticsRouteImport.update({
-    id: '/diagnostics',
-    path: '/diagnostics',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDnaCorrectionsRoute =
-  AuthenticatedDnaCorrectionsRouteImport.update({
-    id: '/dna-corrections',
-    path: '/dna-corrections',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDnaPairsRoute = AuthenticatedDnaPairsRouteImport.update({
-  id: '/dna-pairs',
-  path: '/dna-pairs',
+const AuthenticatedBot4xRoute = AuthenticatedBot4xRouteImport.update({
+  id: '/bot4x',
+  path: '/bot4x',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedDnaTraderRoute = AuthenticatedDnaTraderRouteImport.update({
-  id: '/dna-trader',
-  path: '/dna-trader',
+const AuthenticatedApiRoute = AuthenticatedApiRouteImport.update({
+  id: '/api',
+  path: '/api',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedManipulationRoute =
-  AuthenticatedManipulationRouteImport.update({
-    id: '/manipulation',
-    path: '/manipulation',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedMarketplaceRoute =
-  AuthenticatedMarketplaceRouteImport.update({
-    id: '/marketplace',
-    path: '/marketplace',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPricingRoute = AuthenticatedPricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSentimentRoute = AuthenticatedSentimentRouteImport.update({
-  id: '/sentiment',
-  path: '/sentiment',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSignalsRoute = AuthenticatedSignalsRouteImport.update({
-  id: '/signals',
-  path: '/signals',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedBot4xOnboardingRoute =
-  AuthenticatedBot4xOnboardingRouteImport.update({
-    id: '/onboarding',
-    path: '/onboarding',
-    getParentRoute: () => AuthenticatedBot4xRoute,
-  } as any)
-const AuthenticatedCalibratorHistoryRoute =
-  AuthenticatedCalibratorHistoryRouteImport.update({
-    id: '/history',
-    path: '/history',
-    getParentRoute: () => AuthenticatedCalibratorRoute,
-  } as any)
-const ApiAlertsFeedRoute = ApiAlertsFeedRouteImport.update({
-  id: '/api/alerts/feed',
-  path: '/api/alerts/feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAlertsSettingsRoute = ApiAlertsSettingsRouteImport.update({
-  id: '/api/alerts/settings',
-  path: '/api/alerts/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
-  id: '/api/auth/me',
-  path: '/api/auth/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
-  id: '/api/bot4x/config',
-  path: '/api/bot4x/config',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBot4xExecutionsRoute = ApiBot4xExecutionsRouteImport.update({
-  id: '/api/bot4x/executions',
-  path: '/api/bot4x/executions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBot4xStartRoute = ApiBot4xStartRouteImport.update({
-  id: '/api/bot4x/start',
-  path: '/api/bot4x/start',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
-  id: '/api/bot4x/stop',
-  path: '/api/bot4x/stop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
-  id: '/api/bot4x/telemetry',
-  path: '/api/bot4x/telemetry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCopilotChatRoute = ApiCopilotChatRouteImport.update({
-  id: '/api/copilot/chat',
-  path: '/api/copilot/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
-  id: '/api/copilot/history',
-  path: '/api/copilot/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCopyFollowsRoute = ApiCopyFollowsRouteImport.update({
-  id: '/api/copy/follows',
-  path: '/api/copy/follows',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDnaStatsRoute = ApiDnaStatsRouteImport.update({
-  id: '/api/dna/stats',
-  path: '/api/dna/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiExchangeCredentialsRoute = ApiExchangeCredentialsRouteImport.update({
-  id: '/api/exchange/credentials',
-  path: '/api/exchange/credentials',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiExchangeTestRoute = ApiExchangeTestRouteImport.update({
-  id: '/api/exchange/test',
-  path: '/api/exchange/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiManipulationAlertsRoute = ApiManipulationAlertsRouteImport.update({
-  id: '/api/manipulation/alerts',
-  path: '/api/manipulation/alerts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
-  id: '/api/market-regime/current',
-  path: '/api/market-regime/current',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMarketplaceHistoryRoute = ApiMarketplaceHistoryRouteImport.update({
-  id: '/api/marketplace/history',
-  path: '/api/marketplace/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMarketplaceProductsRoute = ApiMarketplaceProductsRouteImport.update({
-  id: '/api/marketplace/products',
-  path: '/api/marketplace/products',
+const ApiSignalsIndexRoute = ApiSignalsIndexRouteImport.update({
+  id: '/api/signals/',
+  path: '/api/signals/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPricesIndexRoute = ApiPricesIndexRouteImport.update({
@@ -307,19 +210,9 @@ const ApiPricesIndexRoute = ApiPricesIndexRouteImport.update({
   path: '/api/prices/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPricesSymbolRoute = ApiPricesSymbolRouteImport.update({
-  id: '/api/prices/$symbol',
-  path: '/api/prices/$symbol',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiRiskEvaluateRoute = ApiRiskEvaluateRouteImport.update({
-  id: '/api/risk/evaluate',
-  path: '/api/risk/evaluate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiRiskStatusRoute = ApiRiskStatusRouteImport.update({
-  id: '/api/risk/status',
-  path: '/api/risk/status',
+const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
+  id: '/api/signals/$id',
+  path: '/api/signals/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSentimentOverviewRoute = ApiSentimentOverviewRouteImport.update({
@@ -327,48 +220,132 @@ const ApiSentimentOverviewRoute = ApiSentimentOverviewRouteImport.update({
   path: '/api/sentiment/overview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSignalsIndexRoute = ApiSignalsIndexRouteImport.update({
-  id: '/api/signals/',
-  path: '/api/signals/',
+const ApiRiskStatusRoute = ApiRiskStatusRouteImport.update({
+  id: '/api/risk/status',
+  path: '/api/risk/status',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
-  id: '/api/signals/$id',
-  path: '/api/signals/$id',
+const ApiRiskEvaluateRoute = ApiRiskEvaluateRouteImport.update({
+  id: '/api/risk/evaluate',
+  path: '/api/risk/evaluate',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedCalibratorHistoryIdRoute =
-  AuthenticatedCalibratorHistoryIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedCalibratorHistoryRoute,
+const ApiPricesSymbolRoute = ApiPricesSymbolRouteImport.update({
+  id: '/api/prices/$symbol',
+  path: '/api/prices/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMarketplaceProductsRoute = ApiMarketplaceProductsRouteImport.update({
+  id: '/api/marketplace/products',
+  path: '/api/marketplace/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMarketplaceHistoryRoute = ApiMarketplaceHistoryRouteImport.update({
+  id: '/api/marketplace/history',
+  path: '/api/marketplace/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
+  id: '/api/market-regime/current',
+  path: '/api/market-regime/current',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiManipulationAlertsRoute = ApiManipulationAlertsRouteImport.update({
+  id: '/api/manipulation/alerts',
+  path: '/api/manipulation/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExchangeTestRoute = ApiExchangeTestRouteImport.update({
+  id: '/api/exchange/test',
+  path: '/api/exchange/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExchangeCredentialsRoute = ApiExchangeCredentialsRouteImport.update({
+  id: '/api/exchange/credentials',
+  path: '/api/exchange/credentials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDnaStatsRoute = ApiDnaStatsRouteImport.update({
+  id: '/api/dna/stats',
+  path: '/api/dna/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCopyFollowsRoute = ApiCopyFollowsRouteImport.update({
+  id: '/api/copy/follows',
+  path: '/api/copy/follows',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCopilotHistoryRoute = ApiCopilotHistoryRouteImport.update({
+  id: '/api/copilot/history',
+  path: '/api/copilot/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCopilotChatRoute = ApiCopilotChatRouteImport.update({
+  id: '/api/copilot/chat',
+  path: '/api/copilot/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
+  id: '/api/bot4x/telemetry',
+  path: '/api/bot4x/telemetry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
+  id: '/api/bot4x/stop',
+  path: '/api/bot4x/stop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xStartRoute = ApiBot4xStartRouteImport.update({
+  id: '/api/bot4x/start',
+  path: '/api/bot4x/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xExecutionsRoute = ApiBot4xExecutionsRouteImport.update({
+  id: '/api/bot4x/executions',
+  path: '/api/bot4x/executions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
+  id: '/api/bot4x/config',
+  path: '/api/bot4x/config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
+  id: '/api/auth/me',
+  path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlertsSettingsRoute = ApiAlertsSettingsRouteImport.update({
+  id: '/api/alerts/settings',
+  path: '/api/alerts/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlertsFeedRoute = ApiAlertsFeedRouteImport.update({
+  id: '/api/alerts/feed',
+  path: '/api/alerts/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCalibratorHistoryRoute =
+  AuthenticatedCalibratorHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
+    getParentRoute: () => AuthenticatedCalibratorRoute,
   } as any)
-const ApiBot4xExecutionsExportRoute =
-  ApiBot4xExecutionsExportRouteImport.update({
-    id: '/export',
-    path: '/export',
-    getParentRoute: () => ApiBot4xExecutionsRoute,
+const AuthenticatedBot4xOnboardingRoute =
+  AuthenticatedBot4xOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedBot4xRoute,
   } as any)
-const ApiCalibratorFeedbackUserIdRoute =
-  ApiCalibratorFeedbackUserIdRouteImport.update({
-    id: '/api/calibrator/feedback/$userId',
-    path: '/api/calibrator/feedback/$userId',
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiCalibratorRunUserIdRoute = ApiCalibratorRunUserIdRouteImport.update({
-  id: '/api/calibrator/run/$userId',
-  path: '/api/calibrator/run/$userId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCalibratorStateUserIdRoute =
-  ApiCalibratorStateUserIdRouteImport.update({
-    id: '/api/calibrator/state/$userId',
-    path: '/api/calibrator/state/$userId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiDnaProfileUserIdRoute = ApiDnaProfileUserIdRouteImport.update({
-  id: '/api/dna/profile/$userId',
-  path: '/api/dna/profile/$userId',
+const ApiSentimentAssetSymbolRoute = ApiSentimentAssetSymbolRouteImport.update({
+  id: '/api/sentiment/asset/$symbol',
+  path: '/api/sentiment/asset/$symbol',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiManipulationSnapshotPairRoute =
@@ -377,16 +354,39 @@ const ApiManipulationSnapshotPairRoute =
     path: '/api/manipulation/snapshot/$pair',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiSentimentAssetSymbolRoute = ApiSentimentAssetSymbolRouteImport.update({
-  id: '/api/sentiment/asset/$symbol',
-  path: '/api/sentiment/asset/$symbol',
+const ApiDnaProfileUserIdRoute = ApiDnaProfileUserIdRouteImport.update({
+  id: '/api/dna/profile/$userId',
+  path: '/api/dna/profile/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
+const ApiCalibratorStateUserIdRoute =
+  ApiCalibratorStateUserIdRouteImport.update({
+    id: '/api/calibrator/state/$userId',
+    path: '/api/calibrator/state/$userId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiCalibratorRunUserIdRoute = ApiCalibratorRunUserIdRouteImport.update({
+  id: '/api/calibrator/run/$userId',
+  path: '/api/calibrator/run/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCalibratorFeedbackUserIdRoute =
+  ApiCalibratorFeedbackUserIdRouteImport.update({
+    id: '/api/calibrator/feedback/$userId',
+    path: '/api/calibrator/feedback/$userId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiBot4xExecutionsExportRoute =
+  ApiBot4xExecutionsExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => ApiBot4xExecutionsRoute,
+  } as any)
+const AuthenticatedCalibratorHistoryIdRoute =
+  AuthenticatedCalibratorHistoryIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedCalibratorHistoryRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -810,32 +810,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -845,130 +824,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/alerts': {
-      id: '/_authenticated/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/api': {
-      id: '/_authenticated/api'
-      path: '/api'
-      fullPath: '/api'
-      preLoaderRoute: typeof AuthenticatedApiRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/bot4x': {
-      id: '/_authenticated/bot4x'
-      path: '/bot4x'
-      fullPath: '/bot4x'
-      preLoaderRoute: typeof AuthenticatedBot4xRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/calibrator': {
-      id: '/_authenticated/calibrator'
-      path: '/calibrator'
-      fullPath: '/calibrator'
-      preLoaderRoute: typeof AuthenticatedCalibratorRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/copy-trading': {
-      id: '/_authenticated/copy-trading'
-      path: '/copy-trading'
-      fullPath: '/copy-trading'
-      preLoaderRoute: typeof AuthenticatedCopyTradingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/diagnostics': {
-      id: '/_authenticated/diagnostics'
-      path: '/diagnostics'
-      fullPath: '/diagnostics'
-      preLoaderRoute: typeof AuthenticatedDiagnosticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dna-corrections': {
-      id: '/_authenticated/dna-corrections'
-      path: '/dna-corrections'
-      fullPath: '/dna-corrections'
-      preLoaderRoute: typeof AuthenticatedDnaCorrectionsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dna-pairs': {
-      id: '/_authenticated/dna-pairs'
-      path: '/dna-pairs'
-      fullPath: '/dna-pairs'
-      preLoaderRoute: typeof AuthenticatedDnaPairsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dna-trader': {
-      id: '/_authenticated/dna-trader'
-      path: '/dna-trader'
-      fullPath: '/dna-trader'
-      preLoaderRoute: typeof AuthenticatedDnaTraderRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/manipulation': {
-      id: '/_authenticated/manipulation'
-      path: '/manipulation'
-      fullPath: '/manipulation'
-      preLoaderRoute: typeof AuthenticatedManipulationRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/marketplace': {
-      id: '/_authenticated/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/pricing': {
-      id: '/_authenticated/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof AuthenticatedPricingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/sentiment': {
-      id: '/_authenticated/sentiment'
-      path: '/sentiment'
-      fullPath: '/sentiment'
-      preLoaderRoute: typeof AuthenticatedSentimentRouteImport
+    '/_authenticated/signals': {
+      id: '/_authenticated/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof AuthenticatedSignalsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
@@ -978,151 +866,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/signals': {
-      id: '/_authenticated/signals'
-      path: '/signals'
-      fullPath: '/signals'
-      preLoaderRoute: typeof AuthenticatedSignalsRouteImport
+    '/_authenticated/sentiment': {
+      id: '/_authenticated/sentiment'
+      path: '/sentiment'
+      fullPath: '/sentiment'
+      preLoaderRoute: typeof AuthenticatedSentimentRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/bot4x/onboarding': {
-      id: '/_authenticated/bot4x/onboarding'
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pricing': {
+      id: '/_authenticated/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof AuthenticatedPricingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
       path: '/onboarding'
-      fullPath: '/bot4x/onboarding'
-      preLoaderRoute: typeof AuthenticatedBot4xOnboardingRouteImport
-      parentRoute: typeof AuthenticatedBot4xRoute
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/calibrator/history': {
-      id: '/_authenticated/calibrator/history'
-      path: '/history'
-      fullPath: '/calibrator/history'
-      preLoaderRoute: typeof AuthenticatedCalibratorHistoryRouteImport
-      parentRoute: typeof AuthenticatedCalibratorRoute
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/alerts/feed': {
-      id: '/api/alerts/feed'
-      path: '/api/alerts/feed'
-      fullPath: '/api/alerts/feed'
-      preLoaderRoute: typeof ApiAlertsFeedRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/manipulation': {
+      id: '/_authenticated/manipulation'
+      path: '/manipulation'
+      fullPath: '/manipulation'
+      preLoaderRoute: typeof AuthenticatedManipulationRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/alerts/settings': {
-      id: '/api/alerts/settings'
-      path: '/api/alerts/settings'
-      fullPath: '/api/alerts/settings'
-      preLoaderRoute: typeof ApiAlertsSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/dna-trader': {
+      id: '/_authenticated/dna-trader'
+      path: '/dna-trader'
+      fullPath: '/dna-trader'
+      preLoaderRoute: typeof AuthenticatedDnaTraderRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/auth/me': {
-      id: '/api/auth/me'
-      path: '/api/auth/me'
-      fullPath: '/api/auth/me'
-      preLoaderRoute: typeof ApiAuthMeRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/dna-pairs': {
+      id: '/_authenticated/dna-pairs'
+      path: '/dna-pairs'
+      fullPath: '/dna-pairs'
+      preLoaderRoute: typeof AuthenticatedDnaPairsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/bot4x/config': {
-      id: '/api/bot4x/config'
-      path: '/api/bot4x/config'
-      fullPath: '/api/bot4x/config'
-      preLoaderRoute: typeof ApiBot4xConfigRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/dna-corrections': {
+      id: '/_authenticated/dna-corrections'
+      path: '/dna-corrections'
+      fullPath: '/dna-corrections'
+      preLoaderRoute: typeof AuthenticatedDnaCorrectionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/bot4x/executions': {
-      id: '/api/bot4x/executions'
-      path: '/api/bot4x/executions'
-      fullPath: '/api/bot4x/executions'
-      preLoaderRoute: typeof ApiBot4xExecutionsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/diagnostics': {
+      id: '/_authenticated/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/diagnostics'
+      preLoaderRoute: typeof AuthenticatedDiagnosticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/bot4x/start': {
-      id: '/api/bot4x/start'
-      path: '/api/bot4x/start'
-      fullPath: '/api/bot4x/start'
-      preLoaderRoute: typeof ApiBot4xStartRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/bot4x/stop': {
-      id: '/api/bot4x/stop'
-      path: '/api/bot4x/stop'
-      fullPath: '/api/bot4x/stop'
-      preLoaderRoute: typeof ApiBot4xStopRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/copy-trading': {
+      id: '/_authenticated/copy-trading'
+      path: '/copy-trading'
+      fullPath: '/copy-trading'
+      preLoaderRoute: typeof AuthenticatedCopyTradingRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/bot4x/telemetry': {
-      id: '/api/bot4x/telemetry'
-      path: '/api/bot4x/telemetry'
-      fullPath: '/api/bot4x/telemetry'
-      preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/calibrator': {
+      id: '/_authenticated/calibrator'
+      path: '/calibrator'
+      fullPath: '/calibrator'
+      preLoaderRoute: typeof AuthenticatedCalibratorRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/copilot/chat': {
-      id: '/api/copilot/chat'
-      path: '/api/copilot/chat'
-      fullPath: '/api/copilot/chat'
-      preLoaderRoute: typeof ApiCopilotChatRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/bot4x': {
+      id: '/_authenticated/bot4x'
+      path: '/bot4x'
+      fullPath: '/bot4x'
+      preLoaderRoute: typeof AuthenticatedBot4xRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/copilot/history': {
-      id: '/api/copilot/history'
-      path: '/api/copilot/history'
-      fullPath: '/api/copilot/history'
-      preLoaderRoute: typeof ApiCopilotHistoryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/api': {
+      id: '/_authenticated/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof AuthenticatedApiRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/copy/follows': {
-      id: '/api/copy/follows'
-      path: '/api/copy/follows'
-      fullPath: '/api/copy/follows'
-      preLoaderRoute: typeof ApiCopyFollowsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/dna/stats': {
-      id: '/api/dna/stats'
-      path: '/api/dna/stats'
-      fullPath: '/api/dna/stats'
-      preLoaderRoute: typeof ApiDnaStatsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/api/exchange/credentials': {
-      id: '/api/exchange/credentials'
-      path: '/api/exchange/credentials'
-      fullPath: '/api/exchange/credentials'
-      preLoaderRoute: typeof ApiExchangeCredentialsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/exchange/test': {
-      id: '/api/exchange/test'
-      path: '/api/exchange/test'
-      fullPath: '/api/exchange/test'
-      preLoaderRoute: typeof ApiExchangeTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/manipulation/alerts': {
-      id: '/api/manipulation/alerts'
-      path: '/api/manipulation/alerts'
-      fullPath: '/api/manipulation/alerts'
-      preLoaderRoute: typeof ApiManipulationAlertsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/market-regime/current': {
-      id: '/api/market-regime/current'
-      path: '/api/market-regime/current'
-      fullPath: '/api/market-regime/current'
-      preLoaderRoute: typeof ApiMarketRegimeCurrentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/marketplace/history': {
-      id: '/api/marketplace/history'
-      path: '/api/marketplace/history'
-      fullPath: '/api/marketplace/history'
-      preLoaderRoute: typeof ApiMarketplaceHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/marketplace/products': {
-      id: '/api/marketplace/products'
-      path: '/api/marketplace/products'
-      fullPath: '/api/marketplace/products'
-      preLoaderRoute: typeof ApiMarketplaceProductsRouteImport
+    '/api/signals/': {
+      id: '/api/signals/'
+      path: '/api/signals'
+      fullPath: '/api/signals/'
+      preLoaderRoute: typeof ApiSignalsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/prices/': {
@@ -1132,25 +999,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPricesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/prices/$symbol': {
-      id: '/api/prices/$symbol'
-      path: '/api/prices/$symbol'
-      fullPath: '/api/prices/$symbol'
-      preLoaderRoute: typeof ApiPricesSymbolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/risk/evaluate': {
-      id: '/api/risk/evaluate'
-      path: '/api/risk/evaluate'
-      fullPath: '/api/risk/evaluate'
-      preLoaderRoute: typeof ApiRiskEvaluateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/risk/status': {
-      id: '/api/risk/status'
-      path: '/api/risk/status'
-      fullPath: '/api/risk/status'
-      preLoaderRoute: typeof ApiRiskStatusRouteImport
+    '/api/signals/$id': {
+      id: '/api/signals/$id'
+      path: '/api/signals/$id'
+      fullPath: '/api/signals/$id'
+      preLoaderRoute: typeof ApiSignalsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/sentiment/overview': {
@@ -1160,67 +1013,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSentimentOverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/signals/': {
-      id: '/api/signals/'
-      path: '/api/signals'
-      fullPath: '/api/signals/'
-      preLoaderRoute: typeof ApiSignalsIndexRouteImport
+    '/api/risk/status': {
+      id: '/api/risk/status'
+      path: '/api/risk/status'
+      fullPath: '/api/risk/status'
+      preLoaderRoute: typeof ApiRiskStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/signals/$id': {
-      id: '/api/signals/$id'
-      path: '/api/signals/$id'
-      fullPath: '/api/signals/$id'
-      preLoaderRoute: typeof ApiSignalsIdRouteImport
+    '/api/risk/evaluate': {
+      id: '/api/risk/evaluate'
+      path: '/api/risk/evaluate'
+      fullPath: '/api/risk/evaluate'
+      preLoaderRoute: typeof ApiRiskEvaluateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/calibrator/history/$id': {
-      id: '/_authenticated/calibrator/history/$id'
-      path: '/$id'
-      fullPath: '/calibrator/history/$id'
-      preLoaderRoute: typeof AuthenticatedCalibratorHistoryIdRouteImport
-      parentRoute: typeof AuthenticatedCalibratorHistoryRoute
-    }
-    '/api/bot4x/executions/export': {
-      id: '/api/bot4x/executions/export'
-      path: '/export'
-      fullPath: '/api/bot4x/executions/export'
-      preLoaderRoute: typeof ApiBot4xExecutionsExportRouteImport
-      parentRoute: typeof ApiBot4xExecutionsRoute
-    }
-    '/api/calibrator/feedback/$userId': {
-      id: '/api/calibrator/feedback/$userId'
-      path: '/api/calibrator/feedback/$userId'
-      fullPath: '/api/calibrator/feedback/$userId'
-      preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
+    '/api/prices/$symbol': {
+      id: '/api/prices/$symbol'
+      path: '/api/prices/$symbol'
+      fullPath: '/api/prices/$symbol'
+      preLoaderRoute: typeof ApiPricesSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/calibrator/run/$userId': {
-      id: '/api/calibrator/run/$userId'
-      path: '/api/calibrator/run/$userId'
-      fullPath: '/api/calibrator/run/$userId'
-      preLoaderRoute: typeof ApiCalibratorRunUserIdRouteImport
+    '/api/marketplace/products': {
+      id: '/api/marketplace/products'
+      path: '/api/marketplace/products'
+      fullPath: '/api/marketplace/products'
+      preLoaderRoute: typeof ApiMarketplaceProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/calibrator/state/$userId': {
-      id: '/api/calibrator/state/$userId'
-      path: '/api/calibrator/state/$userId'
-      fullPath: '/api/calibrator/state/$userId'
-      preLoaderRoute: typeof ApiCalibratorStateUserIdRouteImport
+    '/api/marketplace/history': {
+      id: '/api/marketplace/history'
+      path: '/api/marketplace/history'
+      fullPath: '/api/marketplace/history'
+      preLoaderRoute: typeof ApiMarketplaceHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/dna/profile/$userId': {
-      id: '/api/dna/profile/$userId'
-      path: '/api/dna/profile/$userId'
-      fullPath: '/api/dna/profile/$userId'
-      preLoaderRoute: typeof ApiDnaProfileUserIdRouteImport
+    '/api/market-regime/current': {
+      id: '/api/market-regime/current'
+      path: '/api/market-regime/current'
+      fullPath: '/api/market-regime/current'
+      preLoaderRoute: typeof ApiMarketRegimeCurrentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/manipulation/snapshot/$pair': {
-      id: '/api/manipulation/snapshot/$pair'
-      path: '/api/manipulation/snapshot/$pair'
-      fullPath: '/api/manipulation/snapshot/$pair'
-      preLoaderRoute: typeof ApiManipulationSnapshotPairRouteImport
+    '/api/manipulation/alerts': {
+      id: '/api/manipulation/alerts'
+      path: '/api/manipulation/alerts'
+      fullPath: '/api/manipulation/alerts'
+      preLoaderRoute: typeof ApiManipulationAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/exchange/test': {
+      id: '/api/exchange/test'
+      path: '/api/exchange/test'
+      fullPath: '/api/exchange/test'
+      preLoaderRoute: typeof ApiExchangeTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/exchange/credentials': {
+      id: '/api/exchange/credentials'
+      path: '/api/exchange/credentials'
+      fullPath: '/api/exchange/credentials'
+      preLoaderRoute: typeof ApiExchangeCredentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dna/stats': {
+      id: '/api/dna/stats'
+      path: '/api/dna/stats'
+      fullPath: '/api/dna/stats'
+      preLoaderRoute: typeof ApiDnaStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copy/follows': {
+      id: '/api/copy/follows'
+      path: '/api/copy/follows'
+      fullPath: '/api/copy/follows'
+      preLoaderRoute: typeof ApiCopyFollowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copilot/history': {
+      id: '/api/copilot/history'
+      path: '/api/copilot/history'
+      fullPath: '/api/copilot/history'
+      preLoaderRoute: typeof ApiCopilotHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copilot/chat': {
+      id: '/api/copilot/chat'
+      path: '/api/copilot/chat'
+      fullPath: '/api/copilot/chat'
+      preLoaderRoute: typeof ApiCopilotChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/telemetry': {
+      id: '/api/bot4x/telemetry'
+      path: '/api/bot4x/telemetry'
+      fullPath: '/api/bot4x/telemetry'
+      preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/stop': {
+      id: '/api/bot4x/stop'
+      path: '/api/bot4x/stop'
+      fullPath: '/api/bot4x/stop'
+      preLoaderRoute: typeof ApiBot4xStopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/start': {
+      id: '/api/bot4x/start'
+      path: '/api/bot4x/start'
+      fullPath: '/api/bot4x/start'
+      preLoaderRoute: typeof ApiBot4xStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/executions': {
+      id: '/api/bot4x/executions'
+      path: '/api/bot4x/executions'
+      fullPath: '/api/bot4x/executions'
+      preLoaderRoute: typeof ApiBot4xExecutionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/config': {
+      id: '/api/bot4x/config'
+      path: '/api/bot4x/config'
+      fullPath: '/api/bot4x/config'
+      preLoaderRoute: typeof ApiBot4xConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/settings': {
+      id: '/api/alerts/settings'
+      path: '/api/alerts/settings'
+      fullPath: '/api/alerts/settings'
+      preLoaderRoute: typeof ApiAlertsSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/feed': {
+      id: '/api/alerts/feed'
+      path: '/api/alerts/feed'
+      fullPath: '/api/alerts/feed'
+      preLoaderRoute: typeof ApiAlertsFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/calibrator/history': {
+      id: '/_authenticated/calibrator/history'
+      path: '/history'
+      fullPath: '/calibrator/history'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryRouteImport
+      parentRoute: typeof AuthenticatedCalibratorRoute
+    }
+    '/_authenticated/bot4x/onboarding': {
+      id: '/_authenticated/bot4x/onboarding'
+      path: '/onboarding'
+      fullPath: '/bot4x/onboarding'
+      preLoaderRoute: typeof AuthenticatedBot4xOnboardingRouteImport
+      parentRoute: typeof AuthenticatedBot4xRoute
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/sentiment/asset/$symbol': {
@@ -1230,12 +1188,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSentimentAssetSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/api/manipulation/snapshot/$pair': {
+      id: '/api/manipulation/snapshot/$pair'
+      path: '/api/manipulation/snapshot/$pair'
+      fullPath: '/api/manipulation/snapshot/$pair'
+      preLoaderRoute: typeof ApiManipulationSnapshotPairRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/dna/profile/$userId': {
+      id: '/api/dna/profile/$userId'
+      path: '/api/dna/profile/$userId'
+      fullPath: '/api/dna/profile/$userId'
+      preLoaderRoute: typeof ApiDnaProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/state/$userId': {
+      id: '/api/calibrator/state/$userId'
+      path: '/api/calibrator/state/$userId'
+      fullPath: '/api/calibrator/state/$userId'
+      preLoaderRoute: typeof ApiCalibratorStateUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/run/$userId': {
+      id: '/api/calibrator/run/$userId'
+      path: '/api/calibrator/run/$userId'
+      fullPath: '/api/calibrator/run/$userId'
+      preLoaderRoute: typeof ApiCalibratorRunUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/feedback/$userId': {
+      id: '/api/calibrator/feedback/$userId'
+      path: '/api/calibrator/feedback/$userId'
+      fullPath: '/api/calibrator/feedback/$userId'
+      preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/executions/export': {
+      id: '/api/bot4x/executions/export'
+      path: '/export'
+      fullPath: '/api/bot4x/executions/export'
+      preLoaderRoute: typeof ApiBot4xExecutionsExportRouteImport
+      parentRoute: typeof ApiBot4xExecutionsRoute
+    }
+    '/_authenticated/calibrator/history/$id': {
+      id: '/_authenticated/calibrator/history/$id'
+      path: '/$id'
+      fullPath: '/calibrator/history/$id'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryIdRouteImport
+      parentRoute: typeof AuthenticatedCalibratorHistoryRoute
     }
   }
 }

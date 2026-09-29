@@ -106,25 +106,23 @@ export async function loadTrades(userId: string, limitDays = 90): Promise<Trade[
     return [];
   }
 
-  return (data ?? []).map(
-    (r): Trade => ({
-      id: r.id,
-      day: r.day,
-      pair: r.pair,
-      side: r.side as Trade["side"],
-      entry: Number(r.entry),
-      stop: r.stop != null ? Number(r.stop) : 0,
-      target: r.target != null ? Number(r.target) : 0,
-      result: r.result as Trade["result"],
-      pnl: Number(r.pnl),
-      pnlPct: Number(r.pnl_pct),
-      accumulated: Number(r.accumulated),
-      profile: (r.profile ?? "conservador") as Trade["profile"],
-      leverage: r.leverage ?? 1,
-      motivo: r.motivo ?? "",
-      hour: r.hour ?? 0,
-    }),
-  );
+  return (data ?? []).map((r): Trade => ({
+    id: r.id,
+    day: r.day,
+    pair: r.pair,
+    side: r.side as Trade["side"],
+    entry: Number(r.entry),
+    stop: r.stop != null ? Number(r.stop) : 0,
+    target: r.target != null ? Number(r.target) : 0,
+    result: r.result as Trade["result"],
+    pnl: Number(r.pnl),
+    pnlPct: Number(r.pnl_pct),
+    accumulated: Number(r.accumulated),
+    profile: (r.profile ?? "conservador") as Trade["profile"],
+    leverage: r.leverage ?? 1,
+    motivo: r.motivo ?? "",
+    hour: r.hour ?? 0,
+  }));
 }
 
 export async function deleteTrade(userId: string, tradeId: string): Promise<void> {
@@ -133,6 +131,5 @@ export async function deleteTrade(userId: string, tradeId: string): Promise<void
     .delete()
     .eq("id", tradeId)
     .eq("user_id", userId);
-  if (error)
-    logger.error("[bot4x-trades-db] deleteTrade error", { error, message: error.message, tradeId });
+  if (error) logger.error("[bot4x-trades-db] deleteTrade error", { error, message: error.message, tradeId });
 }

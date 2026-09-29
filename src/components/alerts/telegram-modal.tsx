@@ -1,10 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Send, Copy, Check, ExternalLink, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,13 +7,7 @@ import { toast } from "sonner";
 
 type Status = "idle" | "waiting" | "connected";
 
-export function TelegramConnectModal({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
+export function TelegramConnectModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [copiedField, setCopiedField] = useState<"link" | "code" | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const code = "AISR-3F92-8KQ1";
@@ -71,11 +59,7 @@ export function TelegramConnectModal({
                 className="size-8 rounded-md bg-secondary hover:bg-secondary/70 flex items-center justify-center text-muted-foreground hover:text-foreground"
                 title="Copy link"
               >
-                {copiedField === "link" ? (
-                  <Check className="size-4 text-emerald-400" />
-                ) : (
-                  <Copy className="size-3.5" />
-                )}
+                {copiedField === "link" ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-3.5" />}
               </button>
               <a
                 href={botLink}
@@ -91,9 +75,7 @@ export function TelegramConnectModal({
 
           <Step n={2} title="Send the start command">
             <div className="flex items-center gap-2">
-              <code className="px-2.5 py-2 rounded-md bg-secondary text-foreground font-mono text-xs">
-                /start
-              </code>
+              <code className="px-2.5 py-2 rounded-md bg-secondary text-foreground font-mono text-xs">/start</code>
               <span className="text-xs text-muted-foreground">in the chat with the bot.</span>
             </div>
           </Step>
@@ -107,11 +89,7 @@ export function TelegramConnectModal({
                 onClick={() => copy(code, "code")}
                 className="size-9 rounded-md bg-secondary hover:bg-secondary/70 flex items-center justify-center text-muted-foreground hover:text-foreground"
               >
-                {copiedField === "code" ? (
-                  <Check className="size-4 text-emerald-400" />
-                ) : (
-                  <Copy className="size-4" />
-                )}
+                {copiedField === "code" ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground mt-1.5">Expires in 10 minutes.</p>
@@ -137,9 +115,7 @@ export function TelegramConnectModal({
             )}
           </div>
           {status === "connected" ? (
-            <Button size="sm" onClick={() => onOpenChange(false)}>
-              Done
-            </Button>
+            <Button size="sm" onClick={() => onOpenChange(false)}>Done</Button>
           ) : (
             <Button size="sm" onClick={verify} disabled={status === "waiting"}>
               {status === "waiting" ? "Verifying…" : "I've sent the code"}

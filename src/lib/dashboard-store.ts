@@ -1,10 +1,5 @@
 import { create } from "zustand";
-import {
-  heatmap as initialHeatmap,
-  initialSignals,
-  type HeatmapAsset,
-  type Signal,
-} from "./dashboard-data";
+import { heatmap as initialHeatmap, initialSignals, type HeatmapAsset, type Signal } from "./dashboard-data";
 import { api, endpoints } from "@/adapters/backend/api.adapter";
 import { signalAdapter } from "@/adapters/backend/signal.adapter";
 import { manipulationAdapter } from "@/adapters/backend/manipulation.adapter";
@@ -74,6 +69,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   regime: null,
   _intervalIds: new Set<number>(),
 
+
   init: () => {
     if (get()._intervalIds.size > 0) return;
     const ids = new Set<number>();
@@ -129,7 +125,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           target: s.tp ?? s.entry,
           rr:
             s.sl && s.tp && s.entry - s.sl !== 0
-              ? +Math.abs((s.tp - s.entry) / (s.entry - s.sl)).toFixed(2)
+              ? +(Math.abs((s.tp - s.entry) / (s.entry - s.sl))).toFixed(2)
               : 0,
           tf: s.tf ?? "1H",
           time: s.createdAt ?? "",
@@ -181,6 +177,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }, 10_000);
     ids.add(backendPoll);
 
+
+
     set({ _intervalIds: ids });
   },
 
@@ -207,7 +205,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set({ _intervalIds: ids });
   },
 
+
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
   setSelectedSignal: (s) => set({ selectedSignal: s }),
   setCmdkOpen: (v) => set({ cmdkOpen: v }),
 }));
+

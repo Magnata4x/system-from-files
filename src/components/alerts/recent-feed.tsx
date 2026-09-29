@@ -77,9 +77,7 @@ export function RecentFeed({
       <ul className="divide-y divide-border max-h-[480px] overflow-y-auto">
         <AnimatePresence initial={false}>
           {loading && feed.length === 0 && (
-            <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-              Carregando alertas…
-            </li>
+            <li className="px-5 py-10 text-center text-sm text-muted-foreground">Carregando alertas…</li>
           )}
           {error && feed.length === 0 && (
             <li className="px-5 py-10 text-center text-sm text-muted-foreground">
@@ -87,9 +85,7 @@ export function RecentFeed({
             </li>
           )}
           {!loading && !error && feed.length === 0 && (
-            <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-              Nenhum alerta ainda.
-            </li>
+            <li className="px-5 py-10 text-center text-sm text-muted-foreground">Nenhum alerta ainda.</li>
           )}
           {feed.map((item) => {
             const meta = META[item.kind];
@@ -114,18 +110,12 @@ export function RecentFeed({
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[13px] font-medium">{item.type}</span>
                     <span className="text-xs font-mono text-muted-foreground">{item.asset}</span>
-                    {!item.read && (
-                      <span className="size-1.5 rounded-full bg-[var(--brand-cyan)]" />
-                    )}
+                    {!item.read && <span className="size-1.5 rounded-full bg-[var(--brand-cyan)]" />}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                    {item.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] text-muted-foreground tabular-nums">
-                    {timeAgo(item.at)}
-                  </span>
+                  <span className="text-[11px] text-muted-foreground tabular-nums">{timeAgo(item.at)}</span>
                   {!item.read && (
                     <button
                       onClick={() => handleRead(item.id)}

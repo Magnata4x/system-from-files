@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAuthSession } from "@/lib/server-auth";
 import { OfflineBanner } from "@/components/offline-banner";
 
+
 // PERF-01: code-split widgets pesados. CopilotPanel só monta após o
 // usuário interagir com o Copilot (useCopilotUI.open).
 const Bot4xFloatingWidget = lazy(() =>
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: AuthGate,
 });
+
 
 function AuthGate() {
   const { session, loading } = useAuth();
@@ -97,11 +99,7 @@ function AuthGate() {
   return <AuthenticatedApp session={session} />;
 }
 
-function AuthenticatedApp({
-  session,
-}: {
-  session: NonNullable<ReturnType<typeof useAuth>["session"]>;
-}) {
+function AuthenticatedApp({ session }: { session: NonNullable<ReturnType<typeof useAuth>["session"]> }) {
   const navigate = useNavigate();
   const copilotOpen = useCopilotUI((s) => s.open);
   // Uma vez aberto, mantenha montado para preservar estado/conversa.

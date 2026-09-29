@@ -12,9 +12,7 @@ export function Sparkline({ data, width = 96, height = 28, positive }: Props) {
   const range = max - min || 1;
   const stepX = width / (data.length - 1);
   const points = data
-    .map(
-      (v, i) => `${(i * stepX).toFixed(2)},${(height - ((v - min) / range) * height).toFixed(2)}`,
-    )
+    .map((v, i) => `${(i * stepX).toFixed(2)},${(height - ((v - min) / range) * height).toFixed(2)}`)
     .join(" ");
   const last = data[data.length - 1];
   const isPos = positive ?? last >= 0;
@@ -29,16 +27,17 @@ export function Sparkline({ data, width = 96, height = 28, positive }: Props) {
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
-      <polygon points={`0,${height} ${points} ${width},${height}`} fill={`url(#${fillId})`} />
-      <polyline
-        points={points}
-        fill="none"
-        stroke={color}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <polygon
+        points={`0,${height} ${points} ${width},${height}`}
+        fill={`url(#${fillId})`}
       />
-      <circle cx={width} cy={height - ((last - min) / range) * height} r={2} fill={color} />
+      <polyline points={points} fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />
+      <circle
+        cx={width}
+        cy={height - ((last - min) / range) * height}
+        r={2}
+        fill={color}
+      />
     </svg>
   );
 }

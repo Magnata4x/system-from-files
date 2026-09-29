@@ -18,9 +18,7 @@ export function KeysManagement() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">API keys</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Gere, rotacione e monitore o uso de chaves de API.
-          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">Gere, rotacione e monitore o uso de chaves de API.</p>
         </div>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border border-amber-500/40 bg-amber-500/10 text-amber-300">
           <Construction className="size-3.5" /> Em breve
@@ -35,28 +33,20 @@ export function KeysManagement() {
           <div className="space-y-2 min-w-0">
             <h3 className="text-sm font-semibold">Emissão de chaves em desenvolvimento</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              O painel de gestão de chaves de API está em desenvolvimento. Quando estiver
-              disponível, clientes do plano Institutional poderão emitir, rotacionar e revogar
-              chaves a partir desta tela, com hashing server-side e validação por middleware em cada
-              request da API pública.
+              O painel de gestão de chaves de API está em desenvolvimento. Quando estiver disponível,
+              clientes do plano Institutional poderão emitir, rotacionar e revogar chaves a partir desta tela,
+              com hashing server-side e validação por middleware em cada request da API pública.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Até lá, esta página é informativa. Se você precisa acessar os endpoints
-              REST/WebSocket, entre em contato com o suporte para emissão manual de credenciais.
+              Até lá, esta página é informativa. Se você precisa acessar os endpoints REST/WebSocket,
+              entre em contato com o suporte para emissão manual de credenciais.
             </p>
             <div className="pt-1 flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled
-                className="opacity-60 cursor-not-allowed"
-              >
+              <Button size="sm" variant="outline" disabled className="opacity-60 cursor-not-allowed">
                 <Sparkles className="size-3.5 mr-1" /> Generate new key
               </Button>
               <Button size="sm" variant="ghost" asChild>
-                <a href="mailto:support@aisignalradar.com?subject=API%20key%20request">
-                  Falar com suporte
-                </a>
+                <a href="mailto:support@aisignalradar.com?subject=API%20key%20request">Falar com suporte</a>
               </Button>
             </div>
           </div>
@@ -77,13 +67,7 @@ export function KeysManagement() {
             </thead>
             <tbody>
               {RATE_LIMITS.map((r) => (
-                <tr
-                  key={r.plan}
-                  className={cn(
-                    "border-t border-border/60",
-                    r.plan === "Institutional" && "bg-[#378ADD]/5",
-                  )}
-                >
+                <tr key={r.plan} className={cn("border-t border-border/60", r.plan === "Institutional" && "bg-[#378ADD]/5")}>
                   <td className="px-4 py-3 font-medium">{r.plan}</td>
                   <td className="px-4 py-3 tabular-nums">{r.limit}</td>
                   <td className="px-4 py-3 text-muted-foreground">{r.burst}</td>

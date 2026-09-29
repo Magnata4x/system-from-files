@@ -4,14 +4,7 @@
 // de um guard `import.meta.env.DEV`. Em builds de produção o tree-shaking
 // remove a referência e o chunk não é emitido — assim mocks não vazam como
 // sinais reais nem mesmo em caso de bug de renderização.
-import type {
-  AssetClass,
-  Session,
-  Signal,
-  SetupType,
-  SignalDirection,
-  SignalStatus,
-} from "./signals-data";
+import type { AssetClass, Session, Signal, SetupType, SignalDirection, SignalStatus } from "./signals-data";
 
 const exchanges = ["Binance", "Bybit", "OKX", "Coinbase"];
 const setups: SetupType[] = ["BOS+OB", "CHoCH+FVG", "VWAP", "S/R", "Breakout", "Reversal"];
@@ -76,14 +69,7 @@ export const mockSignals: Signal[] = pairs.map((p, i) => {
     id: `sig-${i + 1}`,
     asset: p.sym,
     assetClass: p.cls,
-    exchange:
-      p.cls === "Crypto"
-        ? exchanges[Math.floor(rand() * exchanges.length)]
-        : p.cls === "Stocks"
-          ? "NASDAQ"
-          : p.cls === "Forex"
-            ? "OANDA"
-            : "CME",
+    exchange: p.cls === "Crypto" ? exchanges[Math.floor(rand() * exchanges.length)] : p.cls === "Stocks" ? "NASDAQ" : p.cls === "Forex" ? "OANDA" : "CME",
     direction,
     score,
     tf,

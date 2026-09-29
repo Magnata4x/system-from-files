@@ -1,10 +1,5 @@
 import { BadgeCheck } from "lucide-react";
-import {
-  CATEGORY_BADGES,
-  CATEGORY_GRADIENTS,
-  PRODUCTS,
-  type Product,
-} from "@/lib/marketplace-data";
+import { CATEGORY_BADGES, CATEGORY_GRADIENTS, PRODUCTS, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
 
 export function FeaturedCarousel({ onOpen }: { onOpen: (p: Product) => void }) {
@@ -23,15 +18,8 @@ export function FeaturedCarousel({ onOpen }: { onOpen: (p: Product) => void }) {
               onClick={() => onOpen(p)}
               className="group relative w-[320px] shrink-0 rounded-xl border border-border bg-card/40 hover:border-[#378ADD]/40 transition-all overflow-hidden text-left"
             >
-              <div
-                className={cn("relative h-32 bg-gradient-to-br", CATEGORY_GRADIENTS[p.category])}
-              >
-                <span
-                  className={cn(
-                    "absolute top-2.5 left-2.5 text-[10.5px] px-1.5 py-0.5 rounded border",
-                    CATEGORY_BADGES[p.category],
-                  )}
-                >
+              <div className={cn("relative h-32 bg-gradient-to-br", CATEGORY_GRADIENTS[p.category])}>
+                <span className={cn("absolute top-2.5 left-2.5 text-[10.5px] px-1.5 py-0.5 rounded border", CATEGORY_BADGES[p.category])}>
                   {p.category}
                 </span>
                 <span className="absolute top-2.5 right-2.5 text-[10px] uppercase font-semibold tracking-wide px-1.5 py-0.5 rounded bg-background/70 backdrop-blur border border-border text-amber-400">
@@ -45,14 +33,7 @@ export function FeaturedCarousel({ onOpen }: { onOpen: (p: Product) => void }) {
                   {p.creator.verified && <BadgeCheck className="size-3 text-[#5fa8ff]" />}
                 </div>
                 <div className="text-sm font-semibold tabular-nums pt-1">
-                  {p.price === 0 ? (
-                    <span className="text-emerald-400">Gratuito</span>
-                  ) : (
-                    <>
-                      R${p.price}
-                      <span className="text-[11px] text-muted-foreground font-normal">/mês</span>
-                    </>
-                  )}
+                  {p.price === 0 ? <span className="text-emerald-400">Gratuito</span> : <>R${p.price}<span className="text-[11px] text-muted-foreground font-normal">/mês</span></>}
                 </div>
               </div>
             </button>

@@ -3,12 +3,7 @@ import { BadgeCheck, Heart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/marketplace/rating";
 import { ProductDetailModal } from "@/components/marketplace/product-detail-modal";
-import {
-  CATEGORY_BADGES,
-  CATEGORY_GRADIENTS,
-  PRODUCTS,
-  type Product,
-} from "@/lib/marketplace-data";
+import { CATEGORY_BADGES, CATEGORY_GRADIENTS, PRODUCTS, type Product } from "@/lib/marketplace-data";
 import { useWishlist } from "@/lib/wishlist-store";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -39,9 +34,7 @@ export function WishlistTab() {
     <>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">
-            {items.length} {items.length === 1 ? "produto salvo" : "produtos salvos"}
-          </h2>
+          <h2 className="text-sm font-medium">{items.length} {items.length === 1 ? "produto salvo" : "produtos salvos"}</h2>
           <Button asChild variant="outline" size="sm" className="h-7 text-xs">
             <Link to="/marketplace">Explorar mais</Link>
           </Button>
@@ -49,30 +42,18 @@ export function WishlistTab() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {items.map((p) => (
-            <div
-              key={p.id}
-              className="rounded-lg border border-border bg-card/40 overflow-hidden flex"
-            >
+            <div key={p.id} className="rounded-lg border border-border bg-card/40 overflow-hidden flex">
               <button
                 type="button"
-                onClick={() => {
-                  setSelected(p);
-                  setOpen(true);
-                }}
-                className={cn(
-                  "relative w-20 shrink-0 bg-gradient-to-br border-r border-border/60",
-                  CATEGORY_GRADIENTS[p.category],
-                )}
+                onClick={() => { setSelected(p); setOpen(true); }}
+                className={cn("relative w-20 shrink-0 bg-gradient-to-br border-r border-border/60", CATEGORY_GRADIENTS[p.category])}
                 aria-label={`Open ${p.name}`}
               />
               <div className="p-3 flex-1 min-w-0 flex flex-col gap-1.5">
                 <div className="flex items-start justify-between gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setSelected(p);
-                      setOpen(true);
-                    }}
+                    onClick={() => { setSelected(p); setOpen(true); }}
                     className="text-left text-[13px] font-medium line-clamp-1 hover:text-[#5fa8ff]"
                   >
                     {p.name}
@@ -87,14 +68,7 @@ export function WishlistTab() {
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <span
-                    className={cn(
-                      "px-1.5 py-0.5 rounded border text-[10px]",
-                      CATEGORY_BADGES[p.category],
-                    )}
-                  >
-                    {p.category}
-                  </span>
+                  <span className={cn("px-1.5 py-0.5 rounded border text-[10px]", CATEGORY_BADGES[p.category])}>{p.category}</span>
                   <span className="flex items-center gap-1 truncate">
                     @{p.creator.handle}
                     {p.creator.verified && <BadgeCheck className="size-3 text-[#5fa8ff]" />}
@@ -103,14 +77,7 @@ export function WishlistTab() {
                 <div className="flex items-center justify-between mt-auto pt-1">
                   <Rating value={p.rating} count={p.reviews} />
                   <span className="text-xs font-semibold tabular-nums">
-                    {p.price === 0 ? (
-                      <span className="text-emerald-400">Free</span>
-                    ) : (
-                      <>
-                        R${p.price}
-                        <span className="text-[10px] text-muted-foreground font-normal">/mês</span>
-                      </>
-                    )}
+                    {p.price === 0 ? <span className="text-emerald-400">Free</span> : <>R${p.price}<span className="text-[10px] text-muted-foreground font-normal">/mês</span></>}
                   </span>
                 </div>
               </div>

@@ -11,12 +11,7 @@ export const ENDPOINTS: Endpoint[] = [
   { method: "GET", path: "/v1/signals", desc: "List active signals with filters", responseMs: 32 },
   { method: "GET", path: "/v1/signals/:id", desc: "Signal detail + AI analysis", responseMs: 41 },
   { method: "GET", path: "/v1/score/:asset", desc: "AI score for any asset", responseMs: 28 },
-  {
-    method: "GET",
-    path: "/v1/sentiment/:asset",
-    desc: "Multi-source sentiment aggregate",
-    responseMs: 36,
-  },
+  { method: "GET", path: "/v1/sentiment/:asset", desc: "Multi-source sentiment aggregate", responseMs: 36 },
   { method: "GET", path: "/v1/manipulation", desc: "Active manipulation alerts", responseMs: 44 },
   { method: "WS", path: "/v1/stream/signals", desc: "Real-time signal stream", responseMs: 12 },
   { method: "WS", path: "/v1/stream/scores", desc: "Real-time score updates", responseMs: 14 },
@@ -74,22 +69,8 @@ export type ApiKey = {
 };
 
 export const SAMPLE_KEYS: ApiKey[] = [
-  {
-    id: "k1",
-    name: "Production backend",
-    key: "sk_live_••••••••••••PROD",
-    plan: "Institutional",
-    requestsToday: 12483,
-    createdAt: "2026-03-14",
-  },
-  {
-    id: "k2",
-    name: "Research notebooks",
-    key: "sk_live_••••••••••••RSCH",
-    plan: "Institutional",
-    requestsToday: 942,
-    createdAt: "2026-04-02",
-  },
+  { id: "k1", name: "Production backend", key: "sk_live_••••••••••••PROD", plan: "Institutional", requestsToday: 12483, createdAt: "2026-03-14" },
+  { id: "k2", name: "Research notebooks", key: "sk_live_••••••••••••RSCH", plan: "Institutional", requestsToday: 942, createdAt: "2026-04-02" },
 ];
 
 export const RATE_LIMITS = [

@@ -148,16 +148,11 @@ function mapBackendProfile(p: string | undefined): CalibProfile {
   return "conservador";
 }
 
-function executionToTrade(
-  e: BackendBot4xExecution,
-  profile: CalibProfile,
-  leverage: number,
-): Trade {
+function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, leverage: number): Trade {
   const openedAt = e.createdAt ? new Date(e.createdAt).getTime() : Date.now();
   const pnl = e.pnl ?? 0;
   const side: Side = e.side === "BUY" || e.side === "LONG" ? "LONG" : "SHORT";
-  const result: Trade["result"] =
-    e.status === "open" || e.status === "pending" ? "BLOCKED" : pnl >= 0 ? "WIN" : "LOSS";
+  const result: Trade["result"] = e.status === "open" || e.status === "pending" ? "BLOCKED" : pnl >= 0 ? "WIN" : "LOSS";
   const entry = e.entryPrice ?? 0;
   return {
     id: e.id,
@@ -235,8 +230,9 @@ export const useBot4xStore = create<State>()(
         // ainda precisamos trocar para a chave específica do usuário.
         if (prev === uid && _currentUserId === uid) return;
         const userStorageKey = uid ? `bot4x-store-v1:${uid}` : "bot4x-store-v1";
-        const persistedForUser =
-          typeof localStorage !== "undefined" ? localStorage.getItem(userStorageKey) : null;
+        const persistedForUser = typeof localStorage !== "undefined"
+          ? localStorage.getItem(userStorageKey)
+          : null;
         // Limpa tickers/WS antes de trocar de usuário para não vazar handles
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
@@ -302,6 +298,8 @@ export const useBot4xStore = create<State>()(
           // então não basta `if (s._ticker)`.
           if (s._ticker !== undefined && s._ticker !== null) return;
 
+
+
           if (s.history.length === 0) {
             const uid = get().userId;
             if (uid) {
@@ -347,9 +345,7 @@ export const useBot4xStore = create<State>()(
                 stop: o.sl,
                 target: o.tp,
                 result: o.pnlPct >= tpLimit ? "WIN" : "LOSS",
-                pnl: +((o.pnlPct * (prev.totalCapital * (prev.allocationPct / 100))) / 100).toFixed(
-                  2,
-                ),
+                pnl: +((o.pnlPct * (prev.totalCapital * (prev.allocationPct / 100))) / 100).toFixed(2),
                 pnlPct: o.pnlPct,
                 accumulated: 0,
                 profile: prev.profile,
@@ -364,6 +360,8 @@ export const useBot4xStore = create<State>()(
                   newTrades.forEach((t) => saveTrade(uid, t));
                 }
               }
+
+
 
               const today = new Date().toISOString().slice(0, 10);
               const allTodayTrades = [...newTrades, ...prev.history.filter((h) => h.day === today)];
@@ -407,10 +405,7 @@ export const useBot4xStore = create<State>()(
                 ticksProcessed: prev.ticksProcessed + 1,
                 orders: nextOrders,
                 dailyPnlPct: +dailyPnlPct.toFixed(3),
-                history:
-                  newTrades.length > 0
-                    ? [...newTrades, ...prev.history].slice(0, 500)
-                    : prev.history,
+                history: newTrades.length > 0 ? [...newTrades, ...prev.history].slice(0, 500) : prev.history,
               };
             });
           }, 8000);
@@ -433,10 +428,7 @@ export const useBot4xStore = create<State>()(
           const uid = user?.id;
           if (!uid) throw new Error("Usuário não autenticado");
 
-          const [config, executions] = await Promise.all([
-            bot4xAdapter.getConfig(uid),
-            bot4xAdapter.executions(),
-          ]);
+          const [config, executions] = await Promise.all([bot4xAdapter.getConfig(uid), bot4xAdapter.executions()]);
 
           const profile = mapBackendProfile(config?.profile);
           const leverage = get().leverage;
@@ -493,10 +485,7 @@ export const useBot4xStore = create<State>()(
               set((prev) => ({ history: [trade, ...prev.history].slice(0, 500) }));
               if (s.userId) {
                 void saveTradeWithOutbox(s.userId, trade).catch((err) =>
-                  logger.error("[Bot4x] saveTradeWithOutbox failed", {
-                    error: err,
-                    tradeId: trade.id,
-                  }),
+                  logger.error("[Bot4x] saveTradeWithOutbox failed", { error: err, tradeId: trade.id }),
                 );
               }
             }
@@ -622,13 +611,7 @@ export const useBot4xStore = create<State>()(
       // interno (/api/prices). Nunca sobrescreve ordens já existentes.
       seedOrders: () => {
         if (get().orders.length > 0) return;
-        const specs: Array<{
-          id: string;
-          pair: string;
-          side: Side;
-          ageMin: number;
-          pnlPct: number;
-        }> = [
+        const specs: Array<{ id: string; pair: string; side: Side; ageMin: number; pnlPct: number }> = [
           { id: "o1", pair: "BTC/USDT", side: "LONG", ageMin: 4, pnlPct: +0.18 },
           { id: "o2", pair: "ETH/USDT", side: "SHORT", ageMin: 12, pnlPct: -0.09 },
           { id: "o3", pair: "SOL/USDT", side: "LONG", ageMin: 7, pnlPct: +0.31 },
@@ -678,10 +661,7 @@ export const useBot4xStore = create<State>()(
         if (!state) return persisted as State;
         if (version < 2) {
           const legacy = new Set(["o1", "o2", "o3"]);
-          return {
-            ...state,
-            orders: (state.orders ?? []).filter((o) => !legacy.has(o.id)),
-          } as State;
+          return { ...state, orders: (state.orders ?? []).filter((o) => !legacy.has(o.id)) } as State;
         }
         return state as State;
       },
@@ -740,6 +720,7 @@ supabase.auth.onAuthStateChange((event, session) => {
     });
   }
 });
+
 
 // ─── SELECTORS ────────────────────────────────────────────────────────────────
 

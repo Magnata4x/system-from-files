@@ -4,7 +4,7 @@ import { TrendingUp, Flame, Newspaper } from "lucide-react";
 export function MacroCards() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <Card title="Social Volume 24h">
+      <Card title="Social Volume 24h" >
         <div className="flex items-end justify-between">
           <div className="text-2xl font-semibold">{MACRO.socialVolume.value}</div>
           <div className="text-xs text-emerald-400 flex items-center gap-1">
@@ -17,12 +17,8 @@ export function MacroCards() {
         <div className="flex items-center gap-3">
           <Donut bull={MACRO.bullBear.bull} />
           <div className="text-xs space-y-1">
-            <div className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-emerald-400" /> Bull {MACRO.bullBear.bull}%
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-red-400" /> Bear {MACRO.bullBear.bear}%
-            </div>
+            <div className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-emerald-400" /> Bull {MACRO.bullBear.bull}%</div>
+            <div className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-red-400" /> Bear {MACRO.bullBear.bear}%</div>
           </div>
         </div>
       </Card>
@@ -35,10 +31,7 @@ export function MacroCards() {
       </Card>
       <Card title="News Impact Score">
         <div className="flex items-end justify-between">
-          <div className="text-2xl font-semibold">
-            {MACRO.newsImpact}
-            <span className="text-sm text-muted-foreground">/100</span>
-          </div>
+          <div className="text-2xl font-semibold">{MACRO.newsImpact}<span className="text-sm text-muted-foreground">/100</span></div>
           <Newspaper className="size-4 text-muted-foreground" />
         </div>
         <div className="text-[11px] text-emerald-400 mt-1">Moderately positive</div>
@@ -57,21 +50,15 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 function Donut({ bull }: { bull: number }) {
-  const r = 22,
-    c = 2 * Math.PI * r;
+  const r = 22, c = 2 * Math.PI * r;
   const off = c * (1 - bull / 100);
   return (
     <svg width="56" height="56" viewBox="0 0 56 56">
       <circle cx="28" cy="28" r={r} stroke="rgb(239 68 68 / 0.85)" strokeWidth="7" fill="none" />
       <circle
-        cx="28"
-        cy="28"
-        r={r}
-        stroke="rgb(52 211 153)"
-        strokeWidth="7"
-        fill="none"
-        strokeDasharray={c}
-        strokeDashoffset={off}
+        cx="28" cy="28" r={r}
+        stroke="rgb(52 211 153)" strokeWidth="7" fill="none"
+        strokeDasharray={c} strokeDashoffset={off}
         transform="rotate(-90 28 28)"
         strokeLinecap="round"
       />

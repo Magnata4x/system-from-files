@@ -11,18 +11,7 @@ import { cn } from "@/lib/utils";
 type Lang = "javascript" | "python" | "curl" | "json";
 
 const KEYWORDS: Record<Lang, string[]> = {
-  javascript: [
-    "const",
-    "let",
-    "var",
-    "await",
-    "async",
-    "function",
-    "return",
-    "import",
-    "from",
-    "console",
-  ],
+  javascript: ["const", "let", "var", "await", "async", "function", "return", "import", "from", "console"],
   python: ["import", "from", "def", "return", "print", "as"],
   curl: ["curl"],
   json: [],
@@ -55,15 +44,7 @@ function tokenize(code: string, lang: Lang): Token[] {
   return tokens;
 }
 
-export function CodeBlock({
-  code,
-  lang,
-  className,
-}: {
-  code: string;
-  lang: Lang;
-  className?: string;
-}) {
+export function CodeBlock({ code, lang, className }: { code: string; lang: Lang; className?: string }) {
   const [copied, setCopied] = useState(false);
   const tokens = useMemo(() => tokenize(code, lang), [code, lang]);
 
@@ -76,12 +57,7 @@ export function CodeBlock({
   }
 
   return (
-    <div
-      className={cn(
-        "relative rounded-lg border border-border bg-[#0a0e15] overflow-hidden group",
-        className,
-      )}
-    >
+    <div className={cn("relative rounded-lg border border-border bg-[#0a0e15] overflow-hidden group", className)}>
       <button
         onClick={copy}
         className="absolute top-2.5 right-2.5 z-10 size-7 rounded-md bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
@@ -98,7 +74,7 @@ export function CodeBlock({
               </span>
             ) : (
               <span key={i}>{t.text}</span>
-            ),
+            )
           )}
         </code>
       </pre>

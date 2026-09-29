@@ -4,11 +4,7 @@ import { bot4xAdapter } from "@/adapters/backend/bot4x.adapter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
 const PAGE = 15;
@@ -33,7 +29,8 @@ export function DnaOperations() {
 
   const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["dna", "operations", page, result, side],
-    queryFn: () => bot4xAdapter.executionsPage({ limit: PAGE, offset: page * PAGE, result, side }),
+    queryFn: () =>
+      bot4xAdapter.executionsPage({ limit: PAGE, offset: page * PAGE, result, side }),
     staleTime: 30_000,
     placeholderData: (prev) => prev,
     retry: 1,
@@ -49,37 +46,20 @@ export function DnaOperations() {
         <div>
           <h2 className="text-sm font-semibold tracking-tight">Operações detalhadas</h2>
           <p className="text-xs text-muted-foreground">
-            Entrada, stop, alvo, resultado e data — o mesmo histórico que alimenta o radar e o mapa
-            de calor.
+            Entrada, stop, alvo, resultado e data — o mesmo histórico que alimenta o radar e o mapa de calor.
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Select
-            value={side}
-            onValueChange={(v) => {
-              setSide(v);
-              setPage(0);
-            }}
-          >
-            <SelectTrigger className="h-8 w-[120px] text-xs">
-              <SelectValue />
-            </SelectTrigger>
+          <Select value={side} onValueChange={(v) => { setSide(v); setPage(0); }}>
+            <SelectTrigger className="h-8 w-[120px] text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os lados</SelectItem>
               <SelectItem value="LONG">Long</SelectItem>
               <SelectItem value="SHORT">Short</SelectItem>
             </SelectContent>
           </Select>
-          <Select
-            value={result}
-            onValueChange={(v) => {
-              setResult(v);
-              setPage(0);
-            }}
-          >
-            <SelectTrigger className="h-8 w-[140px] text-xs">
-              <SelectValue />
-            </SelectTrigger>
+          <Select value={result} onValueChange={(v) => { setResult(v); setPage(0); }}>
+            <SelectTrigger className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os resultados</SelectItem>
               <SelectItem value="WIN">Ganhos</SelectItem>
@@ -92,18 +72,14 @@ export function DnaOperations() {
 
       {isPending ? (
         <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-9 w-full" />
-          ))}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}
         </div>
       ) : isError ? (
         <div className="rounded-md border border-dashed border-border p-8 text-center space-y-2">
           <p className="text-sm text-[#E24B4A]">
             {(error as Error)?.message ?? "Não foi possível carregar suas operações."}
           </p>
-          <Button size="sm" variant="outline" onClick={() => void refetch()}>
-            Tentar de novo
-          </Button>
+          <Button size="sm" variant="outline" onClick={() => void refetch()}>Tentar de novo</Button>
         </div>
       ) : items.length === 0 ? (
         <div className="rounded-md border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
@@ -139,9 +115,7 @@ export function DnaOperations() {
                     <td className={`py-2 pr-3 ${resultTone(op.result ?? op.status ?? "")}`}>
                       {op.result ?? op.status ?? "—"}
                     </td>
-                    <td
-                      className={`py-2 text-right tabular-nums ${(op.pnl ?? 0) >= 0 ? "text-[#1D9E75]" : "text-[#E24B4A]"}`}
-                    >
+                    <td className={`py-2 text-right tabular-nums ${(op.pnl ?? 0) >= 0 ? "text-[#1D9E75]" : "text-[#E24B4A]"}`}>
                       {fmt(op.pnl, 2)}
                       {op.pnlPct !== undefined && (
                         <span className="text-muted-foreground"> ({fmt(op.pnlPct, 2)}%)</span>
@@ -159,20 +133,10 @@ export function DnaOperations() {
               {isFetching && " · atualizando…"}
             </span>
             <div className="ml-auto flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-              >
+              <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                 Anterior
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page >= lastPage}
-                onClick={() => setPage((p) => p + 1)}
-              >
+              <Button size="sm" variant="outline" disabled={page >= lastPage} onClick={() => setPage((p) => p + 1)}>
                 Próxima
               </Button>
             </div>

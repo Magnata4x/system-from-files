@@ -2,23 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X,
-  Bell,
-  Bookmark,
-  LineChart,
-  Share2,
-  ChevronDown,
-  AlertTriangle,
-  Check,
-  TrendingUp,
-  TrendingDown,
-  Globe,
-  Activity,
-  ShieldCheck,
-  Shield,
-  ShieldAlert,
-  Sparkles,
-  GripVertical,
+  X, Bell, Bookmark, LineChart, Share2, ChevronDown, AlertTriangle, Check,
+  TrendingUp, TrendingDown, Globe, Activity, ShieldCheck, Shield, ShieldAlert, Sparkles, GripVertical,
 } from "lucide-react";
 import { ScoreBadge, scoreColor } from "@/components/dashboard/score-badge";
 import { useSignalsStore } from "@/lib/signals-store";
@@ -71,16 +56,12 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
   return (
     <>
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         className="fixed inset-0 bg-black/60 z-[60]"
       />
       <motion.aside
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
+        initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 280 }}
         className="fixed top-0 right-0 bottom-0 z-[61] w-full md:w-[480px] bg-[#0A0B0E] border-l border-border flex flex-col"
         style={{
@@ -95,16 +76,12 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
           <div
             className="px-5 py-2 text-[12px] font-medium border-b"
             style={{
-              background: isInvalid
-                ? "color-mix(in oklab, #E24B4A 22%, var(--background))"
-                : "color-mix(in oklab, #EF9F27 22%, var(--background))",
+              background: isInvalid ? "color-mix(in oklab, #E24B4A 22%, var(--background))" : "color-mix(in oklab, #EF9F27 22%, var(--background))",
               borderColor: isInvalid ? "#E24B4A" : "#EF9F27",
               color: isInvalid ? "#FF9B9A" : "#F4C57A",
             }}
           >
-            {isInvalid
-              ? "✕ Signal invalidated — stop loss hit"
-              : "⏱ Signal expired — no longer actionable"}
+            {isInvalid ? "✕ Signal invalidated — stop loss hit" : "⏱ Signal expired — no longer actionable"}
           </div>
         )}
 
@@ -132,17 +109,7 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
 }
 
 // ---------- Header ----------
-function Header({
-  signal,
-  accent,
-  isBuy,
-  onClose,
-}: {
-  signal: Signal;
-  accent: string;
-  isBuy: boolean;
-  onClose: () => void;
-}) {
+function Header({ signal, accent, isBuy, onClose }: { signal: Signal; accent: string; isBuy: boolean; onClose: () => void }) {
   const [base, quote] = signal.asset.split("/");
   const mockChange = ((signal.id.charCodeAt(signal.id.length - 1) % 50) - 20) / 10;
   const changeColor = mockChange >= 0 ? "#1D9E75" : "#E24B4A";
@@ -158,18 +125,11 @@ function Header({
       </button>
 
       <div className="flex items-center gap-2 flex-wrap pr-10">
-        <span className="text-[18px] font-medium text-foreground">
-          {base} / {quote ?? "USD"}
-        </span>
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-secondary text-foreground border border-border">
-          {signal.exchange}
-        </span>
-        <span className="text-[14px] font-semibold tabular-nums text-foreground">
-          ${formatPrice(signal.entry)}
-        </span>
+        <span className="text-[18px] font-medium text-foreground">{base} / {quote ?? "USD"}</span>
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-secondary text-foreground border border-border">{signal.exchange}</span>
+        <span className="text-[14px] font-semibold tabular-nums text-foreground">${formatPrice(signal.entry)}</span>
         <span className="text-[12px] font-medium tabular-nums" style={{ color: changeColor }}>
-          {mockChange >= 0 ? "+" : ""}
-          {mockChange.toFixed(1)}%
+          {mockChange >= 0 ? "+" : ""}{mockChange.toFixed(1)}%
         </span>
       </div>
 
@@ -178,15 +138,10 @@ function Header({
           className="px-3 py-1.5 rounded-md text-[13px] font-bold tracking-wide inline-flex items-center gap-1"
           style={{ background: `color-mix(in oklab, ${accent} 22%, transparent)`, color: accent }}
         >
-          {signal.direction}{" "}
-          {isBuy ? <TrendingUp className="size-3.5" /> : <TrendingDown className="size-3.5" />}
+          {signal.direction} {isBuy ? <TrendingUp className="size-3.5" /> : <TrendingDown className="size-3.5" />}
         </span>
-        <span className="px-2 py-1 rounded text-[11px] font-semibold bg-[var(--brand-blue-deep)] text-foreground">
-          {signal.tf}
-        </span>
-        <span className="text-[11px] text-muted-foreground">
-          Generated {formatAge(signal.ageMin)}
-        </span>
+        <span className="px-2 py-1 rounded text-[11px] font-semibold bg-[var(--brand-blue-deep)] text-foreground">{signal.tf}</span>
+        <span className="text-[11px] text-muted-foreground">Generated {formatAge(signal.ageMin)}</span>
         <StatusBadge status={signal.status} />
         <div className="ml-auto flex items-center gap-1.5">
           <ScoreRing score={signal.score}>
@@ -194,10 +149,7 @@ function Header({
           </ScoreRing>
         </div>
       </div>
-      <div
-        className="text-[10px] uppercase tracking-wider mt-1.5 text-right font-medium"
-        style={{ color: scoreColor(signal.score) }}
-      >
+      <div className="text-[10px] uppercase tracking-wider mt-1.5 text-right font-medium" style={{ color: scoreColor(signal.score) }}>
         {tierLabel(signal.score)}
       </div>
     </header>
@@ -205,16 +157,8 @@ function Header({
 }
 
 function StatusBadge({ status }: { status: Signal["status"] }) {
-  if (status === "expired")
-    return (
-      <span className="text-[10px] font-bold uppercase tracking-wider text-[#888780]">EXPIRED</span>
-    );
-  if (status === "invalidated")
-    return (
-      <span className="text-[10px] font-bold uppercase tracking-wider text-[#E24B4A]">
-        INVALIDATED
-      </span>
-    );
+  if (status === "expired") return <span className="text-[10px] font-bold uppercase tracking-wider text-[#888780]">EXPIRED</span>;
+  if (status === "invalidated") return <span className="text-[10px] font-bold uppercase tracking-wider text-[#E24B4A]">INVALIDATED</span>;
   return (
     <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#1D9E75]">
       <span className="relative flex size-1.5">
@@ -234,27 +178,12 @@ function ScoreRing({ score, children }: { score: number; children: React.ReactNo
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   return (
-    <div
-      className="relative inline-flex items-center justify-center"
-      style={{ width: size, height: size }}
-    >
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg className="absolute inset-0 -rotate-90" width={size} height={size}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke="#1E2028"
-          strokeWidth={stroke}
-          fill="none"
-        />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="#1E2028" strokeWidth={stroke} fill="none" />
         <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke={color}
-          strokeWidth={stroke}
-          fill="none"
-          strokeLinecap="round"
+          cx={size / 2} cy={size / 2} r={r}
+          stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round"
           strokeDasharray={c}
           initial={{ strokeDashoffset: c }}
           animate={{ strokeDashoffset: c * (1 - score / 100) }}
@@ -268,15 +197,7 @@ function ScoreRing({ score, children }: { score: number; children: React.ReactNo
 }
 
 // ---------- Section 1: Trade Setup ----------
-function SectionTradeSetup({
-  signal,
-  isBuy,
-  accent,
-}: {
-  signal: Signal;
-  isBuy: boolean;
-  accent: string;
-}) {
+function SectionTradeSetup({ signal, isBuy, accent }: { signal: Signal; isBuy: boolean; accent: string }) {
   const [stop, setStop] = useState(signal.stop);
   const [target, setTarget] = useState(signal.target);
 
@@ -303,31 +224,10 @@ function SectionTradeSetup({
   };
 
   const ladder: Row[] = [
-    {
-      key: "tp2",
-      label: "TARGET 2",
-      price: t2,
-      color: "#1D9E75",
-      change: pct(signal.entry, t2),
-      draggable: "target",
-    },
+    { key: "tp2", label: "TARGET 2", price: t2, color: "#1D9E75", change: pct(signal.entry, t2), draggable: "target" },
     { key: "tp1", label: "TARGET 1", price: t1, color: "#1D9E75", change: pct(signal.entry, t1) },
-    {
-      key: "entry",
-      label: "ENTRY",
-      price: signal.entry,
-      color: "#378ADD",
-      change: 0,
-      highlight: true,
-    },
-    {
-      key: "stop",
-      label: "STOP LOSS",
-      price: stop,
-      color: "#E24B4A",
-      change: pct(signal.entry, stop),
-      draggable: "stop",
-    },
+    { key: "entry", label: "ENTRY", price: signal.entry, color: "#378ADD", change: 0, highlight: true },
+    { key: "stop", label: "STOP LOSS", price: stop, color: "#E24B4A", change: pct(signal.entry, stop), draggable: "stop" },
   ];
   if (!isBuy) ladder.reverse();
 
@@ -368,11 +268,7 @@ function SectionTradeSetup({
       >
         <Stat label="R/R" value={`${rr.toFixed(2)}:1`} color={rrColor} bold />
         <Stat label="Risk" value={`${signal.riskPct}%`} />
-        <Stat
-          label="To TP1"
-          value={`${Math.abs(pct(signal.entry, t1)).toFixed(1)}%`}
-          color={accent}
-        />
+        <Stat label="To TP1" value={`${Math.abs(pct(signal.entry, t1)).toFixed(1)}%`} color={accent} />
       </motion.div>
 
       <PositionCalculator signal={signal} stop={stop} t1={t1} t2={t2} />
@@ -381,19 +277,9 @@ function SectionTradeSetup({
 }
 
 function LadderRow({
-  row,
-  entry,
-  isBuy,
-  onChange,
+  row, entry, isBuy, onChange,
 }: {
-  row: {
-    label: string;
-    price: number;
-    color: string;
-    change: number;
-    highlight?: boolean;
-    draggable?: "target" | "stop";
-  };
+  row: { label: string; price: number; color: string; change: number; highlight?: boolean; draggable?: "target" | "stop" };
   entry: number;
   isBuy: boolean;
   onChange: (next: number) => void;
@@ -423,9 +309,7 @@ function LadderRow({
   const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
     start.current = null;
     setDragging(false);
-    try {
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
   };
 
   return (
@@ -441,15 +325,10 @@ function LadderRow({
         transition: "background 120ms ease",
       }}
     >
-      <span
-        className="uppercase tracking-wide text-[10px] font-semibold"
-        style={{ color: row.color }}
-      >
+      <span className="uppercase tracking-wide text-[10px] font-semibold" style={{ color: row.color }}>
         {row.label}
       </span>
-      <span className="font-semibold tabular-nums text-foreground ml-auto">
-        ${formatPrice(row.price)}
-      </span>
+      <span className="font-semibold tabular-nums text-foreground ml-auto">${formatPrice(row.price)}</span>
       <span className="tabular-nums" style={{ color: row.color, minWidth: 56, textAlign: "right" }}>
         {row.change === 0 ? "—" : `${row.change > 0 ? "+" : ""}${row.change.toFixed(1)}%`}
       </span>
@@ -473,17 +352,7 @@ function LadderRow({
   );
 }
 
-function PositionCalculator({
-  signal,
-  stop,
-  t1,
-  t2,
-}: {
-  signal: Signal;
-  stop: number;
-  t1: number;
-  t2: number;
-}) {
+function PositionCalculator({ signal, stop, t1, t2 }: { signal: Signal; stop: number; t1: number; t2: number }) {
   const [open, setOpen] = useState(false);
   const [account, setAccount] = useState(10000);
   const [risk, setRisk] = useState(1);
@@ -508,16 +377,12 @@ function PositionCalculator({
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
             <div className="px-3 pb-3 space-y-3 border-t border-border pt-3">
               <div>
-                <label className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Account size ($)
-                </label>
+                <label className="text-[10px] uppercase tracking-wide text-muted-foreground">Account size ($)</label>
                 <input
                   type="number"
                   value={account}
@@ -531,11 +396,7 @@ function PositionCalculator({
                   <span className="tabular-nums text-foreground">{risk.toFixed(1)}%</span>
                 </div>
                 <input
-                  type="range"
-                  min={0.5}
-                  max={3}
-                  step={0.1}
-                  value={risk}
+                  type="range" min={0.5} max={3} step={0.1} value={risk}
                   onChange={(e) => setRisk(Number(e.target.value))}
                   className="w-full accent-[var(--brand-cyan)]"
                 />
@@ -544,11 +405,7 @@ function PositionCalculator({
                 <Stat label="Position size" value={`$${positionSize.toFixed(0)}`} />
                 <Stat label="Units" value={units.toFixed(4)} />
                 <Stat label="Max loss" value={`-$${dollarRisk.toFixed(0)}`} color="#E24B4A" />
-                <Stat
-                  label="Gain TP1 / TP2"
-                  value={`+$${gain1.toFixed(0)} / +$${gain2.toFixed(0)}`}
-                  color="#1D9E75"
-                />
+                <Stat label="Gain TP1 / TP2" value={`+$${gain1.toFixed(0)} / +$${gain2.toFixed(0)}`} color="#1D9E75" />
               </div>
             </div>
           </motion.div>
@@ -610,9 +467,7 @@ function SectionAnalysis({ signal }: { signal: Signal }) {
       </div>
 
       <div className="mt-4 rounded-lg border border-border bg-card p-3">
-        <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
-          Confirmations
-        </div>
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Confirmations</div>
         <ul className="space-y-1">
           {confirms.map((c) => (
             <li key={c.label} className="flex items-center gap-2 text-[12px] text-foreground">
@@ -657,22 +512,10 @@ function ScoreBar({ label, value, delay }: { label: string; value: number; delay
 
 function ManipChip({ risk }: { risk: "low" | "medium" | "high" }) {
   if (risk === "low")
-    return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#1D9E75]">
-        <ShieldCheck className="size-3" /> LOW ✓
-      </span>
-    );
+    return <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#1D9E75]"><ShieldCheck className="size-3" /> LOW ✓</span>;
   if (risk === "medium")
-    return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#EF9F27]">
-        <Shield className="size-3" /> MEDIUM
-      </span>
-    );
-  return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#E24B4A]">
-      <ShieldAlert className="size-3" /> HIGH
-    </span>
-  );
+    return <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#EF9F27]"><Shield className="size-3" /> MEDIUM</span>;
+  return <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#E24B4A]"><ShieldAlert className="size-3" /> HIGH</span>;
 }
 
 // ---------- Section 4: Invalidation ----------
@@ -708,30 +551,10 @@ function SectionMarketContext({ signal }: { signal: Signal }) {
   return (
     <Section title="Market Context">
       <div className="grid grid-cols-2 gap-2">
-        <CtxCell
-          icon={<TrendingUp className="size-3" />}
-          label="Trend 4H"
-          value="BULLISH ↑"
-          color="#1D9E75"
-        />
-        <CtxCell
-          icon={<TrendingUp className="size-3" />}
-          label="Trend 1D"
-          value="BULLISH ↑"
-          color="#1D9E75"
-        />
-        <CtxCell
-          icon={<Activity className="size-3" />}
-          label="Volatility"
-          value="MODERATE"
-          color="#EF9F27"
-        />
-        <CtxCell
-          icon={<Globe className="size-3" />}
-          label="Session"
-          value={`${signal.session} Open`}
-          color="#378ADD"
-        />
+        <CtxCell icon={<TrendingUp className="size-3" />} label="Trend 4H" value="BULLISH ↑" color="#1D9E75" />
+        <CtxCell icon={<TrendingUp className="size-3" />} label="Trend 1D" value="BULLISH ↑" color="#1D9E75" />
+        <CtxCell icon={<Activity className="size-3" />} label="Volatility" value="MODERATE" color="#EF9F27" />
+        <CtxCell icon={<Globe className="size-3" />} label="Session" value={`${signal.session} Open`} color="#378ADD" />
       </div>
       <div className="mt-2 space-y-1 text-[12px]">
         <Row label="DXY" value="Weakening ↓ (bullish BTC)" color="#1D9E75" />
@@ -742,25 +565,13 @@ function SectionMarketContext({ signal }: { signal: Signal }) {
   );
 }
 
-function CtxCell({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  color: string;
-}) {
+function CtxCell({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
   return (
     <div className="rounded-md border border-border bg-card p-2">
       <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
         {icon} {label}
       </div>
-      <div className="text-[12px] font-semibold mt-0.5" style={{ color }}>
-        {value}
-      </div>
+      <div className="text-[12px] font-semibold mt-0.5" style={{ color }}>{value}</div>
     </div>
   );
 }
@@ -769,9 +580,7 @@ function Row({ label, value, color }: { label: string; value: string; color?: st
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span className="tabular-nums font-medium" style={{ color: color ?? "var(--foreground)" }}>
-        {value}
-      </span>
+      <span className="tabular-nums font-medium" style={{ color: color ?? "var(--foreground)" }}>{value}</span>
     </div>
   );
 }
@@ -809,9 +618,7 @@ function SectionHistorical() {
           <thead className="bg-background/40 text-muted-foreground">
             <tr>
               {["Date", "Setup", "Entry", "Exit", "Result", "Return"].map((h) => (
-                <th key={h} className="px-2.5 py-1.5 text-left font-medium uppercase tracking-wide">
-                  {h}
-                </th>
+                <th key={h} className="px-2.5 py-1.5 text-left font-medium uppercase tracking-wide">{h}</th>
               ))}
             </tr>
           </thead>
@@ -827,12 +634,8 @@ function SectionHistorical() {
                     {r.win ? "WIN" : "LOSS"}
                   </span>
                 </td>
-                <td
-                  className="px-2.5 py-1.5 tabular-nums font-medium"
-                  style={{ color: r.win ? "#1D9E75" : "#E24B4A" }}
-                >
-                  {r.ret > 0 ? "+" : ""}
-                  {r.ret.toFixed(1)}%
+                <td className="px-2.5 py-1.5 tabular-nums font-medium" style={{ color: r.win ? "#1D9E75" : "#E24B4A" }}>
+                  {r.ret > 0 ? "+" : ""}{r.ret.toFixed(1)}%
                 </td>
               </tr>
             ))}
@@ -840,11 +643,7 @@ function SectionHistorical() {
         </table>
         <div className="px-3 py-2 border-t border-border text-[11px] text-foreground bg-background/40">
           4W / 1L — <span className="font-bold text-[#1D9E75]">80% win rate</span>
-          <span className="text-muted-foreground">
-            {" "}
-            · Avg win <span className="text-[#1D9E75]">+6.8%</span> · Avg loss{" "}
-            <span className="text-[#E24B4A]">-4.1%</span>
-          </span>
+          <span className="text-muted-foreground"> · Avg win <span className="text-[#1D9E75]">+6.8%</span> · Avg loss <span className="text-[#E24B4A]">-4.1%</span></span>
         </div>
       </div>
     </Section>
@@ -865,38 +664,23 @@ function SectionDNA({ signal }: { signal: Signal }) {
       >
         <div className="flex justify-between text-[12px] mb-2">
           <span className="text-muted-foreground">Match</span>
-          <span
-            className="font-bold tabular-nums"
-            style={{ color: good ? "#1D9E75" : "var(--foreground)" }}
-          >
+          <span className="font-bold tabular-nums" style={{ color: good ? "#1D9E75" : "var(--foreground)" }}>
             {signal.dnaMatch}%
           </span>
         </div>
         <div className="h-2 rounded-full bg-secondary overflow-hidden mb-3">
           <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${signal.dnaMatch}%` }}
+            initial={{ width: 0 }} animate={{ width: `${signal.dnaMatch}%` }}
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="h-full rounded-full"
-            style={{
-              background: `linear-gradient(90deg, var(--brand-blue), ${scoreColor(signal.dnaMatch)})`,
-            }}
+            style={{ background: `linear-gradient(90deg, var(--brand-blue), ${scoreColor(signal.dnaMatch)})` }}
           />
         </div>
         <ul className="space-y-1 text-[12px] text-foreground">
-          <li className="flex items-center gap-2">
-            <Check className="size-3.5 text-[#1D9E75]" /> Timeframe match: {signal.tf} (your best)
-          </li>
-          <li className="flex items-center gap-2">
-            <Check className="size-3.5 text-[#1D9E75]" /> Setup match: {signal.setup} (#1 setup)
-          </li>
-          <li className="flex items-center gap-2">
-            <Check className="size-3.5 text-[#1D9E75]" /> Session: {signal.session} Open (best
-            session)
-          </li>
-          <li className="flex items-center gap-2">
-            <AlertTriangle className="size-3.5 text-[#EF9F27]" /> Risk note: within your range
-          </li>
+          <li className="flex items-center gap-2"><Check className="size-3.5 text-[#1D9E75]" /> Timeframe match: {signal.tf} (your best)</li>
+          <li className="flex items-center gap-2"><Check className="size-3.5 text-[#1D9E75]" /> Setup match: {signal.setup} (#1 setup)</li>
+          <li className="flex items-center gap-2"><Check className="size-3.5 text-[#1D9E75]" /> Session: {signal.session} Open (best session)</li>
+          <li className="flex items-center gap-2"><AlertTriangle className="size-3.5 text-[#EF9F27]" /> Risk note: within your range</li>
         </ul>
       </div>
     </Section>
@@ -914,23 +698,9 @@ function Footer({ signal }: { signal: Signal }) {
         {shareOpen && <SharePopover signal={signal} onClose={() => setShareOpen(false)} />}
       </AnimatePresence>
       <div className="flex items-center gap-2">
-        <FooterBtn
-          icon={<Bell className="size-3.5" />}
-          label="Set Alert"
-          onClick={() => {
-            setAlertOpen((o) => !o);
-            setShareOpen(false);
-          }}
-        />
+        <FooterBtn icon={<Bell className="size-3.5" />} label="Set Alert" onClick={() => { setAlertOpen((o) => !o); setShareOpen(false); }} />
         <FooterBtn icon={<Bookmark className="size-3.5" />} label="Save" />
-        <FooterBtn
-          icon={<Share2 className="size-3.5" />}
-          label="Share"
-          onClick={() => {
-            setShareOpen((o) => !o);
-            setAlertOpen(false);
-          }}
-        />
+        <FooterBtn icon={<Share2 className="size-3.5" />} label="Share" onClick={() => { setShareOpen((o) => !o); setAlertOpen(false); }} />
         <button className="ml-auto h-9 px-4 rounded-md bg-[var(--brand-blue)] hover:bg-[var(--brand-blue-deep)] text-foreground text-[12px] font-medium inline-flex items-center gap-1.5 transition-colors">
           <LineChart className="size-3.5" /> Open Chart
         </button>
@@ -939,15 +709,7 @@ function Footer({ signal }: { signal: Signal }) {
   );
 }
 
-function FooterBtn({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  onClick?: () => void;
-}) {
+function FooterBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
@@ -963,56 +725,26 @@ function AlertPopover({ signal, onClose }: { signal: Signal; onClose: () => void
   const [channel, setChannel] = useState<"push" | "email" | "telegram">("push");
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
       className="absolute bottom-full left-3 mb-2 w-[280px] rounded-lg border border-border bg-card shadow-xl p-3 z-20"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[12px] font-medium text-foreground">Configure alert</span>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-          <X className="size-3.5" />
-        </button>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="size-3.5" /></button>
       </div>
       <div className="space-y-2.5">
         <Field label="Trigger">
-          <Tabs
-            options={[
-              { v: "price", l: "Price" },
-              { v: "score", l: "Score" },
-              { v: "expiry", l: "Expiry" },
-            ]}
-            value={trigger}
-            onChange={setTrigger}
-          />
+          <Tabs options={[{ v: "price", l: "Price" }, { v: "score", l: "Score" }, { v: "expiry", l: "Expiry" }]} value={trigger} onChange={setTrigger} />
         </Field>
-        <Field
-          label={
-            trigger === "price"
-              ? "Target price"
-              : trigger === "score"
-                ? "Score threshold"
-                : "Minutes before expiry"
-          }
-        >
+        <Field label={trigger === "price" ? "Target price" : trigger === "score" ? "Score threshold" : "Minutes before expiry"}>
           <input
             type="number"
-            defaultValue={
-              trigger === "price" ? Math.round(signal.entry) : trigger === "score" ? 80 : 30
-            }
+            defaultValue={trigger === "price" ? Math.round(signal.entry) : trigger === "score" ? 80 : 30}
             className="w-full h-8 px-2 rounded-md bg-background border border-border text-[12px] text-foreground tabular-nums focus:outline-none focus:border-[var(--brand-cyan)]"
           />
         </Field>
         <Field label="Channel">
-          <Tabs
-            options={[
-              { v: "push", l: "Push" },
-              { v: "email", l: "Email" },
-              { v: "telegram", l: "Telegram" },
-            ]}
-            value={channel}
-            onChange={setChannel}
-          />
+          <Tabs options={[{ v: "push", l: "Push" }, { v: "email", l: "Email" }, { v: "telegram", l: "Telegram" }]} value={channel} onChange={setChannel} />
         </Field>
         <button className="w-full h-8 rounded-md bg-[var(--brand-blue)] hover:bg-[var(--brand-blue-deep)] text-foreground text-[12px] font-medium">
           Create alert
@@ -1027,16 +759,12 @@ function SharePopover({ signal, onClose }: { signal: Signal; onClose: () => void
   const accent = isBuy ? "#1D9E75" : "#E24B4A";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
       className="absolute bottom-full right-3 mb-2 w-[300px] rounded-lg border border-border bg-card shadow-xl p-3 z-20"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[12px] font-medium text-foreground">Share signal</span>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-          <X className="size-3.5" />
-        </button>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="size-3.5" /></button>
       </div>
       {/* Shareable card preview */}
       <div
@@ -1047,31 +775,17 @@ function SharePopover({ signal, onClose }: { signal: Signal; onClose: () => void
         }}
       >
         <div className="flex items-center justify-between">
-          <span className="text-[11px] uppercase tracking-wider text-[var(--brand-cyan)] font-semibold">
-            AISignalRadar
-          </span>
+          <span className="text-[11px] uppercase tracking-wider text-[var(--brand-cyan)] font-semibold">AISignalRadar</span>
           <ScoreBadge score={signal.score} size="sm" />
         </div>
         <div className="mt-2 text-[18px] font-bold text-white">{signal.asset}</div>
-        <div
-          className="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold"
-          style={{ background: `color-mix(in oklab, ${accent} 28%, transparent)`, color: accent }}
-        >
+        <div className="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold" style={{ background: `color-mix(in oklab, ${accent} 28%, transparent)`, color: accent }}>
           {signal.direction} · {signal.tf}
         </div>
         <div className="mt-3 space-y-0.5 text-[11px] text-white/90">
-          <div className="flex justify-between">
-            <span>Entry</span>
-            <span className="tabular-nums">${formatPrice(signal.entry)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Stop</span>
-            <span className="tabular-nums text-[#FF9B9A]">${formatPrice(signal.stop)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Target</span>
-            <span className="tabular-nums text-[#7EE3BC]">${formatPrice(signal.target)}</span>
-          </div>
+          <div className="flex justify-between"><span>Entry</span><span className="tabular-nums">${formatPrice(signal.entry)}</span></div>
+          <div className="flex justify-between"><span>Stop</span><span className="tabular-nums text-[#FF9B9A]">${formatPrice(signal.stop)}</span></div>
+          <div className="flex justify-between"><span>Target</span><span className="tabular-nums text-[#7EE3BC]">${formatPrice(signal.target)}</span></div>
         </div>
       </div>
       <button className="w-full mt-2 h-8 rounded-md bg-[var(--brand-blue)] hover:bg-[var(--brand-blue-deep)] text-foreground text-[12px] font-medium">
@@ -1090,15 +804,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Tabs<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { v: T; l: string }[];
-  value: T;
-  onChange: (v: T) => void;
-}) {
+function Tabs<T extends string>({ options, value, onChange }: { options: { v: T; l: string }[]; value: T; onChange: (v: T) => void }) {
   return (
     <div className="flex gap-1">
       {options.map((o) => (
@@ -1122,32 +828,17 @@ function Tabs<T extends string>({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="px-5 py-4 border-b border-border">
-      <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">
-        {title}
-      </h3>
+      <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">{title}</h3>
       {children}
     </section>
   );
 }
 
-function Stat({
-  label,
-  value,
-  color,
-  bold,
-}: {
-  label: string;
-  value: string;
-  color?: string;
-  bold?: boolean;
-}) {
+function Stat({ label, value, color, bold }: { label: string; value: string; color?: string; bold?: boolean }) {
   return (
     <div className="rounded-md bg-card border border-border px-2.5 py-1.5">
       <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div
-        className={`text-[13px] tabular-nums mt-0.5 ${bold ? "font-bold" : "font-semibold"}`}
-        style={{ color: color ?? "var(--foreground)" }}
-      >
+      <div className={`text-[13px] tabular-nums mt-0.5 ${bold ? "font-bold" : "font-semibold"}`} style={{ color: color ?? "var(--foreground)" }}>
         {value}
       </div>
     </div>

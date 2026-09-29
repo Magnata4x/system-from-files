@@ -3,14 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type Whale = {
-  id: number;
-  side: string;
-  size: string;
-  price: string;
-  ago: string;
-  fresh?: boolean;
-};
+type Whale = { id: number; side: string; size: string; price: string; ago: string; fresh?: boolean };
 
 const NEW_WHALES: Omit<Whale, "id" | "ago">[] = [
   { side: "BUY", size: "612 BTC", price: "$43,265", fresh: true },
@@ -27,7 +20,9 @@ function bumpAgo(ago: string): string {
 }
 
 export function SmartMoney() {
-  const [whales, setWhales] = useState<Whale[]>(WHALE_ORDERS.map((w, i) => ({ ...w, id: i })));
+  const [whales, setWhales] = useState<Whale[]>(
+    WHALE_ORDERS.map((w, i) => ({ ...w, id: i }))
+  );
 
   useEffect(() => {
     let id = whales.length;
@@ -68,8 +63,7 @@ export function SmartMoney() {
               <div className="flex justify-between text-xs mb-1">
                 <span className="font-medium">{o.asset}</span>
                 <span className="text-muted-foreground">
-                  <span className="text-emerald-400">{o.buy}% buy</span> ·{" "}
-                  <span className="text-red-400">{100 - o.buy}% sell</span>
+                  <span className="text-emerald-400">{o.buy}% buy</span> · <span className="text-red-400">{100 - o.buy}% sell</span>
                 </span>
               </div>
               <div className="h-2 rounded-full overflow-hidden flex bg-secondary">
@@ -80,10 +74,9 @@ export function SmartMoney() {
           ))}
         </TabsContent>
 
+
         <TabsContent value="whales" className="mt-4">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-            Last 10 minutes · live
-          </div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Last 10 minutes · live</div>
           <div className="space-y-1.5 overflow-hidden">
             {whales.map((w) => (
               <div
@@ -120,17 +113,11 @@ export function SmartMoney() {
             <div key={f.asset} className="rounded-lg border border-border bg-card/60 p-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{f.asset}</span>
-                <span
-                  className={`text-sm font-semibold tabular-nums flex items-center gap-1 ${f.rate >= 0 ? "text-emerald-400" : "text-red-400"}`}
-                >
+                <span className={`text-sm font-semibold tabular-nums flex items-center gap-1 ${f.rate >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {f.rate >= 0 ? "+" : ""}
-                  {f.rate.toFixed(3)}%{f.dir === "up" && <ArrowUp className="size-3" />}
-                  {f.dir === "up2" && (
-                    <>
-                      <ArrowUp className="size-3 -mr-2" />
-                      <ArrowUp className="size-3" />
-                    </>
-                  )}
+                  {f.rate.toFixed(3)}%
+                  {f.dir === "up" && <ArrowUp className="size-3" />}
+                  {f.dir === "up2" && <><ArrowUp className="size-3 -mr-2" /><ArrowUp className="size-3" /></>}
                   {f.dir === "down" && <ArrowDown className="size-3" />}
                 </span>
               </div>

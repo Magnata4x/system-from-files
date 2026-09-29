@@ -27,10 +27,9 @@ function DnaPairsPage() {
           <header>
             <h1 className="text-xl font-semibold tracking-tight">DNA — Pares Recomendados</h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-              O DNA analisa o histórico de trades fechados por par usando o intervalo de confiança
-              de Wilson com correção de Bonferroni. Um par recebe PREFER ou AVOID apenas quando há
-              evidência estatística suficiente — mínimo de 20 trades fechados e taxa de acerto
-              consistentemente acima ou abaixo da média global do sistema.
+              O DNA analisa o histórico de trades fechados por par usando o intervalo de confiança de Wilson com
+              correção de Bonferroni. Um par recebe PREFER ou AVOID apenas quando há evidência estatística suficiente —
+              mínimo de 20 trades fechados e taxa de acerto consistentemente acima ou abaixo da média global do sistema.
             </p>
           </header>
           <DnaPairRecommendations />

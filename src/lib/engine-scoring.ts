@@ -14,13 +14,7 @@ export interface OHLCV {
 export type Volatility = "LOW" | "MEDIUM" | "HIGH";
 export type Trend = "BULLISH" | "BEARISH" | "NEUTRAL";
 
-export type RegimeType =
-  | "TRENDING"
-  | "TRENDING_BULL"
-  | "TRENDING_BEAR"
-  | "RANGING"
-  | "RANGING_BULL"
-  | "RANGING_BEAR";
+export type RegimeType = "TRENDING" | "TRENDING_BULL" | "TRENDING_BEAR" | "RANGING" | "RANGING_BULL" | "RANGING_BEAR";
 
 export interface MarketRegime {
   trend: Trend;
@@ -145,6 +139,7 @@ export function calcScalperScore(snapshot: MarketSnapshot, candles: OHLCV[]): En
   if (vr > 0.5) score += 15;
   else if (vr < 0) score -= 8;
 
+
   // Anti-FOMO hard block
   const drift = Math.abs((snapshot.price - snapshot.triggerPrice) / snapshot.triggerPrice);
   if (drift > 0.02) return { score: 0, threshold: 70, side: "HOLD" };
@@ -173,16 +168,11 @@ export const SCALPER_RISK = { slPct: 0.5, tpPct: 1.0, rr: 2.0, expiryMin: 20 };
 
 // ===== Engine 2 — INTRADAY (H1) =====
 
-export function calcIntradayScore(
-  snapshot: MarketSnapshot,
-  candles: OHLCV[],
-  regime: MarketRegime,
-): EngineSignal {
+export function calcIntradayScore(snapshot: MarketSnapshot, candles: OHLCV[], regime: MarketRegime): EngineSignal {
   let score = 50;
 
   const zone = calcChannelZone(candles, snapshot.price);
-  const isRanging =
-    regime.type === "RANGING" || regime.type === "RANGING_BULL" || regime.type === "RANGING_BEAR";
+  const isRanging = regime.type === "RANGING" || regime.type === "RANGING_BULL" || regime.type === "RANGING_BEAR";
 
   if (isRanging) {
     // RSI is OFF in ranging — use pivot channel logic instead
@@ -252,13 +242,7 @@ export function calcIntradayScore(
   const threshold = 68;
   score = Math.max(0, Math.min(100, score));
   const side: Direction =
-    score >= threshold
-      ? regime.trend === "BULLISH"
-        ? "BUY"
-        : regime.trend === "BEARISH"
-          ? "SELL"
-          : "HOLD"
-      : "HOLD";
+    score >= threshold ? (regime.trend === "BULLISH" ? "BUY" : regime.trend === "BEARISH" ? "SELL" : "HOLD") : "HOLD";
   return { score, threshold, side };
 }
 
@@ -311,8 +295,7 @@ export function calcADX(candles: OHLCV[], period = 14): number {
     // Wilder: soma anterior - (soma / period) + novo valor
     trSum = trSum - trSum / period + tr;
     plusDmSum = plusDmSum - plusDmSum / period + (upMove > downMove && upMove > 0 ? upMove : 0);
-    minusDmSum =
-      minusDmSum - minusDmSum / period + (downMove > upMove && downMove > 0 ? downMove : 0);
+    minusDmSum = minusDmSum - minusDmSum / period + (downMove > upMove && downMove > 0 ? downMove : 0);
 
     if (trSum === 0) continue;
     const plusDI = (plusDmSum / trSum) * 100;
@@ -329,10 +312,7 @@ export function calcADX(candles: OHLCV[], period = 14): number {
   return Math.round(lastDx.reduce((a, b) => a + b, 0) / lastDx.length);
 }
 
-export function calcFibProximity(
-  candles: OHLCV[],
-  price: number,
-): "ON_FIB" | "NEAR_FIB" | "OFF_FIB" {
+export function calcFibProximity(candles: OHLCV[], price: number): "ON_FIB" | "NEAR_FIB" | "OFF_FIB" {
   const last50 = candles.slice(-50);
   const swingH = Math.max(...last50.map((c) => c.high));
   const swingL = Math.min(...last50.map((c) => c.low));
@@ -412,29 +392,24 @@ export function calcBTCCorrelation(candles: OHLCV[], btcCandles: OHLCV[]): numbe
   // positiva artificial que inflava o score de Position quando btcCandles vazio.
   if (n < 10) return 0;
 
+
   // Retornos logarítmicos simples nas últimas n barras (alinhados pelo índice final)
   const startAsset = candles.length - 1 - n;
   const startBtc = btcCandles.length - 1 - n;
 
   const r = Array.from(
     { length: n },
-    (_, i) =>
-      (candles[startAsset + i + 1].close - candles[startAsset + i].close) /
-      candles[startAsset + i].close,
+    (_, i) => (candles[startAsset + i + 1].close - candles[startAsset + i].close) / candles[startAsset + i].close,
   );
   const br = Array.from(
     { length: n },
-    (_, i) =>
-      (btcCandles[startBtc + i + 1].close - btcCandles[startBtc + i].close) /
-      btcCandles[startBtc + i].close,
+    (_, i) => (btcCandles[startBtc + i + 1].close - btcCandles[startBtc + i].close) / btcCandles[startBtc + i].close,
   );
 
   const mr = r.reduce((a, b) => a + b, 0) / n;
   const mbr = br.reduce((a, b) => a + b, 0) / n;
   const num = r.reduce((s, v, i) => s + (v - mr) * (br[i] - mbr), 0);
-  const den = Math.sqrt(
-    r.reduce((s, v) => s + (v - mr) ** 2, 0) * br.reduce((s, v) => s + (v - mbr) ** 2, 0),
-  );
+  const den = Math.sqrt(r.reduce((s, v) => s + (v - mr) ** 2, 0) * br.reduce((s, v) => s + (v - mbr) ** 2, 0));
   return den === 0 ? 0 : Math.round((num / den) * 100) / 100;
 }
 
@@ -453,11 +428,7 @@ export function detectWyckoff(candles: OHLCV[]): "ACCUMULATION" | "DISTRIBUTION"
   return "UNKNOWN";
 }
 
-export function calcPositionScore(
-  snapshot: MarketSnapshot,
-  candles: OHLCV[],
-  regime: MarketRegime,
-): EngineSignal {
+export function calcPositionScore(snapshot: MarketSnapshot, candles: OHLCV[], regime: MarketRegime): EngineSignal {
   let score = 50;
 
   const fg = snapshot.fearGreedIndex;
@@ -473,6 +444,7 @@ export function calcPositionScore(
     if (corr >= 0.8) score += 10;
     if (corr < 0.6 && regime.trend === "BEARISH") score -= 25;
   }
+
 
   const wyckoff = detectWyckoff(candles);
   if (wyckoff === "ACCUMULATION") score += 15;

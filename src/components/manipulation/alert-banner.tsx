@@ -1,14 +1,6 @@
 import { X, Zap } from "lucide-react";
 
-export function AlertBanner({
-  count,
-  assets,
-  onDismiss,
-}: {
-  count: number;
-  assets: string[];
-  onDismiss: () => void;
-}) {
+export function AlertBanner({ count, assets, onDismiss }: { count: number; assets: string[]; onDismiss: () => void }) {
   if (count === 0) return null;
   return (
     <div className="relative rounded-xl border-2 border-red-500/70 bg-red-500/10 px-4 py-3 flex items-center gap-3 overflow-hidden manip-pulse">

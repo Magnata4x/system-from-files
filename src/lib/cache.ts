@@ -29,11 +29,7 @@ function getEdgeCache(): CacheStore | undefined {
 // varremos e deletamos todas as que já expiraram. O custo é O(n) mas raro.
 const MEMORY_STORE_PURGE_THRESHOLD = 500;
 
-function memoryCachedJson<T>(
-  key: string,
-  ttlSeconds: number,
-  loader: () => Promise<T>,
-): Promise<T> {
+function memoryCachedJson<T>(key: string, ttlSeconds: number, loader: () => Promise<T>): Promise<T> {
   const now = Date.now();
   const hit = memoryStore.get(key);
   if (hit && hit.expiresAt > now) {
@@ -94,5 +90,8 @@ export async function invalidate(key: string): Promise<void> {
   if (!edge) return;
   const cacheKey = new Request(`https://cache.internal/${encodeURIComponent(key)}`);
   // Cache API: put de Response expirada efetivamente invalida.
-  await edge.put(cacheKey, new Response("", { headers: { "cache-control": "max-age=0" } }));
+  await edge.put(
+    cacheKey,
+    new Response("", { headers: { "cache-control": "max-age=0" } }),
+  );
 }

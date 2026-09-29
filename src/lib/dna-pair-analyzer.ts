@@ -200,8 +200,7 @@ export function analyzePairs(
 
   // Sort: PREFER first (by confidence desc), then NEUTRAL, then AVOID
   analyses.sort((a, b) => {
-    const rank = (r: PairAnalysis["recommendation"]) =>
-      r === "PREFER" ? 0 : r === "NEUTRAL" ? 1 : 2;
+    const rank = (r: PairAnalysis["recommendation"]) => (r === "PREFER" ? 0 : r === "NEUTRAL" ? 1 : 2);
     const dr = rank(a.recommendation) - rank(b.recommendation);
     if (dr !== 0) return dr;
     return b.confidence - a.confidence;

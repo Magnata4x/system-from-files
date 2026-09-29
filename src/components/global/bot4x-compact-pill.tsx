@@ -23,7 +23,11 @@ export function Bot4xCompactPill() {
   const pnlColor = pnl >= 0 ? "#1D9E75" : "#E24B4A";
 
   return (
-    <Link to="/bot4x" className="fixed bottom-4 left-4 z-50" aria-label="Open Bot4x (compact)">
+    <Link
+      to="/bot4x"
+      className="fixed bottom-4 left-4 z-50"
+      aria-label="Open Bot4x (compact)"
+    >
       <motion.div
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -39,12 +43,8 @@ export function Bot4xCompactPill() {
         }}
       >
         <Cpu className="size-4" style={{ color: accent }} />
-        <span
-          className="text-[10px] font-bold tabular-nums leading-none mt-0.5"
-          style={{ color: pnlColor }}
-        >
-          {pnl >= 0 ? "+" : ""}
-          {pnl.toFixed(1)}%
+        <span className="text-[10px] font-bold tabular-nums leading-none mt-0.5" style={{ color: pnlColor }}>
+          {pnl >= 0 ? "+" : ""}{pnl.toFixed(1)}%
         </span>
         <span className="text-[8px] uppercase tracking-wider text-muted-foreground leading-none mt-0.5">
           {mode}

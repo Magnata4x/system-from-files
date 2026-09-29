@@ -1,24 +1,4 @@
-import {
-  LayoutDashboard,
-  Activity,
-  Radar,
-  Bell,
-  Brain,
-  Settings,
-  Cpu,
-  User,
-  Sparkles,
-  Tag,
-  Code2,
-  Users,
-  Store,
-  LogOut,
-  Bot,
-  FlaskConical,
-  History,
-  Layers,
-  Stethoscope,
-} from "lucide-react";
+import { LayoutDashboard, Activity, Radar, Bell, Brain, Settings, Cpu, User, Sparkles, Tag, Code2, Users, Store, LogOut, Bot, FlaskConical, History, Layers, Stethoscope } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,11 +34,7 @@ export function LeftSidebar() {
         <BrandLogo size={36} />
       </div>
       {items.map((it) => (
-        <SideLink
-          key={it.label}
-          item={it}
-          active={path === it.to || (it.to === "/signals" && path.startsWith("/signals/"))}
-        />
+        <SideLink key={it.label} item={it} active={path === it.to || (it.to === "/signals" && path.startsWith("/signals/"))} />
       ))}
       <div className="mt-auto w-10 h-px bg-border my-2" />
       {bottomItems.map((it) => (
@@ -78,31 +54,20 @@ export function LeftSidebar() {
   );
 }
 
-function SideLink({
-  item,
-  active,
-}: {
-  item: { icon: typeof LayoutDashboard; label: string; to: string };
-  active: boolean;
-}) {
+function SideLink({ item, active }: { item: { icon: typeof LayoutDashboard; label: string; to: string }; active: boolean }) {
   const Icon = item.icon;
   const shortcut = item.to === "/bot4x" ? " — Press B" : "";
   return (
     <Link
       to={item.to}
       className={`group relative size-10 rounded-lg flex items-center justify-center transition-colors ${
-        active
-          ? "bg-[var(--brand-blue-deep)] text-foreground"
-          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        active ? "bg-[var(--brand-blue-deep)] text-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
       }`}
     >
       <Icon className="size-[18px]" />
-      {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r bg-[var(--brand-cyan)]" />
-      )}
+      {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r bg-[var(--brand-cyan)]" />}
       <span className="pointer-events-none absolute left-full ml-2 px-2 py-1 rounded-md bg-card border border-border text-[11px] text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-lg">
-        {item.label}
-        {shortcut}
+        {item.label}{shortcut}
       </span>
     </Link>
   );

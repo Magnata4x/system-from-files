@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { analyzePairs, DEFAULT_DNA_MIN_SAMPLE, DNA_MIN_SAMPLE_BOUNDS } from "../dna-pair-analyzer";
+import {
+  analyzePairs,
+  DEFAULT_DNA_MIN_SAMPLE,
+  DNA_MIN_SAMPLE_BOUNDS,
+} from "../dna-pair-analyzer";
 import type { Trade } from "../bot4x-data";
 
 // Helpers ────────────────────────────────────────────────────────────────────

@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { UploadCloud, ImageIcon } from "lucide-react";
@@ -128,18 +122,14 @@ export function AvatarCropper({
             onDragLeave={() => setOver(false)}
             onDrop={onDrop}
             className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-10 px-6 cursor-pointer transition-colors ${
-              over
-                ? "border-[var(--brand-cyan)] bg-[var(--brand-cyan)]/5"
-                : "border-border bg-secondary/30 hover:bg-secondary/50"
+              over ? "border-[var(--brand-cyan)] bg-[var(--brand-cyan)]/5" : "border-border bg-secondary/30 hover:bg-secondary/50"
             }`}
           >
             <div className="size-12 rounded-full bg-[var(--brand-blue-deep)] flex items-center justify-center">
               <UploadCloud className="size-5 text-[var(--brand-cyan)]" />
             </div>
             <div className="text-sm font-medium">Drop image here</div>
-            <div className="text-xs text-muted-foreground">
-              or click to browse · PNG, JPG up to 5MB
-            </div>
+            <div className="text-xs text-muted-foreground">or click to browse · PNG, JPG up to 5MB</div>
             <input type="file" accept="image/*" className="hidden" onChange={onPickFile} />
           </label>
         ) : (
@@ -206,12 +196,8 @@ export function AvatarCropper({
         )}
 
         <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={save} disabled={!img}>
-            Save avatar
-          </Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={save} disabled={!img}>Save avatar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

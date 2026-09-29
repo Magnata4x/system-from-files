@@ -113,11 +113,7 @@ export function Bot4xGlobalNotifier() {
     if (!alertsRef.current.configChanged) return;
     const body = `Perfil ${profile} · ${leverage}x · SL ${slPct}% / TP ${tpPct}% · alocação ${allocationPct}%`;
     push({ type: "INFO", title: "Configuração do Bot4x alterada", body });
-    toast("Bot4x — configuração alterada", {
-      description: body,
-      duration: 3000,
-      dismissible: true,
-    });
+    toast("Bot4x — configuração alterada", { description: body, duration: 3000, dismissible: true });
   }, [profile, leverage, slPct, tpPct, allocationPct, push]);
 
   // SL / TP atingidos (trades fechados)

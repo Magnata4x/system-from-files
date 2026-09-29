@@ -13,9 +13,7 @@ export function Bot4xFloatingWidget() {
   const triggered = pnl <= -1.5;
   const [hover, setHover] = useState(false);
 
-  useEffect(() => {
-    init();
-  }, [init]);
+  useEffect(() => { init(); }, [init]);
 
   // Hide on the Bot4x page itself (it has its own UI)
   if (path.startsWith("/bot4x")) return null;
@@ -54,14 +52,8 @@ export function Bot4xFloatingWidget() {
         >
           <Cpu className="size-5 text-[#E6F1FB]" />
           <span className="absolute -top-0.5 -right-0.5 flex size-2.5">
-            <span
-              className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-              style={{ background: accent }}
-            />
-            <span
-              className="relative inline-flex size-2.5 rounded-full"
-              style={{ background: accent }}
-            />
+            <span className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping" style={{ background: accent }} />
+            <span className="relative inline-flex size-2.5 rounded-full" style={{ background: accent }} />
           </span>
         </div>
 
@@ -75,23 +67,14 @@ export function Bot4xFloatingWidget() {
               className="overflow-hidden whitespace-nowrap"
             >
               <div className="flex flex-col leading-tight pr-1">
-                <span
-                  className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider"
-                  style={{ color: isReal ? "#E24B4A" : "#1D9E75" }}
-                >
-                  {isReal ? <ShieldAlert className="size-3" /> : <Shield className="size-3" />}{" "}
-                  {mode}
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: isReal ? "#E24B4A" : "#1D9E75" }}>
+                  {isReal ? <ShieldAlert className="size-3" /> : <Shield className="size-3" />} {mode}
                 </span>
-                <span
-                  className="text-[13px] font-semibold tabular-nums"
-                  style={{ color: pnlColor }}
-                >
-                  {pnl >= 0 ? "+" : ""}
-                  {pnl.toFixed(2)}%
+                <span className="text-[13px] font-semibold tabular-nums" style={{ color: pnlColor }}>
+                  {pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%
                 </span>
                 <span className="text-[10px] text-muted-foreground tabular-nums">
-                  {ordersCount} ordens{" "}
-                  {triggered && <span className="text-[#E24B4A] font-semibold">· BREAKER</span>}
+                  {ordersCount} ordens {triggered && <span className="text-[#E24B4A] font-semibold">· BREAKER</span>}
                 </span>
               </div>
             </motion.div>
