@@ -21,6 +21,7 @@ export const endpoints = {
     updateConfig: "/bot4x/config",
     executions: "/bot4x/executions",
     telemetry: "/bot4x/telemetry",
+    balance: "/bot4x/balance",
     start: "/bot4x/start",
     stop: "/bot4x/stop",
   },
@@ -43,6 +44,7 @@ export const endpoints = {
     feedback: (userId: string) => `/calibrator/feedback/${userId}`,
     // /simulate foi descontinuado; o backend responde apenas em /run.
     simulate: (userId: string) => `/calibrator/run/${userId}`,
+    intent: (userId: string) => `/calibrator/intent/${userId}`,
   },
   exchange: {
     credentials: "/exchange/credentials",

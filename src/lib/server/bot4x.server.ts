@@ -11,6 +11,7 @@ export function mapConfig(row: ConfigRow) {
   return {
     userId: row.user_id,
     active: row.active,
+    executionMode: row.execution_mode === 'REAL' ? 'REAL' : 'DEMO',
     profile: row.profile,
     dailyPnl: Number(row.daily_pnl ?? 0),
     openSlots: row.open_slots ?? 0,
@@ -90,6 +91,7 @@ const PATCHABLE: Record<string, keyof ConfigRow> = {
   preferredPairs: 'preferred_pairs',
   avoidPairs: 'avoid_pairs',
   circuitBreaker: 'circuit_breaker',
+  executionMode: 'execution_mode',
 }
 
 export async function updateConfig(

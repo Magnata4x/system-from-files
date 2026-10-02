@@ -112,6 +112,15 @@ export interface VerifyResult extends ExchangeStatus {
   balances: { asset: string; free: number }[]
 }
 
+export interface UsdtBalance {
+  asset: 'USDT'
+  free: number
+  locked: number
+  total: number
+  available: boolean
+  updatedAt: string
+}
+
 async function verify(apiKey: string, apiSecret: string) {
   const account = (await binanceSigned(apiKey, apiSecret, '/api/v3/account')) as {
     canTrade?: boolean
@@ -124,6 +133,34 @@ async function verify(apiKey: string, apiSecret: string) {
       .filter((b) => b.free > 0)
       .sort((a, b) => b.free - a.free)
       .slice(0, 10),
+  }
+}
+
+/** Lê o saldo Spot em USDT sem expor as credenciais ou outros ativos. */
+export async function getUsdtBalance(supabase: Client, userId: string): Promise<UsdtBalance> {
+  const { data, error } = await supabase
+    .from('exchange_credentials')
+    .select('api_key_cipher, api_secret_cipher, verified')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) throw new ApiError(error.message, 500)
+  if (!data || !data.verified) throw new ApiError('Binance não conectada ou não verificada.', 409)
+
+  const account = (await binanceSigned(
+    await decryptSecret(data.api_key_cipher),
+    await decryptSecret(data.api_secret_cipher),
+    '/api/v3/account',
+  )) as { balances?: Array<{ asset: string; free: string; locked: string }> }
+  const balance = account.balances?.find((item) => item.asset === 'USDT')
+  const free = Number(balance?.free ?? 0)
+  const locked = Number(balance?.locked ?? 0)
+  return {
+    asset: 'USDT',
+    free,
+    locked,
+    total: free + locked,
+    available: true,
+    updatedAt: new Date().toISOString(),
   }
 }
 
