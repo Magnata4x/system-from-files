@@ -56,6 +56,7 @@ import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
 import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
+import { Route as ApiBot4xBalanceRouteImport } from './routes/api/bot4x/balance'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
 import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
@@ -67,6 +68,7 @@ import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/ma
 import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
 import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
 import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibrator/run.$userId'
+import { Route as ApiCalibratorIntentUserIdRouteImport } from './routes/api/calibrator/intent.$userId'
 import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
 import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
@@ -310,6 +312,11 @@ const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
   path: '/api/bot4x/config',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBot4xBalanceRoute = ApiBot4xBalanceRouteImport.update({
+  id: '/api/bot4x/balance',
+  path: '/api/bot4x/balance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
   id: '/api/auth/me',
   path: '/api/auth/me',
@@ -370,6 +377,12 @@ const ApiCalibratorRunUserIdRoute = ApiCalibratorRunUserIdRouteImport.update({
   path: '/api/calibrator/run/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCalibratorIntentUserIdRoute =
+  ApiCalibratorIntentUserIdRouteImport.update({
+    id: '/api/calibrator/intent/$userId',
+    path: '/api/calibrator/intent/$userId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiCalibratorFeedbackUserIdRoute =
   ApiCalibratorFeedbackUserIdRouteImport.update({
     id: '/api/calibrator/feedback/$userId',
@@ -419,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/api/alerts/feed': typeof ApiAlertsFeedRoute
   '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
@@ -444,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/intent/$userId': typeof ApiCalibratorIntentUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
@@ -481,6 +496,7 @@ export interface FileRoutesByTo {
   '/api/alerts/feed': typeof ApiAlertsFeedRoute
   '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
@@ -506,6 +522,7 @@ export interface FileRoutesByTo {
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/intent/$userId': typeof ApiCalibratorIntentUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
@@ -545,6 +562,7 @@ export interface FileRoutesById {
   '/api/alerts/feed': typeof ApiAlertsFeedRoute
   '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
@@ -570,6 +588,7 @@ export interface FileRoutesById {
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
   '/api/bot4x/executions/export': typeof ApiBot4xExecutionsExportRoute
   '/api/calibrator/feedback/$userId': typeof ApiCalibratorFeedbackUserIdRoute
+  '/api/calibrator/intent/$userId': typeof ApiCalibratorIntentUserIdRoute
   '/api/calibrator/run/$userId': typeof ApiCalibratorRunUserIdRoute
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
@@ -609,6 +628,7 @@ export interface FileRouteTypes {
     | '/api/alerts/feed'
     | '/api/alerts/settings'
     | '/api/auth/me'
+    | '/api/bot4x/balance'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
@@ -634,6 +654,7 @@ export interface FileRouteTypes {
     | '/calibrator/history/$id'
     | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/intent/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
@@ -671,6 +692,7 @@ export interface FileRouteTypes {
     | '/api/alerts/feed'
     | '/api/alerts/settings'
     | '/api/auth/me'
+    | '/api/bot4x/balance'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
@@ -696,6 +718,7 @@ export interface FileRouteTypes {
     | '/calibrator/history/$id'
     | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/intent/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
@@ -734,6 +757,7 @@ export interface FileRouteTypes {
     | '/api/alerts/feed'
     | '/api/alerts/settings'
     | '/api/auth/me'
+    | '/api/bot4x/balance'
     | '/api/bot4x/config'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
@@ -759,6 +783,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calibrator/history/$id'
     | '/api/bot4x/executions/export'
     | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/intent/$userId'
     | '/api/calibrator/run/$userId'
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
@@ -777,6 +802,7 @@ export interface RootRouteChildren {
   ApiAlertsFeedRoute: typeof ApiAlertsFeedRoute
   ApiAlertsSettingsRoute: typeof ApiAlertsSettingsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
+  ApiBot4xBalanceRoute: typeof ApiBot4xBalanceRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
   ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
@@ -800,6 +826,7 @@ export interface RootRouteChildren {
   ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
   ApiCalibratorFeedbackUserIdRoute: typeof ApiCalibratorFeedbackUserIdRoute
+  ApiCalibratorIntentUserIdRoute: typeof ApiCalibratorIntentUserIdRoute
   ApiCalibratorRunUserIdRoute: typeof ApiCalibratorRunUserIdRoute
   ApiCalibratorStateUserIdRoute: typeof ApiCalibratorStateUserIdRoute
   ApiDnaProfileUserIdRoute: typeof ApiDnaProfileUserIdRoute
@@ -1139,6 +1166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/balance': {
+      id: '/api/bot4x/balance'
+      path: '/api/bot4x/balance'
+      fullPath: '/api/bot4x/balance'
+      preLoaderRoute: typeof ApiBot4xBalanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/me': {
       id: '/api/auth/me'
       path: '/api/auth/me'
@@ -1214,6 +1248,13 @@ declare module '@tanstack/react-router' {
       path: '/api/calibrator/run/$userId'
       fullPath: '/api/calibrator/run/$userId'
       preLoaderRoute: typeof ApiCalibratorRunUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/intent/$userId': {
+      id: '/api/calibrator/intent/$userId'
+      path: '/api/calibrator/intent/$userId'
+      fullPath: '/api/calibrator/intent/$userId'
+      preLoaderRoute: typeof ApiCalibratorIntentUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/calibrator/feedback/$userId': {
@@ -1350,6 +1391,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAlertsFeedRoute: ApiAlertsFeedRoute,
   ApiAlertsSettingsRoute: ApiAlertsSettingsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
+  ApiBot4xBalanceRoute: ApiBot4xBalanceRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
   ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
   ApiBot4xStartRoute: ApiBot4xStartRoute,
@@ -1373,6 +1415,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiSignalsIndexRoute: ApiSignalsIndexRoute,
   ApiCalibratorFeedbackUserIdRoute: ApiCalibratorFeedbackUserIdRoute,
+  ApiCalibratorIntentUserIdRoute: ApiCalibratorIntentUserIdRoute,
   ApiCalibratorRunUserIdRoute: ApiCalibratorRunUserIdRoute,
   ApiCalibratorStateUserIdRoute: ApiCalibratorStateUserIdRoute,
   ApiDnaProfileUserIdRoute: ApiDnaProfileUserIdRoute,

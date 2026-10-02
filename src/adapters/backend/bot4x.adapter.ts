@@ -57,6 +57,15 @@ export interface Bot4xTelemetry {
   logs: Array<{ at: string; level: string; message: string; detail?: string }>;
 }
 
+export interface Bot4xUsdtBalance {
+  asset: "USDT";
+  free: number;
+  locked: number;
+  total: number;
+  available: boolean;
+  updatedAt: string;
+}
+
 export function mapBot4xConfig(c: BackendBot4xConfig): Bot4xConfigUI {
   return {
     userId: c.userId,
@@ -141,6 +150,9 @@ export const bot4xAdapter = {
   },
   async telemetry(): Promise<Bot4xTelemetry> {
     return api.get<Bot4xTelemetry>(endpoints.bot4x.telemetry);
+  },
+  async balance(): Promise<Bot4xUsdtBalance> {
+    return api.get<Bot4xUsdtBalance>(endpoints.bot4x.balance);
   },
   async start(userId: string) {
     return api.post(endpoints.bot4x.start, { userId });
