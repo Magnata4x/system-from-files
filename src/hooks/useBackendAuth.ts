@@ -7,19 +7,37 @@ export function useBackendAuth() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const sync = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        const me = await authAdapter.getMe();
-        setUserId(me?.userId ?? data.session.user.id);
-      } else {
-        setUserId(null);
-      }
-      setReady(true);
+    let mounted = true;
+
+    const syncBackendIdentity = async (sessionUserId: string) => {
+      const me = await authAdapter.getMe();
+      if (mounted) setUserId(me?.userId ?? sessionUserId);
     };
-    sync();
-    const { data: listener } = supabase.auth.onAuthStateChange(() => sync());
-    return () => listener.subscription.unsubscribe();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setUserId(session?.user.id ?? null);
+      setReady(true);
+      if (session?.user.id) void syncBackendIdentity(session.user.id);
+    });
+
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return;
+        const sessionUserId = data.session?.user.id ?? null;
+        setUserId(sessionUserId);
+        setReady(true);
+        if (sessionUserId) void syncBackendIdentity(sessionUserId);
+      })
+      .catch(() => {
+        if (mounted) setReady(true);
+      });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   return { userId, ready };

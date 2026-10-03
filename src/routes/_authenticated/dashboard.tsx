@@ -1,7 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import { useBackendAuth } from "@/hooks/useBackendAuth";
+import { useAuth } from "@/lib/auth";
 import { useDashboardStore } from "@/lib/dashboard-store";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
@@ -25,34 +24,34 @@ import { IntegrationWidgets } from "@/components/dashboard/integration-widgets";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
-    meta: [{ title: "Dashboard — AISignalRadar" }],
+    meta: [
+      { title: "Dashboard — AISignalRadar" },
+      {
+        name: "description",
+        content: "Acompanhe sinais, mercado, sentimento e alertas de manipulação no AISignalRadar.",
+      },
+      { property: "og:title", content: "Dashboard — AISignalRadar" },
+      {
+        property: "og:description",
+        content: "Acompanhe sinais, mercado, sentimento e alertas de manipulação no AISignalRadar.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { userId, ready } = useBackendAuth();
-  const navigate = useNavigate();
+  const { session } = useAuth();
   const init = useDashboardStore((s) => s.init);
   const cleanup = useDashboardStore((s) => s.cleanup);
 
   useEffect(() => {
-    if (ready && !userId) navigate({ to: "/login" });
-  }, [ready, userId, navigate]);
-
-  useEffect(() => {
-    if (!ready || !userId) return;
+    if (!session) return;
     init();
     return () => cleanup();
-  }, [ready, userId, init, cleanup]);
-
-  if (!ready || !userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  }, [session, init, cleanup]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -26,3 +26,7 @@
 - [ ] Auditar telas, dados, navegação e estados de erro/vazio
 - [ ] Corrigir primeiro os fluxos críticos de modo REAL, saldo e execução segura
 - [ ] Refinar os módulos por prioridade e validar em desktop e celular
+
+## Dashboard
+- [x] Remover a segunda verificação assíncrona de autenticação que mantinha a tela em carregamento
+- [ ] Validar o Dashboard autenticado, dados e ausência de erros no navegador

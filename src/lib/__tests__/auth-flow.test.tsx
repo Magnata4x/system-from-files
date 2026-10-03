@@ -8,6 +8,8 @@ import { render, screen, act, waitFor } from "@testing-library/react";
 vi.mock("@/integrations/supabase/client", () => {
   const listeners = new Set<(event: string, session: unknown) => void>();
   const auth = {
+    getSession: vi.fn(async () => ({ data: { session: null }, error: null })),
+    refreshSession: vi.fn(async () => ({ data: { session: null }, error: null })),
     onAuthStateChange: vi.fn((cb: (event: string, session: unknown) => void) => {
       listeners.add(cb);
       return { data: { subscription: { unsubscribe: () => listeners.delete(cb) } } };
