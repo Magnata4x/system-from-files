@@ -24,3 +24,6 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+
+<!-- TESTE_GITHUB_CHATGPT_2026-10-03 -->
