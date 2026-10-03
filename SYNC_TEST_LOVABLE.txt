@@ -1,0 +1,2 @@
+LOVABLE_GITHUB_SYNC_TEST_2026-10-03
+Created to verify GitHub -> Lovable synchronization.
