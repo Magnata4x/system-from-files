@@ -1,15 +1,14 @@
 import { create } from "zustand";
-import { heatmap as initialHeatmap, initialSignals, type HeatmapAsset, type Signal } from "./dashboard-data";
 import { api, endpoints } from "@/adapters/backend/api.adapter";
 import { signalAdapter } from "@/adapters/backend/signal.adapter";
 import { manipulationAdapter } from "@/adapters/backend/manipulation.adapter";
 import type { Alert as ManipulationAlert } from "@/lib/manipulation-data";
 import { logger } from "./logger";
 
-type Toast = {
-  id: string;
-  signal: Signal;
-};
+type Toast = { id: string; signal: Signal; };
+
+export type Signal = { id:string; asset:string; direction:"BUY"|"SELL"; score:number; entry:number; stop:number|null; target:number|null; rr:number|null; tf:string; time:string; };
+export type HeatmapAsset = { symbol:string; name:string; price:number; change:number; volume:number; };
 
 export type RiskStatus = {
   level?: string;
@@ -31,6 +30,7 @@ interface DashboardState {
   /** true enquanto o primeiro pull de sinais não retornou. */
   signalsLoading: boolean;
   signalsError: string | null;
+  signalsStale: boolean;
   manipAlerts: ManipulationAlert[];
   manipLoading: boolean;
   manipError: string | null;
@@ -52,13 +52,12 @@ interface DashboardState {
 let seenSignalIds: Set<string> | null = null;
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
-  prices: Object.fromEntries(
-    initialHeatmap.map((h) => [h.symbol, { price: h.price, change: h.change, pulse: 0 }]),
-  ),
-  heatmap: initialHeatmap,
-  signals: initialSignals,
+  prices: {},
+  heatmap: [],
+  signals: [],
   signalsLoading: true,
   signalsError: null,
+  signalsStale: false,
   manipAlerts: [],
   manipLoading: true,
   manipError: null,
@@ -121,16 +120,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           direction: s.direction,
           score: Math.round(s.confidence),
           entry: s.entry,
-          stop: s.sl ?? s.entry,
-          target: s.tp ?? s.entry,
+          stop: s.sl ?? null,
+          target: s.tp ?? null,
           rr:
-            s.sl && s.tp && s.entry - s.sl !== 0
-              ? +(Math.abs((s.tp - s.entry) / (s.entry - s.sl))).toFixed(2)
-              : 0,
-          tf: s.tf ?? "1H",
+            s.sl != null && s.tp != null && s.entry - s.sl !== 0
+              ? +Math.abs((s.tp - s.entry) / (s.entry - s.sl)).toFixed(2)
+              : null,
+          tf: s.tf ?? "—",
           time: s.createdAt ?? "",
         }));
-        set({ signals: mapped, signalsLoading: false, signalsError: null });
+        set({ signals: mapped, signalsLoading: false, signalsError: null, signalsStale: false });
 
         // Toast apenas para sinais novos (nunca na primeira carga).
         if (seenSignalIds === null) {
@@ -147,6 +146,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         logger.warn("[dashboard] signals falhou", { error: err });
         set({
           signalsLoading: false,
+          signalsStale: get().signals.length > 0,
           signalsError: err instanceof Error ? err.message : "Falha ao carregar sinais",
         });
       }
@@ -187,7 +187,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       clearInterval(id);
       clearTimeout(id);
     });
-    set({ _intervalIds: new Set<number>() });
+    seenSignalIds = null;
+    set({ _intervalIds: new Set<number>(), toasts: [] });
   },
 
   pushToast: (signal) => {
