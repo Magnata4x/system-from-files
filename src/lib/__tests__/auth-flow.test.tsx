@@ -12,6 +12,11 @@ vi.mock("@/integrations/supabase/client", () => {
       listeners.add(cb);
       return { data: { subscription: { unsubscribe: () => listeners.delete(cb) } } };
     }),
+    // AuthProvider hydrates from getSession in addition to listening for auth events.
+    // Keep hydration pending in this unit test so the explicit _emit calls remain
+    // the single source of truth for each test's session state.
+    getSession: vi.fn(() => new Promise(() => {})),
+    refreshSession: vi.fn(() => new Promise(() => {})),
     _emit: (event: string, session: unknown) => listeners.forEach((cb) => cb(event, session)),
   };
   return { supabase: { auth } };
