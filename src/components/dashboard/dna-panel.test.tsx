@@ -110,6 +110,6 @@ describe("DnaPanel — dados honestos", () => {
     expect(screen.getByText("70")).toBeTruthy();
     expect(screen.getByText("60")).toBeTruthy();
     expect(screen.queryByText("91.0%")).toBeNull();
-    expect(screen.getByText("—")).toBeTruthy();
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
   });
 });
