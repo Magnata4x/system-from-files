@@ -21,6 +21,10 @@ jobs:
           ref: phase-0-dashboard-real-data
           fetch-depth: 0
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
