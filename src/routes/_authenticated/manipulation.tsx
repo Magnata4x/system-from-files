@@ -142,7 +142,7 @@ function ManipulationPage() {
   const activeAlerts = alerts.filter((a) => a.severity === "HIGH" || a.severity === "MEDIUM");
   const activeAssets = Array.from(new Set(activeAlerts.map((a) => a.asset)));
   const riskLevel = snapshot?.riskLevel ? String(snapshot.riskLevel).toUpperCase() : null;
-  const elevatedRisk = Boolean(riskLevel && riskLevel !== "LOW");
+  const elevatedRisk = riskLevel === "HIGH" || riskLevel === "MEDIUM";
   const manipulationStatus =
     alertsPending || snapshotPending
       ? "loading"
@@ -279,9 +279,13 @@ function ManipulationPage() {
                     Updated {new Date(snapshot.updatedAt).toLocaleTimeString()}
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-1 rounded border border-border">
-                  RISK {String(snapshot.riskLevel).toUpperCase()}
-                </span>
+                {(String(snapshot.riskLevel).toUpperCase() === "HIGH" ||
+                  String(snapshot.riskLevel).toUpperCase() === "MEDIUM" ||
+                  String(snapshot.riskLevel).toUpperCase() === "LOW") && (
+                  <span className="text-[10px] font-bold px-2 py-1 rounded border border-border">
+                    RISK {String(snapshot.riskLevel).toUpperCase()}
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Stat label="Alerts 24h" value={String(snapshot.last24h?.alertCount ?? 0)} />
