@@ -1,4 +1,3 @@
-import { buildHeatmap } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
 
@@ -32,21 +31,17 @@ function statsFor(cell: Cell): CellStats {
 
 export function BehavioralHeatmap() {
   const { data: dna } = useDnaStats();
-  const live = !!dna?.hasData && dna.heatmap.length > 0;
-
   const data = useMemo<Cell[]>(
-    () =>
-      live
-        ? dna!.heatmap.map((h) => ({
-            date: new Date(`${h.date}T00:00:00`),
-            value: h.value,
-            trades: h.trades,
-            pnl: h.pnl,
-            live: true,
-          }))
-        : buildHeatmap(),
-    [live, dna],
+    () => dna?.hasData ? dna.heatmap.map((h) => ({
+      date: new Date(`${h.date}T00:00:00`),
+      value: h.value,
+      trades: h.trades,
+      pnl: h.pnl,
+      live: true,
+    })) : [],
+    [dna],
   );
+  if (!data.length) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Mapa comportamental indisponível — sem histórico real suficiente.</div>;
   const [hover, setHover] = useState<{ cell: Cell; x: number; y: number } | null>(null);
 
   const weeks: (Cell | null)[][] = [];
@@ -60,18 +55,8 @@ export function BehavioralHeatmap() {
   if (current.length) { while (current.length < 7) current.push(null); weeks.push(current); }
 
   const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
-  const stats = hover ? statsFor(hover.cell) : null;
 
   const summary = useMemo(() => {
-    if (!live) {
-      return [
-        { l: "Best day", v: "Tuesday" },
-        { l: "Worst day", v: "Monday" },
-        { l: "Most active", v: "Wednesday" },
-        { l: "Best session", v: "London Open" },
-        { l: "Avg trades / day", v: "3.2" },
-      ];
-    }
     const names = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
     const byWeekday = new Map<number, { pnl: number; trades: number }>();
     let activeDays = 0;
@@ -90,13 +75,13 @@ export function BehavioralHeatmap() {
     const byPnl = [...entries].sort((a, b) => b[1].pnl - a[1].pnl);
     const byVol = [...entries].sort((a, b) => b[1].trades - a[1].trades);
     return [
-      { l: "Melhor dia", v: byPnl.length ? names[byPnl[0][0]] : "—" },
-      { l: "Pior dia", v: byPnl.length ? names[byPnl[byPnl.length - 1][0]] : "—" },
-      { l: "Mais ativo", v: byVol.length ? names[byVol[0][0]] : "—" },
+      { l: "Melhor dia", v: byPnl.length ? names[byPnl[0][0]] : "indisponível" },
+      { l: "Pior dia", v: byPnl.length ? names[byPnl[byPnl.length - 1][0]] : "indisponível" },
+      { l: "Mais ativo", v: byVol.length ? names[byVol[0][0]] : "indisponível" },
       { l: "Dias operados", v: String(activeDays) },
       { l: "Média trades / dia", v: activeDays ? (totalTrades / activeDays).toFixed(1) : "0" },
     ];
-  }, [live, data]);
+  }, [data]);
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5 relative">
@@ -104,7 +89,7 @@ export function BehavioralHeatmap() {
         <div>
           <h2 className="text-sm font-semibold">Behavioral heatmap</h2>
           <p className="text-xs text-muted-foreground">
-            {live ? "Últimos 90 dias — dados reais das suas operações" : "Últimos 90 dias — exemplo demonstrativo"}
+            Últimos 90 dias — dados reais das suas operações
           </p>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
@@ -142,7 +127,7 @@ export function BehavioralHeatmap() {
             </div>
           ))}
 
-          {hover && stats && (
+          {hover && (
             <div
               className="pointer-events-none absolute z-20 rounded-md border border-border bg-popover/95 backdrop-blur p-2.5 text-[11px] shadow-lg min-w-[160px]"
               style={{ left: hover.x, top: hover.y }}
@@ -150,18 +135,18 @@ export function BehavioralHeatmap() {
               <div className="font-medium text-foreground">
                 {hover.cell.date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
               </div>
-              {stats.trades === 0 ? (
+              {hover.cell.trades === 0 ? (
                 <div className="text-muted-foreground mt-1">No trades</div>
               ) : (
                 <div className="mt-1.5 space-y-0.5">
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Trades</span>
-                    <span className="font-medium">{stats.trades}</span>
+                    <span className="font-medium">{hover.cell.trades}</span>
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">PnL</span>
-                    <span className={`font-medium ${stats.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {stats.pnl >= 0 ? "+" : ""}{stats.pnl}u
+                    <span className={`font-medium ${hover.cell.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {hover.cell.pnl >= 0 ? "+" : ""}{Math.round(hover.cell.pnl)}u
                     </span>
                   </div>
                   {!hover.cell.live && (
