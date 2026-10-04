@@ -20,19 +20,19 @@ export const Route = createFileRoute('/api/dna/profile/$userId')({
           if (!data) return null
           return {
             userId: user.userId,
-            consistency: data.dna_consistency ?? 0,
-            discipline: data.dna_discipline ?? 0,
-            riskControl: data.dna_risk_control ?? 0,
-            timing: data.dna_timing ?? 0,
-            emotionalControl: data.dna_emotional_control ?? 0,
-            avgWinRate: Number(data.avg_win_rate ?? 0),
+            consistency: data.dna_consistency ?? undefined,
+            discipline: data.dna_discipline ?? undefined,
+            riskControl: data.dna_risk_control ?? undefined,
+            timing: data.dna_timing ?? undefined,
+            emotionalControl: data.dna_emotional_control ?? undefined,
+            avgWinRate: data.avg_win_rate ?? undefined,
             bestSession: data.best_session ?? undefined,
             worstSession: data.worst_session ?? undefined,
-            overtradingRisk: data.overtrading_risk ?? false,
-            tradingStyle: (data.trading_style ?? 'moderate') as
+            overtradingRisk: data.overtrading_risk ?? undefined,
+            tradingStyle: (data.trading_style ?? undefined) as
               | 'conservative'
               | 'moderate'
-              | 'aggressive',
+              | 'aggressive' | undefined,
           }
         }),
     },
