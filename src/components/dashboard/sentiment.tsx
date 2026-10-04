@@ -3,10 +3,74 @@ import { useSentiment } from "@/hooks/useSentiment";
 
 export function Sentiment() {
   const { data, isLoading, isError } = useSentiment();
-  return <div className="rounded-xl border border-border bg-card p-4 h-full">
-    <div className="flex items-center justify-between"><div><h3 className="text-[15px] font-medium">Sentiment snapshot</h3><p className="text-[10px] text-muted-foreground mt-1">Leitura real calculada a partir do mercado.</p></div>{data && <span className="text-[22px] font-semibold tabular-nums">{data.overall}/100</span>}</div>
-    {isLoading && <div className="flex items-center gap-2 mt-4 text-[12px] text-muted-foreground"><Loader2 className="size-3.5 animate-spin" /> carregando sentimento…</div>}
-    {isError && <div className="flex items-center gap-2 mt-4 text-[12px] text-[#E24B4A]"><AlertTriangle className="size-3.5" /> Fonte de sentimento indisponível.</div>}
-    {data && !isLoading && !isError && <div className="mt-4 space-y-3"><div className="flex items-center gap-3 text-[11px]"><span className="text-[#1D9E75]">{data.bullBear.bull.toFixed(0)}% bullish</span><span className="text-[#E24B4A]">{data.bullBear.bear.toFixed(0)}% bearish</span><span className="text-muted-foreground">{data.advancers} ↑ / {data.decliners} ↓</span></div><div className="space-y-2">{data.assets.slice(0, 4).map((asset) => { const Icon = asset.trend === "up" || asset.trend === "upup" ? TrendingUp : asset.trend === "down" ? TrendingDown : Minus; const tone = asset.signal === "BULLISH" ? "text-[#1D9E75]" : asset.signal === "BEARISH" ? "text-[#E24B4A]" : "text-muted-foreground"; return <div key={asset.asset} className="flex items-center gap-2 text-[11px]"><span className="w-12 font-medium">{asset.asset}</span><div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden"><div className="h-full bg-[var(--brand-cyan)]" style={{ width: `${asset.overall}%` }} /></div><Icon className={`size-3.5 ${tone}`} /><span className={`w-10 text-right font-medium ${tone}`}>{asset.overall}</span></div>; })}</div>{data.topGainer && data.topLoser && <div className="text-[10px] text-muted-foreground">Melhor: {data.topGainer.asset} ({data.topGainer.changePct >= 0 ? "+" : ""}{data.topGainer.changePct.toFixed(2)}%) · Pior: {data.topLoser.asset} ({data.topLoser.changePct.toFixed(2)}%)</div>}</div>}
-  </div>;
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 h-full">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[15px] font-medium">Sentiment snapshot</h3>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Leitura real calculada a partir do mercado.
+          </p>
+        </div>
+        {data && <span className="text-[22px] font-semibold tabular-nums">{data.overall}/100</span>}
+      </div>
+      {isLoading && (
+        <div className="flex items-center gap-2 mt-4 text-[12px] text-muted-foreground">
+          <Loader2 className="size-3.5 animate-spin" /> carregando sentimento…
+        </div>
+      )}
+      {isError && (
+        <div className="flex items-center gap-2 mt-4 text-[12px] text-[#E24B4A]">
+          <AlertTriangle className="size-3.5" /> Fonte de sentimento indisponível.
+        </div>
+      )}
+      {data && !isLoading && !isError && (
+        <div className="mt-4 space-y-3">
+          <div className="flex items-center gap-3 text-[11px]">
+            <span className="text-[#1D9E75]">{data.bullBear.bull.toFixed(0)}% bullish</span>
+            <span className="text-[#E24B4A]">{data.bullBear.bear.toFixed(0)}% bearish</span>
+            <span className="text-muted-foreground">
+              {data.advancers} ↑ / {data.decliners} ↓
+            </span>
+          </div>
+          <div className="space-y-2">
+            {data.assets.slice(0, 4).map((asset) => {
+              const Icon =
+                asset.trend === "up" || asset.trend === "upup"
+                  ? TrendingUp
+                  : asset.trend === "down"
+                    ? TrendingDown
+                    : Minus;
+              const tone =
+                asset.signal === "BULLISH"
+                  ? "text-[#1D9E75]"
+                  : asset.signal === "BEARISH"
+                    ? "text-[#E24B4A]"
+                    : "text-muted-foreground";
+              return (
+                <div key={asset.asset} className="flex items-center gap-2 text-[11px]">
+                  <span className="w-12 font-medium">{asset.asset}</span>
+                  <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="h-full bg-[var(--brand-cyan)]"
+                      style={{ width: `${asset.overall}%` }}
+                    />
+                  </div>
+                  <Icon className={`size-3.5 ${tone}`} />
+                  <span className={`w-10 text-right font-medium ${tone}`}>{asset.overall}</span>
+                </div>
+              );
+            })}
+          </div>
+          {data.topGainer && data.topLoser && (
+            <div className="text-[10px] text-muted-foreground">
+              Melhor: {data.topGainer.asset} ({data.topGainer.changePct >= 0 ? "+" : ""}
+              {data.topGainer.changePct.toFixed(2)}%) · Pior: {data.topLoser.asset} (
+              {data.topLoser.changePct.toFixed(2)}%)
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

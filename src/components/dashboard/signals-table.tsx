@@ -4,6 +4,104 @@ import { ScoreBadge } from "./score-badge";
 import { ChevronRight } from "lucide-react";
 import { DataStatusBadge } from "./data-status";
 import { relativeTime } from "@/lib/data-status";
-type Filter="ALL"|"BUY"|"SELL"|"HIGH";
-export function SignalsTable(){const signals=useDashboardStore(s=>s.signals),loading=useDashboardStore(s=>s.signalsLoading),error=useDashboardStore(s=>s.signalsError),stale=useDashboardStore(s=>s.signalsStale),select=useDashboardStore(s=>s.setSelectedSignal);const [filter,setFilter]=useState<Filter>("ALL");const filtered=signals.filter(s=>filter==="ALL"||filter==="HIGH"?filter==="ALL"||s.score>=80:s.direction===filter);const status=loading&&!signals.length?"loading":!signals.length?"unavailable":stale?"stale":"ok";return <div className="rounded-xl border border-border bg-card overflow-hidden"><div className="flex items-start justify-between p-4 pb-3"><div><h3 className="text-[15px] font-medium">Top signals right now</h3><p className="text-[12px] text-muted-foreground">Live institutional-grade setups</p><DataStatusBadge source="Internal API" status={status}/></div><div className="flex gap-1 p-1 rounded-full bg-secondary">{(["ALL","BUY","SELL","HIGH"] as Filter[]).map(f=><button key={f} onClick={()=>setFilter(f)} aria-pressed={filter===f} className="px-3 py-1 rounded-full text-[12px]">{f==="HIGH"?"≥80":f}</button>)}</div></div>{stale&&error&&<div className="mx-4 mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">Desatualizado: {error}. Os sinais abaixo são a última leitura válida.</div>}<div className="overflow-x-auto"><table className="w-full text-[13px]"><thead><tr className="text-[11px] uppercase text-muted-foreground"><th className="text-left p-2">Asset</th><th>Dir</th><th>Score</th><th>Entry</th><th>Stop</th><th>Target</th><th>R/R</th><th>TF</th><th>Time</th><th></th></tr></thead><tbody>{filtered.map(s=><tr key={s.id} className="border-t border-border"><td className="p-3">{s.asset}</td><td>{s.direction}</td><td><ScoreBadge score={s.score} size="sm"/></td><td>{fmt(s.entry)}</td><td>{fmt(s.stop)}</td><td>{fmt(s.target)}</td><td>{s.rr==null?"—":s.rr.toFixed(1)}</td><td>{s.tf||"—"}</td><td>{relativeTime(s.time)}</td><td><button onClick={()=>select(s)} aria-label={"Ver sinal "+s.asset}><ChevronRight className="size-3"/></button></td></tr>)}{!filtered.length&&<tr><td colSpan={10} className="py-6 text-center text-muted-foreground">{loading?"Carregando sinais…":error||"Nenhum sinal disponível."}</td></tr>}</tbody></table></div></div>}
-function fmt(n:number|null){if(n==null)return "—";return n>=100?n.toLocaleString(undefined,{maximumFractionDigits:1}):n.toFixed(2)}
+type Filter = "ALL" | "BUY" | "SELL" | "HIGH";
+export function SignalsTable() {
+  const signals = useDashboardStore((s) => s.signals),
+    loading = useDashboardStore((s) => s.signalsLoading),
+    error = useDashboardStore((s) => s.signalsError),
+    stale = useDashboardStore((s) => s.signalsStale),
+    select = useDashboardStore((s) => s.setSelectedSignal);
+  const [filter, setFilter] = useState<Filter>("ALL");
+  const filtered = signals.filter((s) =>
+    filter === "ALL" || filter === "HIGH"
+      ? filter === "ALL" || s.score >= 80
+      : s.direction === filter,
+  );
+  const status =
+    loading && !signals.length
+      ? "loading"
+      : !signals.length
+        ? "unavailable"
+        : stale
+          ? "stale"
+          : "ok";
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex items-start justify-between p-4 pb-3">
+        <div>
+          <h3 className="text-[15px] font-medium">Top signals right now</h3>
+          <p className="text-[12px] text-muted-foreground">Live institutional-grade setups</p>
+          <DataStatusBadge source="Internal API" status={status} />
+        </div>
+        <div className="flex gap-1 p-1 rounded-full bg-secondary">
+          {(["ALL", "BUY", "SELL", "HIGH"] as Filter[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              aria-pressed={filter === f}
+              className="px-3 py-1 rounded-full text-[12px]"
+            >
+              {f === "HIGH" ? "≥80" : f}
+            </button>
+          ))}
+        </div>
+      </div>
+      {stale && error && (
+        <div className="mx-4 mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
+          Desatualizado: {error}. Os sinais abaixo são a última leitura válida.
+        </div>
+      )}
+      <div className="overflow-x-auto">
+        <table className="w-full text-[13px]">
+          <thead>
+            <tr className="text-[11px] uppercase text-muted-foreground">
+              <th className="text-left p-2">Asset</th>
+              <th>Dir</th>
+              <th>Score</th>
+              <th>Entry</th>
+              <th>Stop</th>
+              <th>Target</th>
+              <th>R/R</th>
+              <th>TF</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((s) => (
+              <tr key={s.id} className="border-t border-border">
+                <td className="p-3">{s.asset}</td>
+                <td>{s.direction}</td>
+                <td>
+                  <ScoreBadge score={s.score} size="sm" />
+                </td>
+                <td>{fmt(s.entry)}</td>
+                <td>{fmt(s.stop)}</td>
+                <td>{fmt(s.target)}</td>
+                <td>{s.rr == null ? "—" : s.rr.toFixed(1)}</td>
+                <td>{s.tf || "—"}</td>
+                <td>{relativeTime(s.time)}</td>
+                <td>
+                  <button onClick={() => select(s)} aria-label={"Ver sinal " + s.asset}>
+                    <ChevronRight className="size-3" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {!filtered.length && (
+              <tr>
+                <td colSpan={10} className="py-6 text-center text-muted-foreground">
+                  {loading ? "Carregando sinais…" : error || "Nenhum sinal disponível."}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+function fmt(n: number | null) {
+  if (n == null) return "—";
+  return n >= 100 ? n.toLocaleString(undefined, { maximumFractionDigits: 1 }) : n.toFixed(2);
+}

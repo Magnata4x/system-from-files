@@ -1,4 +1,18 @@
-import { Bell, Search, ChevronDown, LogOut, Settings, User, Cpu, Activity, ShieldAlert, Sparkles, TrendingUp, Clock, AlertTriangle } from "lucide-react";
+import {
+  Bell,
+  Search,
+  ChevronDown,
+  LogOut,
+  Settings,
+  User,
+  Cpu,
+  Activity,
+  ShieldAlert,
+  Sparkles,
+  TrendingUp,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +60,8 @@ function usePriceFlash(price: number) {
 }
 
 function fmtPrice(p: number) {
-  if (p >= 1000) return "$" + p.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (p >= 1000)
+    return "$" + p.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   if (p >= 1) return "$" + p.toFixed(4);
   return "$" + p.toFixed(6);
 }
@@ -85,9 +100,10 @@ export function TopBar() {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const name = (user?.user_metadata?.full_name as string | undefined)?.split(" ")[0]
-    ?? user?.email?.split("@")[0]
-    ?? "Trader";
+  const name =
+    (user?.user_metadata?.full_name as string | undefined)?.split(" ")[0] ??
+    user?.email?.split("@")[0] ??
+    "Trader";
 
   const btc = prices.BTC;
   const eth = prices.ETH;
@@ -105,14 +121,21 @@ export function TopBar() {
       {/* Left: greeting */}
       <div className="flex items-baseline gap-2 min-w-0">
         <span className="hidden sm:inline text-[14px] text-muted-foreground">Dashboard</span>
-        <span className="text-[14px] md:text-[16px] font-medium text-foreground truncate">{greeting}, {name}</span>
+        <span className="text-[14px] md:text-[16px] font-medium text-foreground truncate">
+          {greeting}, {name}
+        </span>
       </div>
 
       {/* Center: live prices */}
-      <div data-tour="top-bar-prices" className="hidden xl:flex items-center gap-4 mx-auto text-[13px] tabular-nums">
+      <div
+        data-tour="top-bar-prices"
+        className="hidden xl:flex items-center gap-4 mx-auto text-[13px] tabular-nums"
+      >
         {/* Market status */}
         <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary border border-border">
-          <span className={`size-1.5 rounded-full animate-pulse ${isLive ? "bg-[#1D9E75]" : "bg-[#EF9F27]"}`} />
+          <span
+            className={`size-1.5 rounded-full animate-pulse ${isLive ? "bg-[#1D9E75]" : "bg-[#EF9F27]"}`}
+          />
           <span className="text-foreground">{loading ? "Syncing…" : "Markets Open"}</span>
         </span>
 
@@ -233,10 +256,20 @@ export function TopBar() {
                 <div className="font-medium text-foreground truncate">{name}</div>
                 <div className="text-xs text-muted-foreground truncate">{user?.email}</div>
               </div>
-              <Link to="/profile" search={{ tab: "profile" }} onClick={() => setOpen(false)} className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary">
+              <Link
+                to="/profile"
+                search={{ tab: "profile" }}
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary"
+              >
                 <User className="size-4" /> Profile
               </Link>
-              <Link to="/settings" search={{ tab: "notifications" }} onClick={() => setOpen(false)} className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary">
+              <Link
+                to="/settings"
+                search={{ tab: "notifications" }}
+                onClick={() => setOpen(false)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-foreground hover:bg-secondary"
+              >
                 <Settings className="size-4" /> Settings
               </Link>
               <div className="my-1 h-px bg-border" />
@@ -255,15 +288,24 @@ export function TopBar() {
 }
 
 /* ── PriceItem with flash animation ── */
-function PriceItem({ symbol, price, change24h }: { symbol: string; price: number; change24h: number }) {
+function PriceItem({
+  symbol,
+  price,
+  change24h,
+}: {
+  symbol: string;
+  price: number;
+  change24h: number;
+}) {
   const flash = usePriceFlash(price);
   const up = change24h >= 0;
 
-  const flashBg = flash === "up"
-    ? "color-mix(in oklab, #1D9E75 14%, transparent)"
-    : flash === "down"
-      ? "color-mix(in oklab, #E24B4A 14%, transparent)"
-      : "transparent";
+  const flashBg =
+    flash === "up"
+      ? "color-mix(in oklab, #1D9E75 14%, transparent)"
+      : flash === "down"
+        ? "color-mix(in oklab, #E24B4A 14%, transparent)"
+        : "transparent";
 
   return (
     <span
@@ -273,7 +315,8 @@ function PriceItem({ symbol, price, change24h }: { symbol: string; price: number
       <span className="text-muted-foreground">{symbol}</span>
       <span className="text-foreground tabular-nums">{fmtPrice(price)}</span>
       <span style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
-        {up ? "+" : ""}{change24h.toFixed(1)}%
+        {up ? "+" : ""}
+        {change24h.toFixed(1)}%
       </span>
     </span>
   );
@@ -300,7 +343,10 @@ function Bot4xPill() {
           <span
             className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
             style={{
-              background: mode === "REAL" ? "color-mix(in oklab, #E24B4A 18%, transparent)" : "color-mix(in oklab, #1D9E75 18%, transparent)",
+              background:
+                mode === "REAL"
+                  ? "color-mix(in oklab, #E24B4A 18%, transparent)"
+                  : "color-mix(in oklab, #1D9E75 18%, transparent)",
               color: mode === "REAL" ? "#E24B4A" : "#1D9E75",
               border: `1px solid color-mix(in oklab, ${mode === "REAL" ? "#E24B4A" : "#1D9E75"} 35%, transparent)`,
             }}
@@ -308,7 +354,10 @@ function Bot4xPill() {
             {mode}
           </span>
           <Cpu className="size-3.5" style={{ color: pnlColor }} />
-          <span style={{ color: pnlColor }}>{pnl >= 0 ? "+" : ""}{pnl.toFixed(2)}%</span>
+          <span style={{ color: pnlColor }}>
+            {pnl >= 0 ? "+" : ""}
+            {pnl.toFixed(2)}%
+          </span>
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[320px] p-0 overflow-hidden">
@@ -317,7 +366,11 @@ function Bot4xPill() {
             <h4 className="text-sm font-semibold">Bot4x</h4>
             <span
               className="px-2 py-0.5 rounded text-[10px] font-bold border"
-              style={{ borderColor: `${pnlColor}55`, color: pnlColor, background: `color-mix(in oklab, ${pnlColor} 14%, transparent)` }}
+              style={{
+                borderColor: `${pnlColor}55`,
+                color: pnlColor,
+                background: `color-mix(in oklab, ${pnlColor} 14%, transparent)`,
+              }}
             >
               {breaker ? "SHUTDOWN" : warn ? "WARNING" : "ACTIVE"}
             </span>
@@ -325,7 +378,11 @@ function Bot4xPill() {
           <div className="grid grid-cols-3 gap-2 text-[11px]">
             <Stat label="Mode" value={mode} />
             <Stat label="Profile" value={profile.split("-")[0]} />
-            <Stat label="PnL hoje" value={`${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`} color={pnlColor} />
+            <Stat
+              label="PnL hoje"
+              value={`${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`}
+              color={pnlColor}
+            />
           </div>
           <div className="flex items-center justify-between text-[11px] text-muted-foreground">
             <span>Ordens abertas</span>
@@ -347,7 +404,12 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-md border border-border bg-card/40 p-2">
       <div className="text-[10px] uppercase text-muted-foreground tracking-wide">{label}</div>
-      <div className="text-[12px] font-medium tabular-nums truncate uppercase" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
+      <div
+        className="text-[12px] font-medium tabular-nums truncate uppercase"
+        style={{ color: color ?? "var(--foreground)" }}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -359,7 +421,11 @@ function NotificationsBell() {
   const unread = events.filter((e) => !e.read).length;
 
   return (
-    <Popover onOpenChange={(o) => { if (o) markAllRead(); }}>
+    <Popover
+      onOpenChange={(o) => {
+        if (o) markAllRead();
+      }}
+    >
       <PopoverTrigger asChild>
         <button className="relative size-8 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
           <Bell className="size-4" />
@@ -383,17 +449,29 @@ function NotificationsBell() {
               const M = NOTIF_META[e.type];
               const Icon = M.icon;
               return (
-                <div key={e.id} className="flex items-start gap-2.5 px-3 py-2.5 border-b border-border/60 last:border-b-0 hover:bg-secondary/40">
+                <div
+                  key={e.id}
+                  className="flex items-start gap-2.5 px-3 py-2.5 border-b border-border/60 last:border-b-0 hover:bg-secondary/40"
+                >
                   <div
                     className="size-7 rounded-md flex items-center justify-center shrink-0"
-                    style={{ background: `color-mix(in oklab, ${M.color} 16%, transparent)`, color: M.color }}
+                    style={{
+                      background: `color-mix(in oklab, ${M.color} 16%, transparent)`,
+                      color: M.color,
+                    }}
                   >
                     <Icon className="size-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[12px] font-medium text-foreground line-clamp-1">{e.title}</div>
-                    {e.body && <div className="text-[11px] text-muted-foreground line-clamp-2">{e.body}</div>}
-                    <div className="text-[10px] text-muted-foreground mt-0.5">{relativeTime(e.createdAt)}</div>
+                    <div className="text-[12px] font-medium text-foreground line-clamp-1">
+                      {e.title}
+                    </div>
+                    {e.body && (
+                      <div className="text-[11px] text-muted-foreground line-clamp-2">{e.body}</div>
+                    )}
+                    <div className="text-[10px] text-muted-foreground mt-0.5">
+                      {relativeTime(e.createdAt)}
+                    </div>
                   </div>
                   <button
                     onClick={() => dismiss(e.id)}
@@ -426,8 +504,13 @@ function Ticker({ symbol, price, change }: { symbol: string; price: number; chan
   return (
     <span className="flex items-center gap-1.5">
       <span className="text-muted-foreground">{symbol}</span>
-      <span className="text-foreground tabular-nums">${price.toLocaleString(undefined, { maximumFractionDigits: price > 100 ? 0 : 2 })}</span>
-      <span style={{ color: up ? "#1D9E75" : "#E24B4A" }}>{up ? "+" : ""}{change.toFixed(1)}%</span>
+      <span className="text-foreground tabular-nums">
+        ${price.toLocaleString(undefined, { maximumFractionDigits: price > 100 ? 0 : 2 })}
+      </span>
+      <span style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
+        {up ? "+" : ""}
+        {change.toFixed(1)}%
+      </span>
     </span>
   );
 }
