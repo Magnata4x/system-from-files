@@ -34,10 +34,13 @@ export function DnaHeader() {
     );
   }
 
-  const gauges = metrics.map(([key, label]) => ({
-    label,
-    value: dnaData[key] as number | null,
-  }));
+  const gauges: { label: string; value: number | null }[] = [
+    { label: "Consistency", value: dnaData.dnaConsistency },
+    { label: "Discipline", value: dnaData.dnaDiscipline },
+    { label: "Risk Control", value: dnaData.dnaRiskControl },
+    { label: "Timing", value: dnaData.dnaTiming },
+    { label: "Emotional Control", value: dnaData.dnaEmotionalControl },
+  ];
   const consistency = dnaData.dnaConsistency;
   const size = 88;
   const stroke = 4;
