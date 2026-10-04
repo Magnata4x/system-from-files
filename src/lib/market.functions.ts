@@ -47,6 +47,7 @@ export interface FearGreedDTO {
   value: number;
   label: string;
   updatedAt: number | null;
+  history: { value: number; label: string; timestamp: number }[];
 }
 
 export interface MarketSnapshotDTO {
@@ -156,14 +157,23 @@ async function loadPricesAndGlobal(): Promise<{
 async function loadFearGreed(): Promise<FearGreedDTO | null> {
   const res = await fetch("https://api.alternative.me/fng/?limit=7");
   if (!res.ok) return null;
-  const fg = ((await res.json()) as { data?: Array<{ value: string; value_classification: string }> })
-    .data?.[0];
+  const payload = (await res.json()) as {
+    data?: Array<{ value: string; value_classification: string; timestamp?: string }>;
+  };
+  const history = (payload.data ?? [])
+    .map((item) => ({
+      value: Number.parseInt(item.value, 10),
+      label: item.value_classification,
+      timestamp: Number(item.timestamp) * 1000,
+    }))
+    .filter((item) => Number.isFinite(item.value) && item.value >= 0 && item.value <= 100);
+  const fg = history[0];
   if (!fg) return null;
-  const updatedAt = Number(fg.timestamp) * 1000;
   return {
-    value: parseInt(fg.value, 10),
-    label: fg.value_classification,
-    updatedAt: Number.isFinite(updatedAt) && updatedAt > 0 ? updatedAt : null,
+    value: fg.value,
+    label: fg.label,
+    updatedAt: Number.isFinite(fg.timestamp) && fg.timestamp > 0 ? fg.timestamp : null,
+    history,
   };
 }
 
