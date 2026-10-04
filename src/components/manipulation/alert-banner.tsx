@@ -16,11 +16,7 @@ export function AlertBanner({
   onDismiss,
 }: AlertBannerProps) {
   const normalizedRisk = riskLevel?.toUpperCase();
-  const elevatedRisk =
-    normalizedRisk !== undefined &&
-    normalizedRisk !== null &&
-    normalizedRisk !== "" &&
-    normalizedRisk !== "LOW";
+  const elevatedRisk = normalizedRisk === "HIGH" || normalizedRisk === "MEDIUM";
 
   if (count === 0 && !elevatedRisk) return null;
 
@@ -32,7 +28,10 @@ export function AlertBanner({
     count > 0
       ? assets.join(" · ")
       : "Sem alerta ativo, mas o snapshot de risco está acima de LOW.";
-  const age = updatedAt ? ` · atualizado há ${Math.max(0, Math.floor((Date.now() - new Date(updatedAt).getTime()) / 1000))}s` : "";
+  const updatedMs = updatedAt ? new Date(updatedAt).getTime() : NaN;
+  const age = Number.isFinite(updatedMs)
+    ? ` · atualizado há ${Math.max(0, Math.floor((Date.now() - updatedMs) / 1000))}s`
+    : "";
 
   return (
     <div className="relative rounded-xl border-2 border-red-500/70 bg-red-500/10 px-4 py-3 flex items-center gap-3 overflow-hidden manip-pulse">
