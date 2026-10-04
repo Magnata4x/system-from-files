@@ -17,6 +17,7 @@ import { backendWs } from "@/adapters/backend/ws-client";
 import { initSentry } from "@/lib/sentry";
 import { logger } from "@/lib/logger";
 import { registerPWA } from "@/lib/pwa/register";
+import { MarketDataProvider } from "@/lib/market-data-store";
 
 // Idempotente — múltiplas chamadas (HMR, SSR rehydrate) são no-op.
 initSentry();
@@ -260,8 +261,10 @@ function RootComponent() {
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Outlet />
-          <Toaster position="bottom-right" />
+          <MarketDataProvider>
+            <Outlet />
+            <Toaster position="bottom-right" />
+          </MarketDataProvider>
         </AuthProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
