@@ -37,8 +37,15 @@ export interface SignalUI {
 }
 
 export function mapSignal(s: BackendSignal): SignalUI {
+  if (s.side !== "BUY" && s.side !== "SELL" && s.side !== "LONG" && s.side !== "SHORT") {
+    throw new Error(`Sinal ${s.id} possui side inválido`);
+  }
+
   const side = s.side === "LONG" || s.side === "BUY" ? "BUY" : "SELL";
-  const state = (s.status as SignalUI["state"]) ?? "active";
+  const state =
+    s.status === "closed" || s.status === "pending" || s.status === "active"
+      ? s.status
+      : "active";
   return {
     id: s.id,
     symbol: s.pair,
@@ -59,19 +66,11 @@ export function mapSignal(s: BackendSignal): SignalUI {
 
 export const signalAdapter = {
   async list(): Promise<SignalUI[]> {
-    try {
-      const data = await api.get<BackendSignal[]>(endpoints.signals.list);
-      return (data ?? []).map(mapSignal);
-    } catch {
-      return [];
-    }
+    const data = await api.get<BackendSignal[]>(endpoints.signals.list);
+    return (data ?? []).map(mapSignal);
   },
   async byId(id: string): Promise<SignalUI | null> {
-    try {
-      const data = await api.get<BackendSignal | null>(endpoints.signals.byId(id));
-      return data ? mapSignal(data) : null;
-    } catch {
-      return null;
-    }
+    const data = await api.get<BackendSignal | null>(endpoints.signals.byId(id));
+    return data ? mapSignal(data) : null;
   },
 };

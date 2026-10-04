@@ -1,5 +1,7 @@
 import { AlertTriangle, CircleOff, Loader2 } from "lucide-react";
-import { relativeAge, type DataStatus } from "@/lib/data-status";
+import { relativeAge, relativeTime, type DataStatus } from "@/lib/data-status";
+
+export { relativeTime };
 
 export function DataStatusBadge({
   source,
