@@ -8,10 +8,7 @@ function colorFor(v: number) {
   return shades[Math.min(v, 4) - 1];
 }
 
-type Cell = { date: Date; value: number; trades?: number; pnl?: number; live?: boolean };
-type CellStats = { trades: number; pnl: number; winRate: number };
-
-function statsFor(cell: Cell): CellStats {
+type Cell = { date: Date; value: number; trades: number; pnl: number };
   if (cell.live) {
     return { trades: cell.trades ?? 0, pnl: Math.round(cell.pnl ?? 0), winRate: 0 };
   }
@@ -37,13 +34,11 @@ export function BehavioralHeatmap() {
       value: h.value,
       trades: h.trades,
       pnl: h.pnl,
-      live: true,
     })) : [],
     [dna],
   );
-  if (!data.length) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Mapa comportamental indisponível — sem histórico real suficiente.</div>;
   const [hover, setHover] = useState<{ cell: Cell; x: number; y: number } | null>(null);
-
+  if (!data.length) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Mapa comportamental indisponível — sem histórico real suficiente.</div>;
   const weeks: (Cell | null)[][] = [];
   let current: (Cell | null)[] = [];
   const first = data[0].date.getDay();
@@ -149,12 +144,6 @@ export function BehavioralHeatmap() {
                       {hover.cell.pnl >= 0 ? "+" : ""}{Math.round(hover.cell.pnl)}u
                     </span>
                   </div>
-                  {!hover.cell.live && (
-                    <div className="flex justify-between gap-4">
-                      <span className="text-muted-foreground">Win rate</span>
-                      <span className="font-medium">{stats.winRate}%</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
