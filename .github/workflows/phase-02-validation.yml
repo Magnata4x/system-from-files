@@ -34,5 +34,12 @@ jobs:
           src/lib/data-status.ts
           src/components/dashboard/data-status.tsx
           src/hooks/useLivePrices.ts
+          src/lib/bot4x-store.ts
+          src/lib/bot4x-breaker.test.ts
+          src/lib/dashboard-store.test.ts
+          src/lib/tour-content.test.ts
+          src/components/dashboard/metric-cards.tsx
+          src/components/dashboard/integration-widgets.tsx
+          src/components/dashboard/top-bar.tsx
       - run: npx vitest run src/lib/market-data-store.test.ts
       - run: npm run test
