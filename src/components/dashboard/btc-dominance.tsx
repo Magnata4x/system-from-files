@@ -1,7 +1,7 @@
 import { useMarketData } from "@/lib/market-data-store";
 import { DataStatusBadge } from "./data-status";
 export function BtcDominance() {
-  const { global, loading, error, lastUpdate, status } = useMarketData();
+  const { global, loading, metadataStatus } = useMarketData();
   const dom = global?.btcDominance;
   const change = global?.marketCapChange24h;
   const dataStatus =
@@ -9,7 +9,7 @@ export function BtcDominance() {
       ? "loading"
       : !global || dom == null
         ? "unavailable"
-        : status === "stale" || error
+        : metadataStatus === "stale"
           ? "stale"
           : "ok";
   const up = (change ?? 0) >= 0;
@@ -18,7 +18,7 @@ export function BtcDominance() {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="text-[15px] font-medium">BTC Dominance</h3>
-          <DataStatusBadge source="CoinGecko global" updatedAt={lastUpdate} status={dataStatus} />
+          <DataStatusBadge source="CoinGecko global" updatedAt={global?.updatedAt} status={dataStatus} />
         </div>
         <div className="text-right">
           <div className="text-[22px] font-semibold tabular-nums">
