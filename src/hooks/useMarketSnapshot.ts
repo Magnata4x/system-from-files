@@ -43,7 +43,7 @@ export function useMarketSnapshot(symbol?: string): {
     triggerPrice: price,
     rsi: liveRsi,
     fearGreedIndex: fearGreed.value,
-    btcDominance: global.btcDominance,
+    btcDominance: global.btcDominance ?? undefined,
     btcCandles: btcCandles.length ? btcCandles : mockBTCSnapshot.btcCandles,
   };
 
