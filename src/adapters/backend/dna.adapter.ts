@@ -23,11 +23,17 @@ export interface DnaProfileUI {
   dnaRiskControl?: number;
   dnaTiming?: number;
   dnaEmotionalControl?: number;
+  consistency?: number;
+  discipline?: number;
+  riskControl?: number;
+  timing?: number;
+  emotionalControl?: number;
   avgWinRate?: number;
   bestSession?: string;
   worstSession?: string;
   overtradingRisk?: boolean;
   style?: "conservative" | "moderate" | "aggressive";
+  tradingStyle?: "conservative" | "moderate" | "aggressive";
   raw?: BackendDnaProfile;
 }
 
@@ -39,11 +45,17 @@ export function mapDnaProfile(p: BackendDnaProfile): DnaProfileUI {
     dnaRiskControl: p.riskControl,
     dnaTiming: p.timing,
     dnaEmotionalControl: p.emotionalControl,
+    consistency: p.consistency,
+    discipline: p.discipline,
+    riskControl: p.riskControl,
+    timing: p.timing,
+    emotionalControl: p.emotionalControl,
     avgWinRate: p.avgWinRate,
     bestSession: p.bestSession,
     worstSession: p.worstSession,
     overtradingRisk: p.overtradingRisk,
     style: p.tradingStyle,
+    tradingStyle: p.tradingStyle,
     raw: p,
   };
 }
