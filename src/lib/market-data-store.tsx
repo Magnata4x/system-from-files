@@ -127,6 +127,16 @@ export function normalizeBinanceTicker(ticker: BinanceTicker): CoinPrice | null 
   };
 }
 
+export function deriveMetadataStatus(
+  metadataUpdatedAt: number | null,
+  hasMetadata: boolean,
+  now = Date.now(),
+): MetadataStatus {
+  if (!hasMetadata) return "unavailable";
+  if (metadataUpdatedAt == null) return "stale";
+  return now - metadataUpdatedAt > METADATA_STALE_AFTER_MS ? "stale" : "ok";
+}
+
 export function deriveMarketStatus(
   lastTickAt: number | null,
   hasPrices: boolean,
@@ -365,11 +375,12 @@ class MarketDataStore {
 
   private updateStatus() {
     const hasPrices = Object.keys(this.state.prices).length > 0;
-    const metadataAge = this.state.metadataUpdatedAt
-      ? Date.now() - this.state.metadataUpdatedAt.getTime()
-      : null;
-    if (metadataAge != null && metadataAge > METADATA_STALE_AFTER_MS && this.state.metadataStatus !== "unavailable") {
-      if (this.state.metadataStatus !== "stale") this.patch({ metadataStatus: "stale" });
+    const metadataStatus = deriveMetadataStatus(
+      this.state.metadataUpdatedAt?.getTime() ?? null,
+      Boolean(this.state.global || this.state.fearGreed),
+    );
+    if (metadataStatus !== this.state.metadataStatus && metadataStatus !== "loading") {
+      this.patch({ metadataStatus });
     }
     const status = deriveMarketStatus(this.state.lastTickAt?.getTime() ?? null, hasPrices);
     if (status !== "loading" || this.state.loading) {
