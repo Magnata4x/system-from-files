@@ -8,7 +8,6 @@ import { logger } from "./logger";
 type Toast = { id: string; signal: Signal; };
 
 export type Signal = { id:string; asset:string; direction:"BUY"|"SELL"; score:number; entry:number; stop:number|null; target:number|null; rr:number|null; tf:string; time:string; };
-export type HeatmapAsset = { symbol:string; name:string; price:number; change:number; volume:number; };
 
 export type RiskStatus = {
   level?: string;
@@ -24,8 +23,6 @@ export type MarketRegime = {
 };
 
 interface DashboardState {
-  prices: Record<string, { price: number; change: number; pulse: number }>;
-  heatmap: HeatmapAsset[];
   signals: Signal[];
   /** true enquanto o primeiro pull de sinais não retornou. */
   signalsLoading: boolean;
@@ -52,8 +49,6 @@ interface DashboardState {
 let seenSignalIds: Set<string> | null = null;
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
-  prices: {},
-  heatmap: [],
   signals: [],
   signalsLoading: true,
   signalsError: null,
