@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 
-export function CircularGauge({ value, label, size = 88 }: { value: number; label: string; size?: number }) {
+export function CircularGauge({ value, label, size = 88 }: { value: number | null; label: string; size?: number }) {
   const stroke = 7;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const offset = c - (value / 100) * c;
-  const color = value >= 75 ? "var(--success)" : value >= 50 ? "var(--warning)" : "var(--destructive)";
+  const safeValue = value ?? 0;
+  const offset = c - (safeValue / 100) * c;
+  const color = value === null ? "var(--muted-foreground)" : value >= 75 ? "var(--success)" : value >= 50 ? "var(--warning)" : "var(--destructive)";
 
   return (
     <div className="flex flex-col items-center gap-1.5">
@@ -34,7 +35,7 @@ export function CircularGauge({ value, label, size = 88 }: { value: number; labe
             className="text-lg font-semibold tabular-nums"
             style={{ color }}
           >
-            {value}
+            {value === null ? "—" : value}
           </motion.span>
         </div>
       </div>
