@@ -2,7 +2,7 @@ name: dependency-audit
 
 on:
   push:
-    branches: [main]
+    branches: [main, phase-0-dashboard-real-data]
   pull_request:
   schedule:
     - cron: '0 9 * * 1' # toda segunda às 9h UTC
