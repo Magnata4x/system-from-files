@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { getMarketSnapshot } from "@/lib/market.functions";
 import {
   MARKET_ASSETS,
   MARKET_BINANCE_SYMBOLS,
@@ -15,11 +16,11 @@ export interface CoinPrice {
   exchange: typeof MARKET_EXCHANGE;
   instrument: typeof MARKET_INSTRUMENT;
   price: number;
-  change24h: number;
+  change24h: number | null;
   marketCap: number | null;
-  volume24h: number;
-  high24h: number;
-  low24h: number;
+  volume24h: number | null;
+  high24h: number | null;
+  low24h: number | null;
   lastUpdated: Date;
 }
 
@@ -28,15 +29,18 @@ export interface GlobalMetrics {
   totalVolume: number;
   btcDominance: number;
   marketCapChange24h: number;
+  updatedAt: number | null;
 }
 
 export interface FearGreed {
   value: number;
   label: string;
   history: { value: number; label: string; timestamp: number }[];
+  updatedAt: number | null;
 }
 
 export type MarketStatus = "loading" | "ok" | "stale" | "unavailable" | "error";
+export type MetadataStatus = "loading" | "ok" | "stale" | "unavailable";
 
 export interface MarketDataState {
   prices: Record<string, CoinPrice>;
@@ -47,6 +51,8 @@ export interface MarketDataState {
   status: MarketStatus;
   lastUpdate: Date | null;
   lastTickAt: Date | null;
+  metadataUpdatedAt: Date | null;
+  metadataStatus: MetadataStatus;
   refresh: () => Promise<void>;
 }
 
@@ -70,19 +76,19 @@ interface BinanceTicker {
 
 const BINANCE_REST = "https://api.binance.com/api/v3/ticker/24hr";
 const BINANCE_WS = "wss://stream.binance.com:9443/stream?streams=";
-const COINGECKO_GLOBAL = "https://api.coingecko.com/api/v3/global";
-const FEAR_GREED = "https://api.alternative.me/fng/?limit=7";
 const STALE_AFTER_MS = 30_000;
 const METADATA_TTL_MS = 60_000;
+const METADATA_STALE_AFTER_MS = 5 * 60_000;
 const FALLBACK_POLL_MS = 30_000;
 
 function nowDate(): Date {
   return new Date();
 }
 
-function parseNumber(value: unknown): number {
+function parseNumber(value: unknown): number | null {
+  if (value == null || value === "") return null;
   const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+  return Number.isFinite(n) ? n : null;
 }
 
 export function buildBinanceRestUrl(symbols = MARKET_BINANCE_SYMBOLS): string {
@@ -142,6 +148,8 @@ class MarketDataStore {
     status: "loading",
     lastUpdate: null,
     lastTickAt: null,
+    metadataUpdatedAt: null,
+    metadataStatus: "loading",
     refresh: () => this.refresh(),
   };
   private started = false;
@@ -267,51 +275,44 @@ class MarketDataStore {
   private async refreshMetadata() {
     if (!this.visible || Date.now() - this.metadataAt < METADATA_TTL_MS) return;
     this.metadataAt = Date.now();
-    const [globalResult, fearGreedResult] = await Promise.allSettled([
-      fetch(COINGECKO_GLOBAL, { headers: { accept: "application/json" }, cache: "no-store" }),
-      fetch(FEAR_GREED, { headers: { accept: "application/json" }, cache: "no-store" }),
-    ]);
+    this.patch({ metadataStatus: "loading" });
 
-    let global = this.state.global;
-    let fearGreed = this.state.fearGreed;
-
-    if (globalResult.status === "fulfilled" && globalResult.value.ok) {
-      const payload = (await globalResult.value.json()) as { data?: Record<string, unknown> };
-      const data = payload.data ?? {};
-      const cap = data.total_market_cap as Record<string, unknown> | undefined;
-      const volume = data.total_volume as Record<string, unknown> | undefined;
-      const dominance = data.market_cap_percentage as Record<string, unknown> | undefined;
-      global = {
-        totalMarketCap: parseNumber(cap?.usd),
-        totalVolume: parseNumber(volume?.usd),
-        btcDominance: parseNumber(dominance?.btc),
-        marketCapChange24h: parseNumber(data.market_cap_change_percentage_24h_usd),
-      };
+    try {
+      const snapshot = await getMarketSnapshot();
+      const global = snapshot.global
+        ? {
+            totalMarketCap: snapshot.global.totalMarketCap,
+            totalVolume: snapshot.global.totalVolume,
+            btcDominance: snapshot.global.btcDominance,
+            marketCapChange24h: snapshot.global.marketCapChange24h,
+            updatedAt: snapshot.global.updatedAt,
+          }
+        : this.state.global;
+      const fearGreed = snapshot.fearGreed
+        ? {
+            value: snapshot.fearGreed.value,
+            label: snapshot.fearGreed.label,
+            history: this.state.fearGreed?.history ?? [],
+            updatedAt: snapshot.fearGreed.updatedAt,
+          }
+        : this.state.fearGreed;
+      const metadataUpdatedAt = snapshot.metadataUpdatedAt
+        ? new Date(snapshot.metadataUpdatedAt)
+        : this.state.metadataUpdatedAt;
+      const hasAny = Boolean(global || fearGreed);
+      const complete = Boolean(global && fearGreed);
+      this.patch({
+        global,
+        fearGreed,
+        metadataUpdatedAt,
+        metadataStatus: complete ? "ok" : hasAny ? "stale" : "unavailable",
+      });
+    } catch (error) {
+      console.warn("[market-data] metadados indisponíveis:", error);
+      this.patch({
+        metadataStatus: this.state.global || this.state.fearGreed ? "stale" : "unavailable",
+      });
     }
-
-    if (fearGreedResult.status === "fulfilled" && fearGreedResult.value.ok) {
-      const payload = (await fearGreedResult.value.json()) as {
-        data?: Array<{ value: string; value_classification: string; timestamp?: string }>;
-      };
-      const history = (payload.data ?? [])
-        .map((item) => ({
-          value: parseNumber(item.value),
-          label: String(item.value_classification ?? ""),
-          timestamp: parseNumber(item.timestamp) * 1000,
-        }))
-        .filter((item) => item.value >= 0 && item.value <= 100);
-      const current = history[0];
-      if (current) fearGreed = { value: current.value, label: current.label, history };
-    }
-
-    this.patch({
-      global,
-      fearGreed,
-      status:
-        this.state.status === "loading" && Object.keys(this.state.prices).length
-          ? "ok"
-          : this.state.status,
-    });
   }
 
   private connectSocket() {
@@ -321,7 +322,7 @@ class MarketDataStore {
 
     socket.onopen = () => {
       this.stopFallback();
-      this.patch({ error: null, status: "ok" });
+      this.patch({ error: null });
     };
 
     socket.onmessage = (event) => {
@@ -364,6 +365,12 @@ class MarketDataStore {
 
   private updateStatus() {
     const hasPrices = Object.keys(this.state.prices).length > 0;
+    const metadataAge = this.state.metadataUpdatedAt
+      ? Date.now() - this.state.metadataUpdatedAt.getTime()
+      : null;
+    if (metadataAge != null && metadataAge > METADATA_STALE_AFTER_MS && this.state.metadataStatus !== "unavailable") {
+      if (this.state.metadataStatus !== "stale") this.patch({ metadataStatus: "stale" });
+    }
     const status = deriveMarketStatus(this.state.lastTickAt?.getTime() ?? null, hasPrices);
     if (status !== "loading" || this.state.loading) {
       if (status !== this.state.status && !(this.state.status === "error" && !hasPrices)) {
@@ -392,3 +399,4 @@ export function useMarketData(): MarketDataState {
 }
 
 export const MARKET_STALE_AFTER_MS = STALE_AFTER_MS;
+export const MARKET_METADATA_STALE_AFTER_MS = METADATA_STALE_AFTER_MS;
