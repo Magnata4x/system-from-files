@@ -5,9 +5,20 @@ import { manipulationAdapter } from "@/adapters/backend/manipulation.adapter";
 import type { Alert as ManipulationAlert } from "@/lib/manipulation-data";
 import { logger } from "./logger";
 
-type Toast = { id: string; signal: Signal; };
+type Toast = { id: string; signal: Signal };
 
-export type Signal = { id:string; asset:string; direction:"BUY"|"SELL"; score:number; entry:number; stop:number|null; target:number|null; rr:number|null; tf:string; time:string; };
+export type Signal = {
+  id: string;
+  asset: string;
+  direction: "BUY" | "SELL";
+  score: number;
+  entry: number;
+  stop: number | null;
+  target: number | null;
+  rr: number | null;
+  tf: string;
+  time: string;
+};
 
 export type RiskStatus = {
   level?: string;
@@ -62,7 +73,6 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   risk: null,
   regime: null,
   _intervalIds: new Set<number>(),
-
 
   init: () => {
     if (get()._intervalIds.size > 0) return;
@@ -172,8 +182,6 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }, 10_000);
     ids.add(backendPoll);
 
-
-
     set({ _intervalIds: ids });
   },
 
@@ -201,9 +209,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set({ _intervalIds: ids });
   },
 
-
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
   setSelectedSignal: (s) => set({ selectedSignal: s }),
   setCmdkOpen: (v) => set({ cmdkOpen: v }),
 }));
-

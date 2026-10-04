@@ -54,7 +54,8 @@ export function toBinanceSymbol(pair: string): string {
 export function toMarketPair(symbol: string): string {
   const normalized = symbol.toUpperCase();
   if (normalized.includes("/")) return normalized;
-  if (normalized.endsWith(MARKET_QUOTE)) return `${normalized.slice(0, -MARKET_QUOTE.length)}/${MARKET_QUOTE}`;
+  if (normalized.endsWith(MARKET_QUOTE))
+    return `${normalized.slice(0, -MARKET_QUOTE.length)}/${MARKET_QUOTE}`;
   return normalized;
 }
 

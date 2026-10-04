@@ -12,6 +12,8 @@ vi.mock("@/integrations/supabase/client", () => {
       listeners.add(cb);
       return { data: { subscription: { unsubscribe: () => listeners.delete(cb) } } };
     }),
+    getSession: vi.fn(() => new Promise(() => {})),
+    refreshSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
     _emit: (event: string, session: unknown) => listeners.forEach((cb) => cb(event, session)),
   };
   return { supabase: { auth } };

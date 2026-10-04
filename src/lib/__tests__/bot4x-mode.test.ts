@@ -1,4 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(() => new Promise(() => {})),
+      onAuthStateChange: vi.fn(() => ({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
+      getUser: vi.fn(() => Promise.resolve({ data: { user: null } })),
+    },
+  },
+}));
+
 import { getEffectiveMode, REAL_MODE_ENABLED, setExchangeVerified } from "../bot4x-store";
 
 // ARCH-01: o modo efetivo NUNCA pode ser "REAL" quando a flag de build está
