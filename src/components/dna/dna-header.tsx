@@ -1,32 +1,49 @@
 import { motion } from "framer-motion";
 import { CircularGauge } from "./circular-gauge";
-import { GAUGES } from "@/lib/dna-data";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useAuth } from "@/lib/auth";
 
+const metrics = [
+  ["dnaConsistency", "Consistency"],
+  ["dnaDiscipline", "Discipline"],
+  ["dnaRiskControl", "Risk Control"],
+  ["dnaTiming", "Timing"],
+  ["dnaEmotionalControl", "Emotional Control"],
+] as const;
+
 export function DnaHeader() {
   const { session } = useAuth();
-  const { data: dnaData } = useDnaProfile(session?.user?.id);
+  const { data: dnaData, isLoading } = useDnaProfile(session?.user?.id);
 
-  const hasLive =
-    !!dnaData && typeof dnaData === "object" && "dnaConsistency" in dnaData;
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">
+        Carregando perfil DNA…
+      </div>
+    );
+  }
 
-  const gauges = hasLive
-    ? [
-        { label: "Consistency",       value: Math.round((dnaData as any).dnaConsistency       ?? GAUGES[0].value) },
-        { label: "Discipline",        value: Math.round((dnaData as any).dnaDiscipline        ?? GAUGES[1].value) },
-        { label: "Risk Control",      value: Math.round((dnaData as any).dnaRiskControl       ?? GAUGES[2].value) },
-        { label: "Timing",            value: Math.round((dnaData as any).dnaTiming            ?? GAUGES[3].value) },
-        { label: "Emotional Control", value: Math.round((dnaData as any).dnaEmotionalControl  ?? GAUGES[4].value) },
-      ]
-    : GAUGES;
+  if (!dnaData?.hasProfile) {
+    return (
+      <div className="rounded-xl border border-border bg-card/40 p-5">
+        <h2 className="text-sm font-semibold">DNA Trader</h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          Perfil DNA ainda não calculado. Nenhum dado fictício é exibido.
+        </p>
+      </div>
+    );
+  }
 
-  const consistency = gauges[0].value;
+  const gauges = metrics.map(([key, label]) => ({
+    label,
+    value: dnaData[key] as number | null,
+  }));
+  const consistency = dnaData.dnaConsistency;
   const size = 88;
   const stroke = 4;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const offset = c - (consistency / 100) * c;
+  const offset = consistency == null ? c : c - (consistency / 100) * c;
 
   return (
     <div className="rounded-xl border border-border bg-gradient-to-br from-card/60 to-card/20 p-5">
@@ -41,19 +58,21 @@ export function DnaHeader() {
                 </linearGradient>
               </defs>
               <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--border)" strokeWidth={stroke} fill="none" />
-              <motion.circle
-                cx={size / 2}
-                cy={size / 2}
-                r={r}
-                stroke="url(#ringGrad)"
-                strokeWidth={stroke}
-                strokeLinecap="round"
-                fill="none"
-                strokeDasharray={c}
-                initial={{ strokeDashoffset: c }}
-                animate={{ strokeDashoffset: offset }}
-                transition={{ duration: 1.4, ease: "easeOut" }}
-              />
+              {consistency != null && (
+                <motion.circle
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={r}
+                  stroke="url(#ringGrad)"
+                  strokeWidth={stroke}
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeDasharray={c}
+                  initial={{ strokeDashoffset: c }}
+                  animate={{ strokeDashoffset: offset }}
+                  transition={{ duration: 1.4, ease: "easeOut" }}
+                />
+              )}
             </svg>
             <div className="absolute inset-[6px] rounded-full bg-[var(--brand-blue-deep)] flex items-center justify-center text-foreground text-2xl font-semibold">
               T
@@ -62,27 +81,18 @@ export function DnaHeader() {
 
           <div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider">Trader archetype</div>
-            <div className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-[var(--brand-cyan)] to-purple-400 bg-clip-text text-transparent">
-              MOMENTUM TRADER
+            <div className="text-2xl font-semibold tracking-tight">
+              {dnaData.tradingStyle ?? "—"}
             </div>
-            <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
-              <span>Consistency ring · {consistency}% filled</span>
-              {hasLive ? (
-                <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-500/40 text-emerald-300 bg-emerald-500/10">
-                  ao vivo
-                </span>
-              ) : (
-                <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-border text-muted-foreground bg-muted/20">
-                  demo
-                </span>
-              )}
+            <div className="text-xs text-muted-foreground mt-1">
+              Consistency · {consistency == null ? "—" : `${Math.round(consistency)}%`}
             </div>
           </div>
         </div>
 
         <div className="lg:ml-auto grid grid-cols-3 md:grid-cols-5 gap-3">
           {gauges.map((g) => (
-            <CircularGauge key={g.label} value={g.value} label={g.label} />
+            <CircularGauge key={g.label} value={g.value ?? 0} label={g.label} />
           ))}
         </div>
       </div>
