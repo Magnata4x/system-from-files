@@ -15,7 +15,7 @@ const mockedProfile = vi.mocked(useDnaProfile);
 const mockedStats = vi.mocked(useDnaStats);
 
 function idle<T>(data: T) {
-  return { data, isLoading: false, isError: false } as ReturnType<typeof useDnaProfile>;
+  return { data, isLoading: false, isError: false } as any;
 }
 
 describe("DnaPanel — dados honestos", () => {
@@ -56,13 +56,13 @@ describe("DnaPanel — dados honestos", () => {
       },
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof useDnaStats>);
+    } as any);
 
     render(<DnaPanel />);
 
-    expect(screen.getByText("Perfil DNA ainda não calculado. Nenhum dado fictício é exibido.")).toBeInTheDocument();
-    expect(screen.queryByText("moderate")).not.toBeInTheDocument();
-    expect(screen.queryByText("MOMENTUM TRADER")).not.toBeInTheDocument();
+    expect(screen.getByText("Perfil DNA ainda não calculado. Nenhum dado fictício é exibido.")).toBeTruthy();
+    expect(screen.queryByText("moderate")).toBeNull();
+    expect(screen.queryByText("MOMENTUM TRADER")).toBeNull();
   });
 
   it("renderiza — para dimensões nulas e só mostra win rate quando as estatísticas têm dados", () => {
@@ -107,9 +107,9 @@ describe("DnaPanel — dados honestos", () => {
     render(<DnaPanel />);
 
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
-    expect(screen.getByText("70")).toBeInTheDocument();
-    expect(screen.getByText("60")).toBeInTheDocument();
-    expect(screen.queryByText("91.0%")).not.toBeInTheDocument();
+    expect(screen.getByText("70")).toBeTruthy();
+    expect(screen.getByText("60")).toBeTruthy();
+    expect(screen.queryByText("91.0%")).toBeNull();
     expect(screen.getByText("—")).toBeInTheDocument();
   });
 });
