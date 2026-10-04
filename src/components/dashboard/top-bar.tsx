@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDashboardStore } from "@/lib/dashboard-store";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { useNotificationsStore, type NotifType } from "@/lib/notifications-store";
-import { useLivePrices } from "@/hooks/useLivePrices";
+import { useMarketData } from "@/lib/market-data-store";
+import { fearGreedColor } from "@/lib/fear-greed";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState, useRef, useEffect } from "react";
 import { TourHelpButton } from "@/components/tour/help-button";
@@ -63,7 +64,7 @@ export function TopBar() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const { prices, global, fearGreed, loading, error, lastUpdate } = useLivePrices();
+  const { prices, global, fearGreed, loading, error, lastUpdate } = useMarketData();
 
   /* UTC clock */
   const [utcTime, setUtcTime] = useState("");
@@ -94,17 +95,7 @@ export function TopBar() {
   const fg = fearGreed;
 
   /* Fear & Greed color */
-  const fgColor = !fg
-    ? "#888780"
-    : fg.value >= 75
-      ? "#E24B4A"
-      : fg.value >= 55
-        ? "#EF9F27"
-        : fg.value >= 45
-          ? "#888780"
-          : fg.value >= 25
-            ? "#378ADD"
-            : "#185FA5";
+  const fgColor = fearGreedColor(fg?.value);
 
   /* Live dot color */
   const isLive = !loading && !error;
