@@ -139,6 +139,8 @@ export function Bot4xSummaryWidget() {
   const profile = useBot4xStore((s) => s.profile);
   const leverage = useBot4xStore((s) => s.leverage);
   const pnl = useBot4xStore((s) => s.dailyPnlPct);
+  const breaker = pnl <= -1.5;
+  const realMode = mode === "REAL";
   return (
     <Card title="Bot4x" icon={Cpu} accent="#1D9E75" to="/bot4x">
       <div className="flex items-center gap-3">
@@ -148,12 +150,16 @@ export function Bot4xSummaryWidget() {
           <div className="text-[11px] text-muted-foreground">{leverage}×</div>
         </div>
         <div>
-          <div className="text-[18px] font-semibold">
+          <div
+            className="text-[18px] font-semibold"
+            style={{ color: breaker ? "#E24B4A" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
+          >
             {pnl >= 0 ? "+" : ""}
             {pnl.toFixed(2)}%
           </div>
-          <div className="text-[10px] text-muted-foreground">
-            <Activity className="size-3 inline" /> Status real do Bot4x
+          <div className={`mt-1 flex items-center gap-1.5 text-[10.5px] ${breaker ? "text-[#E24B4A] font-medium" : realMode ? "text-[#1D9E75] font-medium" : "text-muted-foreground"}`}>
+            <Activity className="size-3" />
+            {breaker ? "Disjuntor ativo" : realMode ? "Execução REAL" : "Circuit OK"}
           </div>
         </div>
       </div>
