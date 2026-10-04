@@ -2,6 +2,7 @@ import { Brain, Loader2, AlertTriangle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
+import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 const metrics = [
   ["consistency", "Consistency"],
@@ -20,6 +21,15 @@ export function DnaPanel() {
   const stats = useDnaStats();
   const hasProfile = profile.data?.hasProfile === true;
   const hasStats = stats.data?.hasData === true;
+  const status =
+    profile.isLoading || stats.isLoading
+      ? "loading"
+      : profile.isError || stats.isError
+        ? "unavailable"
+        : profile.isStale || stats.isStale
+          ? "stale"
+          : "ok";
+  const updatedAt = Math.max(profile.dataUpdatedAt || 0, stats.dataUpdatedAt || 0) || null;
 
   return (
     <div data-tour="dna-panel" className="rounded-xl border border-border bg-card p-5">
