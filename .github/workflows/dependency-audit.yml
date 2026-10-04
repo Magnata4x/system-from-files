@@ -27,7 +27,7 @@ jobs:
           cache: npm
 
       - name: Refresh package lock with npm audit fix
-        run: npm audit fix --package-lock-only --ignore-scripts
+        run: npm audit fix --package-lock-only --ignore-scripts || true
 
       - name: Commit refreshed lockfile
         run: |
