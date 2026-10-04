@@ -1,23 +1,15 @@
 // Camada de mercado do backend interno: dados públicos da Binance + indicadores.
 // Substitui o serviço BinanceService/MarketRegime do backend NestJS externo.
 
-export const TARGET_PAIRS = [
-  'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT',
-  'ADA/USDT', 'AVAX/USDT', 'DOT/USDT', 'LINK/USDT', 'LTC/USDT',
-] as const
+import { MARKET_PAIRS, toBinanceSymbol as sharedToBinanceSymbol, toMarketPair } from "@/lib/market-symbols"
 
-const BINANCE = 'https://api.binance.com'
+export const TARGET_PAIRS = MARKET_PAIRS
 
-export function toBinanceSymbol(pair: string): string {
-  return pair.replace('/', '').replace('-', '').toUpperCase()
-}
+const BINANCE = "https://api.binance.com"
 
-export function toPair(symbol: string): string {
-  const s = symbol.toUpperCase()
-  if (s.includes('/')) return s
-  if (s.endsWith('USDT')) return `${s.slice(0, -4)}/USDT`
-  return s
-}
+export function toBinanceSymbol(pair: string): string { return sharedToBinanceSymbol(pair) }
+
+export function toPair(symbol: string): string { return toMarketPair(symbol) }
 
 interface CacheEntry {
   expires: number
