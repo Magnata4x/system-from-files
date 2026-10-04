@@ -17,7 +17,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardStore } from "@/lib/dashboard-store";
-import { useBot4xStore } from "@/lib/bot4x-store";
+import { useBot4xStore, isBot4xCircuitBreakerTriggered } from "@/lib/bot4x-store";
 import { useNotificationsStore, type NotifType } from "@/lib/notifications-store";
 import { useMarketData } from "@/lib/market-data-store";
 import { fearGreedColor } from "@/lib/fear-greed";
@@ -327,7 +327,7 @@ function Bot4xPill() {
   const pnl = useBot4xStore((s) => s.dailyPnlPct);
   const orders = useBot4xStore((s) => s.orders);
 
-  const breaker = pnl <= -1.5;
+  const breaker = isBot4xCircuitBreakerTriggered(pnl);
   const warn = pnl < -0.5 && !breaker;
   const pnlColor = breaker ? "#E24B4A" : warn ? "#EF9F27" : pnl >= 0 ? "#1D9E75" : "#E24B4A";
 
