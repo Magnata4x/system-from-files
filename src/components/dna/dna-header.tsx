@@ -14,12 +14,12 @@ export function DnaHeader() {
     { label: "Timing", value: dnaData.dnaTiming == null ? null : Math.round(dnaData.dnaTiming) },
     { label: "Emotional Control", value: dnaData.dnaEmotionalControl == null ? null : Math.round(dnaData.dnaEmotionalControl) },
   ];
-  const consistency = gauges[0].value ?? 0;
+  const consistency = gauges[0].value;
   const size = 88;
   const stroke = 4;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const offset = c - (consistency / 100) * c;
+  const offset = c - ((consistency ?? 0) / 100) * c;
 
   return (
     <div className="rounded-xl border border-border bg-gradient-to-br from-card/60 to-card/20 p-5">
@@ -59,7 +59,7 @@ export function DnaHeader() {
               {dnaData.style === "aggressive" ? "AGGRESSIVE TRADER" : dnaData.style === "conservative" ? "CONSERVATIVE TRADER" : dnaData.style === "moderate" ? "BALANCED TRADER" : "INDISPONÍVEL"}
             </div>
             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
-              <span>Consistency ring · {consistency}% filled</span>
+              <span>Consistency ring · {consistency == null ? "indisponível" : `${consistency}%`} filled</span>
               <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-500/40 text-emerald-300 bg-emerald-500/10">ao vivo</span>
             </div>         </div>
         </div>
