@@ -27,13 +27,13 @@ export function DnaHeader() {
   }
 
   const gauges: { label: string; value: number | null }[] = [
-    { label: "Consistency", value: dnaData.dnaConsistency },
-    { label: "Discipline", value: dnaData.dnaDiscipline },
-    { label: "Risk Control", value: dnaData.dnaRiskControl },
-    { label: "Timing", value: dnaData.dnaTiming },
-    { label: "Emotional Control", value: dnaData.dnaEmotionalControl },
+    { label: "Consistency", value: dnaData.dnaConsistency as number | null },
+    { label: "Discipline", value: dnaData.dnaDiscipline as number | null },
+    { label: "Risk Control", value: dnaData.dnaRiskControl as number | null },
+    { label: "Timing", value: dnaData.dnaTiming as number | null },
+    { label: "Emotional Control", value: dnaData.dnaEmotionalControl as number | null },
   ];
-  const consistency = dnaData.dnaConsistency;
+  const consistency = dnaData.dnaConsistency as number | null;
   const size = 88;
   const stroke = 4;
   const r = (size - stroke) / 2;
