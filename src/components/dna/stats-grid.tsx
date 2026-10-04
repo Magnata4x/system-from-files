@@ -4,11 +4,11 @@ import { Target, Clock, Sparkles, Hourglass, Shield, TrendingDown, TrendingUp, A
 const ICONS = { Target, Clock, Sparkles, Hourglass, Shield, TrendingDown, TrendingUp } as const;
 
 export function StatsGrid() {
-  const { data } = useDnaStats();
-  const live = !!data?.hasData;
+  const { data, isLoading, isError } = useDnaStats();
+  if (isLoading) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">carregando estatísticas reais…</div>;
+  if (isError || !data?.hasData) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Estatísticas DNA indisponíveis — ainda não há histórico real suficiente.</div>;
 
-  const stats = live
-    ? [
+  const stats = [
         {
           icon: "Target",
           value: `${data!.winRate.toFixed(1)}%`,
@@ -54,8 +54,7 @@ export function StatsGrid() {
           trend: undefined,
           trendUp: data!.maxDrawdownPct < 15,
         },
-      ]
-  ];
+    ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
