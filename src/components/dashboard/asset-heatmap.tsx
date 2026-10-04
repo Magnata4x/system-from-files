@@ -36,6 +36,13 @@ export function AssetHeatmap() {
                 </div>
               </div>
             );
+          if (p.change24h == null)
+            return (
+              <div key={asset.symbol} className="rounded-lg p-2.5 bg-muted/40">
+                <div className="text-[11px] text-muted-foreground">{fmt(p.price)}</div>
+                <div className="text-[10px] text-muted-foreground">sem dado · 24h</div>
+              </div>
+            );
           const c = colorFor(p.change24h);
           return (
             <div

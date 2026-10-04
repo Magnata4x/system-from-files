@@ -14,6 +14,7 @@ import { useStoreCleanup } from "@/hooks/useStoreCleanup";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAuthSession } from "@/lib/server-auth";
 import { OfflineBanner } from "@/components/offline-banner";
+import { MarketDataProvider } from "@/lib/market-data-store";
 
 
 // PERF-01: code-split widgets pesados. CopilotPanel só monta após o
@@ -139,7 +140,7 @@ function AuthenticatedApp({ session }: { session: NonNullable<ReturnType<typeof 
   }, [navigate]);
 
   return (
-    <>
+    <MarketDataProvider>
       <OfflineBanner />
       <Outlet />
       <Suspense fallback={null}>
@@ -160,6 +161,6 @@ function AuthenticatedApp({ session }: { session: NonNullable<ReturnType<typeof 
           />
         </Suspense>
       )}
-    </>
+    </MarketDataProvider>
   );
 }

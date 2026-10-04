@@ -28,23 +28,26 @@ export interface CoinPriceDTO {
   symbol: string;
   name: string;
   price: number;
-  change24h: number;
+  change24h: number | null;
   marketCap: number | null;
-  volume24h: number;
-  high24h: number;
-  low24h: number;
+  volume24h: number | null;
+  high24h: number | null;
+  low24h: number | null;
 }
 
 export interface GlobalMetricsDTO {
-  totalMarketCap: number;
-  totalVolume: number;
-  btcDominance: number;
-  marketCapChange24h: number;
+  totalMarketCap: number | null;
+  totalVolume: number | null;
+  btcDominance: number | null;
+  marketCapChange24h: number | null;
+  updatedAt: number | null;
 }
 
 export interface FearGreedDTO {
   value: number;
   label: string;
+  updatedAt: number | null;
+  history: { value: number; label: string; timestamp: number }[];
 }
 
 export interface MarketSnapshotDTO {
@@ -52,6 +55,13 @@ export interface MarketSnapshotDTO {
   global: GlobalMetricsDTO | null;
   fearGreed: FearGreedDTO | null;
   fetchedAt: number;
+  metadataUpdatedAt: number | null;
+}
+
+function finiteNumber(value: unknown): number | null {
+  if (value == null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
 }
 
 const PRICES_TTL = Number(process.env.CACHE_TTL_PRICES_SECONDS ?? 5);
@@ -78,12 +88,12 @@ async function loadPricesAndGlobal(): Promise<{
         id,
         symbol: sym,
         name: String(c.name ?? ""),
-        price: Number(c.current_price ?? 0),
-        change24h: Number(c.price_change_percentage_24h ?? 0),
-        marketCap: Number(c.market_cap ?? 0),
-        volume24h: Number(c.total_volume ?? 0),
-        high24h: Number(c.high_24h ?? 0),
-        low24h: Number(c.low_24h ?? 0),
+        price: finiteNumber(c.current_price) ?? 0,
+        change24h: finiteNumber(c.price_change_percentage_24h),
+        marketCap: finiteNumber(c.market_cap),
+        volume24h: finiteNumber(c.total_volume),
+        high24h: finiteNumber(c.high_24h),
+        low24h: finiteNumber(c.low_24h),
       };
     }
   } else if (coinsRes.status === "fulfilled") {
@@ -95,15 +105,19 @@ async function loadPricesAndGlobal(): Promise<{
   let global: GlobalMetricsDTO | null = null;
   if (globalRes.status === "fulfilled" && globalRes.value.ok) {
     const g = ((await globalRes.value.json()) as { data?: Record<string, unknown> }).data ?? {};
-    const totalMarketCap = (g.total_market_cap as Record<string, number> | undefined)?.usd ?? 0;
-    const totalVolume = (g.total_volume as Record<string, number> | undefined)?.usd ?? 0;
-    const btcDominance =
-      (g.market_cap_percentage as Record<string, number> | undefined)?.btc ?? 0;
+    const totalMarketCap = finiteNumber((g.total_market_cap as Record<string, unknown> | undefined)?.usd);
+    const totalVolume = finiteNumber((g.total_volume as Record<string, unknown> | undefined)?.usd);
+    const btcDominance = finiteNumber(
+      (g.market_cap_percentage as Record<string, unknown> | undefined)?.btc,
+    );
+    const dateHeader = globalRes.value.headers.get("date");
+    const headerTime = dateHeader ? Date.parse(dateHeader) : NaN;
     global = {
       totalMarketCap,
       totalVolume,
       btcDominance,
-      marketCapChange24h: Number(g.market_cap_change_percentage_24h_usd ?? 0),
+      marketCapChange24h: finiteNumber(g.market_cap_change_percentage_24h_usd),
+      updatedAt: Number.isFinite(headerTime) ? headerTime : Date.now(),
     };
   }
 
@@ -128,12 +142,12 @@ async function loadPricesAndGlobal(): Promise<{
             id: sym.toLowerCase(),
             symbol: sym,
             name: sym,
-            price: Number(t.lastPrice ?? 0),
-            change24h: Number(t.priceChangePercent ?? 0),
+            price: finiteNumber(t.lastPrice) ?? 0,
+            change24h: finiteNumber(t.priceChangePercent),
             marketCap: null,
-            volume24h: Number(t.quoteVolume ?? 0),
-            high24h: Number(t.highPrice ?? 0),
-            low24h: Number(t.lowPrice ?? 0),
+            volume24h: finiteNumber(t.quoteVolume),
+            high24h: finiteNumber(t.highPrice),
+            low24h: finiteNumber(t.lowPrice),
           };
         }
       } else {
@@ -148,12 +162,26 @@ async function loadPricesAndGlobal(): Promise<{
 }
 
 async function loadFearGreed(): Promise<FearGreedDTO | null> {
-  const res = await fetch("https://api.alternative.me/fng/?limit=1");
+  const res = await fetch("https://api.alternative.me/fng/?limit=7");
   if (!res.ok) return null;
-  const fg = ((await res.json()) as { data?: Array<{ value: string; value_classification: string }> })
-    .data?.[0];
+  const payload = (await res.json()) as {
+    data?: Array<{ value: string; value_classification: string; timestamp?: string }>;
+  };
+  const history = (payload.data ?? [])
+    .map((item) => ({
+      value: Number.parseInt(item.value, 10),
+      label: item.value_classification,
+      timestamp: Number(item.timestamp) * 1000,
+    }))
+    .filter((item) => Number.isFinite(item.value) && item.value >= 0 && item.value <= 100);
+  const fg = history[0];
   if (!fg) return null;
-  return { value: parseInt(fg.value, 10), label: fg.value_classification };
+  return {
+    value: fg.value,
+    label: fg.label,
+    updatedAt: Number.isFinite(fg.timestamp) && fg.timestamp > 0 ? fg.timestamp : null,
+    history,
+  };
 }
 
 export const getMarketSnapshot = createServerFn({ method: "GET" }).handler(
@@ -162,11 +190,16 @@ export const getMarketSnapshot = createServerFn({ method: "GET" }).handler(
       cachedJson("market:prices+global", PRICES_TTL, loadPricesAndGlobal),
       cachedJson("market:feargreed", SENTIMENT_TTL, loadFearGreed),
     ]);
+    const metadataUpdatedAt = Math.max(
+      pricesAndGlobal.global?.updatedAt ?? 0,
+      fearGreed?.updatedAt ?? 0,
+    );
     return {
       prices: pricesAndGlobal.prices,
       global: pricesAndGlobal.global,
       fearGreed,
       fetchedAt: Date.now(),
+      metadataUpdatedAt: metadataUpdatedAt > 0 ? metadataUpdatedAt : null,
     };
   },
 );

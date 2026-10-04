@@ -7,12 +7,12 @@ import { useDashboardStore } from "@/lib/dashboard-store";
 import { DataStatusBadge } from "./data-status";
 
 export function MetricCards() {
-  const { prices, global, loading, error, lastUpdate, status } = useMarketData();
+  const { prices, global, loading, metadataStatus } = useMarketData();
   const signals = useDashboardStore((s) => s.signals);
   const signalsLoading = useDashboardStore((s) => s.signalsLoading);
   const manip = useDashboardStore((s) => s.manipAlerts);
   const total = Object.keys(prices).length;
-  const up = Object.values(prices).filter((p) => p.change24h > 0).length;
+  const up = Object.values(prices).filter((p) => p.change24h != null && p.change24h > 0).length;
   const trend = global?.marketCapChange24h;
   const trendLabel =
     trend == null ? "Indisponível" : trend >= 1 ? "Bullish" : trend <= -1 ? "Bearish" : "Neutral";
@@ -24,14 +24,6 @@ export function MetricCards() {
         : trend <= -1
           ? "#E24B4A"
           : "#888780";
-  const priceStatus =
-    loading && !total
-      ? "loading"
-      : !total
-        ? "unavailable"
-        : status === "stale" || error
-          ? "stale"
-          : "ok";
   const top = signals.reduce(
     (b, s) => (!b || s.score > b.score ? s : b),
     null as (typeof signals)[number] | null,
@@ -69,8 +61,8 @@ export function MetricCards() {
         value={loading && !global ? "…" : trendLabel}
         sub={total ? up + " de " + total + " ativos em alta" : "Indisponível"}
         source="CoinGecko global"
-        status={priceStatus}
-        updatedAt={lastUpdate}
+        status={!global ? (metadataStatus === "loading" ? "loading" : "unavailable") : metadataStatus}
+        updatedAt={global?.updatedAt != null ? new Date(global.updatedAt) : null}
       />
       <Card
         index={3}

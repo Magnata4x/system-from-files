@@ -165,7 +165,7 @@ export function TopBar() {
         {loading ? (
           <SkeletonBar className="w-24 h-4" />
         ) : (
-          btcDom !== undefined && (
+          btcDom != null && (
             <span className="flex items-center gap-1.5">
               <span className="text-muted-foreground">BTC.D</span>
               <span className="text-foreground">{btcDom.toFixed(1)}%</span>
@@ -295,10 +295,10 @@ function PriceItem({
 }: {
   symbol: string;
   price: number;
-  change24h: number;
+  change24h: number | null;
 }) {
   const flash = usePriceFlash(price);
-  const up = change24h >= 0;
+  const up = (change24h ?? 0) >= 0;
 
   const flashBg =
     flash === "up"
@@ -315,8 +315,7 @@ function PriceItem({
       <span className="text-muted-foreground">{symbol}</span>
       <span className="text-foreground tabular-nums">{fmtPrice(price)}</span>
       <span style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
-        {up ? "+" : ""}
-        {change24h.toFixed(1)}%
+        {change24h == null ? "—" : `${up ? "+" : ""}${change24h.toFixed(1)}%`}
       </span>
     </span>
   );
