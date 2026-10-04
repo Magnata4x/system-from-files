@@ -1,4 +1,17 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(() => new Promise(() => {})),
+      onAuthStateChange: vi.fn(() => ({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
+      getUser: vi.fn(() => Promise.resolve({ data: { user: null } })),
+    },
+  },
+}));
+
 import { render, screen } from "@testing-library/react";
 import { TabHistorico } from "@/components/bot4x/tab-historico";
 import { useBot4xStore } from "@/lib/bot4x-store";
