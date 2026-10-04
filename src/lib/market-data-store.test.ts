@@ -3,6 +3,7 @@ import {
   buildBinanceRestUrl,
   buildBinanceStreamUrl,
   deriveMarketStatus,
+  deriveMetadataStatus,
   normalizeBinanceTicker,
 } from "@/lib/market-data-store";
 
@@ -39,6 +40,19 @@ describe("market data — single Binance source", () => {
     expect(result?.pair).toBe("BTC/USDT");
     expect(result?.exchange).toBe("binance");
     expect(result?.instrument).toBe("spot");
+    expect(result?.change24h).toBe(1.25);
+  });
+
+  it("mantém campos ausentes como indisponíveis", () => {
+    const result = normalizeBinanceTicker({
+      symbol: "BTCUSDT",
+      lastPrice: "101234.50",
+      E: Date.now(),
+    });
+    expect(result?.change24h).toBeNull();
+    expect(result?.volume24h).toBeNull();
+    expect(result?.high24h).toBeNull();
+    expect(result?.low24h).toBeNull();
   });
 
   it("rejeita símbolo inválido em vez de criar preço fantasma", () => {
@@ -51,5 +65,13 @@ describe("market data — single Binance source", () => {
     expect(deriveMarketStatus(now - 1_000, true, now)).toBe("ok");
     expect(deriveMarketStatus(now - 31_000, true, now)).toBe("stale");
     expect(deriveMarketStatus(null, false, now)).toBe("unavailable");
+  });
+
+  it("marca metadados como stale após cinco minutos sem atualização", () => {
+    const now = 1_000_000;
+    expect(deriveMetadataStatus(now - 60_000, true, now)).toBe("ok");
+    expect(deriveMetadataStatus(now - 5 * 60_000 - 1, true, now)).toBe("stale");
+    expect(deriveMetadataStatus(null, true, now)).toBe("stale");
+    expect(deriveMetadataStatus(null, false, now)).toBe("unavailable");
   });
 });
