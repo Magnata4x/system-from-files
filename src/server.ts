@@ -85,6 +85,8 @@ async function addSecurityHeaders(response: Response, nonce: string): Promise<Re
     "connect-src 'self'",
     supabaseOrigin,
     supabaseWss,
+    "https://api.binance.com",
+    "wss://stream.binance.com:9443",
     apiOrigin,
     apiWsOrigin,
     ...devOrigins,
