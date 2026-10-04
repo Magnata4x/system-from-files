@@ -25,10 +25,10 @@ export interface CoinPrice {
 }
 
 export interface GlobalMetrics {
-  totalMarketCap: number;
-  totalVolume: number;
-  btcDominance: number;
-  marketCapChange24h: number;
+  totalMarketCap: number | null;
+  totalVolume: number | null;
+  btcDominance: number | null;
+  marketCapChange24h: number | null;
   updatedAt: number | null;
 }
 
