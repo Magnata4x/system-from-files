@@ -312,7 +312,7 @@ class MarketDataStore {
         ? new Date(snapshot.metadataUpdatedAt)
         : this.state.metadataUpdatedAt;
       const hasAny = Boolean(global || fearGreed);
-      const complete = Boolean(global && fearGreed);
+      const complete = Boolean(snapshot.global && snapshot.fearGreed);
       this.patch({
         global,
         fearGreed,
