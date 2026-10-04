@@ -3,6 +3,10 @@ import { api } from "@/lib/apiClient";
 
 export interface DnaStats {
   hasData: boolean;
+  periodDays: number;
+  periodStart: string;
+  periodEnd: string;
+  generatedAt: string;
   totalTrades: number;
   winRate: number;
   avgPnlPct: number;
