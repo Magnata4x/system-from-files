@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Brain, Shield, Cpu, Sparkles, ArrowRight, Activity } from "lucide-react";
-import { isBot4xCircuitBreakerTriggered, useBot4xStore } from "@/lib/bot4x-store";
+import { getEffectiveMode, isBot4xCircuitBreakerTriggered, useBot4xStore } from "@/lib/bot4x-store";
 import { useDashboardStore } from "@/lib/dashboard-store";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
@@ -140,13 +140,14 @@ export function Bot4xSummaryWidget() {
   const leverage = useBot4xStore((s) => s.leverage);
   const pnl = useBot4xStore((s) => s.dailyPnlPct);
   const breaker = isBot4xCircuitBreakerTriggered(pnl);
-  const realMode = mode === "REAL";
+  const effectiveMode = getEffectiveMode(mode);
+  const realMode = effectiveMode === "REAL";
   return (
     <Card title="Bot4x" icon={Cpu} accent="#1D9E75" to="/bot4x">
       <div className="flex items-center gap-3">
         <div>
           <div className="text-[10px] uppercase text-muted-foreground">{profile}</div>
-          <div className="font-semibold">{mode}</div>
+          <div className="font-semibold">{effectiveMode}</div>
           <div className="text-[11px] text-muted-foreground">{leverage}×</div>
         </div>
         <div>
