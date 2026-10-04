@@ -168,6 +168,7 @@ class MarketDataStore {
   private socket: WebSocket | null = null;
   private fallbackTimer: ReturnType<typeof setInterval> | null = null;
   private staleTimer: ReturnType<typeof setInterval> | null = null;
+  private metadataTimer: ReturnType<typeof setInterval> | null = null;
   private metadataAt = 0;
   private visible = true;
 
@@ -192,7 +193,10 @@ class MarketDataStore {
     this.started = true;
     this.visible = document.visibilityState === "visible";
     document.addEventListener("visibilitychange", this.onVisibility);
-    if (this.visible) void this.refresh();
+    if (this.visible) {
+      void this.refresh();
+      this.startMetadataTimer();
+    }
     this.staleTimer = setInterval(() => this.updateStatus(), 5_000);
   }
 
@@ -204,6 +208,7 @@ class MarketDataStore {
     this.stopFallback();
     if (this.staleTimer) clearInterval(this.staleTimer);
     this.staleTimer = null;
+    this.stopMetadataTimer();
   }
 
   private onVisibility = () => {
@@ -212,8 +217,10 @@ class MarketDataStore {
     if (!visible) {
       this.stopSocket();
       this.stopFallback();
+      this.stopMetadataTimer();
       return;
     }
+    this.startMetadataTimer();
     void this.refresh();
   };
 
@@ -234,6 +241,16 @@ class MarketDataStore {
   private stopFallback() {
     if (this.fallbackTimer) clearInterval(this.fallbackTimer);
     this.fallbackTimer = null;
+  }
+
+  private startMetadataTimer() {
+    if (this.metadataTimer || !this.visible) return;
+    this.metadataTimer = setInterval(() => void this.refreshMetadata(), METADATA_TTL_MS);
+  }
+
+  private stopMetadataTimer() {
+    if (this.metadataTimer) clearInterval(this.metadataTimer);
+    this.metadataTimer = null;
   }
 
   private startFallback() {
