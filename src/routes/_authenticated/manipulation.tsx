@@ -71,6 +71,7 @@ function ManipulationPage() {
     isFetching: alertsFetching,
     error: alertsError,
     refetch: refetchAlerts,
+    dataUpdatedAt: alertsUpdatedAt,
   } = useQuery({
     queryKey: alertsKey,
     queryFn: () =>
@@ -151,7 +152,7 @@ function ManipulationPage() {
         : alertsFetching || !snapshot?.updatedAt
           ? "stale"
           : "ok";
-  const manipulationUpdatedAt = snapshot?.updatedAt ?? null;
+  const manipulationUpdatedAt = snapshot?.updatedAt ?? (alertsUpdatedAt || null);
   const canLoadMore = hasBackendAlerts && liveAlerts!.length >= limit && limit < 200;
 
   const loadMore = useCallback(() => {
