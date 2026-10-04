@@ -22,77 +22,15 @@ import { CommandPalette } from "@/components/dashboard/command-palette";
 import { AnnouncementBanner } from "@/components/dashboard/announcement-banner";
 import { IntegrationWidgets } from "@/components/dashboard/integration-widgets";
 
-
-export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({
-    meta: [{ title: "Dashboard — AISignalRadar" }],
-  }),
-  component: Dashboard,
-});
+export const Route = createFileRoute("/_authenticated/dashboard")({ head: () => ({ meta: [{ title: "Dashboard — AISignalRadar" }] }), component: Dashboard });
 
 function Dashboard() {
   const { userId, ready } = useBackendAuth();
   const navigate = useNavigate();
   const init = useDashboardStore((s) => s.init);
   const cleanup = useDashboardStore((s) => s.cleanup);
-
-  useEffect(() => {
-    if (ready && !userId) navigate({ to: "/login" });
-  }, [ready, userId, navigate]);
-
-  useEffect(() => {
-    if (!ready || !userId) return;
-    init();
-    return () => cleanup();
-  }, [ready, userId, init, cleanup]);
-
-  if (!ready || !userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <TopBar />
-      <AnnouncementBanner />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 min-w-0 p-5 space-y-5">
-          <IntegrationWidgets />
-          <MetricCards />
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3"><SignalsTable /></div>
-            <div className="lg:col-span-2"><FearGreedGauge /></div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3"><AssetHeatmap /></div>
-            <div className="lg:col-span-2"><BtcDominance /></div>
-          </div>
-
-          <DnaPanel />
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3"><AlertsFeed /></div>
-            <div className="lg:col-span-2"><Sentiment /></div>
-          </div>
-
-          <PerformanceChart />
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3"><MarketCalendar /></div>
-            <div className="lg:col-span-2"><QuickActions /></div>
-          </div>
-        </main>
-      </div>
-
-      <LiveToasts />
-      <SignalDrawer />
-      <CommandPalette />
-    </div>
-  );
+  useEffect(() => { if (ready && !userId) navigate({ to: "/login" }); }, [ready, userId, navigate]);
+  useEffect(() => { if (!ready || !userId) return; init(); return () => cleanup(); }, [ready, userId, init, cleanup]);
+  if (!ready || !userId) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
+  return <div className="min-h-screen bg-background text-foreground"><TopBar /><AnnouncementBanner /><div className="flex"><LeftSidebar /><main className="flex-1 min-w-0 p-5 space-y-5"><IntegrationWidgets /><MetricCards /><div className="grid grid-cols-1 lg:grid-cols-5 gap-5"><div className="lg:col-span-3"><SignalsTable /></div><div className="lg:col-span-2"><FearGreedGauge /></div></div><div className="grid grid-cols-1 lg:grid-cols-5 gap-5"><div className="lg:col-span-3"><AssetHeatmap /></div><div className="lg:col-span-2"><BtcDominance /></div></div><DnaPanel /><div className="grid grid-cols-1 lg:grid-cols-5 gap-5"><div className="lg:col-span-3"><AlertsFeed /></div><div className="lg:col-span-2"><Sentiment /></div></div><PerformanceChart /><div className="grid grid-cols-1 lg:grid-cols-5 gap-5"><div className="lg:col-span-3"><MarketCalendar /></div><div className="lg:col-span-2"><QuickActions /></div></div></main></div><LiveToasts /><SignalDrawer /><CommandPalette /></div>;
 }
