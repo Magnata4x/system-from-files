@@ -7,7 +7,7 @@ import { useDashboardStore } from "@/lib/dashboard-store";
 import { DataStatusBadge } from "./data-status";
 
 export function MetricCards() {
-  const { prices, global, loading, error, lastUpdate, status } = useMarketData();
+  const { prices, global, loading, error, status, metadataStatus } = useMarketData();
   const signals = useDashboardStore((s) => s.signals);
   const signalsLoading = useDashboardStore((s) => s.signalsLoading);
   const manip = useDashboardStore((s) => s.manipAlerts);
@@ -69,8 +69,8 @@ export function MetricCards() {
         value={loading && !global ? "…" : trendLabel}
         sub={total ? up + " de " + total + " ativos em alta" : "Indisponível"}
         source="CoinGecko global"
-        status={priceStatus}
-        updatedAt={lastUpdate}
+        status={metadataStatus === "loading" && !global ? "loading" : metadataStatus}
+        updatedAt={global?.updatedAt}
       />
       <Card
         index={3}
