@@ -5,7 +5,7 @@ import { useDnaProfile } from "@/hooks/useDnaProfile";
 export function DnaHeader() {
   const { data: dnaData, isLoading, isError } = useDnaProfile("me");
   if (isLoading) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">carregando DNA real…</div>;
-  if (isError || !dnaData) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">DNA indisponível — nenhum valor de demonstração é exibido.</div>;
+  if (isError || !dnaData) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">DNA indisponível — nenhum valor fictício é exibido.</div>;
 
   const gauges = [
     { label: "Consistency", value: dnaData.dnaConsistency == null ? null : Math.round(dnaData.dnaConsistency) },
