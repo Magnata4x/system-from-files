@@ -292,7 +292,7 @@ class MarketDataStore {
         ? {
             value: snapshot.fearGreed.value,
             label: snapshot.fearGreed.label,
-            history: this.state.fearGreed?.history ?? [],
+            history: snapshot.fearGreed.history,
             updatedAt: snapshot.fearGreed.updatedAt,
           }
         : this.state.fearGreed;
