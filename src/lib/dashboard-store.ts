@@ -56,6 +56,26 @@ interface DashboardState {
   setCmdkOpen: (v: boolean) => void;
 }
 
+
+export type DashboardDataStatus = "loading" | "ok" | "stale" | "unavailable";
+
+export function selectSignalsStatus(s: DashboardState): DashboardDataStatus {
+  if (s.signalsLoading && s.signals.length === 0) return "loading";
+  if (s.signalsError && s.signals.length === 0) return "unavailable";
+  if (s.signalsStale) return "stale";
+  return "ok";
+}
+
+export function selectManipulationStatus(s: DashboardState): DashboardDataStatus {
+  if (s.manipLoading && s.manipAlerts.length === 0) return "loading";
+  if (s.manipError && s.manipAlerts.length === 0) return "unavailable";
+  return "ok";
+}
+
+export function selectHasActiveManipulationAlerts(s: DashboardState): boolean {
+  return s.manipAlerts.some((alert) => alert.severity === "HIGH" || alert.severity === "MEDIUM");
+}
+
 /** Ids de sinais já vistos — usados para emitir toast só de novidade real. */
 let seenSignalIds: Set<string> | null = null;
 
