@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { DnaPanel } from "./dna-panel";
@@ -7,7 +8,7 @@ import { useDnaStats } from "@/hooks/useDnaStats";
 vi.mock("@/hooks/useDnaProfile", () => ({ useDnaProfile: vi.fn() }));
 vi.mock("@/hooks/useDnaStats", () => ({ useDnaStats: vi.fn() }));
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
 
 const mockedProfile = vi.mocked(useDnaProfile);
