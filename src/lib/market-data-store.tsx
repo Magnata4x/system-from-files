@@ -246,7 +246,7 @@ class MarketDataStore {
         error: null,
         status: "ok",
         lastUpdate: new Date(latest),
-        lastTickAt: latest,
+        lastTickAt: new Date(latest),
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -316,9 +316,9 @@ class MarketDataStore {
     };
 
     socket.onmessage = (event) => {
-      let payload: { data?: BinanceTicker } | BinanceTicker;
-      try { payload = JSON.parse(event.data as string) as { data?: BinanceTicker } | BinanceTicker; } catch { return; }
-      const ticker = "data" in payload ? payload.data : payload;
+      let payload: { data?: BinanceTicker };
+      try { payload = JSON.parse(event.data as string) as { data?: BinanceTicker }; } catch { return; }
+      const ticker = payload.data;
       if (!ticker) return;
       const price = normalizeBinanceTicker(ticker);
       if (!price) return;
@@ -330,7 +330,7 @@ class MarketDataStore {
         error: null,
         status: "ok",
         lastUpdate: price.lastUpdated,
-        lastTickAt: tickAt,
+        lastTickAt: new Date(tickAt),
       });
     };
 
