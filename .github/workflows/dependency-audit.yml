@@ -8,6 +8,9 @@ on:
     - cron: '0 9 * * 1' # toda segunda às 9h UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -20,6 +23,20 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Refresh package lock for Phase 0
+        if: github.ref == 'refs/heads/phase-0-dashboard-real-data' && !contains(github.event.head_commit.message, 'chore: refresh npm lockfile security fixes')
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts
+          if git diff --quiet -- package-lock.json; then
+            echo "No package-lock changes were produced."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: refresh npm lockfile security fixes"
+          git push origin HEAD:phase-0-dashboard-real-data
 
       - name: Run npm audit (moderate+)
         # Permite o job continuar se houver advisories — falha apenas em high/critical.
