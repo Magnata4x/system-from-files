@@ -36,4 +36,29 @@ jobs:
       - name: Diagnose email queue process test
         continue-on-error: true
         run: npx vitest run src/routes/lovable/email/queue/__tests__/process.test.ts
-      - run: npm run test
+      - name: Full Vitest suite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          npx vitest run --reporter=json --outputFile=.vitest-results.json
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            node - <<'NODE'
+            const fs = require('node:fs')
+            const report = JSON.parse(fs.readFileSync('.vitest-results.json', 'utf8'))
+            const failures = []
+            for (const file of report.testResults ?? []) {
+              for (const test of file.assertionResults ?? []) {
+                if (test.status === 'failed') {
+                  failures.push({ file: file.name, test: test.fullName, message: test.failureMessages?.join('\n').slice(0, 4000) ?? 'failure' })
+                }
+              }
+            }
+            const suites = (report.testResults ?? []).filter((file) => file.status === 'failed').map((file) => file.name)
+            const body = ['### Vitest failure diagnostics', '', `Failed suites: ${suites.length}`, suites.map((s) => `- ${s}`).join('\n'), '', ...failures.map((f) => `#### ${f.test}\n\`${f.file}\`\n\n\`\`\`\n${f.message}\n\`\`\``)].join('\n')
+            fs.writeFileSync('.vitest-failure-comment.md', body)
+            NODE
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file .vitest-failure-comment.md
+          fi
+          exit "$status"
