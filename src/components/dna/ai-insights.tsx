@@ -30,24 +30,19 @@ const TONE = {
 };
 
 export function AiInsights() {
-  const { data, isLoading } = useDnaStats();
+  const { data, isLoading, isError } = useDnaStats();
   const live = data?.hasData && data.insights.length > 0;
   const items = data?.insights ?? [];
-  if (!live) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Insights indisponíveis — não há dados reais suficientes.</div>;
+  if (isLoading) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">analisando histórico real…</div>;
+  if (isError || !live) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Insights indisponíveis — não há dados reais suficientes.</div>;
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">AI behavioral insights</h2>
-          <p className="text-xs text-muted-foreground">
-            {live
-              ? `Padrões detectados em ${data!.totalTrades} operações reais.`
-              : isLoading
-                ? "Analisando seu histórico…"
-                : "Sem histórico suficiente — exemplo demonstrativo."}
-          </p>
-        </div>
+          <p className="text-xs text-muted-foreground">Padrões detectados em {data!.totalTrades} operações reais · janela {data!.periodDays} dias.</p>
+     </div>
         <span
           className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${
             live
