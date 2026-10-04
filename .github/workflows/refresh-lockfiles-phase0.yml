@@ -1,42 +1,10 @@
 name: refresh-lockfiles-phase0
 
 on:
-  push:
-    branches: [phase-0-dashboard-real-data]
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: phase-0-dashboard-real-data
-          fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Regenerate lockfiles
-        run: |
-          bun install --lockfile-only
-          npm install --package-lock-only --ignore-scripts
-
-      - name: Commit lockfiles
-        run: |
-          if git diff --quiet -- package-lock.json bun.lock; then
-            echo "No lockfile changes."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json bun.lock
-          git commit -m "chore: refresh lockfiles for security fixes"
-          git push origin HEAD:phase-0-dashboard-real-data
+      - run: echo "Temporary Phase 0 lockfile refresh completed; this workflow is intentionally manual-only."
