@@ -1,5 +1,4 @@
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
-import { RADAR } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useMemo, useState } from "react";
 import { Switch } from "@/components/ui/switch";
@@ -19,13 +18,11 @@ export function DnaRadar() {
   const [animKey, setAnimKey] = useState(0);
 
   const { data: stats } = useDnaStats();
-  const live = !!stats?.hasData && stats.radar.length > 0;
+  if (!stats?.hasData || stats.radar.length === 0) {
+    return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Radar indisponível — sem dados reais suficientes.</div>;
+  }
 
-  const data = useMemo(
-    () =>
-      (live ? stats!.radar : RADAR).map((r) => ({ ...r, top: TOP_TRADERS[r.axis] ?? 85 })),
-    [live, stats],
-  );
+  const data = stats.radar.map((r) => ({ ...r, top: TOP_TRADERS[r.axis] }));
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5">
@@ -33,7 +30,7 @@ export function DnaRadar() {
         <div>
           <h2 className="text-sm font-semibold">DNA radar</h2>
           <p className="text-xs text-muted-foreground">
-            {live ? "Seu DNA real vs benchmark institucional" : "Exemplo demonstrativo vs benchmark institucional"}
+            Seu DNA real vs benchmark institucional
           </p>
         </div>
         <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
