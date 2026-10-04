@@ -76,7 +76,7 @@ export function useLivePrices(): UseLivePricesReturn {
         window.location.reload();
         return;
       }
-      setError("Falha ao buscar preços. Usando cache.");
+      setError("Falha ao atualizar dados de mercado.");
     } finally {
       setLoading(false);
     }
