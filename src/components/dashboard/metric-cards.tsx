@@ -12,7 +12,7 @@ export function MetricCards() {
   const signalsLoading = useDashboardStore((s) => s.signalsLoading);
   const manip = useDashboardStore((s) => s.manipAlerts);
   const total = Object.keys(prices).length;
-  const up = Object.values(prices).filter((p) => p.change24h > 0).length;
+  const up = Object.values(prices).filter((p) => p.change24h != null && p.change24h > 0).length;
   const trend = global?.marketCapChange24h;
   const trendLabel =
     trend == null ? "Indisponível" : trend >= 1 ? "Bullish" : trend <= -1 ? "Bearish" : "Neutral";
@@ -62,7 +62,7 @@ export function MetricCards() {
         sub={total ? up + " de " + total + " ativos em alta" : "Indisponível"}
         source="CoinGecko global"
         status={!global ? (metadataStatus === "loading" ? "loading" : "unavailable") : metadataStatus}
-        updatedAt={global?.updatedAt}
+        updatedAt={global?.updatedAt != null ? new Date(global.updatedAt) : null}
       />
       <Card
         index={3}
