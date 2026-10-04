@@ -5,7 +5,7 @@ import { DataStatusBadge } from "@/components/dashboard/data-status";
 export function Sentiment() {
   const { data, isLoading, isError, isStale, dataUpdatedAt } = useSentiment();
   const status = isLoading ? "loading" : isError ? "unavailable" : isStale ? "stale" : "ok";
-  const updatedAt = data?.updatedAt ?? (dataUpdatedAt || null);
+  const updatedAt = data?.updatedAt ? new Date(data.updatedAt) : (dataUpdatedAt || null);
   return (
     <div className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-center justify-between">
