@@ -24,3 +24,5 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+<!-- teste-sync-claude 2026-10-04 -->
