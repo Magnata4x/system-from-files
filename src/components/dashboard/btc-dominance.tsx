@@ -1,11 +1,12 @@
-import { Area, AreaChart, ResponsiveContainer, YAxis, Tooltip } from "recharts";
-import { btcDomSeries } from "@/lib/dashboard-data";
+
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { DataStatusBadge } from "./data-status";
 
 export function BtcDominance() {
-  const { global } = useLivePrices();
-  const dom = global?.btcDominance ?? 52.4;
-  const change = global?.marketCapChange24h ?? 0;
+  const { global, loading, error, lastUpdate } = useLivePrices();
+  const dom = global?.btcDominance;
+  const change = global?.marketCapChange24h;
+  const status = loading && !global ? "loading" : !global || dom == null ? "unavailable" : error ? "stale" : "ok";
   const up = change >= 0;
 
   return (
@@ -13,16 +14,18 @@ export function BtcDominance() {
       <div className="flex items-baseline justify-between">
         <div>
           <h3 className="text-[15px] font-medium text-foreground">BTC Dominance</h3>
-          <p className="text-[11px] text-muted-foreground">Last 30 days</p>
+          <DataStatusBadge source="CoinGecko" updatedAt={lastUpdate} status={status} />
         </div>
         <div className="text-right">
-          <div className="text-[22px] font-semibold tabular-nums text-foreground">{dom.toFixed(1)}%</div>
+          <div className="text-[22px] font-semibold tabular-nums text-foreground">{dom != null ? dom.toFixed(1) + "%" : "—"}</div>
           <div className="text-[11px] font-medium" style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
-            {up ? "↑" : "↓"} {Math.abs(change).toFixed(2)}% market cap 24h
+            {change != null ? (up ? "↑" : "↓") + " " + Math.abs(change).toFixed(2) + "% market cap 24h" : "Indisponível"}
           </div>
         </div>
       </div>
-      <div className="flex-1 min-h-[180px] mt-2 -mx-2">
+      <div className="flex-1 min-h-[180px] mt-2 rounded-lg border border-border bg-secondary/20 flex items-center justify-center text-[11px] text-muted-foreground">Histórico de 30 dias indisponível nesta fase. Nenhum valor simulado é exibido.</div>
+      {/* Histórico real será ligado na Fase 3. */}
+      <div className="hidden">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={btcDomSeries}>
             <defs>
