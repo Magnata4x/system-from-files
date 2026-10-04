@@ -40,11 +40,13 @@ export interface GlobalMetricsDTO {
   totalVolume: number;
   btcDominance: number;
   marketCapChange24h: number;
+  updatedAt: number | null;
 }
 
 export interface FearGreedDTO {
   value: number;
   label: string;
+  updatedAt: number | null;
 }
 
 export interface MarketSnapshotDTO {
@@ -52,6 +54,7 @@ export interface MarketSnapshotDTO {
   global: GlobalMetricsDTO | null;
   fearGreed: FearGreedDTO | null;
   fetchedAt: number;
+  metadataUpdatedAt: number | null;
 }
 
 const PRICES_TTL = Number(process.env.CACHE_TTL_PRICES_SECONDS ?? 5);
@@ -99,11 +102,14 @@ async function loadPricesAndGlobal(): Promise<{
     const totalVolume = (g.total_volume as Record<string, number> | undefined)?.usd ?? 0;
     const btcDominance =
       (g.market_cap_percentage as Record<string, number> | undefined)?.btc ?? 0;
+    const dateHeader = globalRes.value.headers.get("date");
+    const headerTime = dateHeader ? Date.parse(dateHeader) : NaN;
     global = {
       totalMarketCap,
       totalVolume,
       btcDominance,
       marketCapChange24h: Number(g.market_cap_change_percentage_24h_usd ?? 0),
+      updatedAt: Number.isFinite(headerTime) ? headerTime : Date.now(),
     };
   }
 
@@ -148,12 +154,17 @@ async function loadPricesAndGlobal(): Promise<{
 }
 
 async function loadFearGreed(): Promise<FearGreedDTO | null> {
-  const res = await fetch("https://api.alternative.me/fng/?limit=1");
+  const res = await fetch("https://api.alternative.me/fng/?limit=7");
   if (!res.ok) return null;
   const fg = ((await res.json()) as { data?: Array<{ value: string; value_classification: string }> })
     .data?.[0];
   if (!fg) return null;
-  return { value: parseInt(fg.value, 10), label: fg.value_classification };
+  const updatedAt = Number(fg.timestamp) * 1000;
+  return {
+    value: parseInt(fg.value, 10),
+    label: fg.value_classification,
+    updatedAt: Number.isFinite(updatedAt) && updatedAt > 0 ? updatedAt : null,
+  };
 }
 
 export const getMarketSnapshot = createServerFn({ method: "GET" }).handler(
@@ -162,11 +173,16 @@ export const getMarketSnapshot = createServerFn({ method: "GET" }).handler(
       cachedJson("market:prices+global", PRICES_TTL, loadPricesAndGlobal),
       cachedJson("market:feargreed", SENTIMENT_TTL, loadFearGreed),
     ]);
+    const metadataUpdatedAt = Math.max(
+      pricesAndGlobal.global?.updatedAt ?? 0,
+      fearGreed?.updatedAt ?? 0,
+    );
     return {
       prices: pricesAndGlobal.prices,
       global: pricesAndGlobal.global,
       fearGreed,
       fetchedAt: Date.now(),
+      metadataUpdatedAt: metadataUpdatedAt > 0 ? metadataUpdatedAt : null,
     };
   },
 );
