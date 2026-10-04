@@ -1,4 +1,4 @@
-name: phase-02-validation
+name: ci
 
 on:
   pull_request:
@@ -22,6 +22,17 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm run build
-      - run: 'npx eslint --rule "prettier/prettier: off" src/lib/market-data-store.tsx src/lib/market.functions.ts src/lib/market-data-store.test.ts src/routes/__root.tsx src/routes/_authenticated.tsx src/components/dashboard/btc-dominance.tsx src/components/dashboard/fear-greed-gauge.tsx src/components/dashboard/asset-heatmap.tsx src/components/dashboard/metric-cards.tsx src/components/dashboard/top-bar.tsx'
+      - run: >-
+          npx eslint --rule "prettier/prettier: off"
+          src/lib/dashboard-store.ts
+          src/routes/_authenticated/dashboard.tsx
+          src/lib/market-data-store.tsx
+          src/lib/market-data-store.test.ts
+          src/lib/market.functions.ts
+          src/lib/market-data.ts
+          src/lib/market-symbols.ts
+          src/lib/data-status.ts
+          src/components/dashboard/data-status.tsx
+          src/hooks/useLivePrices.ts
       - run: npx vitest run src/lib/market-data-store.test.ts
       - run: npm run test
