@@ -52,6 +52,7 @@ export interface MarketDataState {
   lastUpdate: Date | null;
   lastTickAt: Date | null;
   metadataUpdatedAt: Date | null;
+  metadataFetchedAt: Date | null;
   metadataStatus: MetadataStatus;
   refresh: () => Promise<void>;
 }
@@ -128,13 +129,13 @@ export function normalizeBinanceTicker(ticker: BinanceTicker): CoinPrice | null 
 }
 
 export function deriveMetadataStatus(
-  metadataUpdatedAt: number | null,
+  lastSuccessAt: number | null,
   hasMetadata: boolean,
   now = Date.now(),
 ): MetadataStatus {
   if (!hasMetadata) return "unavailable";
-  if (metadataUpdatedAt == null) return "stale";
-  return now - metadataUpdatedAt > METADATA_STALE_AFTER_MS ? "stale" : "ok";
+  if (lastSuccessAt == null) return "stale";
+  return now - lastSuccessAt > METADATA_STALE_AFTER_MS ? "stale" : "ok";
 }
 
 export function deriveMarketStatus(
@@ -159,6 +160,7 @@ class MarketDataStore {
     lastUpdate: null,
     lastTickAt: null,
     metadataUpdatedAt: null,
+    metadataFetchedAt: null,
     metadataStatus: "loading",
     refresh: () => this.refresh(),
   };
@@ -315,6 +317,7 @@ class MarketDataStore {
         global,
         fearGreed,
         metadataUpdatedAt,
+        metadataFetchedAt: new Date(),
         metadataStatus: complete ? "ok" : hasAny ? "stale" : "unavailable",
       });
     } catch (error) {
@@ -376,7 +379,7 @@ class MarketDataStore {
   private updateStatus() {
     const hasPrices = Object.keys(this.state.prices).length > 0;
     const metadataStatus = deriveMetadataStatus(
-      this.state.metadataUpdatedAt?.getTime() ?? null,
+      this.state.metadataFetchedAt?.getTime() ?? null,
       Boolean(this.state.global || this.state.fearGreed),
     );
     if (metadataStatus !== this.state.metadataStatus && metadataStatus !== "loading") {
