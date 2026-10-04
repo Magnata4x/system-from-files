@@ -3,14 +3,19 @@ import { motion } from "framer-motion";
 import { ScoreBadge } from "./score-badge";
 import { useCountUp } from "@/lib/use-count-up";
 import { useMarketData } from "@/lib/market-data-store";
-import { useDashboardStore } from "@/lib/dashboard-store";
+import { useDashboardStore, selectManipulationStatus, selectSignalsStatus } from "@/lib/dashboard-store";
 import { DataStatusBadge } from "./data-status";
 
 export function MetricCards() {
   const { prices, global, loading, metadataStatus } = useMarketData();
   const signals = useDashboardStore((s) => s.signals);
+  const signalsError = useDashboardStore((s) => s.signalsError);
+  const signalStatus = useDashboardStore(selectSignalsStatus);
   const signalsLoading = useDashboardStore((s) => s.signalsLoading);
   const manip = useDashboardStore((s) => s.manipAlerts);
+  const manipLoading = useDashboardStore((s) => s.manipLoading);
+  const manipError = useDashboardStore((s) => s.manipError);
+  const manipStatus = useDashboardStore(selectManipulationStatus);
   const total = Object.keys(prices).length;
   const up = Object.values(prices).filter((p) => p.change24h != null && p.change24h > 0).length;
   const trend = global?.marketCapChange24h;
@@ -29,6 +34,22 @@ export function MetricCards() {
     null as (typeof signals)[number] | null,
   );
   const high = signals.filter((s) => s.score >= 80).length;
+  const signalSub = signalsLoading
+    ? "Carregando…"
+    : signalsError && !signals.length
+      ? signalsError
+      : signalsError
+        ? "Última leitura válida · " + high + " high score (≥80)"
+        : signals.length
+          ? high + " high score (≥80)"
+          : "Nenhum sinal ativo";
+  const manipSub = manipLoading
+    ? "Carregando…"
+    : manipError && !manip.length
+      ? manipError
+      : manip.length
+        ? [...new Set(manip.map((a) => a.asset.replace("/USDT", "")))].slice(0, 3).join(" · ")
+        : "Nenhum alerta ativo";
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <Card
@@ -37,9 +58,9 @@ export function MetricCards() {
         color="#378ADD"
         label="Active Signals"
         count={signalsLoading ? undefined : signals.length}
-        sub={signalsLoading ? "Carregando…" : high + " high score (≥80)"}
+        sub={signalSub}
         source="Internal API"
-        status={signalsLoading ? "loading" : "ok"}
+        status={signalStatus}
       />
       <Card
         index={1}
@@ -49,9 +70,9 @@ export function MetricCards() {
         node={
           top ? <ScoreBadge score={top.score} size="lg" /> : <span className="text-[28px]">—</span>
         }
-        sub={top ? top.asset + " · " + top.direction + " · " + top.tf : "Indisponível"}
+        sub={top ? top.asset + " · " + top.direction + " · " + top.tf : signalsLoading ? "Carregando…" : signalsError ? signalsError : "Nenhum sinal ativo"}
         source="Internal API"
-        status={signalsLoading ? "loading" : "ok"}
+        status={signalStatus}
       />
       <Card
         index={2}
@@ -70,13 +91,9 @@ export function MetricCards() {
         color="#E24B4A"
         label="Manipulation Alerts"
         count={manip.length}
-        sub={
-          manip.length
-            ? [...new Set(manip.map((a) => a.asset.replace("/USDT", "")))].slice(0, 3).join(" · ")
-            : "Nenhum alerta ativo"
-        }
+        sub={manipSub}
         source="Internal API"
-        status={manip.length ? "ok" : "unavailable"}
+        status={manipStatus}
       />
     </div>
   );
