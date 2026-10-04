@@ -59,16 +59,7 @@ export function DnaHeader() {
               {dnaData.style === "aggressive" ? "AGGRESSIVE TRADER" : dnaData.style === "conservative" ? "CONSERVATIVE TRADER" : dnaData.style === "moderate" ? "BALANCED TRADER" : "INDISPONÍVEL"}
             </div>
             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
-              <span>Consistency ring · {consistency}% filled</span>
-              {hasLive ? (
-                <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-500/40 text-emerald-300 bg-emerald-500/10">
-                  ao vivo
-                </span>
-              ) : (
-                <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-border text-muted-foreground bg-muted/20">
-                  demo
-                </span>
-              )}
+              <span>Consistency ring · {consistency}% filled</span>              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-emerald-500/40 text-emerald-300 bg-emerald-500/10">ao vivo</span>
             </div>
           </div>
         </div>
