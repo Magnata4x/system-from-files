@@ -4,7 +4,7 @@ type AlertBannerProps = {
   count: number;
   assets: string[];
   riskLevel?: string | null;
-  updatedAt?: string | null;
+  updatedAt?: Date | number | string | null;
   onDismiss: () => void;
 };
 
