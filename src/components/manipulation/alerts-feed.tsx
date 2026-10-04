@@ -1,4 +1,4 @@
-import { ALERTS, type Alert, type Severity } from "@/lib/manipulation-data";
+import { type Alert, type Severity } from "@/lib/manipulation-data";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { ScoreRing } from "./score-ring";
@@ -9,8 +9,8 @@ const sevStyle: Record<Severity, string> = {
   LOW: "bg-zinc-500/15 text-zinc-300 border-zinc-500/40",
 };
 
-export function AlertsFeed({ alerts }: { alerts?: Alert[] } = {}) {
-  const list = alerts && alerts.length ? alerts : ALERTS;
+export function AlertsFeed({ alerts = [] }: { alerts?: Alert[] }) {
+  const list = alerts;
   const [open, setOpen] = useState<string | null>(list[0]?.id ?? null);
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5">

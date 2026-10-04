@@ -10,7 +10,7 @@ import { SmartMoney } from "@/components/manipulation/smart-money";
 import { LiquidityMap } from "@/components/manipulation/liquidity-map";
 import { AggressionAnalysis } from "@/components/manipulation/aggression-analysis";
 import { HistoricalLog } from "@/components/manipulation/historical-log";
-import { ALERTS as MOCK_ALERTS, type Alert } from "@/lib/manipulation-data";
+import { type Alert } from "@/lib/manipulation-data";
 import {
   manipulationAdapter,
   mapAlert,
@@ -18,6 +18,7 @@ import {
 } from "@/adapters/backend/manipulation.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { useBinanceManipulationStream } from "@/hooks/useBinanceManipulationStream";
+import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 const PAGE_SIZES = [10, 20, 50, 100];
 
@@ -70,6 +71,7 @@ function ManipulationPage() {
     isFetching: alertsFetching,
     error: alertsError,
     refetch: refetchAlerts,
+    dataUpdatedAt: alertsUpdatedAt,
   } = useQuery({
     queryKey: alertsKey,
     queryFn: () =>
@@ -137,8 +139,20 @@ function ManipulationPage() {
 
   const hasBackendAlerts = Boolean(liveAlerts && liveAlerts.length > 0);
   const isEmpty = Boolean(liveAlerts && liveAlerts.length === 0);
-  const alerts = hasBackendAlerts ? liveAlerts! : alertsError || isEmpty ? [] : MOCK_ALERTS;
-  const activeAssets = Array.from(new Set(alerts.map((a) => a.asset)));
+  const alerts = liveAlerts ?? [];
+  const activeAlerts = alerts.filter((a) => a.severity === "HIGH" || a.severity === "MEDIUM");
+  const activeAssets = Array.from(new Set(activeAlerts.map((a) => a.asset)));
+  const snapshotRiskLevel = snapshot?.riskLevel ? String(snapshot.riskLevel).toUpperCase() : null;
+  const elevatedRisk = snapshotRiskLevel === "HIGH" || snapshotRiskLevel === "MEDIUM";
+  const manipulationStatus =
+    alertsPending || snapshotPending
+      ? "loading"
+      : alertsError || snapshotError
+        ? "unavailable"
+        : alertsFetching || !snapshot?.updatedAt
+          ? "stale"
+          : "ok";
+  const manipulationUpdatedAt = snapshot?.updatedAt ?? (alertsUpdatedAt || null);
   const canLoadMore = hasBackendAlerts && liveAlerts!.length >= limit && limit < 200;
 
   const loadMore = useCallback(() => {
@@ -170,13 +184,26 @@ function ManipulationPage() {
         <main className="flex-1 min-w-0 p-5 space-y-5">
           <header>
             <h1 className="text-xl font-semibold tracking-tight">Manipulation Radar</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Real-time institutional surveillance — stop hunts, spoofing, liquidity sweeps, and smart-money flow.
-            </p>
+            <div className="flex flex-wrap items-center gap-3 mt-1">
+              <p className="text-sm text-muted-foreground">
+                Real-time institutional surveillance — stop hunts, spoofing, liquidity sweeps, and smart-money flow.
+              </p>
+              <DataStatusBadge
+                source="Manipulation · backend"
+                updatedAt={manipulationUpdatedAt ? new Date(manipulationUpdatedAt) : null}
+                status={manipulationStatus}
+              />
+            </div>
           </header>
 
-          {!dismissed && alerts.length > 0 && (
-            <AlertBanner count={alerts.length} assets={activeAssets} onDismiss={() => setDismissed(true)} />
+          {!dismissed && (activeAlerts.length > 0 || elevatedRisk) && (
+            <AlertBanner
+              count={activeAlerts.length}
+              assets={activeAssets.length ? activeAssets : snapshot?.symbol ? [snapshot.symbol] : []}
+              riskLevel={snapshotRiskLevel}
+              updatedAt={snapshot?.updatedAt ? new Date(snapshot.updatedAt) : null}
+              onDismiss={() => setDismissed(true)}
+            />
           )}
 
           <div className="rounded-xl border border-border bg-card/40 p-4 flex flex-wrap items-end gap-3">
@@ -253,9 +280,13 @@ function ManipulationPage() {
                     Updated {new Date(snapshot.updatedAt).toLocaleTimeString()}
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-1 rounded border border-border">
-                  RISK {String(snapshot.riskLevel).toUpperCase()}
-                </span>
+                {(String(snapshot.riskLevel).toUpperCase() === "HIGH" ||
+                  String(snapshot.riskLevel).toUpperCase() === "MEDIUM" ||
+                  String(snapshot.riskLevel).toUpperCase() === "LOW") && (
+                  <span className="text-[10px] font-bold px-2 py-1 rounded border border-border">
+                    RISK {String(snapshot.riskLevel).toUpperCase()}
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Stat label="Alerts 24h" value={String(snapshot.last24h?.alertCount ?? 0)} />

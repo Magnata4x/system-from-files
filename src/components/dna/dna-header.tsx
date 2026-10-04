@@ -2,10 +2,13 @@ import { motion } from "framer-motion";
 import { CircularGauge } from "./circular-gauge";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useAuth } from "@/lib/auth";
+import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 export function DnaHeader() {
   const { session } = useAuth();
-  const { data: dnaData, isLoading } = useDnaProfile(session?.user?.id);
+  const { data: dnaData, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile(session?.user?.id);
+
+  const status = isLoading ? "loading" : isError ? "unavailable" : isStale ? "stale" : "ok";
 
   if (isLoading) {
     return (
@@ -42,6 +45,9 @@ export function DnaHeader() {
 
   return (
     <div className="rounded-xl border border-border bg-gradient-to-br from-card/60 to-card/20 p-5">
+      <div className="flex justify-end mb-3">
+        <DataStatusBadge source="DNA · backend" updatedAt={dataUpdatedAt || null} status={status} />
+      </div>
       <div className="flex flex-col lg:flex-row lg:items-center gap-6">
         <div className="flex items-center gap-4">
           <div className="relative" style={{ width: size, height: size }}>

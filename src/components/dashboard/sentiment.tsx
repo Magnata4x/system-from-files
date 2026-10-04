@@ -1,18 +1,24 @@
 import { Loader2, AlertTriangle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useSentiment } from "@/hooks/useSentiment";
+import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 export function Sentiment() {
-  const { data, isLoading, isError } = useSentiment();
+  const { data, isLoading, isError, isStale, dataUpdatedAt } = useSentiment();
+  const status = isLoading ? "loading" : isError ? "unavailable" : isStale ? "stale" : "ok";
+  const updatedAt = data?.updatedAt ? new Date(data.updatedAt) : (dataUpdatedAt || null);
   return (
     <div className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-[15px] font-medium">Sentiment snapshot</h3>
+          <h3 className="text-[15px] font-medium">Sentiment de mercado</h3>
           <p className="text-[10px] text-muted-foreground mt-1">
-            Leitura real calculada a partir do mercado.
+            Leitura real baseada em preço, variação e momentum de mercado.
           </p>
         </div>
-        {data && <span className="text-[22px] font-semibold tabular-nums">{data.overall}/100</span>}
+        <div className="flex flex-col items-end gap-1">
+          <DataStatusBadge source="Sentiment · mercado" updatedAt={updatedAt} status={status} />
+          {data && <span className="text-[22px] font-semibold tabular-nums">{data.overall}/100</span>}
+        </div>
       </div>
       {isLoading && (
         <div className="flex items-center gap-2 mt-4 text-[12px] text-muted-foreground">
