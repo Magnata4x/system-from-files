@@ -9,25 +9,9 @@ function colorFor(v: number) {
 }
 
 type Cell = { date: Date; value: number; trades: number; pnl: number };
-  if (cell.live) {
-    return { trades: cell.trades ?? 0, pnl: Math.round(cell.pnl ?? 0), winRate: 0 };
-  }
-  // deterministic pseudo-stats from value + date
-  const seed = cell.date.getDate() + cell.date.getMonth() * 31;
-  const rnd = (n: number) => ((seed * (n + 7)) % 100) / 100;
-  if (cell.value === 0) return { trades: 0, pnl: 0, winRate: 0 };
-  if (cell.value === -1) {
-    const trades = 2 + Math.floor(rnd(1) * 4);
-    return { trades, pnl: -(50 + Math.floor(rnd(2) * 280)), winRate: Math.floor(rnd(3) * 35) };
-  }
-  const trades = cell.value + 1 + Math.floor(rnd(1) * 3);
-  const pnl = cell.value * (80 + Math.floor(rnd(2) * 220));
-  const winRate = 55 + cell.value * 6 + Math.floor(rnd(3) * 10);
-  return { trades, pnl, winRate: Math.min(98, winRate) };
-}
 
 export function BehavioralHeatmap() {
-  const { data: dna } = useDnaStats();
+  const { data: dna, isLoading, isError } = useDnaStats();
   const data = useMemo<Cell[]>(
     () => dna?.hasData ? dna.heatmap.map((h) => ({
       date: new Date(`${h.date}T00:00:00`),
@@ -38,7 +22,8 @@ export function BehavioralHeatmap() {
     [dna],
   );
   const [hover, setHover] = useState<{ cell: Cell; x: number; y: number } | null>(null);
-  if (!data.length) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Mapa comportamental indisponível — sem histórico real suficiente.</div>;
+  if (isLoading) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">carregando mapa comportamental real…</div>;
+  if (isError || !data.length) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Mapa comportamental indisponível — sem histórico real suficiente.</div>;
   const weeks: (Cell | null)[][] = [];
   let current: (Cell | null)[] = [];
   const first = data[0].date.getDay();
