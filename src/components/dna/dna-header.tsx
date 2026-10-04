@@ -1,26 +1,19 @@
 import { motion } from "framer-motion";
 import { CircularGauge } from "./circular-gauge";
-import { GAUGES } from "@/lib/dna-data";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
-import { useAuth } from "@/lib/auth";
 
 export function DnaHeader() {
-  const { session } = useAuth();
-  const { data: dnaData } = useDnaProfile(session?.user?.id);
+  const { data: dnaData, isLoading, isError } = useDnaProfile("me");
+  if (isLoading) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">carregando DNA real…</div>;
+  if (isError || !dnaData) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">DNA indisponível — nenhum valor de demonstração é exibido.</div>;
 
-  const hasLive =
-    !!dnaData && typeof dnaData === "object" && "dnaConsistency" in dnaData;
-
-  const gauges = hasLive
-    ? [
-        { label: "Consistency",       value: Math.round((dnaData as any).dnaConsistency       ?? GAUGES[0].value) },
-        { label: "Discipline",        value: Math.round((dnaData as any).dnaDiscipline        ?? GAUGES[1].value) },
-        { label: "Risk Control",      value: Math.round((dnaData as any).dnaRiskControl       ?? GAUGES[2].value) },
-        { label: "Timing",            value: Math.round((dnaData as any).dnaTiming            ?? GAUGES[3].value) },
-        { label: "Emotional Control", value: Math.round((dnaData as any).dnaEmotionalControl  ?? GAUGES[4].value) },
-      ]
-    : GAUGES;
-
+  const gauges = [
+    { label: "Consistency", value: Math.round(dnaData.dnaConsistency ?? 0) },
+    { label: "Discipline", value: Math.round(dnaData.dnaDiscipline ?? 0) },
+    { label: "Risk Control", value: Math.round(dnaData.dnaRiskControl ?? 0) },
+    { label: "Timing", value: Math.round(dnaData.dnaTiming ?? 0) },
+    { label: "Emotional Control", value: Math.round(dnaData.dnaEmotionalControl ?? 0) },
+  ];
   const consistency = gauges[0].value;
   const size = 88;
   const stroke = 4;
@@ -63,7 +56,7 @@ export function DnaHeader() {
           <div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider">Trader archetype</div>
             <div className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-[var(--brand-cyan)] to-purple-400 bg-clip-text text-transparent">
-              MOMENTUM TRADER
+              {dnaData.style === "aggressive" ? "AGGRESSIVE TRADER" : dnaData.style === "conservative" ? "CONSERVATIVE TRADER" : dnaData.style === "moderate" ? "BALANCED TRADER" : "INDISPONÍVEL"}
             </div>
             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
               <span>Consistency ring · {consistency}% filled</span>
