@@ -1,12 +1,7 @@
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 import { useDnaStats } from "@/hooks/useDnaStats";
-import { useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Trophy } from "lucide-react";
 
 export function DnaRadar() {
-
-
   const { data: stats } = useDnaStats();
   if (!stats?.hasData || stats.radar.length === 0) {
     return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Radar indisponível — sem dados reais suficientes.</div>;
@@ -20,7 +15,7 @@ export function DnaRadar() {
         <div>
           <h2 className="text-sm font-semibold">DNA radar</h2>
           <p className="text-xs text-muted-foreground">
-            Seu DNA real vs benchmark institucional
+            Seu DNA real
           </p>
         </div>
       </div>
@@ -51,12 +46,4 @@ export function DnaRadar() {
           stroke-dashoffset: 600;
           animation: dnaRadarDraw 1400ms ease-out forwards;
         }
-        .dna-radar-anim .recharts-layer > .recharts-radar:nth-child(2) .recharts-radar-polygon { animation-delay: 200ms; }
-        .dna-radar-anim .recharts-layer > .recharts-radar:nth-child(3) .recharts-radar-polygon { animation-delay: 400ms; }
-        @keyframes dnaRadarDraw {
-          to { stroke-dashoffset: 0; }
-        }
-      `}</style>
-    </div>
-  );
 }
