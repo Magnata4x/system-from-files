@@ -25,4 +25,4 @@ npm i
 npm run dev
 ```
 
-<!-- teste-sync-claude 2026-10-04 -->
+<!-- teste-sync-github-lovable 2026-10-04 12:00 -->
