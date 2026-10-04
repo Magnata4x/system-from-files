@@ -26,3 +26,4 @@ npm run dev
 ```
 
 <!-- teste-sync-github-lovable 2026-10-04 12:00 -->
+<!-- TESTE_EDICAO_GITHUB_LOVABLE_2026-10-04 -->
