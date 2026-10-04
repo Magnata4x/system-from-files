@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState, createContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useSyncExternalStore, type ReactNode } from "react";
 import {
   MARKET_ASSETS,
   MARKET_BINANCE_SYMBOLS,
@@ -151,10 +151,10 @@ class MarketDataStore {
   private metadataAt = 0;
   private visible = true;
 
-  subscribe(listener: () => void): () => void {
+  subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
-  }
+  };
 
   getSnapshot = (): MarketDataState => this.state;
 
@@ -372,22 +372,7 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
 export function useMarketData(): MarketDataState {
   const store = useContext(MarketDataContext);
   if (!store) throw new Error("useMarketData deve ser usado dentro de MarketDataProvider");
-  const subscribe = store.subscribe.bind(store);
-  return useSyncExternalStoreCompat(subscribe, store.getSnapshot);
-}
-
-function useSyncExternalStoreCompat(subscribe: (listener: () => void) => () => void, getSnapshot: () => MarketDataState) {
-  const [snapshot, setSnapshot] = useState(getSnapshot);
-  const snapshotRef = useRef(snapshot);
-  useEffect(() => {
-    const sync = () => {
-      const next = getSnapshot();
-      snapshotRef.current = next;
-      setSnapshot(next);
-    };
-    return subscribe(sync);
-  }, [getSnapshot, subscribe]);
-  return useMemo(() => snapshotRef.current, [snapshot]);
+  return useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
 }
 
 export const MARKET_STALE_AFTER_MS = STALE_AFTER_MS;
