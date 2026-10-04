@@ -102,7 +102,7 @@ describe("DnaPanel — dados honestos", () => {
       },
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof useDnaStats>);
+    } as any);
 
     render(<DnaPanel />);
 
@@ -110,6 +110,6 @@ describe("DnaPanel — dados honestos", () => {
     expect(screen.getByText("70")).toBeTruthy();
     expect(screen.getByText("60")).toBeTruthy();
     expect(screen.queryByText("91.0%")).toBeNull();
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("—")).toBeTruthy();
   });
 });
