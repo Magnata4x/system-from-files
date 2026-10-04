@@ -17,7 +17,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardStore } from "@/lib/dashboard-store";
-import { useBot4xStore, isBot4xCircuitBreakerTriggered } from "@/lib/bot4x-store";
+import { getEffectiveMode, useBot4xStore, isBot4xCircuitBreakerTriggered } from "@/lib/bot4x-store";
 import { useNotificationsStore, type NotifType } from "@/lib/notifications-store";
 import { useMarketData } from "@/lib/market-data-store";
 import { fearGreedColor } from "@/lib/fear-greed";
@@ -326,6 +326,7 @@ function Bot4xPill() {
   const profile = useBot4xStore((s) => s.profile);
   const pnl = useBot4xStore((s) => s.dailyPnlPct);
   const orders = useBot4xStore((s) => s.orders);
+  const effectiveMode = getEffectiveMode(mode);
 
   const breaker = isBot4xCircuitBreakerTriggered(pnl);
   const warn = pnl < -0.5 && !breaker;
@@ -343,7 +344,7 @@ function Bot4xPill() {
             className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
             style={{
               background:
-                mode === "REAL"
+                effectiveMode === "REAL"
                   ? "color-mix(in oklab, #E24B4A 18%, transparent)"
                   : "color-mix(in oklab, #1D9E75 18%, transparent)",
               color: mode === "REAL" ? "#E24B4A" : "#1D9E75",
@@ -375,7 +376,7 @@ function Bot4xPill() {
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-[11px]">
-            <Stat label="Mode" value={mode} />
+            <Stat label="Mode" value={effectiveMode} />
             <Stat label="Profile" value={profile.split("-")[0]} />
             <Stat
               label="PnL hoje"
