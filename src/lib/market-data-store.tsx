@@ -109,7 +109,7 @@ export function normalizeBinanceTicker(ticker: BinanceTicker): CoinPrice | null 
   if (!asset) return null;
 
   const price = parseNumber(ticker.lastPrice ?? ticker.c);
-  if (!(price > 0)) return null;
+  if (price == null || !(price > 0)) return null;
 
   return {
     id: asset.symbol.toLowerCase(),
@@ -124,7 +124,7 @@ export function normalizeBinanceTicker(ticker: BinanceTicker): CoinPrice | null 
     volume24h: parseNumber(ticker.quoteVolume ?? ticker.q),
     high24h: parseNumber(ticker.highPrice ?? ticker.h),
     low24h: parseNumber(ticker.lowPrice ?? ticker.l),
-    lastUpdated: new Date(parseNumber(ticker.eventTime ?? ticker.E) || Date.now()),
+    lastUpdated: new Date(parseNumber(ticker.eventTime ?? ticker.E) ?? Date.now()),
   };
 }
 
