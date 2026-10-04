@@ -11,9 +11,16 @@ const metrics = [
   ["emotionalControl", "Emotional"],
 ] as const;
 
+function formatNumber(value: number | null | undefined, digits = 0) {
+  return value == null ? "—" : value.toFixed(digits);
+}
+
 export function DnaPanel() {
   const profile = useDnaProfile("me");
   const stats = useDnaStats();
+  const hasProfile = profile.data?.hasProfile === true;
+  const hasStats = stats.data?.hasData === true;
+
   return (
     <div data-tour="dna-panel" className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-center justify-between gap-3 mb-4">
@@ -30,68 +37,90 @@ export function DnaPanel() {
           Abrir relatório →
         </Link>
       </div>
+
       {(profile.isLoading || stats.isLoading) && (
         <div className="flex items-center gap-2 text-[12px] text-muted-foreground py-3">
           <Loader2 className="size-3.5 animate-spin" /> carregando DNA…
         </div>
       )}
+
       {(profile.isError || stats.isError) && (
         <div className="flex items-center gap-2 text-[12px] text-[#E24B4A] py-3">
           <AlertTriangle className="size-3.5" /> Não foi possível carregar o DNA real agora.
         </div>
       )}
+
       {!profile.isLoading &&
         !stats.isLoading &&
         !profile.isError &&
         !stats.isError &&
-        (profile.data ? (
+        (hasProfile ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {metrics.map(([key, label]) => (
-                <Metric key={key} label={label} value={Number(profile.data?.[key] ?? 0)} />
+                <Metric
+                  key={key}
+                  label={label}
+                  value={profile.data?.[key] as number | null | undefined}
+                />
               ))}
             </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
               <Stat
                 label="Win rate"
-                value={`${Number(profile.data.avgWinRate ?? stats.data?.winRate ?? 0).toFixed(1)}%`}
+                value={hasStats ? `${formatNumber(stats.data?.winRate, 1)}%` : "—"}
               />
-              <Stat label="Operações" value={String(stats.data?.totalTrades ?? 0)} />
-              <Stat label="PnL médio" value={`${Number(stats.data?.avgPnlPct ?? 0).toFixed(2)}%`} />
+              <Stat
+                label="Operações"
+                value={hasStats ? String(stats.data?.totalTrades ?? "—") : "—"}
+              />
+              <Stat
+                label="PnL médio"
+                value={hasStats ? `${formatNumber(stats.data?.avgPnlPct, 2)}%` : "—"}
+              />
               <Stat
                 label="Drawdown"
-                value={`${Number(stats.data?.maxDrawdownPct ?? 0).toFixed(2)}%`}
+                value={hasStats ? `${formatNumber(stats.data?.maxDrawdownPct, 2)}%` : "—"}
               />
             </div>
-            {!stats.data?.hasData && (
+
+            {!hasStats && (
               <div className="rounded-lg border border-border bg-secondary/30 p-3 text-[11px] text-muted-foreground">
-                Perfil disponível, mas ainda não há histórico de operações suficiente para gerar o
-                relatório estatístico.
+                Perfil DNA calculado, mas ainda não há histórico de operações suficiente para gerar as estatísticas.
               </div>
             )}
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-secondary/30 p-4 text-[12px] text-muted-foreground">
-            Perfil DNA ainda não cadastrado. Nenhum dado fictício é exibido.
+            Perfil DNA ainda não calculado. Nenhum dado fictício é exibido.
           </div>
         ))}
     </div>
   );
 }
-function Metric({ label, value }: { label: string; value: number }) {
+
+function Metric({
+  label,
+  value,
+}: {
+  label: string;
+  value: number | null | undefined;
+}) {
   return (
     <div className="rounded-lg border border-border bg-secondary/30 p-3">
       <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</div>
-      <div className="mt-1 text-xl font-semibold tabular-nums">{value.toFixed(0)}</div>
+      <div className="mt-1 text-xl font-semibold tabular-nums">{formatNumber(value)}</div>
       <div className="mt-1 h-1 rounded-full bg-secondary overflow-hidden">
         <div
           className="h-full bg-[var(--brand-cyan)]"
-          style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+          style={{ width: value == null ? "0%" : `${Math.max(0, Math.min(100, value))}%` }}
         />
       </div>
     </div>
   );
 }
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-border bg-card/60 p-3">
