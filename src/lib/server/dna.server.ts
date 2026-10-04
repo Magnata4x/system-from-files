@@ -3,6 +3,10 @@ import type { ApiUser } from './api-auth.server'
 
 export interface DnaStatsResponse {
   hasData: boolean
+  periodDays: number
+  periodStart: string
+  periodEnd: string
+  generatedAt: string
   totalTrades: number
   winRate: number
   avgPnlPct: number
@@ -53,12 +57,16 @@ function groupBest(
 }
 
 export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> {
-  const since = new Date(Date.now() - 180 * 86_400_000).toISOString()
+  const periodDays = 180
+  const periodEnd = new Date()
+  const sinceDate = new Date(periodEnd.getTime() - periodDays * 86_400_000)
+  const periodStart = sinceDate.toISOString()
+  const generatedAt = new Date().toISOString()
   const { data, error } = await user.supabase
     .from('bot4x_trades')
     .select('day, pair, result, pnl, pnl_pct, hour, created_at')
     .eq('user_id', user.userId)
-    .gte('created_at', since)
+    .gte('created_at', periodStart)
     .order('created_at', { ascending: true })
     .limit(5000)
   if (error) throw new Error(error.message)
@@ -77,6 +85,10 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   if (total === 0) {
     return {
       hasData: false,
+      periodDays,
+      periodStart,
+      periodEnd: periodEnd.toISOString(),
+      generatedAt,
       totalTrades: 0,
       winRate: 0,
       avgPnlPct: 0,
@@ -263,6 +275,10 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
 
   return {
     hasData: true,
+    periodDays,
+    periodStart,
+    periodEnd: periodEnd.toISOString(),
+    generatedAt,
     totalTrades: total,
     winRate: Number(winRate.toFixed(2)),
     avgPnlPct: Number(avgPnlPct.toFixed(2)),
