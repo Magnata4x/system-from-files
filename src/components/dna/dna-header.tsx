@@ -3,14 +3,6 @@ import { CircularGauge } from "./circular-gauge";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useAuth } from "@/lib/auth";
 
-const metrics = [
-  ["dnaConsistency", "Consistency"],
-  ["dnaDiscipline", "Discipline"],
-  ["dnaRiskControl", "Risk Control"],
-  ["dnaTiming", "Timing"],
-  ["dnaEmotionalControl", "Emotional Control"],
-] as const;
-
 export function DnaHeader() {
   const { session } = useAuth();
   const { data: dnaData, isLoading } = useDnaProfile(session?.user?.id);
