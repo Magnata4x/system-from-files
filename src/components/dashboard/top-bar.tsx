@@ -165,7 +165,7 @@ export function TopBar() {
         {loading ? (
           <SkeletonBar className="w-24 h-4" />
         ) : (
-          btcDom !== undefined && (
+          btcDom != null && (
             <span className="flex items-center gap-1.5">
               <span className="text-muted-foreground">BTC.D</span>
               <span className="text-foreground">{btcDom.toFixed(1)}%</span>
