@@ -10,6 +10,9 @@ import { EvolutionTimeline } from "@/components/dna/evolution-timeline";
 import { AiRecommendations } from "@/components/dna/ai-recommendations";
 import { DnaBot4xCompat } from "@/components/dna/dna-bot4x-compat";
 import { DnaOperations } from "@/components/dna/dna-operations";
+import { useDnaProfile } from "@/hooks/useDnaProfile";
+import { useDnaStats } from "@/hooks/useDnaStats";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/dna-trader")({
   head: () => ({
@@ -22,6 +25,12 @@ export const Route = createFileRoute("/_authenticated/dna-trader")({
 });
 
 function DnaTraderPage() {
+  const { session } = useAuth();
+  const profile = useDnaProfile(session?.user?.id);
+  const stats = useDnaStats();
+  const hasProfile = profile.data?.hasProfile === true;
+  const hasStats = stats.data?.hasData === true;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <TopBar />
@@ -30,25 +39,51 @@ function DnaTraderPage() {
         <main className="flex-1 min-w-0 p-5 space-y-5">
           <header>
             <h1 className="text-xl font-semibold tracking-tight">DNA Trader</h1>
-            <p className="text-sm text-muted-foreground mt-1">Your behavioral signature, scored and compared to institutional benchmark.</p>
+            <p className="text-sm text-muted-foreground mt-1">Sua assinatura comportamental, calculada a partir dos dados reais.</p>
           </header>
 
-          <DnaHeader />
-          <BehavioralHeatmap />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <DnaRadar />
-            <div className="space-y-5">
-              <StatsGrid />
+          {profile.isLoading || stats.isLoading ? (
+            <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">
+              Carregando dados reais do DNA…
             </div>
-          </div>
+          ) : profile.isError || stats.isError ? (
+            <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-destructive">
+              Não foi possível carregar os dados reais do DNA agora.
+            </div>
+          ) : !hasProfile ? (
+            <div className="rounded-xl border border-border bg-card/40 p-5">
+              <h2 className="text-sm font-semibold">Perfil DNA ainda não calculado</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Nenhum score, estilo ou histórico demonstrativo é exibido até existirem dados reais.
+              </p>
+            </div>
+          ) : (
+            <>
+              <DnaHeader />
+              {!hasStats ? (
+                <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">
+                  O perfil DNA está disponível, mas ainda não há histórico de operações suficiente para gerar o relatório estatístico.
+                </div>
+              ) : (
+                <>
+                  <BehavioralHeatmap />
 
-          <DnaOperations />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <DnaRadar />
+                    <div className="space-y-5">
+                      <StatsGrid />
+                    </div>
+                  </div>
 
-          <AiInsights />
-          <EvolutionTimeline />
-          <AiRecommendations />
-          <DnaBot4xCompat />
+                  <DnaOperations />
+                  <AiInsights />
+                  <EvolutionTimeline />
+                  <AiRecommendations />
+                  <DnaBot4xCompat />
+                </>
+              )}
+            </>
+          )}
         </main>
       </div>
     </div>
