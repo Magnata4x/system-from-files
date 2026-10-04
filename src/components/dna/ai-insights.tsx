@@ -1,4 +1,3 @@
-import { INSIGHTS } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import {
   TrendingUp,
@@ -33,7 +32,8 @@ const TONE = {
 export function AiInsights() {
   const { data, isLoading } = useDnaStats();
   const live = data?.hasData && data.insights.length > 0;
-  const items = live ? data!.insights : INSIGHTS;
+  const items = data?.insights ?? [];
+  if (!live) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Insights indisponíveis — não há dados reais suficientes.</div>;
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-5">
@@ -55,7 +55,7 @@ export function AiInsights() {
               : "border-border text-muted-foreground bg-muted/20"
           }`}
         >
-          {live ? "ao vivo" : "demo"}
+          ao vivo
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
