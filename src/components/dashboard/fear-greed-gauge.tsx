@@ -2,7 +2,7 @@ import { useMarketData } from "@/lib/market-data-store";
 import { DataStatusBadge } from "./data-status";
 import { FEAR_GREED_ZONES, fearGreedColor } from "@/lib/fear-greed";
 export function FearGreedGauge() {
-  const { fearGreed, loading, error, lastUpdate, status } = useMarketData();
+  const { fearGreed, loading, metadataStatus } = useMarketData();
   const VALUE = fearGreed?.value,
     LABEL = fearGreed?.label;
   const dataStatus =
@@ -10,7 +10,7 @@ export function FearGreedGauge() {
       ? "loading"
       : !fearGreed
         ? "unavailable"
-        : status === "stale" || error
+        : metadataStatus === "stale"
           ? "stale"
           : "ok";
   const angle = VALUE == null ? 0 : (VALUE / 100) * 180,
@@ -30,7 +30,7 @@ export function FearGreedGauge() {
         <h3 className="text-[15px] font-medium text-foreground">Fear &amp; Greed Index</h3>
         <DataStatusBadge
           source="Alternative.me · 7 dias"
-          updatedAt={lastUpdate}
+          updatedAt={fearGreed?.updatedAt}
           status={dataStatus}
         />
       </div>
