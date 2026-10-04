@@ -44,15 +44,16 @@ describe("computeDnaStats", () => {
       makeUser([
         { day: "2026-10-01", pair: "BTC/USDT", result: "win", pnl: 20, pnl_pct: 2, hour: 9, created_at: "2026-10-01T09:00:00Z" },
         { day: "2026-10-02", pair: "BTC/USDT", result: "loss", pnl: -10, pnl_pct: -1, hour: 9, created_at: "2026-10-02T09:00:00Z" },
-        { day: "2026-10-03", pair: "ETH/USDT", result: "win", pnl: 10, pnl_pct: 1, hour: 14, created_at: "2026-10-03T14:00:00Z" },
+        { day: "2026-10-03", pair: "BTC/USDT", result: "win", pnl: 10, pnl_pct: 1, hour: 9, created_at: "2026-10-03T09:00:00Z" },
+        { day: "2026-10-04", pair: "ETH/USDT", result: "win", pnl: 5, pnl_pct: 0.5, hour: 14, created_at: "2026-10-04T14:00:00Z" },
       ]),
     );
 
     expect(result.hasData).toBe(true);
     expect(result.totalTrades).toBe(3);
     expect(result.winRate).toBeCloseTo(66.67, 2);
-    expect(result.totalPnl).toBe(20);
-    expect(result.avgPnlPct).toBeCloseTo(0.67, 2);
+    expect(result.totalPnl).toBe(25);
+    expect(result.avgPnlPct).toBeCloseTo(0.625, 2);
     expect(result.bestPair).toBe("BTC/USDT");
     expect(result.bestHour).toBe(9);
     expect(result.periodDays).toBe(180);
