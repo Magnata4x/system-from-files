@@ -18,14 +18,21 @@ export function StatsGrid() {
         },
         {
           icon: "Sparkles",
-          value: data!.bestPair ?? "—",
+          value: data!.bestSetup ?? "indisponível",
+          label: "Melhor setup",
+          trend: data!.worstSetup ? `pior: ${data!.worstSetup}` : undefined,
+          trendUp: true,
+        },
+        {
+          icon: "Sparkles",
+          value: data!.bestPair ?? "indisponível",
           label: "Melhor par",
           trend: data!.worstPair ? `pior: ${data!.worstPair}` : undefined,
           trendUp: true,
         },
         {
           icon: "Clock",
-          value: data!.bestHour !== null ? `${String(data!.bestHour).padStart(2, "0")}h` : "—",
+          value: data!.bestHour !== null ? `${String(data!.bestHour).padStart(2, "0")}h` : "indisponível",
           label: "Melhor horário",
           trend:
             data!.worstHour !== null
