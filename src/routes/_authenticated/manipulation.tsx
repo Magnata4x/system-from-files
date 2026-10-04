@@ -142,8 +142,8 @@ function ManipulationPage() {
   const alerts = liveAlerts ?? [];
   const activeAlerts = alerts.filter((a) => a.severity === "HIGH" || a.severity === "MEDIUM");
   const activeAssets = Array.from(new Set(activeAlerts.map((a) => a.asset)));
-  const riskLevel = snapshot?.riskLevel ? String(snapshot.riskLevel).toUpperCase() : null;
-  const elevatedRisk = riskLevel === "HIGH" || riskLevel === "MEDIUM";
+  const snapshotRiskLevel = snapshot?.riskLevel ? String(snapshot.riskLevel).toUpperCase() : null;
+  const elevatedRisk = snapshotRiskLevel === "HIGH" || snapshotRiskLevel === "MEDIUM";
   const manipulationStatus =
     alertsPending || snapshotPending
       ? "loading"
@@ -190,7 +190,7 @@ function ManipulationPage() {
               </p>
               <DataStatusBadge
                 source="Manipulation · backend"
-                updatedAt={manipulationUpdatedAt}
+                updatedAt={manipulationUpdatedAt ? new Date(manipulationUpdatedAt) : null}
                 status={manipulationStatus}
               />
             </div>
@@ -200,8 +200,8 @@ function ManipulationPage() {
             <AlertBanner
               count={activeAlerts.length}
               assets={activeAssets.length ? activeAssets : snapshot?.symbol ? [snapshot.symbol] : []}
-              riskLevel={riskLevel}
-              updatedAt={snapshot?.updatedAt}
+              riskLevel={snapshotRiskLevel}
+              updatedAt={snapshot?.updatedAt ? new Date(snapshot.updatedAt) : null}
               onDismiss={() => setDismissed(true)}
             />
           )}
