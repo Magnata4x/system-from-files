@@ -12,11 +12,13 @@ export interface DnaStats {
   avgPnlPct: number;
   bestPair: string | null;
   worstPair: string | null;
+  bestSetup: string | null;
+  worstSetup: string | null;
   bestHour: number | null;
   worstHour: number | null;
   maxDrawdownPct: number;
   totalPnl: number;
-  radar: { axis: string; you: number; bench: number }[];
+  radar: { axis: string; you: number }[];
   gauges: { label: string; value: number }[];
   heatmap: { date: string; value: number; trades: number; pnl: number }[];
   evolution: { month: string; overall: number; emotional: number; note?: string }[];
