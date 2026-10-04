@@ -82,10 +82,6 @@ const METADATA_TTL_MS = 60_000;
 const METADATA_STALE_AFTER_MS = 5 * 60_000;
 const FALLBACK_POLL_MS = 30_000;
 
-function nowDate(): Date {
-  return new Date();
-}
-
 function parseNumber(value: unknown): number | null {
   if (value == null || value === "") return null;
   const n = Number(value);
