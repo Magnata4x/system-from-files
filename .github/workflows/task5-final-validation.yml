@@ -1,0 +1,42 @@
+name: Task 5 final validation
+
+on:
+  push:
+    branches:
+      - fix/task5-finalize-review
+
+permissions:
+  contents: write
+
+jobs:
+  format-validate-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/task5-finalize-review
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx prettier --write src/components/dashboard src/lib/market-data-store.tsx src/hooks/useLivePrices.ts
+      - run: npx tsc --noEmit
+      - run: npm run build
+      - run: npx eslint src/components/dashboard src/lib/market-data-store.tsx src/hooks/useLivePrices.ts
+
+      - name: Commit formatting and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/dashboard src/lib/market-data-store.tsx src/hooks/useLivePrices.ts
+          git rm .github/workflows/task5-final-validation.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(task5): format dashboard and validate build"
+          git push origin HEAD:fix/task5-finalize-review
