@@ -1,4 +1,4 @@
-name: phase-02-validation
+name: ci
 
 on:
   pull_request:
@@ -24,4 +24,16 @@ jobs:
       - run: npm run build
       - run: 'npx eslint --rule "prettier/prettier: off" src/lib/market-data-store.tsx src/lib/market.functions.ts src/lib/market-data-store.test.ts src/routes/__root.tsx src/routes/_authenticated.tsx src/components/dashboard/btc-dominance.tsx src/components/dashboard/fear-greed-gauge.tsx src/components/dashboard/asset-heatmap.tsx src/components/dashboard/metric-cards.tsx src/components/dashboard/top-bar.tsx'
       - run: npx vitest run src/lib/market-data-store.test.ts
+      - name: Diagnose auth-flow test
+        continue-on-error: true
+        run: npx vitest run src/lib/__tests__/auth-flow.test.tsx
+      - name: Diagnose bot4x-mode test
+        continue-on-error: true
+        run: npx vitest run src/lib/__tests__/bot4x-mode.test.ts
+      - name: Diagnose tab-historico virtualization test
+        continue-on-error: true
+        run: npx vitest run src/components/bot4x/__tests__/tab-historico.virtualization.test.tsx
+      - name: Diagnose email queue process test
+        continue-on-error: true
+        run: npx vitest run src/routes/lovable/email/queue/__tests__/process.test.ts
       - run: npm run test
