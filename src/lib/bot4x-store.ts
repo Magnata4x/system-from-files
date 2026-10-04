@@ -42,6 +42,10 @@ export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
 // ─── RISK MODEL CONSTANTS ─────────────────────────────────────────────────────
 export const MAX_SLOTS = 10;
 export const RISK_PER_SLOT = 0.1;
+export const BOT4X_CIRCUIT_BREAKER_PNL_PCT = -1.5;
+export function isBot4xCircuitBreakerTriggered(pnlPct: number): boolean {
+  return pnlPct <= BOT4X_CIRCUIT_BREAKER_PNL_PCT;
+}
 
 // ─── USER-SCOPED STORAGE ──────────────────────────────────────────────────────
 // Cada usuário tem sua própria chave: "bot4x-store-v1:<uid>".
