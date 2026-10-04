@@ -8,13 +8,13 @@ export function DnaHeader() {
   if (isError || !dnaData) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">DNA indisponível — nenhum valor de demonstração é exibido.</div>;
 
   const gauges = [
-    { label: "Consistency", value: Math.round(dnaData.dnaConsistency ?? 0) },
-    { label: "Discipline", value: Math.round(dnaData.dnaDiscipline ?? 0) },
-    { label: "Risk Control", value: Math.round(dnaData.dnaRiskControl ?? 0) },
-    { label: "Timing", value: Math.round(dnaData.dnaTiming ?? 0) },
-    { label: "Emotional Control", value: Math.round(dnaData.dnaEmotionalControl ?? 0) },
+    { label: "Consistency", value: dnaData.dnaConsistency == null ? null : Math.round(dnaData.dnaConsistency) },
+    { label: "Discipline", value: dnaData.dnaDiscipline == null ? null : Math.round(dnaData.dnaDiscipline) },
+    { label: "Risk Control", value: dnaData.dnaRiskControl == null ? null : Math.round(dnaData.dnaRiskControl) },
+    { label: "Timing", value: dnaData.dnaTiming == null ? null : Math.round(dnaData.dnaTiming) },
+    { label: "Emotional Control", value: dnaData.dnaEmotionalControl == null ? null : Math.round(dnaData.dnaEmotionalControl) },
   ];
-  const consistency = gauges[0].value;
+  const consistency = gauges[0].value ?? 0;
   const size = 88;
   const stroke = 4;
   const r = (size - stroke) / 2;
