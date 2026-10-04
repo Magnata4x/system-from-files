@@ -1,13 +1,12 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceDot, Tooltip, Legend } from "recharts";
-import { EVOLUTION } from "@/lib/dna-data";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 export function EvolutionTimeline() {
   const { data: stats } = useDnaStats();
-  const live = !!stats?.hasData && stats.evolution.length >= 2;
-  const series = live ? stats!.evolution : EVOLUTION;
+  if (!stats?.hasData || stats.evolution.length < 2) return <div className="rounded-xl border border-border bg-card/40 p-5 text-sm text-muted-foreground">Evolução indisponível — histórico real insuficiente.</div>;
+  const series = stats.evolution;
 
   const back = Math.min(3, series.length - 1);
   const delta = series[series.length - 1].overall - series[series.length - 1 - back].overall;
@@ -19,7 +18,7 @@ export function EvolutionTimeline() {
         <div>
           <h2 className="text-sm font-semibold">Evolution timeline</h2>
           <p className="text-xs text-muted-foreground">
-            {live ? "Últimos meses com operações reais" : "Exemplo demonstrativo — últimos 6 meses"}
+            Últimos meses com operações reais
           </p>
         </div>
         <Badge
