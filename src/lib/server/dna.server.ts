@@ -12,6 +12,8 @@ export interface DnaStatsResponse {
   avgPnlPct: number
   bestPair: string | null
   worstPair: string | null
+  bestSetup: string | null
+  worstSetup: string | null
   bestHour: number | null
   worstHour: number | null
   maxDrawdownPct: number
@@ -27,6 +29,7 @@ type TradeRow = {
   day: string
   pair: string
   result: string
+  motivo: string | null
   pnl: number
   pnl_pct: number
   hour: number | null
@@ -64,7 +67,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   const generatedAt = new Date().toISOString()
   const { data, error } = await user.supabase
     .from('bot4x_trades')
-    .select('day, pair, result, pnl, pnl_pct, hour, created_at')
+    .select('day, pair, result, motivo, pnl, pnl_pct, hour, created_at')
     .eq('user_id', user.userId)
     .gte('created_at', periodStart)
     .order('created_at', { ascending: true })
@@ -75,6 +78,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
     day: String(r.day),
     pair: String(r.pair),
     result: String(r.result ?? ''),
+    motivo: r.motivo === null || r.motivo === undefined ? null : String(r.motivo),
     pnl: Number(r.pnl ?? 0),
     pnl_pct: Number(r.pnl_pct ?? 0),
     hour: r.hour === null || r.hour === undefined ? null : Number(r.hour),
@@ -94,6 +98,8 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
       avgPnlPct: 0,
       bestPair: null,
       worstPair: null,
+      bestSetup: null,
+      worstSetup: null,
       bestHour: null,
       worstHour: null,
       maxDrawdownPct: 0,
@@ -122,6 +128,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   }
 
   const pairs = groupBest(rows, (t) => t.pair)
+  const setups = groupBest(rows, (t) => t.motivo)
   const hours = groupBest(rows, (t) => (t.hour === null ? null : String(t.hour)))
 
   // Consistência: dispersão dos resultados diários
@@ -163,12 +170,12 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   ]
 
   const radar = [
-    { axis: 'Win Rate', you: clamp(winRate), bench: 72 },
-    { axis: 'Avg R/R', you: clamp(rr * 40), bench: 80 },
-    { axis: 'Consistency', you: consistency, bench: 85 },
-    { axis: 'Drawdown Ctrl', you: riskControl, bench: 88 },
-    { axis: 'Timing', you: timing, bench: 78 },
-    { axis: 'Volume Disc.', you: discipline, bench: 82 },
+    { axis: 'Win Rate', you: clamp(winRate) },
+    { axis: 'Avg R/R', you: clamp(rr * 40) },
+    { axis: 'Consistency', you: consistency },
+    { axis: 'Drawdown Ctrl', you: riskControl },
+    { axis: 'Timing', you: timing },
+    { axis: 'Volume Disc.', you: discipline },
   ]
 
   // Heatmap dos últimos 90 dias (intensidade -1..4)
@@ -284,6 +291,8 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
     avgPnlPct: Number(avgPnlPct.toFixed(2)),
     bestPair: pairs.best,
     worstPair: pairs.worst,
+    bestSetup: setups.best,
+    worstSetup: setups.worst,
     bestHour: hours.best === null ? null : Number(hours.best),
     worstHour: hours.worst === null ? null : Number(hours.worst),
     maxDrawdownPct: Number(maxDd.toFixed(2)),
