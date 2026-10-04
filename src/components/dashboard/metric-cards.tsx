@@ -52,6 +52,7 @@ export function MetricCards() {
         : "Nenhum alerta ativo";
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div data-tour="metric-signals">
       <Card
         index={0}
         icon={<Activity className="size-4" />}
@@ -62,6 +63,7 @@ export function MetricCards() {
         source="Internal API"
         status={signalStatus}
       />
+      </div>
       <Card
         index={1}
         icon={<Trophy className="size-4" />}
