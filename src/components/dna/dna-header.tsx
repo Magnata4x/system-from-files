@@ -91,9 +91,16 @@ export function DnaHeader() {
         </div>
 
         <div className="lg:ml-auto grid grid-cols-3 md:grid-cols-5 gap-3">
-          {gauges.map((g) => (
-            <CircularGauge key={g.label} value={g.value ?? 0} label={g.label} />
-          ))}
+          {gauges.map((g) =>
+            g.value == null ? (
+              <div key={g.label} className="flex flex-col items-center justify-center min-w-16 h-20 rounded-lg border border-border bg-card/40">
+                <span className="text-lg font-semibold">—</span>
+                <span className="text-[9px] text-muted-foreground text-center">{g.label}</span>
+              </div>
+            ) : (
+              <CircularGauge key={g.label} value={g.value} label={g.label} />
+            ),
+          )}
         </div>
       </div>
     </div>
