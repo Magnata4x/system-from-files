@@ -1,4 +1,9 @@
-import { useMarketData, type CoinPrice, type GlobalMetrics, type FearGreed } from "@/lib/market-data-store";
+import {
+  useMarketData,
+  type CoinPrice,
+  type GlobalMetrics,
+  type FearGreed,
+} from "@/lib/market-data-store";
 
 export type { CoinPrice, GlobalMetrics, FearGreed };
 

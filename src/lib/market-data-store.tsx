@@ -203,7 +203,11 @@ class MarketDataStore {
     this.socket.onmessage = null;
     this.socket.onerror = null;
     this.socket.onclose = null;
-    try { this.socket.close(); } catch { /* ignore */ }
+    try {
+      this.socket.close();
+    } catch {
+      /* ignore */
+    }
     this.socket = null;
   }
 
@@ -289,11 +293,13 @@ class MarketDataStore {
       const payload = (await fearGreedResult.value.json()) as {
         data?: Array<{ value: string; value_classification: string; timestamp?: string }>;
       };
-      const history = (payload.data ?? []).map((item) => ({
-        value: parseNumber(item.value),
-        label: String(item.value_classification ?? ""),
-        timestamp: parseNumber(item.timestamp) * 1000,
-      })).filter((item) => item.value >= 0 && item.value <= 100);
+      const history = (payload.data ?? [])
+        .map((item) => ({
+          value: parseNumber(item.value),
+          label: String(item.value_classification ?? ""),
+          timestamp: parseNumber(item.timestamp) * 1000,
+        }))
+        .filter((item) => item.value >= 0 && item.value <= 100);
       const current = history[0];
       if (current) fearGreed = { value: current.value, label: current.label, history };
     }
@@ -301,7 +307,10 @@ class MarketDataStore {
     this.patch({
       global,
       fearGreed,
-      status: this.state.status === "loading" && Object.keys(this.state.prices).length ? "ok" : this.state.status,
+      status:
+        this.state.status === "loading" && Object.keys(this.state.prices).length
+          ? "ok"
+          : this.state.status,
     });
   }
 
@@ -317,7 +326,11 @@ class MarketDataStore {
 
     socket.onmessage = (event) => {
       let payload: { data?: BinanceTicker };
-      try { payload = JSON.parse(event.data as string) as { data?: BinanceTicker }; } catch { return; }
+      try {
+        payload = JSON.parse(event.data as string) as { data?: BinanceTicker };
+      } catch {
+        return;
+      }
       const ticker = payload.data;
       if (!ticker) return;
       const price = normalizeBinanceTicker(ticker);
@@ -335,7 +348,10 @@ class MarketDataStore {
     };
 
     socket.onerror = () => {
-      this.patch({ error: "WebSocket Binance indisponível; usando atualização periódica.", status: Object.keys(this.state.prices).length ? "stale" : "error" });
+      this.patch({
+        error: "WebSocket Binance indisponível; usando atualização periódica.",
+        status: Object.keys(this.state.prices).length ? "stale" : "error",
+      });
       this.stopSocket();
       this.startFallback();
     };
