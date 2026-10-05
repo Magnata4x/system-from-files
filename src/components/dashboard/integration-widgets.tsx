@@ -167,7 +167,7 @@ export function Bot4xSummaryWidget() {
   const leverage = useBot4xStore((s) => s.leverage);
   const pnl = useDashboardStore((s) => s.risk?.dailyPnlPct);
   const riskAvailable = pnl != null;
-  const breaker = riskAvailable && isBot4xCircuitBreakerTriggered(pnl);
+  const breaker = pnl != null && isBot4xCircuitBreakerTriggered(pnl);
   const effectiveMode = getEffectiveMode(mode);
   const realMode = effectiveMode === "REAL";
   return (
