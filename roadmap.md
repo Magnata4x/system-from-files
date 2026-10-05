@@ -26,3 +26,8 @@
 - [ ] Auditar telas, dados, navegação e estados de erro/vazio
 - [ ] Corrigir primeiro os fluxos críticos de modo REAL, saldo e execução segura
 - [ ] Refinar os módulos por prioridade e validar em desktop e celular
+
+## Integração Marketaux
+- [ ] Cadastrar `MARKETAUX_API_TOKEN` exclusivamente nos Secrets do projeto
+- [ ] Consumir notícias reais do Marketaux no Dashboard com cache server-side de 5 minutos
+- [ ] Validar disponibilidade da credencial no runtime, tipos e build sem expor o token
