@@ -40,6 +40,12 @@ interface DashboardState {
   signalsError: string | null;
   signalsStale: boolean;
   signalsUpdatedAt: number | null;
+  riskUpdatedAt: number | null;
+  riskError: string | null;
+  riskStale: boolean;
+  regimeUpdatedAt: number | null;
+  regimeError: string | null;
+  regimeStale: boolean;
   manipAlerts: ManipulationAlert[];
   manipLoading: boolean;
   manipError: string | null;
@@ -88,6 +94,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   signalsError: null,
   signalsStale: false,
   signalsUpdatedAt: null,
+  riskUpdatedAt: null,
+  riskError: null,
+  riskStale: false,
+  regimeUpdatedAt: null,
+  regimeError: null,
+  regimeStale: false,
   manipAlerts: [],
   manipLoading: true,
   manipError: null,
@@ -118,10 +130,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
               dailyPnlPct: (raw.dailyPnlPct ?? raw.pnlPct) as number | undefined,
               raw,
             },
+            riskUpdatedAt: Date.now(),
+            riskError: null,
+            riskStale: false,
           });
         }
       } catch (err) {
         logger.warn("[dashboard] risk/status falhou", { error: err });
+        set({ riskError: err instanceof Error ? err.message : "Falha ao carregar risco", riskStale: get().risk != null });
       }
     };
     const pullRegime = async () => {
@@ -136,10 +152,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
               pair: (raw.pair as string | undefined) ?? "BTC/USDT",
               raw,
             },
+            regimeUpdatedAt: Date.now(),
+            regimeError: null,
+            regimeStale: false,
           });
         }
       } catch (err) {
         logger.warn("[dashboard] market-regime/current falhou", { error: err });
+        set({ regimeError: err instanceof Error ? err.message : "Falha ao carregar regime", regimeStale: get().regime != null });
       }
     };
     const pullSignals = async () => {
