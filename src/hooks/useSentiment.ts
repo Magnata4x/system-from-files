@@ -3,9 +3,6 @@ import { api } from "@/lib/apiClient";
 
 export interface SentimentAsset {
   asset: string;
-  social: number;
-  news: number;
-  onchain: number;
   overall: number;
   trend: "up" | "upup" | "flat" | "down";
   signal: "BULLISH" | "NEUTRAL" | "BEARISH";
