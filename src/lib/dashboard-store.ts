@@ -18,6 +18,9 @@ export type Signal = {
   rr: number | null;
   tf: string;
   time: string;
+  type?: string;
+  setup?: string;
+  confluences?: string[];
 };
 
 export type RiskStatus = {
@@ -179,6 +182,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
               : null,
           tf: s.tf ?? "—",
           time: s.createdAt ?? "",
+          type: s.type,
+          setup: s.setup,
+          confluences: s.confluences,
         }));
         set({
           signals: mapped,
