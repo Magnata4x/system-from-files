@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      market_snapshots: {
+        Row: {
+          btc_dominance: number | null
+          captured_at: string
+          created_at: string
+          id: number
+          market_cap_change_24h: number | null
+          source: string
+          total_market_cap: number | null
+          total_volume: number | null
+        }
+        Insert: {
+          btc_dominance?: number | null
+          captured_at?: string
+          created_at?: string
+          id?: number
+          market_cap_change_24h?: number | null
+          source?: string
+          total_market_cap?: number | null
+          total_volume?: number | null
+        }
+        Update: {
+          btc_dominance?: number | null
+          captured_at?: string
+          created_at?: string
+          id?: number
+          market_cap_change_24h?: number | null
+          source?: string
+          total_market_cap?: number | null
+          total_volume?: number | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           actor_id: string
