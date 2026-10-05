@@ -17,7 +17,7 @@ export interface DnaProfile {
   [key: string]: unknown;
 }
 
-export function useDnaProfile(userId: string | undefined) {
+export function useDnaProfile(userId: string | null | undefined) {
   return useQuery({
     queryKey: ["dna", "profile", userId],
     queryFn: () => api.get<DnaProfile>(`/dna/profile/${userId}`),

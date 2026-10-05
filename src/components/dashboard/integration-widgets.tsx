@@ -5,6 +5,7 @@ import { useDashboardStore } from "@/lib/dashboard-store";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useSentiment } from "@/hooks/useSentiment";
+import { useBackendAuth } from "@/hooks/useBackendAuth";
 import { DataStatusBadge } from "./data-status";
 
 function Card(p: {
@@ -58,7 +59,8 @@ function Status({
   return <>{children}</>;
 }
 export function DnaTraderWidget() {
-  const { data, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile("me");
+  const { userId } = useBackendAuth();
+  const { data, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile(userId);
   const { data: stats, isLoading: statsLoading, isError: statsError, isStale: statsStale, dataUpdatedAt: statsUpdatedAt } = useDnaStats();
   const hasProfile = data?.hasProfile === true;
   const status = isLoading || statsLoading ? "loading" : isError || statsError ? "unavailable" : isStale || statsStale ? "stale" : "ok";
@@ -163,8 +165,9 @@ export function Bot4xSummaryWidget() {
   const mode = useBot4xStore((s) => s.mode);
   const profile = useBot4xStore((s) => s.profile);
   const leverage = useBot4xStore((s) => s.leverage);
-  const pnl = useBot4xStore((s) => s.dailyPnlPct);
-  const breaker = isBot4xCircuitBreakerTriggered(pnl);
+  const pnl = useDashboardStore((s) => s.risk?.dailyPnlPct);
+  const riskAvailable = pnl != null;
+  const breaker = pnl != null ? isBot4xCircuitBreakerTriggered(pnl) : false;
   const effectiveMode = getEffectiveMode(mode);
   const realMode = effectiveMode === "REAL";
   return (
@@ -178,20 +181,48 @@ export function Bot4xSummaryWidget() {
         <div>
           <div
             className="text-[18px] font-semibold"
-            style={{ color: breaker ? "#E24B4A" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
+            style={{ color: breaker ? "#E24B4A" : !riskAvailable ? "var(--muted-foreground)" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
           >
-            {pnl >= 0 ? "+" : ""}
-            {pnl.toFixed(2)}%
+            {riskAvailable ? (pnl >= 0 ? "+" : "") + pnl.toFixed(2) + "%" : "—"}
           </div>
           <div className={`mt-1 flex items-center gap-1.5 text-[10.5px] ${breaker ? "text-[#E24B4A] font-medium" : realMode ? "text-[#1D9E75] font-medium" : "text-muted-foreground"}`}>
             <Activity className="size-3" />
-            {breaker ? "Disjuntor ativo" : realMode ? "Execução REAL" : "Circuit OK"}
+            {breaker ? "Disjuntor ativo" : !riskAvailable ? "Risco indisponível" : realMode ? "Execução REAL" : "Circuit OK"}
           </div>
         </div>
       </div>
     </Card>
   );
 }
+export function RiskRegimeWidget() {
+  const risk = useDashboardStore((s) => s.risk);
+  const regime = useDashboardStore((s) => s.regime);
+  const riskError = useDashboardStore((s) => s.riskError);
+  const regimeError = useDashboardStore((s) => s.regimeError);
+  const riskStale = useDashboardStore((s) => s.riskStale);
+  const regimeStale = useDashboardStore((s) => s.regimeStale);
+  const riskUpdatedAt = useDashboardStore((s) => s.riskUpdatedAt);
+  const regimeUpdatedAt = useDashboardStore((s) => s.regimeUpdatedAt);
+  const loading = !risk && !riskError && !regime && !regimeError;
+  const status = loading ? "loading" : riskError || regimeError ? "unavailable" : riskStale || regimeStale ? "stale" : "ok";
+  const updatedAt = Math.max(riskUpdatedAt || 0, regimeUpdatedAt || 0) || null;
+  return (
+    <Card title="Risk & Regime" icon={Activity} accent="#EF9F27" to="/bot4x">
+      <div className="space-y-2">
+        <DataStatusBadge source="Backend · risk/regime" updatedAt={updatedAt} status={status} />
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-muted-foreground">Risk</span>
+          <span className="font-medium">{risk?.level ?? "—"}</span>
+        </div>
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-muted-foreground">{regime?.pair ?? "BTC/USDT"} regime</span>
+          <span className="font-medium">{regime?.regime ?? "—"}</span>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function MiniMetric({ label, value }: { label: string; value: number | null | undefined }) {
   return (
     <div className="rounded-md border border-border bg-secondary/30 px-2 py-1">
@@ -202,11 +233,12 @@ function MiniMetric({ label, value }: { label: string; value: number | null | un
 }
 export function IntegrationWidgets() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
       <DnaTraderWidget />
       <ManipulationWidget />
       <SentimentWidget />
       <Bot4xSummaryWidget />
+      <RiskRegimeWidget />
     </div>
   );
 }

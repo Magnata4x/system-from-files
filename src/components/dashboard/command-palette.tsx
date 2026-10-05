@@ -1,4 +1,5 @@
 import { useDashboardStore } from "@/lib/dashboard-store";
+import { useMarketData } from "@/lib/market-data-store";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -8,7 +9,6 @@ import {
   Brain,
   Flame,
   BarChart3,
-  Calendar,
   ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -18,24 +18,15 @@ const QUICK_ACTIONS = [
   { id: "qa2", icon: Activity, label: "Browse all signals", hint: "Signals", to: "/signals" },
   { id: "qa3", icon: Brain, label: "Open DNA report", hint: "DNA", to: "/dna-trader" },
   { id: "qa4", icon: Flame, label: "Open manipulation", hint: "Manipulation", to: "/manipulation" },
-  { id: "qa5", icon: BarChart3, label: "Performance breakdown", hint: "Stats", to: "/dna-trader" },
-  { id: "qa6", icon: Calendar, label: "Upcoming events", hint: "Calendar", to: "/dashboard" },
+  { id: "qa5", icon: BarChart3, label: "Performance breakdown", hint: "DNA", to: "/dna-trader" },
 ];
-const ASSETS = [
-  "BTC/USDT",
-  "ETH/USDT",
-  "SOL/USDT",
-  "BNB/USDT",
-  "LINK/USDT",
-  "AVAX/USDT",
-  "MATIC/USDT",
-  "ARB/USDT",
-];
-const RECENT = ["BTC liquidity sweep", "ETH 4H setup", "Funding rate", "Open interest"];
 
 export function CommandPalette() {
   const open = useDashboardStore((s) => s.cmdkOpen);
   const setOpen = useDashboardStore((s) => s.setCmdkOpen);
+  const signals = useDashboardStore((s) => s.signals);
+  const setSelectedSignal = useDashboardStore((s) => s.setSelectedSignal);
+  const { prices } = useMarketData();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   useEffect(() => {
@@ -56,7 +47,12 @@ export function CommandPalette() {
   const filteredActions = QUICK_ACTIONS.filter(
     (a) => a.label.toLowerCase().includes(term) || a.hint.toLowerCase().includes(term),
   );
-  const filteredAssets = ASSETS.filter((a) => a.toLowerCase().includes(term));
+  const filteredSignals = signals.filter((s) =>
+    [s.asset, s.direction, s.tf].some((value) => value.toLowerCase().includes(term)),
+  );
+  const filteredAssets = Object.values(prices).filter((p) =>
+    [p.pair, p.symbol, p.name].some((value) => value.toLowerCase().includes(term)),
+  );
   const run = (to: string) => {
     setOpen(false);
     navigate({ to });
@@ -76,6 +72,9 @@ export function CommandPalette() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
             transition={{ duration: 0.18 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command palette"
             className="w-full max-w-[600px] rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -92,18 +91,7 @@ export function CommandPalette() {
                 ESC
               </kbd>
             </div>
-            <div className="max-h-[60vh] overflow-y-auto py-2">
-              {q === "" && (
-                <Group label="Recent">
-                  {RECENT.map((r) => (
-                    <Row
-                      key={r}
-                      icon={<Search className="size-4 text-muted-foreground" />}
-                      label={r}
-                    />
-                  ))}
-                </Group>
-              )}
+            <div className="max-h-[60vh] overflow-y-auto py-2" role="listbox" aria-label="Resultados da busca">
               {filteredActions.length > 0 && (
                 <Group label="Quick actions">
                   {filteredActions.map((a) => (
@@ -117,24 +105,36 @@ export function CommandPalette() {
                   ))}
                 </Group>
               )}
+              {filteredSignals.length > 0 && (
+                <Group label="Sinais reais">
+                  {filteredSignals.map((s) => (
+                    <Row
+                      key={s.id}
+                      icon={<Activity className="size-4 text-[var(--brand-cyan)]" />}
+                      label={s.asset}
+                      hint={s.direction + " · score " + s.score}
+                      onClick={() => {
+                        setOpen(false);
+                        setSelectedSignal(s);
+                      }}
+                    />
+                  ))}
+                </Group>
+              )}
               {filteredAssets.length > 0 && (
-                <Group label="Assets">
+                <Group label="Ativos reais">
                   {filteredAssets.map((a) => (
                     <Row
-                      key={a}
-                      icon={
-                        <span className="text-[11px] font-semibold text-muted-foreground w-4">
-                          $
-                        </span>
-                      }
-                      label={a}
-                      hint="Sentiment"
+                      key={a.id}
+                      icon={<span className="text-[11px] font-semibold text-muted-foreground w-4">$</span>}
+                      label={a.pair}
+                      hint={a.symbol}
                       onClick={() => run("/sentiment")}
                     />
                   ))}
                 </Group>
               )}
-              {filteredActions.length === 0 && filteredAssets.length === 0 && q !== "" && (
+              {filteredActions.length === 0 && filteredSignals.length === 0 && filteredAssets.length === 0 && q !== "" && (
                 <div className="px-4 py-8 text-center text-[13px] text-muted-foreground">
                   No results for "{q}"
                 </div>

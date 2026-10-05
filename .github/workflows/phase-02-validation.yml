@@ -40,6 +40,6 @@ jobs:
           src/lib/tour-content.test.ts
           src/components/dashboard/metric-cards.tsx
           src/components/dashboard/integration-widgets.tsx
-          src/components/dashboard/top-bar.tsx src/components/dashboard/asset-heatmap.tsx src/components/dashboard/alerts-feed.tsx src/components/dashboard/signals-table.tsx src/components/dashboard/announcement-banner.tsx
+          src/components/dashboard/top-bar.tsx src/components/dashboard/asset-heatmap.tsx src/components/dashboard/alerts-feed.tsx src/components/dashboard/signals-table.tsx src/components/dashboard/announcement-banner.tsx src/components/dashboard/command-palette.tsx src/components/dashboard/signal-drawer.tsx src/components/dashboard/dna-panel.tsx src/hooks/useDnaProfile.ts src/components/dashboard/dna-panel.test.tsx
       - run: npx vitest run src/lib/market-data-store.test.ts
       - run: npm run test

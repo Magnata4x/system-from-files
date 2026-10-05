@@ -7,6 +7,7 @@ import { useDnaStats } from "@/hooks/useDnaStats";
 
 vi.mock("@/hooks/useDnaProfile", () => ({ useDnaProfile: vi.fn() }));
 vi.mock("@/hooks/useDnaStats", () => ({ useDnaStats: vi.fn() }));
+vi.mock("@/hooks/useBackendAuth", () => ({ useBackendAuth: () => ({ userId: "u1", ready: true }) }));
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }));
