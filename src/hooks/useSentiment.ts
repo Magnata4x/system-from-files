@@ -9,6 +9,26 @@ export interface SentimentAsset {
   spark: number[];
 }
 
+export interface NewsItem {
+  id: string;
+  title: string;
+  source: string;
+  url: string;
+  publishedAt: string;
+  sentimentScore: number | null;
+  tone: "POSITIVE" | "NEGATIVE" | "NEUTRAL";
+  assets: string[];
+}
+
+export interface NewsSentiment {
+  status: "ok" | "stale" | "unavailable";
+  score: number | null;
+  articleCount: number;
+  updatedAt: string | null;
+  source: "Marketaux" | null;
+  articles: NewsItem[];
+}
+
 export interface SentimentOverview {
   overall: number;
   bullBear: { bull: number; bear: number };
@@ -19,6 +39,7 @@ export interface SentimentOverview {
   quoteVolume24h: number;
   assets: SentimentAsset[];
   updatedAt: string;
+  news: NewsSentiment;
 }
 
 export function useSentiment() {
