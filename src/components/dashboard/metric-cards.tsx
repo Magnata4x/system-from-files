@@ -15,6 +15,9 @@ export function MetricCards() {
   const manip = useDashboardStore((s) => s.manipAlerts);
   const manipLoading = useDashboardStore((s) => s.manipLoading);
   const manipError = useDashboardStore((s) => s.manipError);
+  const manipStale = useDashboardStore((s) => s.manipStale);
+  const manipUpdatedAt = useDashboardStore((s) => s.manipUpdatedAt);
+  const signalsUpdatedAt = useDashboardStore((s) => s.signalsUpdatedAt);
   const manipStatus = useDashboardStore(selectManipulationStatus);
   const total = Object.keys(prices).length;
   const up = Object.values(prices).filter((p) => p.change24h != null && p.change24h > 0).length;
@@ -62,6 +65,7 @@ export function MetricCards() {
         sub={signalSub}
         source="Internal API"
         status={signalStatus}
+        updatedAt={signalsUpdatedAt}
       />
       </div>
       <Card
@@ -95,7 +99,8 @@ export function MetricCards() {
         count={manip.length}
         sub={manipSub}
         source="Internal API"
-        status={manipStatus}
+        status={manipStale ? "stale" : manipStatus}
+        updatedAt={manipUpdatedAt}
       />
     </div>
   );
