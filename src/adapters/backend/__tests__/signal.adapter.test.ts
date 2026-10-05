@@ -26,6 +26,28 @@ describe("signalAdapter — contrato de dados reais", () => {
     });
   });
 
+  it("preserva setup, tipo e confluências fornecidos pelo motor", () => {
+    expect(
+      mapSignal({
+        ...base,
+        type: "trend-following",
+        setup: "Tendência de alta",
+        confluences: ["Tendência de mercado confirmada", "RSI alinhado à direção"],
+      }),
+    ).toMatchObject({
+      type: "trend-following",
+      setup: "Tendência de alta",
+      confluences: ["Tendência de mercado confirmada", "RSI alinhado à direção"],
+    });
+  });
+
+  it("mantém metadados ausentes como ausentes, sem inventar valores", () => {
+    expect(mapSignal(base)).toMatchObject({ id: "sig-1" });
+    expect(mapSignal(base).type).toBeUndefined();
+    expect(mapSignal(base).setup).toBeUndefined();
+    expect(mapSignal(base).confluences).toBeUndefined();
+  });
+
   it("não propaga status arbitrário para a UI", () => {
     expect(mapSignal({ ...base, status: "unexpected-backend-status" })).toMatchObject({
       state: "active",
