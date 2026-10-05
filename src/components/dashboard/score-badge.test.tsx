@@ -5,7 +5,7 @@ import { ScoreBadge, scoreColor } from "./score-badge";
 describe("ScoreBadge", () => {
   it("exposes the score to assistive technology", () => {
     render(<ScoreBadge score={82} />);
-    expect(screen.getByLabelText("Score 82")).toHaveTextContent("82");
+    expect(screen.getByLabelText("Score 82").textContent).toContain("82");
   });
 
   it("uses theme tokens rather than fixed hex colors", () => {
