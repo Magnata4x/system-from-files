@@ -22,6 +22,9 @@ export interface BackendSignal {
   createdAt: string
   rsi: number
   regime: string
+  type: 'trend-following'
+  setup: string
+  confluences: string[]
 }
 
 function stableId(pair: string, bucket: number): string {
@@ -54,6 +57,16 @@ export async function generateSignals(): Promise<BackendSignal[]> {
         const side: 'BUY' | 'SELL' = regime.regime === 'BULLISH' ? 'BUY' : 'SELL'
         const dir = side === 'BUY' ? 1 : -1
         const bucket = Math.floor(last.openTime / 1000)
+        const confluences = [
+          'Tendência de mercado confirmada',
+          ...( (side === 'BUY' && r < 65) || (side === 'SELL' && r > 35)
+            ? ['RSI alinhado à direção']
+            : []),
+          ...(r < 30 || r > 70 ? ['RSI em região extrema'] : []),
+          ...(regime.volatility > 0.4 && regime.volatility < 6
+            ? ['Volatilidade dentro da faixa do motor']
+            : []),
+        ]
 
         return {
           id: stableId(pair, bucket),
@@ -71,6 +84,9 @@ export async function generateSignals(): Promise<BackendSignal[]> {
           createdAt: new Date(last.openTime).toISOString(),
           rsi: r,
           regime: regime.regime,
+          type: 'trend-following',
+          setup: side === 'BUY' ? 'Tendência de alta' : 'Tendência de baixa',
+          confluences,
         }
       } catch {
         return null
