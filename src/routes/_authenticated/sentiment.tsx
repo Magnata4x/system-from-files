@@ -27,8 +27,7 @@ function SentimentPage() {
           <header>
             <h1 className="text-xl font-semibold tracking-tight">Sentiment de Mercado</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Leitura baseada em preço, variação e momentum do mercado. Não representa
-              sentimento social, notícias ou dados on-chain.
+              Leitura de mercado baseada em preço, variação e momentum, complementada por sentimento de notícias financeiras reais. Não representa dados sociais ou on-chain.
             </p>
           </header>
 
