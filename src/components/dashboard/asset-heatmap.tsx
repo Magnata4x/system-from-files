@@ -1,4 +1,5 @@
 import { useMarketData } from "@/lib/market-data-store";
+import { DataStatusBadge } from "./data-status";
 import { MARKET_ASSETS } from "@/lib/market-symbols";
 function colorFor(c: number) {
   if (c >= 5) return { bg: "#0F3020", text: "#1D9E75" };
@@ -16,14 +17,16 @@ function fmt(p: number) {
   return "$" + p.toFixed(5);
 }
 export function AssetHeatmap() {
-  const { prices, loading, error, status } = useMarketData();
+  const { prices, loading, error, status, lastUpdate } = useMarketData();
   return (
     <div data-tour="heatmap" className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-[15px] font-medium">Asset Heatmap</h3>
-        <span className="text-[11px] text-muted-foreground">
-          {status === "stale" || error ? "desatualizado" : "24h change · Binance spot"}
-        </span>
+        <DataStatusBadge
+          source="Binance spot"
+          updatedAt={lastUpdate}
+          status={status === "error" ? "unavailable" : status}
+        />
       </div>
       <div className="grid grid-cols-4 gap-2">
         {MARKET_ASSETS.map((asset) => {
