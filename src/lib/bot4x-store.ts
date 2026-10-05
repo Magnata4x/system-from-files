@@ -19,6 +19,9 @@ import { saveTrade, loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
 import { logger } from "./logger";
 import { loadConfig, saveConfig } from "./bot4x-config-db";
 import type { CalibProfile as CalibProfileType } from "./bot4x-data";
+import { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from "./bot4x-breaker";
+
+export { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from "./bot4x-breaker";
 
 // ─── FEATURE FLAG ─────────────────────────────────────────────────────────────
 // Quando false, TODA a execução cai em DEMO (simulação client-side com Math.random).
@@ -42,12 +45,7 @@ export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
 // ─── RISK MODEL CONSTANTS ─────────────────────────────────────────────────────
 export const MAX_SLOTS = 10;
 export const RISK_PER_SLOT = 0.1;
-export const BOT4X_CIRCUIT_BREAKER_PNL_PCT = -1.5;
-export function isBot4xCircuitBreakerTriggered(pnlPct: number): boolean {
-  return pnlPct <= BOT4X_CIRCUIT_BREAKER_PNL_PCT;
-}
-
-// ─── USER-SCOPED STORAGE ──────────────────────────────────────────────────────
+ // ─── USER-SCOPED STORAGE ──────────────────────────────────────────────────────
 // Cada usuário tem sua própria chave: "bot4x-store-v1:<uid>".
 // O storage dinâmico lê o userId do próprio state na hora de montar/hidratar.
 function makeUserStorage(getUserId: () => string | null) {
