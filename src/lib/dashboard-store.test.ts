@@ -13,7 +13,7 @@ const base = {
   manipAlerts: [],
   manipLoading: false,
   manipError: null,
-} as never;
+} as Parameters<typeof selectSignalsStatus>[0];
 
 describe("dashboard metric selectors", () => {
   it("distinguishes loading, unavailable, stale and successful zero signals", () => {
