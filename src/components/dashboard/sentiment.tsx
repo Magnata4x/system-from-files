@@ -1,4 +1,4 @@
-import { Loader2, AlertTriangle, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Loader2, AlertTriangle, TrendingUp, TrendingDown, Minus, ExternalLink } from "lucide-react";
 import { useSentiment } from "@/hooks/useSentiment";
 import { DataStatusBadge } from "@/components/dashboard/data-status";
 
@@ -75,6 +75,41 @@ export function Sentiment() {
               {data.topLoser.changePct.toFixed(2)}%)
             </div>
           )}
+          <div className="border-t border-border pt-3">
+            <div className="flex items-center justify-between gap-3 text-[10px]">
+              <DataStatusBadge
+                source={data.newsFeed.provider}
+                updatedAt={data.newsFeed.updatedAt ? new Date(data.newsFeed.updatedAt) : null}
+                status={data.newsFeed.status === "available" ? "ok" : "unavailable"}
+              />
+              <span className="text-muted-foreground tabular-nums">
+                {data.newsFeed.status === "available"
+                  ? `${data.newsFeed.count} notícias${data.newsFeed.score === null ? "" : ` · score ${data.newsFeed.score}`}`
+                  : "notícias indisponíveis"}
+              </span>
+            </div>
+            {data.newsFeed.status === "available" && data.newsFeed.articles.length > 0 && (
+              <div className="mt-2 space-y-2">
+                {data.newsFeed.articles.slice(0, 3).map((article) => (
+                  <a
+                    key={article.id}
+                    href={article.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group flex items-start justify-between gap-2 text-[11px] text-foreground/90 hover:text-primary"
+                  >
+                    <span className="min-w-0">
+                      <span className="line-clamp-1">{article.title}</span>
+                      <span className="text-[9px] text-muted-foreground">
+                        {article.source}{article.score === null ? "" : ` · ${article.score}/100`}
+                      </span>
+                    </span>
+                    <ExternalLink className="mt-0.5 size-3 shrink-0 text-muted-foreground group-hover:text-primary" />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

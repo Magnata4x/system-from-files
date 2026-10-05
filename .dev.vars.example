@@ -20,6 +20,9 @@ LOVABLE_API_KEY=<lovable-api-key>
 # Opcional: URL alternativa do endpoint de envio (default = produção).
 LOVABLE_SEND_URL=
 
+# Token da API Marketaux para notícias financeiras reais. Server-side apenas.
+MARKETAUX_API_TOKEN=<marketaux-api-token>
+
 # Segredo do cron pg_cron → /lovable/email/queue/process.
 # Gerar: openssl rand -hex 32
 EMAIL_QUEUE_CRON_SECRET=<random-256-bit-hex>
