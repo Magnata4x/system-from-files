@@ -27,7 +27,7 @@ export function AnnouncementBanner() {
             </span>
           )}
         </div>
-        <Link to="/manipulation" className="text-[var(--brand-cyan)] hover:underline shrink-0">
+        <Link to="/manipulation" search={{ symbol: "", riskLevel: "", limit: 20 }} className="text-[var(--brand-cyan)] hover:underline shrink-0">
           Ver detalhes
         </Link>
       </div>
