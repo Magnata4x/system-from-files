@@ -1,3 +1,4 @@
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useScoreDistribution } from "@/hooks/useScoreDistribution";
 import { DataStatusBadge } from "./data-status";
 
@@ -10,6 +11,12 @@ export function PerformanceChart() {
       : query.isError || !group
         ? "unavailable"
         : "ok";
+
+  const chartData =
+    group?.buckets.map((bucket) => ({
+      label: `${bucket.from}–${bucket.to === 101 ? 100 : bucket.to - 1}`,
+      n: bucket.n,
+    })) ?? [];
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -42,24 +49,18 @@ export function PerformanceChart() {
             <span>{group.asset} · {group.timeframe}</span>
             <span>n = {group.n}</span>
           </div>
-          <div className="grid grid-cols-5 gap-2 items-end h-[180px]">
-            {group.buckets.map((bucket) => {
-              const max = Math.max(...group.buckets.map((item) => item.n), 1);
-              const height = bucket.n ? Math.max(8, Math.round((bucket.n / max) * 150)) : 0;
-              return (
-                <div key={bucket.from} className="h-full flex flex-col justify-end">
-                  <div className="text-center text-[10px] text-muted-foreground mb-1">{bucket.n}</div>
-                  <div
-                    className="rounded-t-md bg-primary/70 min-h-0"
-                    style={{ height: `${height}px` }}
-                    aria-label={`Score ${bucket.from} a ${bucket.to === 101 ? 100 : bucket.to - 1}: ${bucket.n} sinais`}
-                  />
-                  <div className="text-center text-[9px] text-muted-foreground mt-1">
-                    {bucket.from}–{bucket.to === 101 ? 100 : bucket.to - 1}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="h-[180px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <XAxis dataKey="label" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value) => [typeof value === "number" ? value : "Indisponível", "n"]}
+                  labelFormatter={(label) => `Score ${label}`}
+                />
+                <Bar dataKey="n" name="n" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
           {query.data && query.data.groups.length > 1 && (
             <div className="mt-3 text-[10px] text-muted-foreground">
