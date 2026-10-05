@@ -36,7 +36,7 @@ export function PerformanceChart() {
           <span>Distribuição de scores indisponível.</span>
           <span className="mt-1 text-[10px]">Nenhum sinal persistido no período ou fonte indisponível.</span>
         </div>
-      ) : (
+      ) : group ? (
         <div className="mt-4">
           <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-3">
             <span>{group.asset} · {group.timeframe}</span>
