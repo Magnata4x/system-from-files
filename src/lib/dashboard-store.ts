@@ -71,6 +71,26 @@ interface DashboardState {
 
 export type DashboardDataStatus = "loading" | "ok" | "stale" | "unavailable";
 
+export function calculateRiskReward(
+  entry: number,
+  stop: number | null,
+  target: number | null,
+): number | null {
+  if (stop == null || target == null || entry - stop === 0) return null;
+  return +Math.abs((target - entry) / (entry - stop)).toFixed(2);
+}
+
+export function collectNewSignals(previousIds: Set<string>, signals: Signal[]): Signal[] {
+  const fresh: Signal[] = [];
+  for (const signal of signals) {
+    if (!previousIds.has(signal.id)) {
+      previousIds.add(signal.id);
+      fresh.push(signal);
+    }
+  }
+  return fresh;
+}
+
 export function selectSignalsStatus(s: DashboardState): DashboardDataStatus {
   if (s.signalsLoading && s.signals.length === 0) return "loading";
   if (s.signalsError && s.signals.length === 0) return "unavailable";
@@ -176,10 +196,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           entry: s.entry,
           stop: s.sl ?? null,
           target: s.tp ?? null,
-          rr:
-            s.sl != null && s.tp != null && s.entry - s.sl !== 0
-              ? +Math.abs((s.tp - s.entry) / (s.entry - s.sl)).toFixed(2)
-              : null,
+          rr: calculateRiskReward(s.entry, s.sl ?? null, s.tp ?? null),
           tf: s.tf ?? "—",
           time: s.createdAt ?? "",
           type: s.type,
@@ -198,11 +215,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         if (seenSignalIds === null) {
           seenSignalIds = new Set(mapped.map((m) => m.id));
         } else {
-          for (const m of mapped) {
-            if (!seenSignalIds.has(m.id)) {
-              seenSignalIds.add(m.id);
-              get().pushToast(m);
-            }
+          for (const m of collectNewSignals(seenSignalIds, mapped)) {
+            get().pushToast(m);
           }
         }
       } catch (err) {
