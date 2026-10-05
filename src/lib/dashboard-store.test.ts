@@ -3,6 +3,8 @@ import {
   selectHasActiveManipulationAlerts,
   selectManipulationStatus,
   selectSignalsStatus,
+  calculateRiskReward,
+  collectNewSignals,
 } from "./dashboard-store";
 
 const base = {
@@ -59,5 +61,25 @@ describe("dashboard metric selectors", () => {
         }],
       }),
     ).toBe(true);
+  });
+});
+
+
+describe("dashboard data calculations", () => {
+  it("calculates R/R from real entry, stop and target values", () => {
+    expect(calculateRiskReward(100, 99, 102)).toBe(2);
+    expect(calculateRiskReward(100, null, 102)).toBeNull();
+    expect(calculateRiskReward(100, 100, 102)).toBeNull();
+  });
+
+  it("deduplicates signal notifications by stable signal id", () => {
+    const seen = new Set(["existing"]);
+    const fresh = collectNewSignals(seen, [
+      { id: "existing", asset: "BTC/USDT", direction: "BUY", score: 80, entry: 100, stop: 99, target: 102, rr: 2, tf: "1h", time: "" },
+      { id: "new-1", asset: "ETH/USDT", direction: "SELL", score: 82, entry: 200, stop: 202, target: 196, rr: 2, tf: "1h", time: "" },
+      { id: "new-1", asset: "ETH/USDT", direction: "SELL", score: 82, entry: 200, stop: 202, target: 196, rr: 2, tf: "1h", time: "" },
+    ]);
+    expect(fresh.map((s) => s.id)).toEqual(["new-1"]);
+    expect(seen.has("new-1")).toBe(true);
   });
 });
