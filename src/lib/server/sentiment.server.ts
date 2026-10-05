@@ -3,9 +3,6 @@ import { getKlines, getTickers, TARGET_PAIRS } from './market.server'
 
 export interface SentimentAsset {
   asset: string
-  social: number
-  news: number
-  onchain: number
   overall: number
   trend: 'up' | 'upup' | 'flat' | 'down'
   signal: 'BULLISH' | 'NEUTRAL' | 'BEARISH'
@@ -30,6 +27,10 @@ const scoreFromChange = (pct: number) => clamp(50 + pct * 6)
 export async function computeSentiment(): Promise<SentimentOverview> {
   const pairs = TARGET_PAIRS.slice(0, 6)
   const tickers = await getTickers(pairs)
+
+  if (!tickers.length) {
+    throw new Error('Sentimento de mercado indisponível: nenhuma cotação real foi retornada.')
+  }
 
   const assets = await Promise.all(
     tickers.map(async (t): Promise<SentimentAsset> => {
@@ -58,26 +59,24 @@ export async function computeSentiment(): Promise<SentimentOverview> {
           ? ((recent[recent.length - 1]! - recent[0]!) / recent[0]!) * 100
           : 0
 
-      const news = scoreFromChange(t.changePct)
-      const social = clamp(news * 0.6 + scoreFromChange(momentum) * 0.4)
+      const changeScore = scoreFromChange(t.changePct)
+      const momentumScore = scoreFromChange(momentum)
       const range = t.high - t.low || 1
-      const onchain = clamp(((t.price - t.low) / range) * 100)
-      const overall = clamp(news * 0.4 + social * 0.35 + onchain * 0.25)
+      const rangePosition = clamp(((t.price - t.low) / range) * 100)
+      const overall = clamp(changeScore * 0.4 + momentumScore * 0.35 + rangePosition * 0.25)
 
       const trend: SentimentAsset['trend'] =
         momentum > 1.5 ? 'upup' : momentum > 0.3 ? 'up' : momentum < -0.3 ? 'down' : 'flat'
       const signal: SentimentAsset['signal'] =
         overall >= 60 ? 'BULLISH' : overall <= 40 ? 'BEARISH' : 'NEUTRAL'
 
-      return { asset: base, social, news, onchain, overall, trend, signal, spark }
+      return { asset: base, overall, trend, signal, spark }
     }),
   )
 
   const advancers = tickers.filter((t) => t.changePct > 0).length
   const decliners = tickers.length - advancers
-  const overall = assets.length
-    ? clamp(assets.reduce((s, a) => s + a.overall, 0) / assets.length)
-    : 50
+  const overall = clamp(assets.reduce((s, a) => s + a.overall, 0) / assets.length)
   const sorted = [...tickers].sort((a, b) => b.changePct - a.changePct)
   const top = sorted[0]
   const bottom = sorted[sorted.length - 1]
