@@ -2,6 +2,20 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { useScoreDistribution } from "@/hooks/useScoreDistribution";
 import { DataStatusBadge } from "./data-status";
 
+export interface ScoreDistributionChartPoint {
+  label: string;
+  n: number;
+}
+
+export function buildScoreDistributionChartData(
+  buckets: readonly { from: number; to: number; n: number }[],
+): ScoreDistributionChartPoint[] {
+  return buckets.map((bucket) => ({
+    label: `${bucket.from}–${bucket.to === 101 ? 100 : bucket.to - 1}`,
+    n: bucket.n,
+  }));
+}
+
 export function PerformanceChart() {
   const query = useScoreDistribution();
   const group = query.data?.groups[0] ?? null;
@@ -12,11 +26,7 @@ export function PerformanceChart() {
         ? "unavailable"
         : "ok";
 
-  const chartData =
-    group?.buckets.map((bucket) => ({
-      label: `${bucket.from}–${bucket.to === 101 ? 100 : bucket.to - 1}`,
-      n: bucket.n,
-    })) ?? [];
+  const chartData = group ? buildScoreDistributionChartData(group.buckets) : [];
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -29,7 +39,7 @@ export function PerformanceChart() {
         </div>
         <DataStatusBadge
           source="Signals · banco"
-          updatedAt={query.data?.generatedAt ? new Date(query.data.generatedAt) : null}
+          updatedAt={query.data?.latestDataAt ? new Date(query.data.latestDataAt) : null}
           status={status}
         />
       </div>
@@ -55,13 +65,21 @@ export function PerformanceChart() {
                 <XAxis dataKey="label" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
                 <Tooltip
-                  formatter={(value) => [typeof value === "number" ? value : "Indisponível", "n"]}
-                  labelFormatter={(label) => `Score ${label}`}
+                  formatter={(value, _name, item) => [
+                    typeof value === "number" ? `${value} sinais · faixa ${item?.payload?.label ?? "indisponível"}` : "Indisponível",
+                    "",
+                  ]}
+                  labelFormatter={() => ""}
                 />
                 <Bar dataKey="n" name="n" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
+          {query.data?.truncated && (
+            <div className="mt-3 text-[10px] text-amber-600">
+              Exibição limitada aos 10.000 sinais mais recentes; existem mais sinais no período.
+            </div>
+          )}
           {query.data && query.data.groups.length > 1 && (
             <div className="mt-3 text-[10px] text-muted-foreground">
               Exibindo o grupo com maior número de sinais. Outros grupos: {query.data.groups.length - 1}.
