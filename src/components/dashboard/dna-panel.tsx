@@ -2,6 +2,7 @@ import { Brain, Loader2, AlertTriangle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
+import { useBackendAuth } from "@/hooks/useBackendAuth";
 import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 const metrics = [
@@ -17,7 +18,8 @@ function formatNumber(value: number | null | undefined, digits = 0) {
 }
 
 export function DnaPanel() {
-  const profile = useDnaProfile("me");
+  const { userId } = useBackendAuth();
+  const profile = useDnaProfile(userId);
   const stats = useDnaStats();
   const hasProfile = profile.data?.hasProfile === true;
   const hasStats = stats.data?.hasData === true;
