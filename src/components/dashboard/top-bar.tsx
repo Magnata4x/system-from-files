@@ -274,7 +274,10 @@ export function TopBar() {
               </Link>
               <div className="my-1 h-px bg-border" />
               <button
-                onClick={() => supabase.auth.signOut()}
+                onClick={() => {
+                  useDashboardStore.getState().cleanup();
+                  void supabase.auth.signOut();
+                }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-left text-[#E24B4A] hover:bg-secondary"
               >
                 <LogOut className="size-4" /> Sign out
