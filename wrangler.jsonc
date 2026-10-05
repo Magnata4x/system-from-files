@@ -5,6 +5,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
 
+  // Coleta horária do histórico real de métricas globais via CoinGecko /global.
+  "triggers": {
+    "crons": ["0 * * * *"]
+  },
+
   // Observabilidade: habilita Workers Logs / Logpush com amostragem total.
   // head_sampling_rate = 1 → 100% das invocações geram logs estruturados.
   // Reduzir (ex.: 0.1) se o volume ficar alto demais e gerar custo.
