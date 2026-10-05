@@ -1,22 +1,38 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useMarketData } from "@/lib/market-data-store";
+import { buildFearGreedSeries, FEAR_GREED_ZONES, fearGreedColor } from "@/lib/fear-greed";
 import { DataStatusBadge } from "./data-status";
-import { FEAR_GREED_ZONES, fearGreedColor, getFearGreedHistory7d } from "@/lib/fear-greed";
+
+const HISTORY_STALE_AFTER_MS = 48 * 60 * 60 * 1000;
+
+function formatUtcDate(timestamp: number): string {
+  return new Date(timestamp).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "UTC",
+  });
+}
 
 export function FearGreedGauge() {
   const { fearGreed, loading, metadataStatus } = useMarketData();
   const VALUE = fearGreed?.value;
   const LABEL = fearGreed?.label;
+  const series = buildFearGreedSeries(fearGreed?.history);
+  const latestHistoryAt = series.at(-1)?.timestamp ?? null;
+  const historyStatus =
+    series.length === 0
+      ? "unavailable"
+      : latestHistoryAt != null && Date.now() - latestHistoryAt > HISTORY_STALE_AFTER_MS
+        ? "stale"
+        : "ok";
   const dataStatus =
     loading && !fearGreed
       ? "loading"
       : !fearGreed
         ? "unavailable"
-        : metadataStatus === "stale"
+        : metadataStatus === "stale" || historyStatus === "stale"
           ? "stale"
           : "ok";
-  const history = getFearGreedHistory7d(fearGreed?.history ?? []);
-  const historyStatus = history.length ? "ok" : "unavailable";
   const angle = VALUE == null ? 0 : (VALUE / 100) * 180;
   const rad = ((180 - angle) * Math.PI) / 180;
   const cx = 110;
@@ -25,16 +41,14 @@ export function FearGreedGauge() {
   const nx = cx + r * Math.cos(rad);
   const ny = cy - r * Math.sin(rad);
   const zoneColor = fearGreedColor(VALUE);
+  const source = series.length >= 2 ? `Alternative.me · ${series.length} dias` : "Alternative.me";
+  const updatedAt = latestHistoryAt ?? fearGreed?.updatedAt ?? null;
 
   return (
     <div data-tour="fear-greed" className="rounded-xl border border-border bg-card p-4 h-full flex flex-col">
       <div className="flex items-baseline justify-between">
         <h3 className="text-[15px] font-medium text-foreground">Fear &amp; Greed Index</h3>
-        <DataStatusBadge
-          source="Alternative.me"
-          updatedAt={fearGreed?.updatedAt}
-          status={dataStatus}
-        />
+        <DataStatusBadge source={source} updatedAt={updatedAt} status={dataStatus} />
       </div>
       <div className="relative flex-1 flex items-center justify-center mt-2">
         <svg viewBox="0 0 220 130" className="w-full max-w-[260px]">
@@ -68,15 +82,29 @@ export function FearGreedGauge() {
         </div>
       </div>
 
-      {historyStatus === "ok" ? (
-        <div className="mt-3 h-[110px]">
-          <div className="text-[10px] text-muted-foreground mb-1">Histórico · 7 dias</div>
+      {series.length >= 2 ? (
+        <div
+          className="mt-3 h-[110px]"
+          role="img"
+          aria-label={`Histórico de Fear & Greed, ${series.length} dias`}
+        >
+          <div className="text-[10px] text-muted-foreground mb-1">Histórico real</div>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={history} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
-              <XAxis dataKey="date" tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
+            <LineChart data={series} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
+              <XAxis
+                dataKey="timestamp"
+                tick={{ fontSize: 8 }}
+                tickFormatter={formatUtcDate}
+                axisLine={false}
+                tickLine={false}
+              />
               <YAxis domain={[0, 100]} tick={{ fontSize: 8 }} axisLine={false} tickLine={false} />
               <Tooltip
-                formatter={(value) => [typeof value === "number" ? value : "Indisponível", "Fear & Greed"]}
+                labelFormatter={(value) => formatUtcDate(Number(value))}
+                formatter={(value, _name, item) => [
+                  typeof value === "number" ? value : "Indisponível",
+                  item?.payload?.label ?? "Fear & Greed",
+                ]}
               />
               <Line type="monotone" dataKey="value" dot={{ r: 2 }} strokeWidth={2} connectNulls={false} />
             </LineChart>
@@ -84,7 +112,7 @@ export function FearGreedGauge() {
         </div>
       ) : (
         <div className="mt-3 rounded-lg border border-border bg-secondary/20 p-3 text-[11px] text-muted-foreground">
-          Histórico de 7 dias indisponível.
+          Histórico indisponível; exibindo apenas a leitura atual.
         </div>
       )}
     </div>
