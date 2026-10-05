@@ -21,6 +21,22 @@ export interface SentimentOverview {
   topLoser: { asset: string; changePct: number } | null;
   quoteVolume24h: number;
   assets: SentimentAsset[];
+  newsFeed: {
+    provider: "Marketaux";
+    status: "available" | "unavailable";
+    count: number;
+    score: number | null;
+    articles: Array<{
+      id: string;
+      title: string;
+      url: string;
+      source: string;
+      publishedAt: string;
+      score: number | null;
+      symbols: string[];
+    }>;
+    updatedAt: string | null;
+  };
   updatedAt: string;
 }
 
