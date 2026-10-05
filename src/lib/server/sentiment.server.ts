@@ -1,4 +1,5 @@
-// Sentimento de mercado calculado a partir de dados reais da Binance.
+// Leitura de mercado baseada exclusivamente em dados reais da Binance.
+// Notícias financeiras são uma fonte separada e opcional (Marketaux).
 import { getKlines, getTickers, TARGET_PAIRS } from './market.server'
 import { cachedJson } from '../cache'
 
@@ -35,7 +36,6 @@ interface MarketauxArticleResponse {
   url?: unknown
   source?: unknown
   published_at?: unknown
-  relevance_score?: unknown
   entities?: unknown
 }
 
@@ -45,9 +45,8 @@ interface MarketauxResponse {
 
 export interface SentimentAsset {
   asset: string
-  social: number
-  news: number
-  onchain: number
+  momentum: number
+  rangePosition: number
   overall: number
   trend: 'up' | 'upup' | 'flat' | 'down'
   signal: 'BULLISH' | 'NEUTRAL' | 'BEARISH'
@@ -116,12 +115,9 @@ async function loadMarketauxNews(): Promise<MarketauxNews> {
       const averageSentiment = sentimentValues.length
         ? sentimentValues.reduce((sum, value) => sum + value, 0) / sentimentValues.length
         : null
-      const relevanceScore = finiteNumber(item.relevance_score)
       const score = averageSentiment === null
-        ? relevanceScore !== null && relevanceScore >= 0 && relevanceScore <= 1
-          ? Math.round(relevanceScore * 100)
-          : null
-        : Math.round(((averageSentiment + 1) / 2) * 100)
+        ? null
+        : clamp(50 + averageSentiment * 50)
       const symbols = Array.from(new Set(entities.flatMap((entity) =>
         typeof entity.symbol === 'string' && entity.symbol.trim()
           ? [entity.symbol.trim().toUpperCase()]
@@ -138,6 +134,7 @@ async function loadMarketauxNews(): Promise<MarketauxNews> {
         symbols,
       }]
     })
+
     const scores = articles
       .map((article) => article.score)
       .filter((score): score is number => score !== null)
@@ -165,6 +162,10 @@ export async function computeSentiment(): Promise<SentimentOverview> {
   const pairs = TARGET_PAIRS.slice(0, 6)
   const [tickers, newsFeed] = await Promise.all([getTickers(pairs), getMarketauxNews()])
 
+  if (tickers.length === 0) {
+    throw new Error('Sentimento de mercado indisponível: nenhuma cotação real foi retornada.')
+  }
+
   const assets = await Promise.all(
     tickers.map(async (t): Promise<SentimentAsset> => {
       const base = t.pair.split('/')[0] ?? t.pair
@@ -185,33 +186,37 @@ export async function computeSentiment(): Promise<SentimentOverview> {
           })()
         : []
 
-      // Momento curto (últimas 6 barras) x variação de 24h.
       const recent = closes.slice(-6)
-      const momentum =
+      const momentumPct =
         recent.length >= 2 && recent[0]
           ? ((recent[recent.length - 1]! - recent[0]!) / recent[0]!) * 100
-          : 0
+          : t.changePct
+      const momentum = scoreFromChange(momentumPct)
+      const range = t.high - t.low
+      const rangePosition = range > 0 ? clamp(((t.price - t.low) / range) * 100) : null
 
-      const news = scoreFromChange(t.changePct)
-      const social = clamp(news * 0.6 + scoreFromChange(momentum) * 0.4)
-      const range = t.high - t.low || 1
-      const onchain = clamp(((t.price - t.low) / range) * 100)
-      const overall = clamp(news * 0.4 + social * 0.35 + onchain * 0.25)
+      // Sem histórico de candles ou range válido, não inventamos score.
+      // O ativo continua presente, mas o score fica indisponível.
+      const overall = rangePosition === null
+        ? momentum
+        : clamp((momentum + rangePosition) / 2)
 
       const trend: SentimentAsset['trend'] =
-        momentum > 1.5 ? 'upup' : momentum > 0.3 ? 'up' : momentum < -0.3 ? 'down' : 'flat'
+        momentumPct > 1.5 ? 'upup' : momentumPct > 0.3 ? 'up' : momentumPct < -0.3 ? 'down' : 'flat'
       const signal: SentimentAsset['signal'] =
         overall >= 60 ? 'BULLISH' : overall <= 40 ? 'BEARISH' : 'NEUTRAL'
 
-      return { asset: base, social, news, onchain, overall, trend, signal, spark }
+      return { asset: base, momentum, rangePosition: rangePosition ?? momentum, overall, trend, signal, spark }
     }),
   )
 
   const advancers = tickers.filter((t) => t.changePct > 0).length
-  const decliners = tickers.length - advancers
+  const decliners = tickers.filter((t) => t.changePct < 0).length
   const overall = assets.length
     ? clamp(assets.reduce((s, a) => s + a.overall, 0) / assets.length)
-    : 50
+    : (() => {
+        throw new Error('Sentimento de mercado indisponível: nenhum ativo real possui score.')
+      })()
   const sorted = [...tickers].sort((a, b) => b.changePct - a.changePct)
   const top = sorted[0]
   const bottom = sorted[sorted.length - 1]
