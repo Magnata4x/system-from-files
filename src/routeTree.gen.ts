@@ -459,10 +459,6 @@ export interface FileRoutesByFullPath {
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
-  '/api/market/history': typeof ApiMarketHistoryRoute
-  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
-  '/api/market/history': typeof ApiMarketHistoryRoute
-  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
