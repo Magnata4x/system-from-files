@@ -4,24 +4,26 @@ import { X, Bell } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ScoreBadge } from "./score-badge";
 import { relativeTime } from "@/lib/data-status";
+
 export function SignalDrawer() {
-  const s = useDashboardStore((st) => st.selectedSignal),
-    close = useDashboardStore((st) => st.setSelectedSignal);
+  const s = useDashboardStore((st) => st.selectedSignal);
+  const close = useDashboardStore((st) => st.setSelectedSignal);
   return (
     <AnimatePresence>
       {s && (
         <>
-          <motion.div className="fixed inset-0 bg-black/60 z-50" onClick={() => close(null)} />
+          <motion.div className="fixed inset-0 bg-black/60 z-50" onClick={() => close(null)} aria-hidden="true" />
           <motion.aside
             className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-card border-l border-border overflow-y-auto"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
+            aria-label={`Detalhes do sinal ${s.asset}`}
           >
             <div className="p-6">
               <div className="flex justify-between">
                 <div>
-                  <div className="text-[11px] uppercase text-muted-foreground">Signal detail</div>
+                  <div className="text-[11px] uppercase text-muted-foreground">Detalhes do sinal</div>
                   <div className="text-[22px] mt-1">{s.asset}</div>
                 </div>
                 <button onClick={() => close(null)} aria-label="Fechar detalhes">
@@ -35,16 +37,16 @@ export function SignalDrawer() {
                   · {s.tf || "—"} · {relativeTime(s.time)}
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <Stat label="Entry" value={money(s.entry)} />
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <Stat label="Entrada" value={money(s.entry)} />
                 <Stat label="Stop" value={money(s.stop)} />
-                <Stat label="Target" value={money(s.target)} />
+                <Stat label="Alvo" value={money(s.target)} />
                 <Stat label="R/R" value={s.rr == null ? "—" : s.rr.toFixed(1)} />
-                <Stat label="Timeframe" value={s.tf || "—"} />
-                <Stat label="Type" value={s.type ?? "—"} />
+                <Stat label="Período" value={s.tf || "—"} />
+                <Stat label="Tipo" value={s.type ?? "—"} />
               </div>
               <Section title="Setup">{s.setup ?? "—"}</Section>
-              <Section title="Confluences">
+              <Section title="Confluências">
                 {s.confluences?.length ? s.confluences.join(" · ") : "—"}
               </Section>
               <Link
