@@ -1,35 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { getFearGreedHistory7d } from "./fear-greed";
+import { buildFearGreedSeries } from "./fear-greed";
 
-const DAY = 24 * 60 * 60 * 1000;
-
-describe("fear greed history", () => {
-  it("retorna somente pontos reais dentro dos últimos 7 dias, em ordem", () => {
-    const now = 10 * DAY;
-    const result = getFearGreedHistory7d(
-      [
-        { value: 50, label: "Neutral", timestamp: now - 8 * DAY },
-        { value: 30, label: "Fear", timestamp: now - 2 * DAY },
-        { value: 70, label: "Greed", timestamp: now - 5 * DAY },
-        { value: 90, label: "Extreme Greed", timestamp: now - DAY },
-      ],
-      now,
-    );
-
-    expect(result.map((point) => point.value)).toEqual([70, 30, 90]);
-    expect(result).toHaveLength(3);
+describe("buildFearGreedSeries", () => {
+  it("retorna vazio para histórico ausente ou vazio", () => {
+    expect(buildFearGreedSeries(null)).toEqual([]);
+    expect(buildFearGreedSeries(undefined)).toEqual([]);
+    expect(buildFearGreedSeries([])).toEqual([]);
   });
 
-  it("não cria pontos quando o histórico real está ausente", () => {
-    expect(getFearGreedHistory7d([], 10 * DAY)).toEqual([]);
+  it("ordena os pontos reais em ordem crescente sem criar pontos", () => {
+    const input = [
+      { value: 90, label: "Extreme Greed", timestamp: 3000 },
+      { value: 30, label: "Fear", timestamp: 1000 },
+      { value: 70, label: "Greed", timestamp: 2000 },
+    ];
+    const result = buildFearGreedSeries(input);
+
+    expect(result.map((point) => point.timestamp)).toEqual([1000, 2000, 3000]);
+    expect(result).toHaveLength(input.length);
   });
 
-  it("não fabrica valor para ponto inválido", () => {
-    expect(
-      getFearGreedHistory7d(
-        [{ value: Number.NaN, label: "Invalid", timestamp: 10 * DAY - DAY }],
-        10 * DAY,
-      ),
-    ).toEqual([]);
+  it("descarta valores e timestamps inválidos", () => {
+    const input = [
+      { value: Number.NaN, label: "Invalid", timestamp: 1000 },
+      { value: -1, label: "Invalid", timestamp: 2000 },
+      { value: 101, label: "Invalid", timestamp: 3000 },
+      { value: 50, label: "Neutral", timestamp: 0 },
+      { value: 60, label: "Greed", timestamp: Number.NaN },
+      { value: 40, label: "Neutral", timestamp: 4000 },
+    ];
+    const result = buildFearGreedSeries(input);
+
+    expect(result).toEqual([{ value: 40, label: "Neutral", timestamp: 4000 }]);
+    expect(result.length).toBeLessThanOrEqual(input.length);
   });
 });
