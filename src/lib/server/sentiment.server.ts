@@ -46,7 +46,7 @@ interface MarketauxResponse {
 export interface SentimentAsset {
   asset: string
   momentum: number
-  rangePosition: number
+  rangePosition: number | null
   overall: number
   trend: 'up' | 'upup' | 'flat' | 'down'
   signal: 'BULLISH' | 'NEUTRAL' | 'BEARISH'
@@ -195,8 +195,7 @@ export async function computeSentiment(): Promise<SentimentOverview> {
       const range = t.high - t.low
       const rangePosition = range > 0 ? clamp(((t.price - t.low) / range) * 100) : null
 
-      // Sem histórico de candles ou range válido, não inventamos score.
-      // O ativo continua presente, mas o score fica indisponível.
+      // Sem range válido, o overall usa apenas o momentum real; não inventamos o range.
       const overall = rangePosition === null
         ? momentum
         : clamp((momentum + rangePosition) / 2)
