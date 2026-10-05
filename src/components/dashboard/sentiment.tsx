@@ -6,30 +6,34 @@ export function Sentiment() {
   const { data, isLoading, isError, isStale, dataUpdatedAt } = useSentiment();
   const status = isLoading ? "loading" : isError ? "unavailable" : isStale ? "stale" : "ok";
   const updatedAt = data?.updatedAt ? new Date(data.updatedAt) : (dataUpdatedAt || null);
+
   return (
     <div className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-[15px] font-medium">Sentiment de mercado</h3>
+          <h3 className="text-[15px] font-medium">Momentum de mercado</h3>
           <p className="text-[10px] text-muted-foreground mt-1">
-            Leitura real baseada em preço, variação e momentum de mercado.
+            Leitura real baseada em variação, momentum e posição no range da Binance.
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <DataStatusBadge source="Sentiment · mercado" updatedAt={updatedAt} status={status} />
+          <DataStatusBadge source="Binance · mercado" updatedAt={updatedAt} status={status} />
           {data && <span className="text-[22px] font-semibold tabular-nums">{data.overall}/100</span>}
         </div>
       </div>
+
       {isLoading && (
         <div className="flex items-center gap-2 mt-4 text-[12px] text-muted-foreground">
-          <Loader2 className="size-3.5 animate-spin" /> carregando sentimento…
+          <Loader2 className="size-3.5 animate-spin" /> carregando momentum…
         </div>
       )}
+
       {isError && (
         <div className="flex items-center gap-2 mt-4 text-[12px] text-[#E24B4A]">
-          <AlertTriangle className="size-3.5" /> Fonte de sentimento indisponível.
+          <AlertTriangle className="size-3.5" /> Fonte de mercado indisponível.
         </div>
       )}
+
       {data && !isLoading && !isError && (
         <div className="mt-4 space-y-3">
           <div className="flex items-center gap-3 text-[11px]">
@@ -39,6 +43,7 @@ export function Sentiment() {
               {data.advancers} ↑ / {data.decliners} ↓
             </span>
           </div>
+
           <div className="space-y-2">
             {data.assets.slice(0, 4).map((asset) => {
               const Icon =
@@ -53,6 +58,7 @@ export function Sentiment() {
                   : asset.signal === "BEARISH"
                     ? "text-[#E24B4A]"
                     : "text-muted-foreground";
+
               return (
                 <div key={asset.asset} className="flex items-center gap-2 text-[11px]">
                   <span className="w-12 font-medium">{asset.asset}</span>
@@ -68,6 +74,7 @@ export function Sentiment() {
               );
             })}
           </div>
+
           {data.topGainer && data.topLoser && (
             <div className="text-[10px] text-muted-foreground">
               Melhor: {data.topGainer.asset} ({data.topGainer.changePct >= 0 ? "+" : ""}
@@ -75,6 +82,7 @@ export function Sentiment() {
               {data.topLoser.changePct.toFixed(2)}%)
             </div>
           )}
+
           <div className="border-t border-border pt-3">
             <div className="flex items-center justify-between gap-3 text-[10px]">
               <DataStatusBadge
@@ -88,6 +96,7 @@ export function Sentiment() {
                   : "notícias indisponíveis"}
               </span>
             </div>
+
             {data.newsFeed.status === "available" && data.newsFeed.articles.length > 0 && (
               <div className="mt-2 space-y-2">
                 {data.newsFeed.articles.slice(0, 3).map((article) => (
