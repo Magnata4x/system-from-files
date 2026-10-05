@@ -14,13 +14,13 @@ import { VitePWA } from "vite-plugin-pwa";
 const publicSupabaseUrl =
   process.env.VITE_SUPABASE_URL ??
   process.env.SUPABASE_URL ??
-  "https://tzqqkrlzrgsnicfugkzf.supabase.co";
+  "https://yjlqwotxoyjdqcagixys.supabase.co";
 const publicSupabasePublishableKey =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
   process.env.SUPABASE_PUBLISHABLE_KEY ??
   process.env.VITE_SUPABASE_ANON_KEY ??
   process.env.SUPABASE_ANON_KEY ??
-  "sb_publishable_YDsUlR4X2ESk0PHdtg59vg_DZcoU_Z0";
+  "sb_publishable_nUeXPHAqoaN_jTnoteIW2g_MY2LLzLA";
 
 // PWA-01: offline degradado para usuários que monitoram posições abertas.
 // - registerType:"autoUpdate" + sw em /sw.js, NetworkFirst para navegações
