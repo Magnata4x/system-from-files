@@ -16,6 +16,9 @@ export interface BackendSignal {
   tf?: string;
   exchange?: string;
   createdAt?: string;
+  type?: string;
+  setup?: string;
+  confluences?: string[];
 }
 
 export interface SignalUI {
@@ -32,6 +35,9 @@ export interface SignalUI {
   tf?: string;
   exchange?: string;
   createdAt?: string;
+  type?: string;
+  setup?: string;
+  confluences?: string[];
   // raw passthrough para componentes que precisem de campos extras
   raw?: BackendSignal;
 }
@@ -60,6 +66,9 @@ export function mapSignal(s: BackendSignal): SignalUI {
     tf: s.tf,
     exchange: s.exchange,
     createdAt: s.createdAt,
+    type: s.type,
+    setup: s.setup,
+    confluences: s.confluences,
     raw: s,
   };
 }
