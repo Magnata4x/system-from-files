@@ -181,7 +181,7 @@ export function Bot4xSummaryWidget() {
         <div>
           <div
             className="text-[18px] font-semibold"
-            style={{ color: breaker ? "#E24B4A" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
+            style={{ color: breaker ? "#E24B4A" : !riskAvailable ? "var(--muted-foreground)" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
           >
             {riskAvailable ? (pnl >= 0 ? "+" : "") + pnl.toFixed(2) + "%" : "—"}
           </div>
