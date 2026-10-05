@@ -5,6 +5,7 @@ import { useDashboardStore } from "@/lib/dashboard-store";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useSentiment } from "@/hooks/useSentiment";
+import { DataStatusBadge } from "./data-status";
 
 function Card(p: {
   title: string;
@@ -57,31 +58,42 @@ function Status({
   return <>{children}</>;
 }
 export function DnaTraderWidget() {
-  const { data, isLoading, isError } = useDnaProfile("me");
-  const { data: stats } = useDnaStats();
+  const { data, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile("me");
+  const { data: stats, isLoading: statsLoading, isError: statsError, isStale: statsStale, dataUpdatedAt: statsUpdatedAt } = useDnaStats();
+  const hasProfile = data?.hasProfile === true;
+  const status = isLoading || statsLoading ? "loading" : isError || statsError ? "unavailable" : isStale || statsStale ? "stale" : "ok";
+  const updatedAt = Math.max(dataUpdatedAt || 0, statsUpdatedAt || 0) || null;
   return (
     <Card title="DNA Trader" icon={Brain} accent="#378ADD" to="/dna-trader">
-      <Status loading={isLoading} error={isError}>
-        {data ? (
-          <div className="space-y-2">
+      <Status loading={isLoading || statsLoading} error={isError || statsError}>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
             <div className="text-[11px] text-muted-foreground">
-              {String(data.tradingStyle ?? "moderate")} · win rate{" "}
-              {Number(data.avgWinRate ?? 0).toFixed(1)}%
+              {hasProfile
+                ? String(data?.tradingStyle ?? "—") + " · win rate " + (data?.avgWinRate == null ? "—" : data.avgWinRate.toFixed(1) + "%")
+                : "Perfil DNA indisponível."}
             </div>
-            <div className="grid grid-cols-3 gap-1.5 text-[10px]">
-              <MiniMetric label="Consist." value={Number(data.consistency ?? 0)} />
-              <MiniMetric label="Discipl." value={Number(data.discipline ?? 0)} />
-              <MiniMetric label="Risco" value={Number(data.riskControl ?? 0)} />
-            </div>
-            {stats?.hasData && (
-              <div className="text-[10px] text-muted-foreground">
-                {stats.totalTrades} operações · {stats.bestPair ?? "sem par destaque"}
-              </div>
-            )}
+            <DataStatusBadge source="DNA · backend" updatedAt={updatedAt} status={status} />
           </div>
-        ) : (
-          <div className="text-[11px] text-muted-foreground">Sem perfil DNA disponível.</div>
-        )}
+          {hasProfile ? (
+            <>
+              <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+                <MiniMetric label="Consist." value={data?.consistency} />
+                <MiniMetric label="Discipl." value={data?.discipline} />
+                <MiniMetric label="Risco" value={data?.riskControl} />
+              </div>
+              {stats?.hasData ? (
+                <div className="text-[10px] text-muted-foreground">
+                  {stats.totalTrades} operações · {stats.bestPair ?? "—"}
+                </div>
+              ) : (
+                <div className="text-[10px] text-muted-foreground">Sem histórico de operações suficiente.</div>
+              )}
+            </>
+          ) : (
+            <div className="text-[11px] text-muted-foreground">Nenhum perfil calculado. Nenhum dado fictício é exibido.</div>
+          )}
+        </div>
       </Status>
     </Card>
   );
@@ -90,10 +102,17 @@ export function ManipulationWidget() {
   const alerts = useDashboardStore((s) => s.manipAlerts);
   const loading = useDashboardStore((s) => s.manipLoading);
   const error = useDashboardStore((s) => s.manipError);
+  const stale = useDashboardStore((s) => s.manipStale);
+  const updatedAt = useDashboardStore((s) => s.manipUpdatedAt);
   const high = alerts.filter((a) => a.severity === "HIGH").length;
   return (
     <Card title="Manipulation" icon={Shield} accent="#E24B4A" to="/manipulation">
-      <Status loading={loading} error={!!error}>
+      <Status loading={loading} error={!!error && alerts.length === 0}>
+        <DataStatusBadge
+          source="Manipulation · backend"
+          updatedAt={updatedAt}
+          status={loading && alerts.length === 0 ? "loading" : error && alerts.length === 0 ? "unavailable" : stale ? "stale" : "ok"}
+        />
         <div className="space-y-2">
           <div className="text-[11px] text-muted-foreground">
             {alerts.length ? `${alerts.length} alertas ativos` : "Nenhum alerta ativo"}
@@ -112,10 +131,16 @@ export function ManipulationWidget() {
   );
 }
 export function SentimentWidget() {
-  const { data, isLoading, isError } = useSentiment();
+  const { data, isLoading, isError, isStale, dataUpdatedAt } = useSentiment();
+  const sentimentStatus = isLoading ? "loading" : isError ? "unavailable" : isStale ? "stale" : "ok";
   return (
     <Card title="Sentiment" icon={Sparkles} accent="#7F77DD" to="/sentiment">
       <Status loading={isLoading} error={isError}>
+        <DataStatusBadge
+          source="Sentiment · mercado"
+          updatedAt={data?.updatedAt ? new Date(data.updatedAt) : dataUpdatedAt || null}
+          status={sentimentStatus}
+        />
         {data ? (
           <div className="space-y-2">
             <div className="flex items-baseline gap-2">
@@ -167,11 +192,11 @@ export function Bot4xSummaryWidget() {
     </Card>
   );
 }
-function MiniMetric({ label, value }: { label: string; value: number }) {
+function MiniMetric({ label, value }: { label: string; value: number | null | undefined }) {
   return (
     <div className="rounded-md border border-border bg-secondary/30 px-2 py-1">
       <div className="text-[9px] text-muted-foreground">{label}</div>
-      <div className="text-[11px] font-medium tabular-nums">{value.toFixed(0)}</div>
+      <div className="text-[11px] font-medium tabular-nums">{value == null ? "—" : value.toFixed(0)}</div>
     </div>
   );
 }
