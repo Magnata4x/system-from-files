@@ -5,6 +5,7 @@ import { useDashboardStore } from "@/lib/dashboard-store";
 import { useDnaProfile } from "@/hooks/useDnaProfile";
 import { useDnaStats } from "@/hooks/useDnaStats";
 import { useSentiment } from "@/hooks/useSentiment";
+import { useBackendAuth } from "@/hooks/useBackendAuth";
 import { DataStatusBadge } from "./data-status";
 
 function Card(p: {
@@ -58,7 +59,8 @@ function Status({
   return <>{children}</>;
 }
 export function DnaTraderWidget() {
-  const { data, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile("me");
+  const { userId } = useBackendAuth();
+  const { data, isLoading, isError, isStale, dataUpdatedAt } = useDnaProfile(userId);
   const { data: stats, isLoading: statsLoading, isError: statsError, isStale: statsStale, dataUpdatedAt: statsUpdatedAt } = useDnaStats();
   const hasProfile = data?.hasProfile === true;
   const status = isLoading || statsLoading ? "loading" : isError || statsError ? "unavailable" : isStale || statsStale ? "stale" : "ok";
