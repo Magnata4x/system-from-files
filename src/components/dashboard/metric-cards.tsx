@@ -116,7 +116,7 @@ function Card(p: {
   sub: string;
   source: string;
   status: "loading" | "ok" | "stale" | "unavailable";
-  updatedAt?: Date | null;
+  updatedAt?: Date | number | null;
 }) {
   const n = useCountUp(p.count ?? 0, 1200);
   return (
