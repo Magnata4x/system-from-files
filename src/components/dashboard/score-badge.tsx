@@ -1,8 +1,8 @@
 export function scoreColor(score: number): string {
-  if (score >= 90) return "#7F77DD";
-  if (score >= 75) return "#1D9E75";
-  if (score >= 60) return "#EF9F27";
-  return "#E24B4A";
+  if (score >= 90) return "var(--score-excellent)";
+  if (score >= 75) return "var(--score-good)";
+  if (score >= 60) return "var(--score-medium)";
+  return "var(--score-low)";
 }
 
 export function ScoreBadge({ score, size = "md" }: { score: number; size?: "sm" | "md" | "lg" }) {
@@ -21,6 +21,7 @@ export function ScoreBadge({ score, size = "md" }: { score: number; size?: "sm" 
         color,
         border: `1px solid color-mix(in oklab, ${color} 35%, transparent)`,
       }}
+      aria-label={`Score ${score}`}
     >
       {score}
     </span>
