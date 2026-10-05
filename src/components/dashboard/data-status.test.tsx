@@ -5,11 +5,11 @@ import { DataStatusBadge } from "./data-status";
 describe("DataStatusBadge", () => {
   it("exposes unavailable state without fabricating a value", () => {
     render(<DataStatusBadge source="Calendário econômico" status="unavailable" />);
-    expect(screen.getByText("Calendário econômico · indisponível")).toBeInTheDocument();
+    expect(screen.getByText("Calendário econômico · indisponível")).toBeTruthy();
   });
 
   it("makes stale state explicit with age", () => {
     render(<DataStatusBadge source="Sinais" status="stale" updatedAt={Date.now() - 120_000} />);
-    expect(screen.getByText(/Sinais · desatualizado/)).toBeInTheDocument();
+    expect(screen.getByText(/Sinais · desatualizado/)).toBeTruthy();
   });
 });
