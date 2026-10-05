@@ -206,7 +206,7 @@ export async function computeSentiment(): Promise<SentimentOverview> {
       const signal: SentimentAsset['signal'] =
         overall >= 60 ? 'BULLISH' : overall <= 40 ? 'BEARISH' : 'NEUTRAL'
 
-      return { asset: base, momentum, rangePosition: rangePosition ?? momentum, overall, trend, signal, spark }
+      return { asset: base, momentum, rangePosition, overall, trend, signal, spark }
     }),
   )
 
