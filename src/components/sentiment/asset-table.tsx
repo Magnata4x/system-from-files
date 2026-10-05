@@ -1,4 +1,3 @@
-import { ASSETS } from "@/lib/sentiment-data";
 import { useState } from "react";
 import { useSentiment, useSentimentAsset } from "@/hooks/useSentiment";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,36 +13,47 @@ export function AssetSentimentTable() {
   const { data, isPending, isError } = useSentiment();
   const [selected, setSelected] = useState<string | null>(null);
   const detail = useSentimentAsset(selected);
-  const rows = data?.assets?.length ? data.assets : ASSETS;
+  const rows = data?.assets ?? [];
 
   if (isPending) {
     return (
       <div className="rounded-xl border border-border bg-card/40 p-4 space-y-2">
         <div className="flex items-baseline justify-between mb-3">
-        <h3 className="text-sm font-semibold">Asset Sentiment</h3>
-        <span className="text-[10px] text-muted-foreground">
-          {isError ? "dados indisponíveis · demo" : data ? "ao vivo" : "demo"}
-        </span>
-      </div>
+          <h3 className="text-sm font-semibold">Momentum por ativo</h3>
+          <span className="text-[10px] text-muted-foreground">carregando</span>
+        </div>
         {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+      </div>
+    );
+  }
+
+  if (isError || rows.length === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-card/40 p-4">
+        <div className="flex items-baseline justify-between mb-3">
+          <h3 className="text-sm font-semibold">Momentum por ativo</h3>
+          <span className="text-[10px] text-muted-foreground">dados indisponíveis</span>
+        </div>
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          Dados reais de mercado indisponíveis no momento.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="rounded-xl border border-border bg-card/40 p-4">
-      <h3 className="text-sm font-semibold mb-3">Asset Sentiment</h3>
+      <h3 className="text-sm font-semibold mb-3">Momentum por ativo</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-xs min-w-[640px]">
           <thead>
             <tr className="text-[10px] uppercase tracking-wider text-muted-foreground text-left">
-              <th className="py-2 font-medium">Asset</th>
-              <th className="font-medium">Social</th>
-              <th className="font-medium">News</th>
-              <th className="font-medium">On-chain</th>
+              <th className="py-2 font-medium">Ativo</th>
+              <th className="font-medium">Momentum</th>
+              <th className="font-medium">Range</th>
               <th className="font-medium">Overall</th>
-              <th className="font-medium">7d Trend</th>
-              <th className="font-medium text-right">Signal</th>
+              <th className="font-medium">Tendência</th>
+              <th className="font-medium text-right">Sinal</th>
             </tr>
           </thead>
           <tbody>
@@ -54,9 +64,8 @@ export function AssetSentimentTable() {
                 onClick={() => setSelected(a.asset)}
               >
                 <td className="py-2.5 font-semibold">{a.asset}</td>
-                <td className="tabular-nums">{a.social}</td>
-                <td className="tabular-nums">{a.news}</td>
-                <td className="tabular-nums">{a.onchain}</td>
+                <td className="tabular-nums">{a.momentum}</td>
+                <td className="tabular-nums">{a.rangePosition ?? "—"}</td>
                 <td className="tabular-nums font-semibold">{a.overall}</td>
                 <td>
                   <div className="flex items-center gap-2">
