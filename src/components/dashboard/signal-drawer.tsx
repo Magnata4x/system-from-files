@@ -1,6 +1,7 @@
 import { useDashboardStore } from "@/lib/dashboard-store";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Bell } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { ScoreBadge } from "./score-badge";
 import { relativeTime } from "@/lib/data-status";
 export function SignalDrawer() {
@@ -44,12 +45,13 @@ export function SignalDrawer() {
               </div>
               <Section title="Setup">—</Section>
               <Section title="Confluences">—</Section>
-              <button
-                disabled
-                className="w-full mt-4 h-11 rounded-lg opacity-50 cursor-not-allowed"
+              <Link
+                to="/alerts"
+                className="w-full mt-4 h-11 rounded-lg border border-border flex items-center justify-center gap-2 text-[13px] hover:bg-secondary transition-colors"
               >
-                Set alert for this signal · indisponível
-              </button>
+                <Bell className="size-4" />
+                Configurar alerta para este sinal
+              </Link>
             </div>
           </motion.aside>
         </>
