@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   BOT4X_CIRCUIT_BREAKER_PNL_PCT,
   isBot4xCircuitBreakerTriggered,
-} from "./bot4x-store";
+} from "./bot4x-breaker";
 
 describe("Bot4x circuit breaker", () => {
   it("triggers at or below -1.5% PnL", () => {
