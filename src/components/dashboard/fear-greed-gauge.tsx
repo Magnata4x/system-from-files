@@ -3,8 +3,6 @@ import { useMarketData } from "@/lib/market-data-store";
 import { buildFearGreedSeries, FEAR_GREED_ZONES, fearGreedColor } from "@/lib/fear-greed";
 import { DataStatusBadge } from "./data-status";
 
-const HISTORY_STALE_AFTER_MS = 48 * 60 * 60 * 1000;
-
 function formatUtcDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -18,19 +16,12 @@ export function FearGreedGauge() {
   const VALUE = fearGreed?.value;
   const LABEL = fearGreed?.label;
   const series = buildFearGreedSeries(fearGreed?.history);
-  const latestHistoryAt = series.at(-1)?.timestamp ?? null;
-  const historyStatus =
-    series.length === 0
-      ? "unavailable"
-      : latestHistoryAt != null && Date.now() - latestHistoryAt > HISTORY_STALE_AFTER_MS
-        ? "stale"
-        : "ok";
   const dataStatus =
     loading && !fearGreed
       ? "loading"
       : !fearGreed
         ? "unavailable"
-        : metadataStatus === "stale" || historyStatus === "stale"
+        : metadataStatus === "stale"
           ? "stale"
           : "ok";
   const angle = VALUE == null ? 0 : (VALUE / 100) * 180;
@@ -42,7 +33,7 @@ export function FearGreedGauge() {
   const ny = cy - r * Math.sin(rad);
   const zoneColor = fearGreedColor(VALUE);
   const source = series.length >= 2 ? `Alternative.me · ${series.length} dias` : "Alternative.me";
-  const updatedAt = latestHistoryAt ?? fearGreed?.updatedAt ?? null;
+  const updatedAt = fearGreed?.updatedAt ?? null;
 
   return (
     <div data-tour="fear-greed" className="rounded-xl border border-border bg-card p-4 h-full flex flex-col">
