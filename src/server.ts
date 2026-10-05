@@ -1,3 +1,4 @@
+import { collectMarketSnapshot } from "./lib/server/market-snapshot-cron";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -204,6 +205,17 @@ function withTraceHeader(response: Response, traceId: string): Response {
 }
 
 export default {
+  async scheduled(controller: { cron: string; scheduledTime: number }) {
+    if (controller.cron !== "0 * * * *") return;
+    try {
+      const result = await collectMarketSnapshot();
+      console.log("[market-snapshot] cron ok", result);
+    } catch (error) {
+      console.error("[market-snapshot] cron failed", error);
+      throw error;
+    }
+  },
+
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const nonce = crypto.randomUUID().replace(/-/g, "");
     const traceId =

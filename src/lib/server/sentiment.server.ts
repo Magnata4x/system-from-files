@@ -211,6 +211,8 @@ export async function computeSentiment(): Promise<SentimentOverview> {
 
   const advancers = tickers.filter((t) => t.changePct > 0).length
   const decliners = tickers.filter((t) => t.changePct < 0).length
+  const bullishAssets = assets.filter((asset) => asset.signal === 'BULLISH').length
+  const bearishAssets = assets.filter((asset) => asset.signal === 'BEARISH').length
   const overall = assets.length
     ? clamp(assets.reduce((s, a) => s + a.overall, 0) / assets.length)
     : (() => {
@@ -222,7 +224,10 @@ export async function computeSentiment(): Promise<SentimentOverview> {
 
   return {
     overall,
-    bullBear: { bull: overall, bear: 100 - overall },
+    bullBear: {
+      bull: Math.round((bullishAssets / assets.length) * 100),
+      bear: Math.round((bearishAssets / assets.length) * 100),
+    },
     advancers,
     decliners,
     topGainer: top ? { asset: top.pair, changePct: top.changePct } : null,

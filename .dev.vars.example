@@ -11,6 +11,8 @@
 # =============================================================
 
 # ----- Supabase (server-side) ---------------------------------
+# URL do projeto Supabase usada somente pelo cron server-side.
+SUPABASE_URL=https://<project-ref>.supabase.co
 # Service role key — bypassa RLS, NUNCA exponha no cliente.
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 
