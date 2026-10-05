@@ -9,7 +9,6 @@ import {
   Brain,
   Flame,
   BarChart3,
-  Calendar,
   ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
