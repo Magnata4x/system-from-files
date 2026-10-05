@@ -41,10 +41,12 @@ export function SignalDrawer() {
                 <Stat label="Target" value={money(s.target)} />
                 <Stat label="R/R" value={s.rr == null ? "—" : s.rr.toFixed(1)} />
                 <Stat label="Timeframe" value={s.tf || "—"} />
-                <Stat label="Type" value="—" />
+                <Stat label="Type" value={s.type ?? "—"} />
               </div>
-              <Section title="Setup">—</Section>
-              <Section title="Confluences">—</Section>
+              <Section title="Setup">{s.setup ?? "—"}</Section>
+              <Section title="Confluences">
+                {s.confluences?.length ? s.confluences.join(" · ") : "—"}
+              </Section>
               <Link
                 to="/alerts"
                 className="w-full mt-4 h-11 rounded-lg border border-border flex items-center justify-center gap-2 text-[13px] hover:bg-secondary transition-colors"
