@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { useDashboardStore } from "@/lib/dashboard-store";
+import { DataStatusBadge } from "./data-status";
 import type { Severity } from "@/lib/manipulation-data";
 
 const colors: Record<Severity, string> = {
@@ -20,11 +21,18 @@ export function AlertsFeed() {
   const alerts = useDashboardStore((s) => s.manipAlerts);
   const loading = useDashboardStore((s) => s.manipLoading);
   const error = useDashboardStore((s) => s.manipError);
+  const stale = useDashboardStore((s) => s.manipStale);
+  const updatedAt = useDashboardStore((s) => s.manipUpdatedAt);
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 h-full">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-[15px] font-medium text-foreground">Recent alerts</h3>
+        <DataStatusBadge
+          source="Manipulation · backend"
+          updatedAt={updatedAt}
+          status={loading && alerts.length === 0 ? "loading" : error && alerts.length === 0 ? "unavailable" : stale ? "stale" : "ok"}
+        />
         <Link
           to="/manipulation"
           search={{ symbol: "", riskLevel: "", limit: 20 }}

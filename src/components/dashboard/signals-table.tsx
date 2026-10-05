@@ -10,6 +10,7 @@ export function SignalsTable() {
     loading = useDashboardStore((s) => s.signalsLoading),
     error = useDashboardStore((s) => s.signalsError),
     stale = useDashboardStore((s) => s.signalsStale),
+    updatedAt = useDashboardStore((s) => s.signalsUpdatedAt),
     select = useDashboardStore((s) => s.setSelectedSignal);
   const [filter, setFilter] = useState<Filter>("ALL");
   const filtered = signals.filter((s) =>
@@ -31,7 +32,7 @@ export function SignalsTable() {
         <div>
           <h3 className="text-[15px] font-medium">Top signals right now</h3>
           <p className="text-[12px] text-muted-foreground">Live institutional-grade setups</p>
-          <DataStatusBadge source="Internal API" status={status} />
+          <DataStatusBadge source="Internal API" updatedAt={updatedAt} status={status} />
         </div>
         <div className="flex gap-1 p-1 rounded-full bg-secondary">
           {(["ALL", "BUY", "SELL", "HIGH"] as Filter[]).map((f) => (
