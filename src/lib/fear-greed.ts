@@ -18,22 +18,24 @@ export function fearGreedColor(value: number | null | undefined): string {
   return FEAR_GREED_ZONES.find((zone) => value >= zone.from && value < zone.to)?.color ?? "#888780";
 }
 
-export type FearGreedHistoryPoint = {
+export interface FearGreedPoint {
   value: number;
   label: string;
   timestamp: number;
-};
+}
 
-export function getFearGreedHistory7d(
-  history: readonly FearGreedHistoryPoint[],
-  now = Date.now(),
-): Array<FearGreedHistoryPoint & { date: string }> {
-  const start = now - 7 * 24 * 60 * 60 * 1000;
+export function buildFearGreedSeries(
+  history: readonly FearGreedPoint[] | null | undefined,
+): FearGreedPoint[] {
+  if (!history) return [];
   return history
-    .filter((point) => Number.isFinite(point.value) && point.timestamp >= start && point.timestamp <= now)
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .map((point) => ({
-      ...point,
-      date: new Date(point.timestamp).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-    }));
+    .filter(
+      (point) =>
+        Number.isFinite(point.value) &&
+        point.value >= 0 &&
+        point.value <= 100 &&
+        Number.isFinite(point.timestamp) &&
+        point.timestamp > 0,
+    )
+    .sort((a, b) => a.timestamp - b.timestamp);
 }
