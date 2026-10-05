@@ -25,13 +25,16 @@ export const Route = createFileRoute("/api/market/score-distribution")({
           const data = rowsLimited.slice(0, MAX_ROWS);
           const latestDataAt = data[0]?.created_at ?? null;
 
+          const groups = buildScoreDistribution(data);
+          const total = groups.reduce((sum, group) => sum + group.n, 0);
+
           return {
             periodStart,
             generatedAt: new Date().toISOString(),
             latestDataAt,
             truncated,
-            groups: buildScoreDistribution(data),
-            total: data.length,
+            groups,
+            total,
           };
         }),
     },
