@@ -75,6 +75,21 @@ export function Sentiment() {
               {data.topLoser.changePct.toFixed(2)}%)
             </div>
           )}
+          <div className="pt-3 border-t border-border/60">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="text-[11px] font-medium">Sentimento das notícias</div>
+                <div className="text-[9px] text-muted-foreground">Fonte real: {data.news.source ?? "indisponível"} · {data.news.articleCount} artigos</div>
+              </div>
+              <span className="text-[18px] font-semibold tabular-nums">{data.news.score === null ? "indisponível" : data.news.score + "/100"}</span>
+            </div>
+            {data.news.articles.length > 0 ? data.news.articles.map((article) => (
+              <div key={article.id} className="rounded-md bg-secondary/30 p-2 mb-1.5">
+                <div className="text-[10px] text-muted-foreground">{article.source}</div>
+                <div className="text-[11px] line-clamp-2">{article.title}</div>
+              </div>
+            )) : <div className="text-[10px] text-muted-foreground">Notícias indisponíveis no momento.</div>}
+          </div>
         </div>
       )}
     </div>
