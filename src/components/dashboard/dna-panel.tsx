@@ -46,6 +46,11 @@ export function DnaPanel() {
         <Link to="/dna-trader" className="text-[11px] text-[var(--brand-cyan)] hover:underline">
           Abrir relatório →
         </Link>
+        <DataStatusBadge
+          source="DNA · backend"
+          updatedAt={updatedAt}
+          status={status}
+        />
       </div>
 
       {(profile.isLoading || stats.isLoading) && (
