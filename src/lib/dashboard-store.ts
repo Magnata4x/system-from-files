@@ -39,9 +39,12 @@ interface DashboardState {
   signalsLoading: boolean;
   signalsError: string | null;
   signalsStale: boolean;
+  signalsUpdatedAt: number | null;
   manipAlerts: ManipulationAlert[];
   manipLoading: boolean;
   manipError: string | null;
+  manipStale: boolean;
+  manipUpdatedAt: number | null;
   toasts: Toast[];
   selectedSignal: Signal | null;
   cmdkOpen: boolean;
@@ -84,9 +87,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   signalsLoading: true,
   signalsError: null,
   signalsStale: false,
+  signalsUpdatedAt: null,
   manipAlerts: [],
   manipLoading: true,
   manipError: null,
+  manipStale: false,
+  manipUpdatedAt: null,
   toasts: [],
   selectedSignal: null,
   cmdkOpen: false,
@@ -154,7 +160,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
           tf: s.tf ?? "—",
           time: s.createdAt ?? "",
         }));
-        set({ signals: mapped, signalsLoading: false, signalsError: null, signalsStale: false });
+        set({
+          signals: mapped,
+          signalsLoading: false,
+          signalsError: null,
+          signalsStale: false,
+          signalsUpdatedAt: Date.now(),
+        });
 
         // Toast apenas para sinais novos (nunca na primeira carga).
         if (seenSignalIds === null) {
@@ -179,12 +191,19 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const pullManipulation = async () => {
       try {
         const list = await manipulationAdapter.getAlerts({ limit: 8 });
-        set({ manipAlerts: list, manipLoading: false, manipError: null });
+        set({
+          manipAlerts: list,
+          manipLoading: false,
+          manipError: null,
+          manipStale: false,
+          manipUpdatedAt: Date.now(),
+        });
       } catch (err) {
         logger.warn("[dashboard] manipulation/alerts falhou", { error: err });
         set({
           manipLoading: false,
           manipError: err instanceof Error ? err.message : "Falha ao carregar alertas",
+          manipStale: get().manipAlerts.length > 0,
         });
       }
     };
