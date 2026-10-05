@@ -43,6 +43,8 @@ import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiPricesSymbolRouteImport } from './routes/api/prices/$symbol'
 import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketplace/products'
 import { Route as ApiMarketplaceHistoryRouteImport } from './routes/api/marketplace/history'
+import { Route as ApiMarketHistoryRouteImport } from './routes/api/market/history'
+import { Route as ApiMarketScoreDistributionRouteImport } from './routes/api/market/score-distribution'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
@@ -247,6 +249,16 @@ const ApiMarketplaceHistoryRoute = ApiMarketplaceHistoryRouteImport.update({
   path: '/api/marketplace/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketHistoryRoute = ApiMarketHistoryRouteImport.update({
+  id: '/api/market/history',
+  path: '/api/market/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMarketScoreDistributionRoute = ApiMarketScoreDistributionRouteImport.update({
+  id: '/api/market/score-distribution',
+  path: '/api/market/score-distribution',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
   id: '/api/market-regime/current',
   path: '/api/market-regime/current',
@@ -445,6 +457,12 @@ export interface FileRoutesByFullPath {
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
+  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
+  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
+  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
@@ -509,6 +527,8 @@ export interface FileRoutesByTo {
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
+  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
@@ -575,6 +595,8 @@ export interface FileRoutesById {
   '/api/exchange/credentials': typeof ApiExchangeCredentialsRoute
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
+  '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
@@ -641,6 +663,8 @@ export interface FileRouteTypes {
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
+    | '/api/market/history'
+    | '/api/market/score-distribution'
     | '/api/market-regime/current'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -705,6 +729,8 @@ export interface FileRouteTypes {
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
+    | '/api/market/history'
+    | '/api/market/score-distribution'
     | '/api/market-regime/current'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -770,6 +796,8 @@ export interface FileRouteTypes {
     | '/api/exchange/credentials'
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
+    | '/api/market/history'
+    | '/api/market/score-distribution'
     | '/api/market-regime/current'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -815,6 +843,8 @@ export interface RootRouteChildren {
   ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
   ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
+  ApiMarketHistoryRoute: typeof ApiMarketHistoryRoute
+  ApiMarketScoreDistributionRoute: typeof ApiMarketScoreDistributionRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
   ApiMarketplaceHistoryRoute: typeof ApiMarketplaceHistoryRoute
   ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
@@ -1073,6 +1103,20 @@ declare module '@tanstack/react-router' {
       path: '/api/marketplace/history'
       fullPath: '/api/marketplace/history'
       preLoaderRoute: typeof ApiMarketplaceHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/history': {
+      id: '/api/market/history'
+      path: '/api/market/history'
+      fullPath: '/api/market/history'
+      preLoaderRoute: typeof ApiMarketHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/score-distribution': {
+      id: '/api/market/score-distribution'
+      path: '/api/market/score-distribution'
+      fullPath: '/api/market/score-distribution'
+      preLoaderRoute: typeof ApiMarketScoreDistributionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/market-regime/current': {
@@ -1404,6 +1448,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
   ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
+  ApiMarketHistoryRoute: ApiMarketHistoryRoute,
+  ApiMarketScoreDistributionRoute: ApiMarketScoreDistributionRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
   ApiMarketplaceHistoryRoute: ApiMarketplaceHistoryRoute,
   ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
