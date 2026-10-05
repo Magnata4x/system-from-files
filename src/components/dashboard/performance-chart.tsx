@@ -67,7 +67,7 @@ export function PerformanceChart() {
             </div>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
