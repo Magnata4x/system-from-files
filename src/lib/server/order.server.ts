@@ -138,6 +138,9 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
       }
     } catch (recoveryError) {
       if (recoveryError instanceof ApiError && recoveryError.status === 503) throw recoveryError
+      if (!(recoveryError instanceof ApiError) || recoveryError.status !== 404) {
+        throw new ApiError('Não foi possível confirmar o resultado da submissão na Binance. A intenção permanece pendente; não tente reenviar.', 503)
+      }
     }
     await supabase.from('bot4x_execution_intents').update({
       status: 'failed',
@@ -261,6 +264,9 @@ export async function executeAuthorizedSixDollarBtcOrder(
       }
     } catch (recoveryError) {
       if (recoveryError instanceof ApiError && recoveryError.status === 503) throw recoveryError
+      if (!(recoveryError instanceof ApiError) || recoveryError.status !== 404) {
+        throw new ApiError('Não foi possível confirmar o resultado da submissão REAL na Binance. A intenção permanece pendente; não tente reenviar.', 503)
+      }
     }
     await supabase.from('bot4x_execution_intents').update({
       status: 'failed',
