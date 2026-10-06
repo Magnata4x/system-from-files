@@ -55,6 +55,7 @@ import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
+import { Route as ApiBot4xCycleRouteImport } from './routes/api/bot4x/cycle'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
@@ -312,6 +313,11 @@ const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
   path: '/api/bot4x/telemetry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBot4xCycleRoute = ApiBot4xCycleRouteImport.update({
+  id: '/api/bot4x/cycle',
+  path: '/api/bot4x/cycle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
   id: '/api/bot4x/stop',
   path: '/api/bot4x/stop',
@@ -464,6 +470,7 @@ export interface FileRoutesByFullPath {
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
+  '/api/bot4x/cycle': typeof ApiBot4xCycleRoute
   '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/copy/follows': typeof ApiCopyFollowsRoute
@@ -1203,6 +1210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/cycle': {
+      id: '/api/bot4x/cycle'
+      path: '/api/bot4x/cycle'
+      fullPath: '/api/bot4x/cycle'
+      preLoaderRoute: typeof ApiBot4xCycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/bot4x/stop': {
       id: '/api/bot4x/stop'
       path: '/api/bot4x/stop'
@@ -1473,6 +1487,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
+  ApiBot4xCycleRoute: ApiBot4xCycleRoute,
   ApiCopilotChatRoute: ApiCopilotChatRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
   ApiCopyFollowsRoute: ApiCopyFollowsRoute,
