@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Zap, Lock } from "lucide-react";
 import {
   useBot4xStore, selectActiveCapital, selectSlotSize, MAX_SLOTS, RISK_PER_SLOT,
-  REAL_MODE_ENABLED as REAL_MODE_FLAG,
 } from "@/lib/bot4x-store";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
 import { useLivePrices } from "@/hooks/useLivePrices";
@@ -37,7 +36,7 @@ function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolea
   const [text, setText] = useState("");
 
   // A rota consulta a exchange uma única vez e só libera o REAL após confirmação.
-  const REAL_MODE_ENABLED = exchangeVerified || REAL_MODE_FLAG;
+  const REAL_MODE_ENABLED = exchangeVerified;
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
