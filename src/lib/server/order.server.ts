@@ -4,8 +4,6 @@ import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
 import { getBinanceEnvironment, getExchangeStatus, getVerifiedBinanceAccount, submitVerifiedBinanceMarketOrder } from './exchange.server'
 import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from './order-risk'
-import { saveTradeWithOutbox } from '@/lib/bot4x-trades-db'
-import type { Trade } from '@/lib/bot4x-data'
 
 type Client = SupabaseClient<Database>
 
@@ -116,41 +114,12 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
       cummulativeQuoteQty:
         typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
     }
-    const orderId = response.orderId
-    const executedQty = response.executedQty ?? 0
-    const quoteQty = response.cummulativeQuoteQty ?? 0
-    const entry = executedQty > 0 && quoteQty > 0 ? quoteQty / executedQty : 0
-    const trade: Trade = {
-      id: `binance-${intent.id}`,
-      day: new Date().toISOString().slice(0, 10),
-      pair: 'BTC/USDT',
-      side: input.side === 'BUY' ? 'LONG' : 'SHORT',
-      entry,
-      stop: 0,
-      target: 0,
-      result: 'open',
-      pnl: 0,
-      pnlPct: 0,
-      accumulated: 0,
-      profile: config.profile as Trade['profile'],
-      leverage: config.leverage ?? 1,
-      motivo: `Binance ${getBinanceEnvironment()} orderId=${orderId ?? 'unknown'} status=${response.status ?? 'unknown'}`,
-      hour: new Date().getHours(),
-    }
-    let tradeRecorded = true
-    try {
-      await saveTradeWithOutbox(userId, trade)
-    } catch {
-      tradeRecorded = false
-    }
-
-    const readings = { ...response, tradeId: trade.id, tradeRecorded }
     const { error: updateError } = await supabase
       .from('bot4x_execution_intents')
       .update({ status: 'submitted', processed_at: new Date().toISOString(), readings })
       .eq('id', intent.id)
     if (updateError) throw new ApiError(updateError.message, 500)
-    return { ...response, tradeId: trade.id, tradeRecorded }
+    return response
   } catch (error) {
     await supabase
       .from('bot4x_execution_intents')
