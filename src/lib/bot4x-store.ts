@@ -167,7 +167,7 @@ function mapBackendProfile(p: string | undefined): CalibProfile {
   return "conservador";
 }
 
-function verifiedHistoryToTrade(e: BackendBot4xVerifiedHistory, accumulated: number): Trade {
+export function verifiedHistoryToTrade(e: BackendBot4xVerifiedHistory, accumulated: number): Trade {
   const openedAt = new Date(e.createdAt).getTime();
   const pnl = e.realizedPnl;
   const side: Side = e.side === "BUY" ? "LONG" : "SHORT";
