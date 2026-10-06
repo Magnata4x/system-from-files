@@ -96,6 +96,7 @@ type State = {
   circuitBreaker: "none" | "emergency" | "profitLock";
   errorMsg: string | null;
   realInited: boolean;
+  todayStats: { trades: number; wins: number; losses: number; open: number; pnl: number; serverTime: string | null };
 
   setUserId: (uid: string | null) => void;
   init: () => void;
@@ -218,6 +219,7 @@ export const useBot4xStore = create<State>()(
       circuitBreaker: "none",
       errorMsg: null,
       realInited: false,
+      todayStats: { trades: 0, wins: 0, losses: 0, open: 0, pnl: 0, serverTime: null },
 
       // ─── SET USER ID ──────────────────────────────────────────────────────
       // Chamado ao login/logout via supabase.auth.onAuthStateChange.
@@ -440,7 +442,11 @@ export const useBot4xStore = create<State>()(
           const uid = user?.id;
           if (!uid) throw new Error("Usuário não autenticado");
 
-          const [config, executions] = await Promise.all([bot4xAdapter.getConfig(uid), bot4xAdapter.executions()]);
+          const [config, executions, telemetry] = await Promise.all([
+            bot4xAdapter.getConfig(uid),
+            bot4xAdapter.executions(),
+            bot4xAdapter.telemetry(),
+          ]);
 
           const profile = mapBackendProfile(config?.profile);
           const leverage = get().leverage;
@@ -454,6 +460,10 @@ export const useBot4xStore = create<State>()(
             profile,
             circuitBreaker: (config?.circuitBreaker as State["circuitBreaker"]) ?? "none",
             history: mappedHistory,
+            dailyPnlPct: typeof telemetry?.dailyPnl === "number" ? telemetry.dailyPnl : get().dailyPnlPct,
+            todayStats: telemetry?.today
+              ? { ...telemetry.today, serverTime: telemetry.serverTime ?? null }
+              : get().todayStats,
             errorMsg: null,
           });
 
@@ -510,9 +520,10 @@ export const useBot4xStore = create<State>()(
           realPoller = setInterval(() => {
             void (async () => {
               try {
-                const [cfg, execs] = await Promise.all([
+                const [cfg, execs, telemetry] = await Promise.all([
                   bot4xAdapter.getConfig(uid),
                   bot4xAdapter.executions(),
+                  bot4xAdapter.telemetry(),
                 ]);
                 if (!cfg) return;
                 const prof = mapBackendProfile(cfg.profile);
@@ -520,7 +531,10 @@ export const useBot4xStore = create<State>()(
                   status: cfg.active ? "RUNNING" : "IDLE",
                   profile: prof,
                   circuitBreaker: (cfg.circuitBreaker as State["circuitBreaker"]) ?? "none",
-                  dailyPnlPct: cfg.dailyPnl ?? get().dailyPnlPct,
+                  dailyPnlPct: typeof telemetry?.dailyPnl === "number" ? telemetry.dailyPnl : (cfg.dailyPnl ?? get().dailyPnlPct),
+                  todayStats: telemetry?.today
+                    ? { ...telemetry.today, serverTime: telemetry.serverTime ?? null }
+                    : get().todayStats,
                   history: (execs ?? []).map((e) => executionToTrade(e, prof, get().leverage)),
                   errorMsg: null,
                 });
