@@ -465,8 +465,8 @@ export interface FileRoutesByFullPath {
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
-  '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/calendar': typeof ApiMarketCalendarRoute
+  '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
@@ -533,7 +533,6 @@ export interface FileRoutesByTo {
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
   '/api/market/history': typeof ApiMarketHistoryRoute
-  '/api/market/calendar': typeof ApiMarketCalendarRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
   '/api/marketplace/products': typeof ApiMarketplaceProductsRoute
@@ -737,7 +736,6 @@ export interface FileRouteTypes {
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/market/history'
-    | '/api/market/calendar'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -805,7 +803,696 @@ export interface FileRouteTypes {
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/market/history'
-    | '/api/market/calendar'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
+    | '/api/prices/$symbol'
+    | '/api/risk/evaluate'
+    | '/api/risk/status'
+    | '/api/sentiment/overview'
+    | '/api/signals/$id'
+    | '/api/prices/'
+    | '/api/signals/'
+    | '/_authenticated/calibrator/history/$id'
+    | '/api/bot4x/executions/export'
+    | '/api/calibrator/feedback/$userId'
+    | '/api/calibrator/intent/$userId'
+    | '/api/calibrator/run/$userId'
+    | '/api/calibrator/state/$userId'
+    | '/api/dna/profile/$userId'
+    | '/api/manipulation/snapshot/$pair'
+    | '/api/sentiment/asset/$symbol'
+    | '/lovable/email/queue/process'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
+  ApiAlertsFeedRoute: typeof ApiAlertsFeedRoute
+  ApiAlertsSettingsRoute: typeof ApiAlertsSettingsRoute
+  ApiAuthMeRoute: typeof ApiAuthMeRoute
+  ApiBot4xBalanceRoute: typeof ApiBot4xBalanceRoute
+  ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
+  ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
+  ApiBot4xStartRoute: typeof ApiBot4xStartRoute
+  ApiBot4xStopRoute: typeof ApiBot4xStopRoute
+  ApiBot4xTelemetryRoute: typeof ApiBot4xTelemetryRoute
+  ApiCopilotChatRoute: typeof ApiCopilotChatRoute
+  ApiCopilotHistoryRoute: typeof ApiCopilotHistoryRoute
+  ApiCopyFollowsRoute: typeof ApiCopyFollowsRoute
+  ApiDnaStatsRoute: typeof ApiDnaStatsRoute
+  ApiExchangeCredentialsRoute: typeof ApiExchangeCredentialsRoute
+  ApiExchangeTestRoute: typeof ApiExchangeTestRoute
+  ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
+  ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
+  ApiMarketHistoryRoute: typeof ApiMarketHistoryRoute
+  ApiMarketCalendarRoute: typeof ApiMarketCalendarRoute
+  ApiMarketScoreDistributionRoute: typeof ApiMarketScoreDistributionRoute
+  ApiMarketplaceHistoryRoute: typeof ApiMarketplaceHistoryRoute
+  ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
+  ApiPricesSymbolRoute: typeof ApiPricesSymbolRoute
+  ApiRiskEvaluateRoute: typeof ApiRiskEvaluateRoute
+  ApiRiskStatusRoute: typeof ApiRiskStatusRoute
+  ApiSentimentOverviewRoute: typeof ApiSentimentOverviewRoute
+  ApiSignalsIdRoute: typeof ApiSignalsIdRoute
+  ApiPricesIndexRoute: typeof ApiPricesIndexRoute
+  ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
+  ApiCalibratorFeedbackUserIdRoute: typeof ApiCalibratorFeedbackUserIdRoute
+  ApiCalibratorIntentUserIdRoute: typeof ApiCalibratorIntentUserIdRoute
+  ApiCalibratorRunUserIdRoute: typeof ApiCalibratorRunUserIdRoute
+  ApiCalibratorStateUserIdRoute: typeof ApiCalibratorStateUserIdRoute
+  ApiDnaProfileUserIdRoute: typeof ApiDnaProfileUserIdRoute
+  ApiManipulationSnapshotPairRoute: typeof ApiManipulationSnapshotPairRoute
+  ApiSentimentAssetSymbolRoute: typeof ApiSentimentAssetSymbolRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/signals': {
+      id: '/_authenticated/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof AuthenticatedSignalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sentiment': {
+      id: '/_authenticated/sentiment'
+      path: '/sentiment'
+      fullPath: '/sentiment'
+      preLoaderRoute: typeof AuthenticatedSentimentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pricing': {
+      id: '/_authenticated/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof AuthenticatedPricingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/manipulation': {
+      id: '/_authenticated/manipulation'
+      path: '/manipulation'
+      fullPath: '/manipulation'
+      preLoaderRoute: typeof AuthenticatedManipulationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-trader': {
+      id: '/_authenticated/dna-trader'
+      path: '/dna-trader'
+      fullPath: '/dna-trader'
+      preLoaderRoute: typeof AuthenticatedDnaTraderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-pairs': {
+      id: '/_authenticated/dna-pairs'
+      path: '/dna-pairs'
+      fullPath: '/dna-pairs'
+      preLoaderRoute: typeof AuthenticatedDnaPairsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dna-corrections': {
+      id: '/_authenticated/dna-corrections'
+      path: '/dna-corrections'
+      fullPath: '/dna-corrections'
+      preLoaderRoute: typeof AuthenticatedDnaCorrectionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/diagnostics': {
+      id: '/_authenticated/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/diagnostics'
+      preLoaderRoute: typeof AuthenticatedDiagnosticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/copy-trading': {
+      id: '/_authenticated/copy-trading'
+      path: '/copy-trading'
+      fullPath: '/copy-trading'
+      preLoaderRoute: typeof AuthenticatedCopyTradingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calibrator': {
+      id: '/_authenticated/calibrator'
+      path: '/calibrator'
+      fullPath: '/calibrator'
+      preLoaderRoute: typeof AuthenticatedCalibratorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bot4x': {
+      id: '/_authenticated/bot4x'
+      path: '/bot4x'
+      fullPath: '/bot4x'
+      preLoaderRoute: typeof AuthenticatedBot4xRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/api': {
+      id: '/_authenticated/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof AuthenticatedApiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/signals/': {
+      id: '/api/signals/'
+      path: '/api/signals'
+      fullPath: '/api/signals/'
+      preLoaderRoute: typeof ApiSignalsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/prices/': {
+      id: '/api/prices/'
+      path: '/api/prices'
+      fullPath: '/api/prices/'
+      preLoaderRoute: typeof ApiPricesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/signals/$id': {
+      id: '/api/signals/$id'
+      path: '/api/signals/$id'
+      fullPath: '/api/signals/$id'
+      preLoaderRoute: typeof ApiSignalsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sentiment/overview': {
+      id: '/api/sentiment/overview'
+      path: '/api/sentiment/overview'
+      fullPath: '/api/sentiment/overview'
+      preLoaderRoute: typeof ApiSentimentOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/risk/status': {
+      id: '/api/risk/status'
+      path: '/api/risk/status'
+      fullPath: '/api/risk/status'
+      preLoaderRoute: typeof ApiRiskStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/risk/evaluate': {
+      id: '/api/risk/evaluate'
+      path: '/api/risk/evaluate'
+      fullPath: '/api/risk/evaluate'
+      preLoaderRoute: typeof ApiRiskEvaluateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/prices/$symbol': {
+      id: '/api/prices/$symbol'
+      path: '/api/prices/$symbol'
+      fullPath: '/api/prices/$symbol'
+      preLoaderRoute: typeof ApiPricesSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/marketplace/products': {
+      id: '/api/marketplace/products'
+      path: '/api/marketplace/products'
+      fullPath: '/api/marketplace/products'
+      preLoaderRoute: typeof ApiMarketplaceProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/marketplace/history': {
+      id: '/api/marketplace/history'
+      path: '/api/marketplace/history'
+      fullPath: '/api/marketplace/history'
+      preLoaderRoute: typeof ApiMarketplaceHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/score-distribution': {
+      id: '/api/market/score-distribution'
+      path: '/api/market/score-distribution'
+      fullPath: '/api/market/score-distribution'
+      preLoaderRoute: typeof ApiMarketScoreDistributionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/calendar': {
+      id: '/api/market/calendar'
+      path: '/api/market/calendar'
+      fullPath: '/api/market/calendar'
+      preLoaderRoute: typeof ApiMarketCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/history': {
+      id: '/api/market/history'
+      path: '/api/market/history'
+      fullPath: '/api/market/history'
+      preLoaderRoute: typeof ApiMarketHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market-regime/current': {
+      id: '/api/market-regime/current'
+      path: '/api/market-regime/current'
+      fullPath: '/api/market-regime/current'
+      preLoaderRoute: typeof ApiMarketRegimeCurrentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/manipulation/alerts': {
+      id: '/api/manipulation/alerts'
+      path: '/api/manipulation/alerts'
+      fullPath: '/api/manipulation/alerts'
+      preLoaderRoute: typeof ApiManipulationAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/exchange/test': {
+      id: '/api/exchange/test'
+      path: '/api/exchange/test'
+      fullPath: '/api/exchange/test'
+      preLoaderRoute: typeof ApiExchangeTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/exchange/credentials': {
+      id: '/api/exchange/credentials'
+      path: '/api/exchange/credentials'
+      fullPath: '/api/exchange/credentials'
+      preLoaderRoute: typeof ApiExchangeCredentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dna/stats': {
+      id: '/api/dna/stats'
+      path: '/api/dna/stats'
+      fullPath: '/api/dna/stats'
+      preLoaderRoute: typeof ApiDnaStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copy/follows': {
+      id: '/api/copy/follows'
+      path: '/api/copy/follows'
+      fullPath: '/api/copy/follows'
+      preLoaderRoute: typeof ApiCopyFollowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copilot/history': {
+      id: '/api/copilot/history'
+      path: '/api/copilot/history'
+      fullPath: '/api/copilot/history'
+      preLoaderRoute: typeof ApiCopilotHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/copilot/chat': {
+      id: '/api/copilot/chat'
+      path: '/api/copilot/chat'
+      fullPath: '/api/copilot/chat'
+      preLoaderRoute: typeof ApiCopilotChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/telemetry': {
+      id: '/api/bot4x/telemetry'
+      path: '/api/bot4x/telemetry'
+      fullPath: '/api/bot4x/telemetry'
+      preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/stop': {
+      id: '/api/bot4x/stop'
+      path: '/api/bot4x/stop'
+      fullPath: '/api/bot4x/stop'
+      preLoaderRoute: typeof ApiBot4xStopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/start': {
+      id: '/api/bot4x/start'
+      path: '/api/bot4x/start'
+      fullPath: '/api/bot4x/start'
+      preLoaderRoute: typeof ApiBot4xStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/executions': {
+      id: '/api/bot4x/executions'
+      path: '/api/bot4x/executions'
+      fullPath: '/api/bot4x/executions'
+      preLoaderRoute: typeof ApiBot4xExecutionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/config': {
+      id: '/api/bot4x/config'
+      path: '/api/bot4x/config'
+      fullPath: '/api/bot4x/config'
+      preLoaderRoute: typeof ApiBot4xConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/balance': {
+      id: '/api/bot4x/balance'
+      path: '/api/bot4x/balance'
+      fullPath: '/api/bot4x/balance'
+      preLoaderRoute: typeof ApiBot4xBalanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/settings': {
+      id: '/api/alerts/settings'
+      path: '/api/alerts/settings'
+      fullPath: '/api/alerts/settings'
+      preLoaderRoute: typeof ApiAlertsSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/feed': {
+      id: '/api/alerts/feed'
+      path: '/api/alerts/feed'
+      fullPath: '/api/alerts/feed'
+      preLoaderRoute: typeof ApiAlertsFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/calibrator/history': {
+      id: '/_authenticated/calibrator/history'
+      path: '/history'
+      fullPath: '/calibrator/history'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryRouteImport
+      parentRoute: typeof AuthenticatedCalibratorRoute
+    }
+    '/_authenticated/bot4x/onboarding': {
+      id: '/_authenticated/bot4x/onboarding'
+      path: '/onboarding'
+      fullPath: '/bot4x/onboarding'
+      preLoaderRoute: typeof AuthenticatedBot4xOnboardingRouteImport
+      parentRoute: typeof AuthenticatedBot4xRoute
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sentiment/asset/$symbol': {
+      id: '/api/sentiment/asset/$symbol'
+      path: '/api/sentiment/asset/$symbol'
+      fullPath: '/api/sentiment/asset/$symbol'
+      preLoaderRoute: typeof ApiSentimentAssetSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/manipulation/snapshot/$pair': {
+      id: '/api/manipulation/snapshot/$pair'
+      path: '/api/manipulation/snapshot/$pair'
+      fullPath: '/api/manipulation/snapshot/$pair'
+      preLoaderRoute: typeof ApiManipulationSnapshotPairRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dna/profile/$userId': {
+      id: '/api/dna/profile/$userId'
+      path: '/api/dna/profile/$userId'
+      fullPath: '/api/dna/profile/$userId'
+      preLoaderRoute: typeof ApiDnaProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/state/$userId': {
+      id: '/api/calibrator/state/$userId'
+      path: '/api/calibrator/state/$userId'
+      fullPath: '/api/calibrator/state/$userId'
+      preLoaderRoute: typeof ApiCalibratorStateUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/run/$userId': {
+      id: '/api/calibrator/run/$userId'
+      path: '/api/calibrator/run/$userId'
+      fullPath: '/api/calibrator/run/$userId'
+      preLoaderRoute: typeof ApiCalibratorRunUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/intent/$userId': {
+      id: '/api/calibrator/intent/$userId'
+      path: '/api/calibrator/intent/$userId'
+      fullPath: '/api/calibrator/intent/$userId'
+      preLoaderRoute: typeof ApiCalibratorIntentUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/calibrator/feedback/$userId': {
+      id: '/api/calibrator/feedback/$userId'
+      path: '/api/calibrator/feedback/$userId'
+      fullPath: '/api/calibrator/feedback/$userId'
+      preLoaderRoute: typeof ApiCalibratorFeedbackUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/executions/export': {
+      id: '/api/bot4x/executions/export'
+      path: '/export'
+      fullPath: '/api/bot4x/executions/export'
+      preLoaderRoute: typeof ApiBot4xExecutionsExportRouteImport
+      parentRoute: typeof ApiBot4xExecutionsRoute
+    }
+    '/_authenticated/calibrator/history/$id': {
+      id: '/_authenticated/calibrator/history/$id'
+      path: '/$id'
+      fullPath: '/calibrator/history/$id'
+      preLoaderRoute: typeof AuthenticatedCalibratorHistoryIdRouteImport
+      parentRoute: typeof AuthenticatedCalibratorHistoryRoute
+    }
+  }
+}
+
+interface AuthenticatedBot4xRouteChildren {
+  AuthenticatedBot4xOnboardingRoute: typeof AuthenticatedBot4xOnboardingRoute
+}
+
+const AuthenticatedBot4xRouteChildren: AuthenticatedBot4xRouteChildren = {
+  AuthenticatedBot4xOnboardingRoute: AuthenticatedBot4xOnboardingRoute,
+}
+
+const AuthenticatedBot4xRouteWithChildren =
+  AuthenticatedBot4xRoute._addFileChildren(AuthenticatedBot4xRouteChildren)
+
+interface AuthenticatedCalibratorHistoryRouteChildren {
+  AuthenticatedCalibratorHistoryIdRoute: typeof AuthenticatedCalibratorHistoryIdRoute
+}
+
+const AuthenticatedCalibratorHistoryRouteChildren: AuthenticatedCalibratorHistoryRouteChildren =
+  {
+    AuthenticatedCalibratorHistoryIdRoute:
+      AuthenticatedCalibratorHistoryIdRoute,
+  }
+
+const AuthenticatedCalibratorHistoryRouteWithChildren =
+  AuthenticatedCalibratorHistoryRoute._addFileChildren(
+    AuthenticatedCalibratorHistoryRouteChildren,
+  )
+
+interface AuthenticatedCalibratorRouteChildren {
+  AuthenticatedCalibratorHistoryRoute: typeof AuthenticatedCalibratorHistoryRouteWithChildren
+}
+
+const AuthenticatedCalibratorRouteChildren: AuthenticatedCalibratorRouteChildren =
+  {
+    AuthenticatedCalibratorHistoryRoute:
+      AuthenticatedCalibratorHistoryRouteWithChildren,
+  }
+
+const AuthenticatedCalibratorRouteWithChildren =
+  AuthenticatedCalibratorRoute._addFileChildren(
+    AuthenticatedCalibratorRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
+  AuthenticatedApiRoute: typeof AuthenticatedApiRoute
+  AuthenticatedBot4xRoute: typeof AuthenticatedBot4xRouteWithChildren
+  AuthenticatedCalibratorRoute: typeof AuthenticatedCalibratorRouteWithChildren
+  AuthenticatedCopyTradingRoute: typeof AuthenticatedCopyTradingRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiagnosticsRoute: typeof AuthenticatedDiagnosticsRoute
+  AuthenticatedDnaCorrectionsRoute: typeof AuthenticatedDnaCorrectionsRoute
+  AuthenticatedDnaPairsRoute: typeof AuthenticatedDnaPairsRoute
+  AuthenticatedDnaTraderRoute: typeof AuthenticatedDnaTraderRoute
+  AuthenticatedManipulationRoute: typeof AuthenticatedManipulationRoute
+  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSentimentRoute: typeof AuthenticatedSentimentRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSignalsRoute: typeof AuthenticatedSignalsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
+  AuthenticatedApiRoute: AuthenticatedApiRoute,
+  AuthenticatedBot4xRoute: AuthenticatedBot4xRouteWithChildren,
+  AuthenticatedCalibratorRoute: AuthenticatedCalibratorRouteWithChildren,
+  AuthenticatedCopyTradingRoute: AuthenticatedCopyTradingRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiagnosticsRoute: AuthenticatedDiagnosticsRoute,
+  AuthenticatedDnaCorrectionsRoute: AuthenticatedDnaCorrectionsRoute,
+  AuthenticatedDnaPairsRoute: AuthenticatedDnaPairsRoute,
+  AuthenticatedDnaTraderRoute: AuthenticatedDnaTraderRoute,
+  AuthenticatedManipulationRoute: AuthenticatedManipulationRoute,
+  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPricingRoute: AuthenticatedPricingRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSentimentRoute: AuthenticatedSentimentRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSignalsRoute: AuthenticatedSignalsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
+interface ApiBot4xExecutionsRouteChildren {
+  ApiBot4xExecutionsExportRoute: typeof ApiBot4xExecutionsExportRoute
+}
+
+const ApiBot4xExecutionsRouteChildren: ApiBot4xExecutionsRouteChildren = {
+  ApiBot4xExecutionsExportRoute: ApiBot4xExecutionsExportRoute,
+}
+
+const ApiBot4xExecutionsRouteWithChildren =
+  ApiBot4xExecutionsRoute._addFileChildren(ApiBot4xExecutionsRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
+  ApiAlertsFeedRoute: ApiAlertsFeedRoute,
+  ApiAlertsSettingsRoute: ApiAlertsSettingsRoute,
+  ApiAuthMeRoute: ApiAuthMeRoute,
+  ApiBot4xBalanceRoute: ApiBot4xBalanceRoute,
+  ApiBot4xConfigRoute: ApiBot4xConfigRoute,
+  ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
+  ApiBot4xStartRoute: ApiBot4xStartRoute,
+  ApiBot4xStopRoute: ApiBot4xStopRoute,
+  ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
+  ApiCopilotChatRoute: ApiCopilotChatRoute,
+  ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
+  ApiCopyFollowsRoute: ApiCopyFollowsRoute,
+  ApiDnaStatsRoute: ApiDnaStatsRoute,
+  ApiExchangeCredentialsRoute: ApiExchangeCredentialsRoute,
+  ApiExchangeTestRoute: ApiExchangeTestRoute,
+  ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
+  ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
+  ApiMarketHistoryRoute: ApiMarketHistoryRoute,
+  ApiMarketCalendarRoute: ApiMarketCalendarRoute,
+  ApiMarketScoreDistributionRoute: ApiMarketScoreDistributionRoute,
+  ApiMarketplaceHistoryRoute: ApiMarketplaceHistoryRoute,
+  ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
+  ApiPricesSymbolRoute: ApiPricesSymbolRoute,
+  ApiRiskEvaluateRoute: ApiRiskEvaluateRoute,
+  ApiRiskStatusRoute: ApiRiskStatusRoute,
+  ApiSentimentOverviewRoute: ApiSentimentOverviewRoute,
+  ApiSignalsIdRoute: ApiSignalsIdRoute,
+  ApiPricesIndexRoute: ApiPricesIndexRoute,
+  ApiSignalsIndexRoute: ApiSignalsIndexRoute,
+  ApiCalibratorFeedbackUserIdRoute: ApiCalibratorFeedbackUserIdRoute,
+  ApiCalibratorIntentUserIdRoute: ApiCalibratorIntentUserIdRoute,
+  ApiCalibratorRunUserIdRoute: ApiCalibratorRunUserIdRoute,
+  ApiCalibratorStateUserIdRoute: ApiCalibratorStateUserIdRoute,
+  ApiDnaProfileUserIdRoute: ApiDnaProfileUserIdRoute,
+  ApiManipulationSnapshotPairRoute: ApiManipulationSnapshotPairRoute,
+  ApiSentimentAssetSymbolRoute: ApiSentimentAssetSymbolRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
