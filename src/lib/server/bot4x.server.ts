@@ -277,29 +277,44 @@ export async function exportExecutionsCsv(
 /** Telemetria do bot: estado atual + agregados do dia, para polling da UI. */
 export async function getTelemetry(supabase: Client, userId: string) {
   const config = await getOrCreateConfig(supabase, userId)
-  const today = new Date().toISOString().slice(0, 10)
-  const dayStart = new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
+
+  // Daily telemetry uses the user's configured timezone. Legacy trades remain
+  // available for operational history but are not the source of verified PnL.
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('timezone')
+    .eq('id', userId)
+    .maybeSingle()
+  if (profileError) throw new ApiError(profileError.message, 500)
+
+  const timezone = profile?.timezone || 'UTC'
+  const now = new Date()
+  const localDay = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now)
+  const recentStart = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
 
   const { data, error } = await supabase
     .from('bot4x_trades')
     .select('result, pnl, pair, side, created_at, motivo')
     .eq('user_id', userId)
-    .eq('day', today)
+    .gte('created_at', recentStart)
     .order('created_at', { ascending: false })
-    .limit(200)
+    .limit(500)
   if (error) throw new ApiError(error.message, 500)
 
-  const rows = data ?? []
-  const wins = rows.filter((r) => r.result === 'WIN').length
-  const losses = rows.filter((r) => r.result === 'LOSS').length
-  const open = rows.filter((r) => r.result === 'open').length
-  const pnl = rows.reduce((acc, r) => acc + Number(r.pnl ?? 0), 0)
+  const rows = (data ?? []).filter((r) =>
+    new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(r.created_at)) === localDay
+  )
 
   const { data: intents, error: intentsError } = await supabase
     .from('bot4x_execution_intents')
     .select('id, status, pair, side, created_at, readings')
     .eq('user_id', userId)
-    .gte('created_at', dayStart)
+    .gte('created_at', new Date(new Date().getTime() - 48 * 60 * 60 * 1000).toISOString())
     .order('created_at', { ascending: false })
     .limit(200)
   if (intentsError) throw new ApiError(intentsError.message, 500)
@@ -524,6 +539,17 @@ export async function getTelemetry(supabase: Client, userId: string) {
     }
   }
 
+  const verifiedRealizedRows = executionRows
+    .filter((r) => r.status === 'completed' && r.side === 'SELL')
+    .map((r) => Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl))
+    .filter((value) => Number.isFinite(value))
+    .map((value) => ({ pnl: value }))
+
+  const wins = verifiedRealizedRows.filter((r) => r.pnl > 0).length
+  const losses = verifiedRealizedRows.filter((r) => r.pnl < 0).length
+  const open = rows.filter((r) => r.result === 'open').length
+  const pnl = verifiedRealizedRows.reduce((acc, r) => acc + r.pnl, 0)
+
   const submitted = executionRows.filter((r) => r.status === 'submitted' || r.status === 'completed').length
   const pending = executionRows.filter((r) => r.status === 'pending').length
   const failed = executionRows.filter((r) => r.status === 'failed').length
@@ -541,6 +567,8 @@ export async function getTelemetry(supabase: Client, userId: string) {
       losses,
       open,
       pnl: Number(pnl.toFixed(2)),
+      pnlSource: 'verified_binance_execution_ledger',
+      timezone,
       executions: executionRows.length,
       submitted,
       pending,
