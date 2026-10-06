@@ -466,9 +466,9 @@ export const useBot4xStore = create<State>()(
           const uid = user?.id;
           if (!uid) throw new Error("Usuário não autenticado");
 
-          const [config, executions, telemetry] = await Promise.all([
+          const [config, verifiedHistory, telemetry] = await Promise.all([
             bot4xAdapter.getConfig(uid),
-            bot4xAdapter.executions(),
+            bot4xAdapter.verifiedHistory(),
             bot4xAdapter.telemetry(),
           ]);
 
@@ -536,9 +536,9 @@ export const useBot4xStore = create<State>()(
           realPoller = setInterval(() => {
             void (async () => {
               try {
-                const [cfg, execs, telemetry] = await Promise.all([
+                const [cfg, verifiedHistory, telemetry] = await Promise.all([
                   bot4xAdapter.getConfig(uid),
-                  bot4xAdapter.executions(),
+                  bot4xAdapter.verifiedHistory(),
                   bot4xAdapter.telemetry(),
                 ]);
                 if (!cfg) return;
