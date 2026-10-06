@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
-import { getExchangeStatus } from './exchange.server'
+import { getExchangeStatus, getVerifiedBinanceOrder } from './exchange.server'
 
 type Client = SupabaseClient<Database>
 type ConfigRow = Database['public']['Tables']['bot4x_configs']['Row']
@@ -264,6 +264,7 @@ export async function exportExecutionsCsv(
 export async function getTelemetry(supabase: Client, userId: string) {
   const config = await getOrCreateConfig(supabase, userId)
   const today = new Date().toISOString().slice(0, 10)
+  const dayStart = new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
 
   const { data, error } = await supabase
     .from('bot4x_trades')
@@ -282,14 +283,71 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   const { data: intents, error: intentsError } = await supabase
     .from('bot4x_execution_intents')
-    .select('status, pair, side, created_at, readings')
+    .select('id, status, pair, side, created_at, readings')
     .eq('user_id', userId)
-    .gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+    .gte('created_at', dayStart)
     .order('created_at', { ascending: false })
     .limit(200)
   if (intentsError) throw new ApiError(intentsError.message, 500)
 
   const executionRows = intents ?? []
+
+  // Reconcile submitted Binance orders before exposing telemetry. This only
+  // reads order state and updates the execution ledger; it never submits,
+  // cancels, or modifies an order.
+  for (const intent of executionRows) {
+    if (intent.status !== 'submitted') continue
+    const readings = (intent.readings ?? {}) as Record<string, unknown>
+    const orderId = typeof readings.orderId === 'number' ? readings.orderId : null
+    if (!orderId) continue
+
+    try {
+      const order = await getVerifiedBinanceOrder(supabase, userId, {
+        symbol: intent.pair,
+        orderId,
+      })
+      const binanceStatus = typeof order.status === 'string' ? order.status : null
+      if (!binanceStatus) continue
+
+      const nextStatus =
+        binanceStatus === 'FILLED'
+          ? 'completed'
+          : binanceStatus === 'CANCELED' || binanceStatus === 'REJECTED' || binanceStatus === 'EXPIRED'
+            ? 'failed'
+            : 'submitted'
+
+      const nextReadings = {
+        ...readings,
+        status: binanceStatus,
+        orderId,
+        executedQty: typeof order.executedQty === 'string' ? Number(order.executedQty) : readings.executedQty,
+        cummulativeQuoteQty:
+          typeof order.cummulativeQuoteQty === 'string'
+            ? Number(order.cummulativeQuoteQty)
+            : readings.cummulativeQuoteQty,
+        reconciledAt: new Date().toISOString(),
+      }
+
+      if (nextStatus !== intent.status || JSON.stringify(nextReadings) !== JSON.stringify(readings)) {
+        const { error: updateError } = await supabase
+          .from('bot4x_execution_intents')
+          .update({
+            status: nextStatus,
+            processed_at: nextStatus === 'submitted' ? undefined : new Date().toISOString(),
+            readings: nextReadings,
+          })
+          .eq('id', intent.id)
+        if (updateError) throw new ApiError(updateError.message, 500)
+        intent.status = nextStatus
+        intent.readings = nextReadings
+      }
+    } catch (error) {
+      // A temporary reconciliation failure must not erase a confirmed
+      // submission or turn it into a false failure.
+      if (error instanceof ApiError && error.statusCode >= 500) throw error
+    }
+  }
+
   const submitted = executionRows.filter((r) => r.status === 'submitted' || r.status === 'completed').length
   const pending = executionRows.filter((r) => r.status === 'pending').length
   const failed = executionRows.filter((r) => r.status === 'failed').length
@@ -331,3 +389,4 @@ export async function getTelemetry(supabase: Client, userId: string) {
     ].slice(0, 20),
   }
 }
+
