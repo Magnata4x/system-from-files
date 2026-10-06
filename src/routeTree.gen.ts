@@ -55,6 +55,7 @@ import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
+// Fase 30 operational cycle route
 import { Route as ApiBot4xCycleRouteImport } from './routes/api/bot4x/cycle'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
