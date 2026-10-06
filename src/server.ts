@@ -1,4 +1,5 @@
 import { collectMarketSnapshot } from "./lib/server/market-snapshot-cron";
+import { runBot4xOrchestratorCycle } from "./lib/server/bot4x-orchestrator.server";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -206,6 +207,16 @@ function withTraceHeader(response: Response, traceId: string): Response {
 
 export default {
   async scheduled(controller: { cron: string; scheduledTime: number }) {
+    if (controller.cron === "*/1 * * * *") {
+      try {
+        const result = await runBot4xOrchestratorCycle();
+        console.log("[bot4x-orchestrator] cron ok", result);
+      } catch (error) {
+        console.error("[bot4x-orchestrator] cron failed", error);
+      }
+      return;
+    }
+
     if (controller.cron !== "0 * * * *") return;
     try {
       const result = await collectMarketSnapshot();

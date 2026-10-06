@@ -7,7 +7,7 @@
 
   // Coleta horária do histórico real de métricas globais via CoinGecko /global.
   "triggers": {
-    "crons": ["0 * * * *"]
+    "crons": ["0 * * * *", "*/1 * * * *"]
   },
 
   // Observabilidade: habilita Workers Logs / Logpush com amostragem total.
