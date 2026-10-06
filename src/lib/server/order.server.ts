@@ -136,10 +136,41 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
 export async function executeAuthorizedSixDollarBtcOrder(
   supabase: Client,
   userId: string,
-  input: { side: RealOrderSide; confirmed: boolean },
+  input: { side: RealOrderSide; confirmed: boolean; idempotencyKey: string },
 ) {
+  const idempotencyKey = input.idempotencyKey.trim()
+  if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
   if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem REAL é obrigatória.', 409)
-  if (getBinanceEnvironment() !== 'production') throw new ApiError('Ordens REAL estão bloqueadas fora do ambiente de produção.', 409)
+  if (getBinanceEnvironment() !== 'production') {
+    throw new ApiError('Ordens REAL estão bloqueadas fora do ambiente de produção.', 409)
+  }
+
+  const { data: existingIntent, error: existingIntentError } = await supabase
+    .from('bot4x_execution_intents')
+    .select('status, readings')
+    .eq('user_id', userId)
+    .eq('idempotency_key', idempotencyKey)
+    .maybeSingle()
+  if (existingIntentError) throw new ApiError(existingIntentError.message, 500)
+  if (existingIntent) {
+    if (existingIntent.status === 'submitted' || existingIntent.status === 'completed') {
+      const readings = (existingIntent.readings ?? {}) as Record<string, unknown>
+      return {
+        submitted: true,
+        replay: true,
+        environment: 'production',
+        symbol: 'BTCUSDT',
+        side: input.side,
+        quoteOrderQty: 6,
+        orderId: typeof readings.orderId === 'number' ? readings.orderId : null,
+        status: typeof readings.status === 'string' ? readings.status : null,
+        executedQty: typeof readings.executedQty === 'number' ? readings.executedQty : null,
+        cummulativeQuoteQty: typeof readings.cummulativeQuoteQty === 'number' ? readings.cummulativeQuoteQty : null,
+      }
+    }
+    if (existingIntent.status === 'pending') throw new ApiError('Esta ordem já está em processamento.', 409)
+    throw new ApiError('Esta idempotency key já foi utilizada por uma ordem com falha.', 409)
+  }
 
   const intent = await validateRealMarketOrder(supabase, userId, {
     symbol: 'BTCUSDT',
@@ -148,22 +179,63 @@ export async function executeAuthorizedSixDollarBtcOrder(
     confirmed: true,
   })
 
-  const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
-    symbol: 'BTCUSDT',
-    side: input.side,
-    quoteOrderQty: 6,
-  })
+  const { data: createdIntent, error: intentError } = await supabase
+    .from('bot4x_execution_intents')
+    .insert({
+      user_id: userId,
+      idempotency_key: idempotencyKey,
+      mode: 'REAL',
+      pair: intent.symbol,
+      side: intent.side,
+      quote_amount: 6,
+      reason: 'manual-real-order',
+      readings: { environment: 'production', confirmed: true },
+      status: 'pending',
+      confirmed_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single()
+  if (intentError || !createdIntent) {
+    throw new ApiError(intentError?.message ?? 'Falha ao registrar intenção de execução REAL.', 500)
+  }
 
-  return {
-    submitted: true,
-    symbol: intent.symbol,
-    side: intent.side,
-    quoteOrderQty: 6,
-    orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
-    status: typeof result['status'] === 'string' ? result['status'] : null,
-    executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
-    cummulativeQuoteQty:
-      typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
+  try {
+    const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
+      symbol: intent.symbol,
+      side: intent.side,
+      quoteOrderQty: 6,
+    })
+    const response = {
+      submitted: true,
+      environment: 'production' as const,
+      symbol: intent.symbol,
+      side: intent.side,
+      quoteOrderQty: 6,
+      orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
+      status: typeof result['status'] === 'string' ? result['status'] : null,
+      executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
+      cummulativeQuoteQty:
+        typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
+    }
+    const { error: updateError } = await supabase
+      .from('bot4x_execution_intents')
+      .update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response })
+      .eq('id', createdIntent.id)
+    if (updateError) throw new ApiError(updateError.message, 500)
+    return response
+  } catch (error) {
+    await supabase
+      .from('bot4x_execution_intents')
+      .update({
+        status: 'failed',
+        processed_at: new Date().toISOString(),
+        readings: {
+          environment: 'production',
+          error: error instanceof Error ? error.message : 'Falha desconhecida',
+        },
+      })
+      .eq('id', createdIntent.id)
+    throw error
   }
 }
 
