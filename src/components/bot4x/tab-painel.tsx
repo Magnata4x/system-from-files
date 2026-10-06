@@ -467,13 +467,12 @@ function OrderGrid() {
 function TodayPnlRow() {
   const mode = useBot4xStore((s) => s.mode);
   const pnl = useBot4xStore((s) => s.dailyPnlPct);
-  const history = useBot4xStore((s) => s.history);
+  const todayStats = useBot4xStore((s) => s.todayStats);
 
-  const realHistory = mode === "REAL" ? history : [];
-  const closedTrades = realHistory.filter((trade) => trade.result === "WIN" || trade.result === "LOSS");
-  const wins = closedTrades.filter((trade) => trade.result === "WIN").length;
-  const losses = closedTrades.filter((trade) => trade.result === "LOSS").length;
-  const winRate = closedTrades.length > 0 ? (wins / closedTrades.length) * 100 : null;
+  const closedTrades = mode === "REAL" ? todayStats.trades - todayStats.open : 0;
+  const wins = mode === "REAL" ? todayStats.wins : 0;
+  const losses = mode === "REAL" ? todayStats.losses : 0;
+  const winRate = closedTrades > 0 ? (wins / closedTrades) * 100 : null;
 
   if (mode !== "REAL") {
     return (
@@ -490,7 +489,7 @@ function TodayPnlRow() {
   return (
     <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <Stat label="Daily PnL" value={Number.isFinite(pnl) ? `${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%` : "indisponível"} />
-      <Stat label="Trades (W/L)" value={closedTrades.length > 0 ? `${wins} / ${losses}` : "indisponível"} />
+      <Stat label="Trades (W/L)" value={closedTrades > 0 ? `${wins} / ${losses}` : "indisponível"} />
       <Stat label="Win rate" value={winRate !== null ? `${winRate.toFixed(1)}%` : "indisponível"} />
       <Stat label="Capital at risk" value="indisponível" />
     </section>
