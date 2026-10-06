@@ -212,7 +212,7 @@ export const calibratorAdapter = {
         initialBalance: req.initial_balance ?? 10000,
         leverage: req.leverage ?? 1,
       });
-      return mapSimulationResult(result);
+      return mapSimulationResult({ ...result, persistence: { status: "failed", reason: "Backtest local: backend indisponível; resultado não foi persistido." } });
     }
   },
   /**
@@ -252,6 +252,6 @@ export const calibratorAdapter = {
       initialBalance: req.initial_balance ?? 10000,
       leverage: req.leverage ?? 1,
     });
-    return mapSimulationResult(result);
+    return mapSimulationResult({ ...result, persistence: { status: "failed", reason: "Backtest local: resultado não foi persistido." } });
   },
 };
