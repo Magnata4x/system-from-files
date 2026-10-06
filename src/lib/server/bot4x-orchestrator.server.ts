@@ -60,12 +60,13 @@ function minimumScore(config: ReturnType<typeof mapConfig>): number {
  * construída nas Fases 18–27. A submissão de ordens será uma etapa posterior,
  * explicitamente autorizada, depois que este ciclo estiver validado.
  */
-export async function runBot4xOrchestratorCycle(): Promise<Bot4xCycleResult> {
+export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xCycleResult> {
   const startedAt = new Date().toISOString();
   const { data: configRows, error: configError } = await supabaseAdmin
     .from("bot4x_configs")
     .select("*")
-    .eq("active", true);
+    .eq("active", true)
+    .then((result) => userId ? { ...result, data: (result.data ?? []).filter((row) => row.user_id === userId) } : result);
 
   if (configError) throw new Error(`Bot4x config scan failed: ${configError.message}`);
 
@@ -122,6 +123,9 @@ export async function runBot4xOrchestratorCycle(): Promise<Bot4xCycleResult> {
               ? "profit_lock"
               : "open_slots_limit",
           mode: config.executionMode as Bot4xMode,
+          profile: config.profile,
+          circuitBreaker: config.circuitBreaker,
+          openSlots,
           executionSubmitted: false,
         });
       }
@@ -142,6 +146,9 @@ export async function runBot4xOrchestratorCycle(): Promise<Bot4xCycleResult> {
           ? "signal_passed_bot4x_gates"
           : `score_below_profile_minimum_${minScore}`,
         mode: config.executionMode as Bot4xMode,
+        profile: config.profile,
+        circuitBreaker: config.circuitBreaker,
+        openSlots,
         executionSubmitted: false,
       });
     }
