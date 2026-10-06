@@ -7,17 +7,23 @@ import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from
 
 type Client = SupabaseClient<Database>
 
-export interface ExecuteRealOrderInput {
+export interface RealOrderValidationInput {
   symbol: string
   side: RealOrderSide
   quoteOrderQty: number
   confirmed: boolean
 }
 
+interface AuthorizedOrderExecutionInput {
+  side: RealOrderSide
+  confirmed: boolean
+  idempotencyKey: string
+}
+
 export async function executeAuthorizedSixDollarBtcDemoOrder(
   supabase: Client,
   userId: string,
-  input: { side: RealOrderSide; confirmed: boolean; idempotencyKey: string },
+  input: AuthorizedOrderExecutionInput,
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
@@ -159,7 +165,7 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
 export async function executeAuthorizedSixDollarBtcOrder(
   supabase: Client,
   userId: string,
-  input: { side: RealOrderSide; confirmed: boolean; idempotencyKey: string },
+  input: AuthorizedOrderExecutionInput,
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
@@ -285,7 +291,7 @@ export async function executeAuthorizedSixDollarBtcOrder(
 export async function validateRealMarketOrder(
   supabase: Client,
   userId: string,
-  input: ExecuteRealOrderInput,
+  input: RealOrderValidationInput,
 ) {
   const config = await getOrCreateConfig(supabase, userId)
   const exchange = await getExchangeStatus(supabase, userId)
@@ -311,9 +317,9 @@ export async function validateRealMarketOrder(
   })
   if (!risk.ok) throw new ApiError(risk.reason, 409)
 
-  // This phase deliberately stops at a validated server-side execution intent.
-  // No BUY/SELL is submitted to Binance. The live submission step is isolated
-  // for the later, explicitly authorized manual US$6 validation.
+  // This function only validates the REAL order parameters and server-side risk gates.
+  // It does not submit to Binance; the explicitly authorized US$6 execution function
+  // above performs the submission after creating the idempotent execution intent.
   return {
     ready: true,
     executionMode: config.executionMode,
