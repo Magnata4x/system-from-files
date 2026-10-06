@@ -12,6 +12,7 @@ export interface ExecuteRealOrderInput {
   side: RealOrderSide
   quoteOrderQty: number
   confirmed: boolean
+  idempotencyKey?: string
 }
 
 export async function executeAuthorizedSixDollarBtcDemoOrder(
@@ -311,9 +312,9 @@ export async function validateRealMarketOrder(
   })
   if (!risk.ok) throw new ApiError(risk.reason, 409)
 
-  // This phase deliberately stops at a validated server-side execution intent.
-  // No BUY/SELL is submitted to Binance. The live submission step is isolated
-  // for the later, explicitly authorized manual US$6 validation.
+  // This function only validates the REAL order parameters and server-side risk gates.
+  // It does not submit to Binance; the explicitly authorized US$6 execution function
+  // above performs the submission after creating the idempotent execution intent.
   return {
     ready: true,
     executionMode: config.executionMode,
