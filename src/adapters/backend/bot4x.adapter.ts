@@ -124,7 +124,7 @@ export const bot4xAdapter = {
   },
   async verifiedHistory(limit = 500): Promise<BackendBot4xVerifiedHistory[]> {
     return api.get<BackendBot4xVerifiedHistory[]>(
-      `${endpoints.bot4x.history}?limit=${encodeURIComponent(String(limit))}`,
+      `${endpoints.bot4x.executions}?source=verified&limit=${encodeURIComponent(String(limit))}`,
     );
   },
   async executions(): Promise<BackendBot4xExecution[]> {
