@@ -11,7 +11,7 @@ import {
   genHistory,
 } from "./bot4x-data";
 import { PROFILES } from "./bot4x-data";
-import { bot4xAdapter, type BackendBot4xExecution } from "@/adapters/backend/bot4x.adapter";
+import { bot4xAdapter, type BackendBot4xVerifiedHistory } from "@/adapters/backend/bot4x.adapter";
 import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
