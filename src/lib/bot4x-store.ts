@@ -473,8 +473,6 @@ export const useBot4xStore = create<State>()(
           ]);
 
           const profile = mapBackendProfile(config?.profile);
-          const leverage = get().leverage;
-
           let accumulated = 0;
           const mappedHistory: Trade[] = (verifiedHistory ?? []).map((e) => {
             const trade = verifiedHistoryToTrade(e, accumulated);
