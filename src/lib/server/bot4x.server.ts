@@ -280,6 +280,20 @@ export async function getTelemetry(supabase: Client, userId: string) {
   const open = rows.filter((r) => r.result === 'open').length
   const pnl = rows.reduce((acc, r) => acc + Number(r.pnl ?? 0), 0)
 
+  const { data: intents, error: intentsError } = await supabase
+    .from('bot4x_execution_intents')
+    .select('status, pair, side, created_at, readings')
+    .eq('user_id', userId)
+    .gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(200)
+  if (intentsError) throw new ApiError(intentsError.message, 500)
+
+  const executionRows = intents ?? []
+  const submitted = executionRows.filter((r) => r.status === 'submitted' || r.status === 'completed').length
+  const pending = executionRows.filter((r) => r.status === 'pending').length
+  const failed = executionRows.filter((r) => r.status === 'failed').length
+
   return {
     serverTime: new Date().toISOString(),
     active: config.active,
@@ -287,12 +301,33 @@ export async function getTelemetry(supabase: Client, userId: string) {
     circuitBreaker: config.circuitBreaker,
     dailyPnl: config.dailyPnl,
     openSlots: config.openSlots,
-    today: { trades: rows.length, wins, losses, open, pnl: Number(pnl.toFixed(2)) },
-    logs: rows.slice(0, 20).map((r) => ({
-      at: r.created_at,
-      level: r.result === 'LOSS' ? 'warn' : 'info',
-      message: `${r.pair} ${r.side} · ${r.result} · ${Number(r.pnl ?? 0) >= 0 ? '+' : ''}${Number(r.pnl ?? 0).toFixed(2)}`,
-      detail: r.motivo ?? '',
-    })),
+    today: {
+      trades: rows.length,
+      wins,
+      losses,
+      open,
+      pnl: Number(pnl.toFixed(2)),
+      executions: executionRows.length,
+      submitted,
+      pending,
+      failed,
+    },
+    logs: [
+      ...executionRows.slice(0, 20).map((r) => ({
+        at: r.created_at,
+        level: r.status === 'failed' ? 'warn' : 'info',
+        message: r.pair + ' ' + r.side + ' · Binance · ' + r.status,
+        detail: ((r.readings ?? {}) as Record<string, unknown>).orderId
+          ? 'orderId=' + String(((r.readings ?? {}) as Record<string, unknown>).orderId)
+          : 'Execução registrada no ledger',
+      })),
+      ...rows.slice(0, 20).map((r) => ({
+        at: r.created_at,
+        level: r.result === 'LOSS' ? 'warn' : 'info',
+        message: r.pair + ' ' + r.side + ' · ' + r.result + ' · ' +
+          (Number(r.pnl ?? 0) >= 0 ? '+' : '') + Number(r.pnl ?? 0).toFixed(2),
+        detail: r.motivo ?? '',
+      })),
+    ].slice(0, 20),
   }
 }
