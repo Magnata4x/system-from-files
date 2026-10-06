@@ -82,17 +82,15 @@ export async function getMarketCalendar(now = new Date()): Promise<MarketCalenda
   const cacheKey = `market-calendar:${from}:${to}`;
 
   try {
-    return await cachedJson(cacheKey, MARKET_CALENDAR_TTL_SECONDS, async () => {
-      const payload = await fetchCalendar(from, to);
-      return {
-        status: "available" as const,
-        provider: "XOOMAR" as const,
-        timezone: "UTC" as const,
-        updatedAt: payload.updatedAt ?? new Date().toISOString(),
-        events: normalizeCalendarEvents(payload, now),
-        attribution: payload.meta?.sourceAttribution ?? "Data: XOOMAR",
-      };
-    });
+    const payload = await cachedJson(cacheKey, MARKET_CALENDAR_TTL_SECONDS, () => fetchCalendar(from, to));
+    return {
+      status: "available",
+      provider: "XOOMAR",
+      timezone: "UTC",
+      updatedAt: payload.updatedAt ?? new Date().toISOString(),
+      events: normalizeCalendarEvents(payload, now),
+      attribution: payload.meta?.sourceAttribution ?? "Data: XOOMAR",
+    };
   } catch (error) {
     console.warn("[api] calendário econômico indisponível", error);
     return {
