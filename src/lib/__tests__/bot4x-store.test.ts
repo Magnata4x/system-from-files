@@ -25,6 +25,7 @@ vi.mock("@/adapters/backend/bot4x.adapter", () => ({
   bot4xAdapter: {
     getConfig: vi.fn().mockResolvedValue(null),
     executions: vi.fn().mockResolvedValue([]),
+    verifiedHistory: vi.fn().mockResolvedValue([]),
   },
 }));
 
