@@ -224,6 +224,19 @@ export async function submitVerifiedBinanceMarketOrder(
   })
 }
 
+/** Consulta o estado de uma ordem Spot existente na Binance. */
+export async function getVerifiedBinanceOrder(
+  supabase: Client,
+  userId: string,
+  input: { symbol: string; orderId: number },
+) {
+  const credentials = await getStoredCredentials(supabase, userId)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
+    symbol: input.symbol,
+    orderId: String(input.orderId),
+  })
+}
+
 export async function getVerifiedBinanceAccount(
   supabase: Client,
   userId: string,
