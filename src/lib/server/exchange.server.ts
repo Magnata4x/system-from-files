@@ -150,7 +150,7 @@ export interface UsdtBalance {
 }
 
 async function verify(apiKey: string, apiSecret: string) {
-  const account = (await binanceSigned(apiKey, apiSecret, '/api/v3/account')) as {
+  const account = (await binanceSigned(apiKey, apiSecret, '/v3/account')) as {
     canTrade?: boolean
     balances?: { asset: string; free: string }[]
   }
@@ -177,7 +177,7 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
   const account = (await binanceSigned(
     await decryptSecret(data.api_key_cipher),
     await decryptSecret(data.api_secret_cipher),
-    '/api/v3/account',
+    '/v3/account',
   )) as { balances?: Array<{ asset: string; free: string; locked: string }> }
   const balance = account.balances?.find((item) => item.asset === 'USDT')
   const free = Number(balance?.free ?? 0)
@@ -219,7 +219,7 @@ export async function submitVerifiedBinanceMarketOrder(
   input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number },
 ) {
   const credentials = await getStoredCredentials(supabase, userId)
-  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/api/v3/order', {
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', {
     symbol: input.symbol, side: input.side, type: 'MARKET', quoteOrderQty: input.quoteOrderQty.toFixed(2),
   })
 }
@@ -229,7 +229,7 @@ export async function getVerifiedBinanceAccount(
   userId: string,
 ): Promise<VerifiedBinanceAccount> {
   const credentials = await getStoredCredentials(supabase, userId)
-  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/api/v3/account')) as {
+  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/v3/account')) as {
     canTrade?: boolean
     balances?: Array<{ asset: string; free: string; locked: string }>
   }
