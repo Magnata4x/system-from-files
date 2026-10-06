@@ -150,7 +150,7 @@ export async function executeAuthorizedSixDollarBtcOrder(
 
   const { data: existingIntent, error: existingIntentError } = await supabase
     .from('bot4x_execution_intents')
-    .select('status, readings')
+    .select('status, readings, mode, pair, side, quote_amount')
     .eq('user_id', userId)
     .eq('idempotency_key', idempotencyKey)
     .maybeSingle()
