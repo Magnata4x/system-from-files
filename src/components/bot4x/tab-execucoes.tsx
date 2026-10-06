@@ -217,7 +217,7 @@ export function TabExecucoes() {
                       <Td right>
                         <span
                           className="tabular-nums font-medium"
-                          style={{ color: pnl > 0 ? "#1D9E75" : pnl < 0 ? "#E24B4A" : undefined }}
+                          style={{ color: pnl == null ? undefined : pnl > 0 ? "#1D9E75" : pnl < 0 ? "#E24B4A" : undefined }}
                         >
                           {pnl == null ? "—" : `${pnl >= 0 ? "+" : ""}${fmt(pnl)}`}
                         </span>
