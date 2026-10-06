@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { handleApi } from '@/lib/server/api-auth.server'
-import { listExecutions, listExecutionsPaged } from '@/lib/server/bot4x.server'
+import { listExecutions, listExecutionsPaged, listVerifiedHistory } from '@/lib/server/bot4x.server'
 
 export const Route = createFileRoute('/api/bot4x/executions')({
   server: {
