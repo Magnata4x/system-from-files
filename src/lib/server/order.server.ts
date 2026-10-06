@@ -96,6 +96,9 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
     .select('id')
     .single()
   if (intentError || !intent) {
+    if (intentError?.code === '23505') {
+      throw new ApiError('Esta ordem já está em processamento para esta idempotency key. Não tente reenviar.', 409)
+    }
     throw new ApiError(intentError?.message ?? 'Falha ao registrar intenção de execução.', 500)
   }
 
@@ -179,6 +182,9 @@ export async function executeAuthorizedSixDollarBtcOrder(
     .select('id')
     .single()
   if (intentError || !createdIntent) {
+    if (intentError?.code === '23505') {
+      throw new ApiError('Esta ordem REAL já está em processamento para esta idempotency key. Não tente reenviar.', 409)
+    }
     throw new ApiError(intentError?.message ?? 'Falha ao registrar intenção de execução REAL.', 500)
   }
 
