@@ -320,11 +320,11 @@ export async function getTelemetry(supabase: Client, userId: string) {
         ...readings,
         status: binanceStatus,
         orderId,
-        executedQty: typeof order.executedQty === 'string' ? Number(order.executedQty) : readings.executedQty,
+        executedQty: typeof order.executedQty === 'string' ? Number(order.executedQty) : null,
         cummulativeQuoteQty:
           typeof order.cummulativeQuoteQty === 'string'
             ? Number(order.cummulativeQuoteQty)
-            : readings.cummulativeQuoteQty,
+            : null,
         reconciledAt: new Date().toISOString(),
       }
 
@@ -344,7 +344,7 @@ export async function getTelemetry(supabase: Client, userId: string) {
     } catch (error) {
       // A temporary reconciliation failure must not erase a confirmed
       // submission or turn it into a false failure.
-      if (error instanceof ApiError && error.statusCode >= 500) throw error
+      if (error instanceof ApiError && error.status >= 500) throw error
     }
   }
 
