@@ -10,6 +10,10 @@ export const Route = createFileRoute('/api/bot4x/demo-order')({
           const body = (await request.json().catch(() => ({}))) as {
             side?: 'BUY' | 'SELL'
             confirmed?: boolean
+            idempotencyKey?: string
+          }
+          if (!body.idempotencyKey?.trim()) {
+            throw new ApiError('Idempotency key é obrigatória.', 400)
           }
           if (body.side !== 'BUY' && body.side !== 'SELL') {
             throw new ApiError('Lado da ordem deve ser BUY ou SELL.', 400)
@@ -17,6 +21,7 @@ export const Route = createFileRoute('/api/bot4x/demo-order')({
           return executeAuthorizedSixDollarBtcDemoOrder(user.supabase, user.userId, {
             side: body.side,
             confirmed: body.confirmed === true,
+            idempotencyKey: body.idempotencyKey,
           })
         }),
     },
