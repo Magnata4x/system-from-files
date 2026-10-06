@@ -1,5 +1,20 @@
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useScoreDistribution } from "@/hooks/useScoreDistribution";
 import { DataStatusBadge } from "./data-status";
+
+export interface ScoreDistributionChartPoint {
+  label: string;
+  n: number;
+}
+
+export function buildScoreDistributionChartData(
+  buckets: readonly { from: number; to: number; n: number }[],
+): ScoreDistributionChartPoint[] {
+  return buckets.map((bucket) => ({
+    label: `${bucket.from}–${bucket.to === 101 ? 100 : bucket.to - 1}`,
+    n: bucket.n,
+  }));
+}
 
 export function PerformanceChart() {
   const query = useScoreDistribution();
@@ -10,6 +25,8 @@ export function PerformanceChart() {
       : query.isError || !group
         ? "unavailable"
         : "ok";
+
+  const chartData = group ? buildScoreDistributionChartData(group.buckets) : [];
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -22,7 +39,7 @@ export function PerformanceChart() {
         </div>
         <DataStatusBadge
           source="Signals · banco"
-          updatedAt={query.data?.generatedAt ? new Date(query.data.generatedAt) : null}
+          updatedAt={query.data?.latestDataAt ? new Date(query.data.latestDataAt) : null}
           status={status}
         />
       </div>
@@ -42,25 +59,27 @@ export function PerformanceChart() {
             <span>{group.asset} · {group.timeframe}</span>
             <span>n = {group.n}</span>
           </div>
-          <div className="grid grid-cols-5 gap-2 items-end h-[180px]">
-            {group.buckets.map((bucket) => {
-              const max = Math.max(...group.buckets.map((item) => item.n), 1);
-              const height = bucket.n ? Math.max(8, Math.round((bucket.n / max) * 150)) : 0;
-              return (
-                <div key={bucket.from} className="h-full flex flex-col justify-end">
-                  <div className="text-center text-[10px] text-muted-foreground mb-1">{bucket.n}</div>
-                  <div
-                    className="rounded-t-md bg-primary/70 min-h-0"
-                    style={{ height: `${height}px` }}
-                    aria-label={`Score ${bucket.from} a ${bucket.to === 101 ? 100 : bucket.to - 1}: ${bucket.n} sinais`}
-                  />
-                  <div className="text-center text-[9px] text-muted-foreground mt-1">
-                    {bucket.from}–{bucket.to === 101 ? 100 : bucket.to - 1}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="h-[180px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <XAxis dataKey="label" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value, _name, item) => [
+                    typeof value === "number" ? `${value} sinais · faixa ${item?.payload?.label ?? "indisponível"}` : "Indisponível",
+                    "",
+                  ]}
+                  labelFormatter={() => ""}
+                />
+                <Bar dataKey="n" name="n" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+          {query.data?.truncated && (
+            <div className="mt-3 text-[10px] text-amber-600">
+              Exibição limitada aos 10.000 sinais mais recentes; existem mais sinais no período.
+            </div>
+          )}
           {query.data && query.data.groups.length > 1 && (
             <div className="mt-3 text-[10px] text-muted-foreground">
               Exibindo o grupo com maior número de sinais. Outros grupos: {query.data.groups.length - 1}.

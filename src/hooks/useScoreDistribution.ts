@@ -17,6 +17,8 @@ export interface ScoreDistributionGroup {
 export interface ScoreDistribution {
   periodStart: string;
   generatedAt: string;
+  latestDataAt: string | null;
+  truncated: boolean;
   groups: ScoreDistributionGroup[];
   total: number;
 }

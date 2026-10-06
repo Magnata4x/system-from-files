@@ -17,3 +17,25 @@ export function fearGreedColor(value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value)) return "#888780";
   return FEAR_GREED_ZONES.find((zone) => value >= zone.from && value < zone.to)?.color ?? "#888780";
 }
+
+export interface FearGreedPoint {
+  value: number;
+  label: string;
+  timestamp: number;
+}
+
+export function buildFearGreedSeries(
+  history: readonly FearGreedPoint[] | null | undefined,
+): FearGreedPoint[] {
+  if (!history) return [];
+  return history
+    .filter(
+      (point) =>
+        Number.isFinite(point.value) &&
+        point.value >= 0 &&
+        point.value <= 100 &&
+        Number.isFinite(point.timestamp) &&
+        point.timestamp > 0,
+    )
+    .sort((a, b) => a.timestamp - b.timestamp);
+}
