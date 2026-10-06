@@ -116,7 +116,7 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
     }
     const { error: updateError } = await supabase
       .from('bot4x_execution_intents')
-      .update({ status: 'submitted', processed_at: new Date().toISOString(), readings })
+      .update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response })
       .eq('id', intent.id)
     if (updateError) throw new ApiError(updateError.message, 500)
     return response
