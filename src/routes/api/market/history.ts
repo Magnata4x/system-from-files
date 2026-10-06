@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/market/history")({
             : 30;
           const periodStart = new Date(Date.now() - days * 24 * 60 * 60_000).toISOString();
 
-          const { data, error } = await user.supabase
+          const { data, error } = await (user.supabase as any)
             .from("market_snapshots")
             .select(
               "captured_at,source,total_market_cap,total_volume,btc_dominance,market_cap_change_24h",
@@ -24,13 +24,21 @@ export const Route = createFileRoute("/api/market/history")({
             .order("captured_at", { ascending: true })
             .limit(10_000);
 
-          if (error) throw new Error(`Histórico de mercado indisponível: ${error.message}`);
+          if (error) {
+            console.warn(`[api] Histórico de mercado indisponível: ${error.message}`);
+            return {
+              periodStart,
+              generatedAt: new Date().toISOString(),
+              source: "coingecko",
+              points: [],
+            };
+          }
 
           return {
             periodStart,
             generatedAt: new Date().toISOString(),
             source: data[0]?.source ?? "coingecko",
-            points: data.map((row) => ({
+            points: (data as any[]).map((row: any) => ({
               capturedAt: row.captured_at,
               totalMarketCap: row.total_market_cap,
               totalVolume: row.total_volume,
