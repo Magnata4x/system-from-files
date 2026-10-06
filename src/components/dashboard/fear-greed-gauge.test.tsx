@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.stubGlobal(
+  "ResizeObserver",
+  class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+);
+
 const { useMarketData } = vi.hoisted(() => ({ useMarketData: vi.fn() }));
 vi.mock("@/lib/market-data-store", () => ({ useMarketData }));
 vi.mock("./data-status", async () => {

@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+vi.stubGlobal(
+  "ResizeObserver",
+  class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+);
+
 const { useScoreDistribution } = vi.hoisted(() => ({ useScoreDistribution: vi.fn() }));
 vi.mock("@/hooks/useScoreDistribution", () => ({ useScoreDistribution }));
 
