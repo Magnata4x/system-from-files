@@ -221,7 +221,7 @@ export async function executeAuthorizedSixDollarBtcOrder(
       side: intent.side,
       quote_amount: 6,
       reason: 'manual-real-order',
-      readings: { environment: 'production', confirmed: true },
+      readings: { environment: 'production', confirmed: true, profile: config.profile, leverage: config.leverage },
       status: 'pending',
       confirmed_at: new Date().toISOString(),
     })
@@ -282,7 +282,7 @@ export async function executeAuthorizedSixDollarBtcOrder(
     throw error
   }
 
-  const response = { submitted: true, environment: 'production' as const, symbol: intent.symbol, side: intent.side, quoteOrderQty: 6, clientOrderId: createdIntent.id, orderId: typeof result.orderId === 'number' ? result.orderId : null, status: typeof result.status === 'string' ? result.status : null, executedQty: typeof result.executedQty === 'string' ? Number(result.executedQty) : null, cummulativeQuoteQty: typeof result.cummulativeQuoteQty === 'string' ? Number(result.cummulativeQuoteQty) : null }
+  const response = { submitted: true, environment: 'production' as const, symbol: intent.symbol, side: intent.side, quoteOrderQty: 6, clientOrderId: createdIntent.id, profile: config.profile, leverage: config.leverage, orderId: typeof result.orderId === 'number' ? result.orderId : null, status: typeof result.status === 'string' ? result.status : null, executedQty: typeof result.executedQty === 'string' ? Number(result.executedQty) : null, cummulativeQuoteQty: typeof result.cummulativeQuoteQty === 'string' ? Number(result.cummulativeQuoteQty) : null }
   const { error: updateError } = await supabase.from('bot4x_execution_intents').update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response }).eq('id', createdIntent.id)
   if (updateError) throw new ApiError('Ordem enviada à Binance, mas o ledger não confirmou a persistência. Não tente reenviar com a mesma idempotency key.', 503)
   return response
