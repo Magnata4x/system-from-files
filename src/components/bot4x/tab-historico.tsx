@@ -608,6 +608,7 @@ function ResultBadge({ r }: { r: Trade["result"] }) {
     LOSS: { c: "#E24B4A", l: "Loss" },
     BLOCKED: { c: "#888780", l: "Bloq." },
     SHUTDOWN: { c: "#E24B4A", l: "Shut." },
+    OPEN: { c: "#EF9F27", l: "Aberto" },
   };
   const { c, l } = map[r];
   return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: `color-mix(in oklab, ${c} 22%, transparent)`, color: c }}>{l}</span>;
