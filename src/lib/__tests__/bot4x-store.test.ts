@@ -3,7 +3,7 @@
 //
 // Mocks necessários: adapters/db helpers e ws-client são importados no
 // top-level do store e disparam efeitos de rede/persistência.
-import { verifiedHistoryToTrade, describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/integrations/supabase/client", () => {
   const listeners = new Set<(event: string, session: unknown) => void>();
@@ -59,6 +59,7 @@ import {
   REAL_MODE_ENABLED,
   selectActiveCapital,
   selectSlotSize,
+  verifiedHistoryToTrade,
 } from "../bot4x-store";
 import { supabase } from "@/integrations/supabase/client";
 
