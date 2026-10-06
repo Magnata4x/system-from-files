@@ -24,8 +24,10 @@ import { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from ".
 export { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from "./bot4x-breaker";
 
 // ─── REAL MODE GATE ───────────────────────────────────────────────────────────
-// O modo REAL nunca é liberado por feature flag, estado local ou variável VITE_*.
-// A única autorização local é o estado verificado pelo backend da exchange.
+// Mantido apenas para compatibilidade com testes/consumidores legados.
+// A flag permanece permanentemente desabilitada: REAL só é liberado após
+// verificação da exchange em runtime pelo backend.
+export const REAL_MODE_ENABLED = false;
 let exchangeVerified = false;
 export function setExchangeVerified(value: boolean) {
   exchangeVerified = value;
