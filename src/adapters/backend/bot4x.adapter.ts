@@ -79,6 +79,32 @@ export interface Bot4xTelemetry {
   logs: Array<{ at: string; level: string; message: string; detail?: string }>;
 }
 
+export interface BackendBot4xCycleDecision {
+  userId: string;
+  pair: string;
+  side: "BUY" | "SELL";
+  score: number;
+  decision: "EXECUTION_CANDIDATE" | "IGNORED" | "BLOCKED" | "INACTIVE";
+  reason: string;
+  mode: "DEMO" | "REAL";
+  profile: string;
+  circuitBreaker: string;
+  openSlots: number;
+  executionSubmitted: false;
+}
+
+export interface BackendBot4xCycle {
+  startedAt: string;
+  finishedAt: string;
+  usersScanned: number;
+  activeUsers: number;
+  signalsScanned: number;
+  candidates: number;
+  blocked: number;
+  ignored: number;
+  decisions: BackendBot4xCycleDecision[];
+}
+
 export interface Bot4xUsdtBalance {
   asset: "USDT";
   free: number;
@@ -180,6 +206,9 @@ export const bot4xAdapter = {
   },
   async telemetry(): Promise<Bot4xTelemetry> {
     return api.get<Bot4xTelemetry>(endpoints.bot4x.telemetry);
+  },
+  async cycle(): Promise<BackendBot4xCycle> {
+    return api.get<BackendBot4xCycle>(endpoints.bot4x.cycle);
   },
   async balance(): Promise<Bot4xUsdtBalance> {
     return api.get<Bot4xUsdtBalance>(endpoints.bot4x.balance);
