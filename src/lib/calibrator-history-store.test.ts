@@ -29,6 +29,7 @@ const result = {
   maxDrawdown: 0, sharpe: 0, equityCurve: [],
   dnaFeedback: { patternDetected: "", correction: "", expectedImprovement: "" },
   commentary: "",
+  persistence: { status: "persisted" as const, runId: "test-run" },
 };
 
 describe("calibrator history persistence", () => {
