@@ -237,6 +237,19 @@ export async function getVerifiedBinanceOrder(
   })
 }
 
+/** Consulta os fills reais de uma ordem Spot já existente. Somente leitura. */
+export async function getVerifiedBinanceTrades(
+  supabase: Client,
+  userId: string,
+  input: { symbol: string; orderId: number },
+) {
+  const credentials = await getStoredCredentials(supabase, userId)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/myTrades', {
+    symbol: input.symbol,
+    orderId: String(input.orderId),
+  })
+}
+
 export async function getVerifiedBinanceAccount(
   supabase: Client,
   userId: string,
