@@ -167,12 +167,12 @@ function mapBackendProfile(p: string | undefined): CalibProfile {
   return "conservador";
 }
 
-function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, leverage: number): Trade {
-  const openedAt = e.createdAt ? new Date(e.createdAt).getTime() : Date.now();
-  const pnl = e.pnl ?? 0;
-  const side: Side = e.side === "BUY" || e.side === "LONG" ? "LONG" : "SHORT";
-  const result: Trade["result"] = e.status === "open" || e.status === "pending" ? "BLOCKED" : pnl >= 0 ? "WIN" : "LOSS";
+function verifiedHistoryToTrade(e: BackendBot4xVerifiedHistory, accumulated: number): Trade {
+  const openedAt = new Date(e.createdAt).getTime();
+  const pnl = e.realizedPnl;
+  const side: Side = e.side === "BUY" ? "LONG" : "SHORT";
   const entry = e.entryPrice ?? 0;
+  const result: Trade["result"] = pnl === null ? "OPEN" : pnl >= 0 ? "WIN" : "LOSS";
   return {
     id: e.id,
     day: new Date(openedAt).toISOString().slice(0, 10),
@@ -182,12 +182,12 @@ function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, lever
     stop: entry,
     target: entry,
     result,
-    pnl,
-    pnlPct: pnl,
-    accumulated: 0,
-    profile,
-    leverage,
-    motivo: "",
+    pnl: pnl ?? 0,
+    pnlPct: 0,
+    accumulated: pnl === null ? accumulated : accumulated + pnl,
+    profile: mapBackendProfile(e.profile),
+    leverage: e.leverage,
+    motivo: e.lifecycle ?? "execução Binance verificada",
     hour: new Date(openedAt).getHours(),
   };
 }
@@ -475,9 +475,12 @@ export const useBot4xStore = create<State>()(
           const profile = mapBackendProfile(config?.profile);
           const leverage = get().leverage;
 
-          const mappedHistory: Trade[] = (executions ?? []).map((e: BackendBot4xExecution) =>
-            executionToTrade(e, profile, leverage),
-          );
+          let accumulated = 0;
+          const mappedHistory: Trade[] = (verifiedHistory ?? []).map((e) => {
+            const trade = verifiedHistoryToTrade(e, accumulated);
+            accumulated = trade.accumulated;
+            return trade;
+          });
 
           set({
             status: config?.active ? "RUNNING" : "IDLE",
@@ -559,7 +562,7 @@ export const useBot4xStore = create<State>()(
                   todayStats: telemetry?.today
                     ? { ...telemetry.today, serverTime: telemetry.serverTime ?? null }
                     : get().todayStats,
-                  history: (execs ?? []).map((e) => executionToTrade(e, prof, get().leverage)),
+                  history: (() => {\n                    let accumulated = 0;\n                    return (verifiedHistory ?? []).map((e) => {\n                      const trade = verifiedHistoryToTrade(e, accumulated);\n                      accumulated = trade.accumulated;\n                      return trade;\n                    });\n                  })(),
                   errorMsg: null,
                 });
               } catch (err) {
