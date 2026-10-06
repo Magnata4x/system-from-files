@@ -107,7 +107,7 @@ async function binanceSignedRequest(
   const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
   const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey } })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
-  if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), res.status)
+  if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
   return body
 }
 
@@ -130,7 +130,7 @@ async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
   })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) {
-    throw new ApiError(String(body['msg'] ?? `Binance respondeu ${res.status}`), res.status)
+    throw new ApiError(String(body['msg'] ?? `Binance respondeu ${res.status}`), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
   }
   return body
 }

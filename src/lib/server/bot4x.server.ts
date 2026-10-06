@@ -446,9 +446,12 @@ export async function getTelemetry(supabase: Client, userId: string) {
         intent.readings = nextReadings
       }
     } catch (error) {
-      // An unavailable/unknown clientOrderId means Binance has no order we can
-      // prove exists yet. Keep pending rather than inventing a failure or retry.
-      if (error instanceof ApiError && error.status >= 500) throw error
+      // Only Binance's definitive order-not-found code means there is no
+      // evidence of an order. Authentication, signature, rate-limit and other
+      // exchange errors must not be interpreted as absence.
+      if (error instanceof ApiError && error.code === -2013 && error.status === 400) continue
+      if (error instanceof ApiError) throw new ApiError('Não foi possível reconciliar a ordem na Binance. A intenção permanece no ledger para nova reconciliação.', 503, error.code)
+      throw error
     }
   }
 

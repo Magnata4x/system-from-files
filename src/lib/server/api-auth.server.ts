@@ -17,7 +17,7 @@ export function jsonResponse(body: unknown, status = 200): Response {
 }
 
 export class ApiError extends Error {
-  constructor(message: string, readonly status = 400) {
+  constructor(message: string, readonly status = 400, readonly code?: number) {
     super(message)
   }
 }
