@@ -31,8 +31,8 @@ export interface BackendBot4xExecution {
   id: string;
   pair: string;
   side: "LONG" | "SHORT" | "BUY" | "SELL";
-  entryPrice: number;
-  pnl?: number;
+  entryPrice: number | null;
+  pnl?: number | null;
   status: "open" | "closed" | "pending" | string;
   createdAt?: string;
 }
@@ -56,7 +56,7 @@ export interface BackendBot4xVerifiedHistory {
 export interface BackendBot4xExecutionRich extends BackendBot4xExecution {
   stopLoss?: number;
   takeProfit?: number;
-  pnlPct?: number;
+  pnlPct?: number | null;
   result?: string;
   motivo?: string;
 }

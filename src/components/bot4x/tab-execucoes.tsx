@@ -186,7 +186,7 @@ export function TabExecucoes() {
           <EmptyPanel
             title="Nenhuma execução encontrada"
             message={
-              result !== "all" || side !== "all" || pair
+              result !== "all" || side !== "all" || profile !== "all" || from || to || pair
                 ? "Nenhum resultado para os filtros aplicados. Ajuste ou limpe os filtros."
                 : "O Bot4x ainda não registrou execuções. Inicie o bot para começar a operar."
             }
@@ -202,7 +202,7 @@ export function TabExecucoes() {
               </thead>
               <tbody>
                 {data!.items.map((e) => {
-                  const pnl = e.pnl ?? 0;
+                  const pnl = e.pnl;
                   return (
                     <tr key={e.id} className="border-b border-border/50 hover:bg-secondary/40">
                       <Td>{e.createdAt ? new Date(e.createdAt).toLocaleString("pt-BR") : "—"}</Td>
@@ -210,16 +210,16 @@ export function TabExecucoes() {
                       <Td>
                         <span style={{ color: e.side === "SHORT" ? "#E24B4A" : "#1D9E75" }}>{e.side}</span>
                       </Td>
-                      <Td right>{fmt(e.entryPrice)}</Td>
+                      <Td right>{e.entryPrice == null ? "—" : fmt(e.entryPrice)}</Td>
                       <Td right>{e.stopLoss != null ? fmt(e.stopLoss) : "—"}</Td>
                       <Td right>{e.takeProfit != null ? fmt(e.takeProfit) : "—"}</Td>
                       <Td><StatusBadge status={e.status} result={e.result} /></Td>
                       <Td right>
                         <span
                           className="tabular-nums font-medium"
-                          style={{ color: pnl > 0 ? "#1D9E75" : pnl < 0 ? "#E24B4A" : undefined }}
+                          style={{ color: pnl == null ? undefined : pnl > 0 ? "#1D9E75" : pnl < 0 ? "#E24B4A" : undefined }}
                         >
-                          {pnl >= 0 ? "+" : ""}{fmt(pnl)}
+                          {pnl == null ? "—" : `${pnl >= 0 ? "+" : ""}${fmt(pnl)}`}
                         </span>
                       </Td>
                     </tr>
