@@ -45,6 +45,7 @@ import { Route as ApiMarketplaceProductsRouteImport } from './routes/api/marketp
 import { Route as ApiMarketplaceHistoryRouteImport } from './routes/api/marketplace/history'
 import { Route as ApiMarketScoreDistributionRouteImport } from './routes/api/market/score-distribution'
 import { Route as ApiMarketHistoryRouteImport } from './routes/api/market/history'
+import { Route as ApiMarketCalendarRouteImport } from './routes/api/market/calendar'
 import { Route as ApiMarketRegimeCurrentRouteImport } from './routes/api/market-regime/current'
 import { Route as ApiManipulationAlertsRouteImport } from './routes/api/manipulation/alerts'
 import { Route as ApiExchangeTestRouteImport } from './routes/api/exchange/test'
@@ -260,6 +261,11 @@ const ApiMarketHistoryRoute = ApiMarketHistoryRouteImport.update({
   path: '/api/market/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketCalendarRoute = ApiMarketCalendarRouteImport.update({
+  id: '/api/market/calendar',
+  path: '/api/market/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMarketRegimeCurrentRoute = ApiMarketRegimeCurrentRouteImport.update({
   id: '/api/market-regime/current',
   path: '/api/market-regime/current',
@@ -459,6 +465,7 @@ export interface FileRoutesByFullPath {
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/market/calendar': typeof ApiMarketCalendarRoute
   '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
@@ -662,6 +669,7 @@ export interface FileRouteTypes {
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
     | '/api/market/history'
+    | '/api/market/calendar'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -842,6 +850,7 @@ export interface RootRouteChildren {
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
   ApiMarketHistoryRoute: typeof ApiMarketHistoryRoute
+  ApiMarketCalendarRoute: typeof ApiMarketCalendarRoute
   ApiMarketScoreDistributionRoute: typeof ApiMarketScoreDistributionRoute
   ApiMarketplaceHistoryRoute: typeof ApiMarketplaceHistoryRoute
   ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
@@ -1107,6 +1116,13 @@ declare module '@tanstack/react-router' {
       path: '/api/market/score-distribution'
       fullPath: '/api/market/score-distribution'
       preLoaderRoute: typeof ApiMarketScoreDistributionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/calendar': {
+      id: '/api/market/calendar'
+      path: '/api/market/calendar'
+      fullPath: '/api/market/calendar'
+      preLoaderRoute: typeof ApiMarketCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/market/history': {
@@ -1447,6 +1463,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
   ApiMarketHistoryRoute: ApiMarketHistoryRoute,
+  ApiMarketCalendarRoute: ApiMarketCalendarRoute,
   ApiMarketScoreDistributionRoute: ApiMarketScoreDistributionRoute,
   ApiMarketplaceHistoryRoute: ApiMarketplaceHistoryRoute,
   ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
