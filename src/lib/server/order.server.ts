@@ -28,12 +28,15 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
 
   const { data: existingIntent, error: existingIntentError } = await supabase
     .from('bot4x_execution_intents')
-    .select('status, readings')
+    .select('status, readings, mode, pair, side, quote_amount')
     .eq('user_id', userId)
     .eq('idempotency_key', idempotencyKey)
     .maybeSingle()
   if (existingIntentError) throw new ApiError(existingIntentError.message, 500)
   if (existingIntent) {
+    if (existingIntent.mode !== 'DEMO' || existingIntent.pair !== 'BTCUSDT' || existingIntent.side !== input.side || Number(existingIntent.quote_amount) !== 6) {
+      throw new ApiError('Esta idempotency key já está vinculada a outra ordem.', 409)
+    }
     if (existingIntent.status === 'submitted' || existingIntent.status === 'completed') {
       const readings = (existingIntent.readings ?? {}) as Record<string, unknown>
       return {
@@ -153,6 +156,9 @@ export async function executeAuthorizedSixDollarBtcOrder(
     .maybeSingle()
   if (existingIntentError) throw new ApiError(existingIntentError.message, 500)
   if (existingIntent) {
+    if (existingIntent.mode !== 'REAL' || existingIntent.pair !== 'BTCUSDT' || existingIntent.side !== input.side || Number(existingIntent.quote_amount) !== 6) {
+      throw new ApiError('Esta idempotency key já está vinculada a outra ordem.', 409)
+    }
     if (existingIntent.status === 'submitted' || existingIntent.status === 'completed') {
       const readings = (existingIntent.readings ?? {}) as Record<string, unknown>
       return {
