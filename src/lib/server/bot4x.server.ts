@@ -325,6 +325,19 @@ export async function getTelemetry(supabase: Client, userId: string) {
           typeof order.cummulativeQuoteQty === 'string'
             ? Number(order.cummulativeQuoteQty)
             : null,
+        averageFillPrice: (() => {
+          const executedQty = typeof order.executedQty === 'string' ? Number(order.executedQty) : NaN
+          const quoteQty = typeof order.cummulativeQuoteQty === 'string' ? Number(order.cummulativeQuoteQty) : NaN
+          return Number.isFinite(executedQty) && executedQty > 0 && Number.isFinite(quoteQty)
+            ? quoteQty / executedQty
+            : null
+        })(),
+        lifecycle: binanceStatus === 'FILLED'
+          ? 'filled_unrealized'
+          : binanceStatus === 'CANCELED' || binanceStatus === 'REJECTED' || binanceStatus === 'EXPIRED'
+            ? 'not_executed'
+            : 'pending',
+        realizedPnl: null,
         reconciledAt: new Date().toISOString(),
       }
 
