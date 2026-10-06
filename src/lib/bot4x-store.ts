@@ -295,6 +295,7 @@ export const useBot4xStore = create<State>()(
             }
           })();
         }
+      },
 
       // ─── INIT ─────────────────────────────────────────────────────────────
       init: async () => {
