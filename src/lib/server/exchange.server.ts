@@ -216,11 +216,15 @@ async function getStoredCredentials(supabase: Client, userId: string) {
 /** Envia uma ordem MARKET somente após a validação server-side. */
 export async function submitVerifiedBinanceMarketOrder(
   supabase: Client, userId: string,
-  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number },
+  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number; clientOrderId: string },
 ) {
   const credentials = await getStoredCredentials(supabase, userId)
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', {
-    symbol: input.symbol, side: input.side, type: 'MARKET', quoteOrderQty: input.quoteOrderQty.toFixed(2),
+    symbol: input.symbol,
+    side: input.side,
+    type: 'MARKET',
+    quoteOrderQty: input.quoteOrderQty.toFixed(2),
+    newClientOrderId: input.clientOrderId,
   })
 }
 
@@ -234,6 +238,19 @@ export async function getVerifiedBinanceOrder(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
     symbol: input.symbol,
     orderId: String(input.orderId),
+  })
+}
+
+/** Consulta uma ordem Spot pelo clientOrderId. Somente leitura e usada para recuperar intents pendentes. */
+export async function getVerifiedBinanceOrderByClientOrderId(
+  supabase: Client,
+  userId: string,
+  input: { symbol: string; clientOrderId: string },
+) {
+  const credentials = await getStoredCredentials(supabase, userId)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
+    symbol: input.symbol,
+    origClientOrderId: input.clientOrderId,
   })
 }
 
