@@ -102,8 +102,8 @@ export async function updateConfig(
 ) {
   const current = await getOrCreateConfig(supabase, userId)
   const requestedMode = patch.executionMode === 'REAL' ? 'REAL' : patch.executionMode === 'DEMO' ? 'DEMO' : current.executionMode
-  const requestedActive = patch.active === true
-  if (requestedMode === 'REAL' || (requestedActive && current.executionMode === 'REAL')) {
+  const enablingReal = patch.executionMode === 'REAL' || (patch.active === true && current.executionMode === 'REAL')
+  if (enablingReal) {
     const exchange = await getExchangeStatus(supabase, userId)
     if (!exchange.verified) {
       throw new ApiError('Modo REAL exige credencial Binance verificada.', 409)
