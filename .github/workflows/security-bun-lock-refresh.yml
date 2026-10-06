@@ -1,0 +1,32 @@
+name: security-bun-lock-refresh
+on:
+  push:
+    branches:
+      - chore/security-audit-2026-10-06
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/security-audit-2026-10-06
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Refresh Bun lockfile
+        run: |
+          bun install --lockfile-only
+          bun install --frozen-lockfile
+          npm audit --audit-level=moderate
+      - name: Commit Bun lockfile
+        run: |
+          if git diff --quiet -- bun.lock; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          git commit -m "chore: refresh Bun lockfile"
+          git push
