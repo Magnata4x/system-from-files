@@ -60,6 +60,7 @@ import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
 import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
 import { Route as ApiBot4xBalanceRouteImport } from './routes/api/bot4x/balance'
+import { Route as ApiBot4xDemoOrderRouteImport } from './routes/api/bot4x/demo-order'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
 import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
@@ -331,6 +332,11 @@ const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
   path: '/api/bot4x/config',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBot4xDemoOrderRoute = ApiBot4xDemoOrderRouteImport.update({
+  id: '/api/bot4x/demo-order',
+  path: '/api/bot4x/demo-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBot4xBalanceRoute = ApiBot4xBalanceRouteImport.update({
   id: '/api/bot4x/balance',
   path: '/api/bot4x/balance',
@@ -452,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
+  '/api/bot4x/demo-order': typeof ApiBot4xDemoOrderRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
@@ -836,6 +843,7 @@ export interface RootRouteChildren {
   ApiAlertsSettingsRoute: typeof ApiAlertsSettingsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xBalanceRoute: typeof ApiBot4xBalanceRoute
+  ApiBot4xDemoOrderRoute: typeof ApiBot4xDemoOrderRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
   ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
@@ -1223,11 +1231,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/demo-order'
+    '/api/bot4x/demo-order'
+    '/api/bot4x/demo-order'
     '/api/bot4x/balance': {
       id: '/api/bot4x/balance'
       path: '/api/bot4x/balance'
       fullPath: '/api/bot4x/balance'
       preLoaderRoute: typeof ApiBot4xBalanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/demo-order': {
+      id: '/api/bot4x/demo-order'
+      path: '/api/bot4x/demo-order'
+      fullPath: '/api/bot4x/demo-order'
+      preLoaderRoute: typeof ApiBot4xDemoOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/me': {
@@ -1449,6 +1467,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAlertsSettingsRoute: ApiAlertsSettingsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xBalanceRoute: ApiBot4xBalanceRoute,
+  ApiBot4xDemoOrderRoute: ApiBot4xDemoOrderRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
   ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
   ApiBot4xStartRoute: ApiBot4xStartRoute,

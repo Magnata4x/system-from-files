@@ -2,8 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
-import { getExchangeStatus, getVerifiedBinanceAccount } from './exchange.server'
-import { validateRealOrderRisk, type RealOrderSide } from './order-risk'
+import { getBinanceEnvironment, getExchangeStatus, getVerifiedBinanceAccount, submitVerifiedBinanceMarketOrder } from './exchange.server'
+import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from './order-risk'
 
 type Client = SupabaseClient<Database>
 
@@ -12,6 +12,82 @@ export interface ExecuteRealOrderInput {
   side: RealOrderSide
   quoteOrderQty: number
   confirmed: boolean
+}
+
+export async function executeAuthorizedSixDollarBtcDemoOrder(
+  supabase: Client,
+  userId: string,
+  input: { side: RealOrderSide; confirmed: boolean },
+) {
+  if (getBinanceEnvironment() === 'production') {
+    throw new ApiError('Ambiente de produção bloqueado nesta fase DEMO.', 409)
+  }
+  if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem DEMO é obrigatória.', 409)
+
+  const config = await getOrCreateConfig(supabase, userId)
+  const exchange = await getExchangeStatus(supabase, userId)
+  if (!exchange.verified) throw new ApiError('Binance não conectada ou não verificada.', 409)
+  const account = await getVerifiedBinanceAccount(supabase, userId)
+  if (!account.canTrade) throw new ApiError('A conta Binance não possui permissão de trade.', 409)
+  const usdt = account.balances.find((item) => item.asset === 'USDT')
+  const risk = validateDemoOrderRisk({
+    executionMode: config.executionMode as "DEMO" | "REAL",
+    exchange: config.exchange,
+    credentialsVerified: exchange.verified,
+    canTrade: account.canTrade,
+    circuitBreaker: config.circuitBreaker as "none" | "emergency" | "profitLock",
+    symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6,
+    freeUsdt: usdt?.free ?? 0, configuredCapital: config.totalCapital,
+    allocationPct: config.allocationPct, confirmed: true,
+  })
+  if (!risk.ok) throw new ApiError(risk.reason, 409)
+
+  const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
+    symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6,
+  })
+  return {
+    submitted: true,
+    environment: getBinanceEnvironment(),
+    symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6,
+    orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
+    status: typeof result['status'] === 'string' ? result['status'] : null,
+    executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
+    cummulativeQuoteQty: typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
+  }
+}
+
+export async function executeAuthorizedSixDollarBtcOrder(
+  supabase: Client,
+  userId: string,
+  input: { side: RealOrderSide; confirmed: boolean },
+) {
+  if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem REAL é obrigatória.', 409)
+  if (getBinanceEnvironment() !== 'production') throw new ApiError('Ordens REAL estão bloqueadas fora do ambiente de produção.', 409)
+
+  const intent = await validateRealMarketOrder(supabase, userId, {
+    symbol: 'BTCUSDT',
+    side: input.side,
+    quoteOrderQty: 6,
+    confirmed: true,
+  })
+
+  const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
+    symbol: 'BTCUSDT',
+    side: input.side,
+    quoteOrderQty: 6,
+  })
+
+  return {
+    submitted: true,
+    symbol: intent.symbol,
+    side: intent.side,
+    quoteOrderQty: 6,
+    orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
+    status: typeof result['status'] === 'string' ? result['status'] : null,
+    executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
+    cummulativeQuoteQty:
+      typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
+  }
 }
 
 export async function validateRealMarketOrder(

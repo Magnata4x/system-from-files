@@ -56,6 +56,20 @@ export interface ExchangeStatus {
   lastError: string | null
 }
 
+export type BinanceEnvironment = 'demo' | 'testnet' | 'production'
+
+export function getBinanceEnvironment(): BinanceEnvironment {
+  const value = process.env['BINANCE_TRADING_ENV']?.trim().toLowerCase()
+  if (value === 'production' || value === 'testnet' || value === 'demo') return value
+  return 'demo'
+}
+
+export function getBinanceBaseUrl(environment = getBinanceEnvironment()): string {
+  if (environment === 'production') return 'https://api.binance.com/api'
+  if (environment === 'testnet') return 'https://testnet.binance.vision/api'
+  return 'https://demo-api.binance.com/api'
+}
+
 const EMPTY: ExchangeStatus = {
   connected: false,
   exchange: 'binance',
@@ -83,6 +97,20 @@ export async function getExchangeStatus(supabase: Client, userId: string): Promi
   }
 }
 
+/** Assina uma chamada privada da Binance com método e parâmetros explícitos. */
+async function binanceSignedRequest(
+  apiKey: string, apiSecret: string, method: 'GET' | 'POST', path: string, params: Record<string, string>,
+) {
+  const query = new URLSearchParams({ ...params, timestamp: String(Date.now()), recvWindow: '10000' }).toString()
+  const key = await crypto.subtle.importKey('raw', enc.encode(apiSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
+  const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
+  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey } })
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
+  if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), 400)
+  return body
+}
+
 /** Assina e chama um endpoint privado da Binance (HMAC SHA-256). */
 async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
   const query = `timestamp=${Date.now()}&recvWindow=10000`
@@ -97,7 +125,7 @@ async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
   const signature = Array.from(sigBytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
-  const res = await fetch(`https://api.binance.com${path}?${query}&signature=${signature}`, {
+  const res = await fetch(`${getBinanceBaseUrl()}${path}?${query}&signature=${signature}`, {
     headers: { 'X-MBX-APIKEY': apiKey },
   })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
@@ -183,6 +211,17 @@ async function getStoredCredentials(supabase: Client, userId: string) {
     apiKey: await decryptSecret(data.api_key_cipher),
     apiSecret: await decryptSecret(data.api_secret_cipher),
   }
+}
+
+/** Envia uma ordem MARKET somente após a validação server-side. */
+export async function submitVerifiedBinanceMarketOrder(
+  supabase: Client, userId: string,
+  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number },
+) {
+  const credentials = await getStoredCredentials(supabase, userId)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/api/v3/order', {
+    symbol: input.symbol, side: input.side, type: 'MARKET', quoteOrderQty: input.quoteOrderQty.toFixed(2),
+  })
 }
 
 export async function getVerifiedBinanceAccount(
