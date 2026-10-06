@@ -14,7 +14,7 @@ export interface RealOrderValidationInput {
   confirmed: boolean
 }
 
-interface RealOrderExecutionInput {
+interface AuthorizedOrderExecutionInput {
   side: RealOrderSide
   confirmed: boolean
   idempotencyKey: string
@@ -23,7 +23,7 @@ interface RealOrderExecutionInput {
 export async function executeAuthorizedSixDollarBtcDemoOrder(
   supabase: Client,
   userId: string,
-  input: RealOrderExecutionInput,
+  input: AuthorizedOrderExecutionInput,
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
@@ -165,7 +165,7 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
 export async function executeAuthorizedSixDollarBtcOrder(
   supabase: Client,
   userId: string,
-  input: { side: RealOrderSide; confirmed: boolean; idempotencyKey: string },
+  input: AuthorizedOrderExecutionInput,
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
