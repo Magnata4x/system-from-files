@@ -9,7 +9,7 @@ export const Route = createFileRoute('/api/bot4x/executions')({
         handleApi(request, (user) => {
           const url = new URL(request.url)
           const p = url.searchParams
-          if (p.get('source') === 'verified-history') return listVerifiedHistory(user.supabase, user.userId, p.get('limit') ? Number(p.get('limit')) : undefined)
+          if (p.get('source') === 'verified') return listVerifiedHistory(user.supabase, user.userId, p.get('limit') ? Number(p.get('limit')) : undefined)
           // Sem parâmetros de paginação mantemos o formato legado (array).
           if (!p.has('limit') && !p.has('offset') && !p.has('result') && !p.has('pair') && !p.has('side') && !p.has('profile') && !p.has('from') && !p.has('to')) {
             return listExecutions(user.supabase, user.userId)
