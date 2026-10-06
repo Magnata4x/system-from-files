@@ -28,11 +28,11 @@ export async function validateRealMarketOrder(
 
   const usdt = account.balances.find((item) => item.asset === 'USDT')
   const risk = validateRealOrderRisk({
-    executionMode: config.executionMode,
+    executionMode: config.executionMode as "DEMO" | "REAL",
     exchange: config.exchange,
     credentialsVerified: exchange.verified,
     canTrade: account.canTrade,
-    circuitBreaker: config.circuitBreaker,
+    circuitBreaker: config.circuitBreaker as "none" | "emergency" | "profitLock",
     symbol: input.symbol.toUpperCase(),
     side: input.side,
     quoteOrderQty: input.quoteOrderQty,
