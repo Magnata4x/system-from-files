@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
-import { getExchangeStatus, getVerifiedBinanceOrder, getVerifiedBinanceTrades } from './exchange.server'
+import { getExchangeStatus, getVerifiedBinanceOrder, getVerifiedBinanceOrderByClientOrderId, getVerifiedBinanceTrades } from './exchange.server'
 
 type Client = SupabaseClient<Database>
 type ConfigRow = Database['public']['Tables']['bot4x_configs']['Row']
@@ -321,20 +321,30 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   const executionRows = intents ?? []
 
-  // Reconcile submitted Binance orders before exposing telemetry. This only
-  // reads order state and updates the execution ledger; it never submits,
-  // cancels, or modifies an order.
+  // Reconcile submitted orders and recover pending intents using the deterministic
+  // Binance clientOrderId. This is read-only: it never submits, cancels, or modifies.
   for (const intent of executionRows) {
-    if (intent.status !== 'submitted') continue
+    if (intent.status !== 'submitted' && intent.status !== 'pending') continue
     const readings = (intent.readings ?? {}) as Record<string, unknown>
     const orderId = typeof readings.orderId === 'number' ? readings.orderId : null
-    if (!orderId) continue
+    const clientOrderId =
+      typeof readings.clientOrderId === 'string' && readings.clientOrderId
+        ? readings.clientOrderId
+        : intent.status === 'pending'
+          ? intent.id
+          : null
+    if (!orderId && !clientOrderId) continue
 
     try {
-      const order = await getVerifiedBinanceOrder(supabase, userId, {
-        symbol: intent.pair,
-        orderId,
-      })
+      const order = orderId
+        ? await getVerifiedBinanceOrder(supabase, userId, {
+            symbol: intent.pair,
+            orderId,
+          })
+        : await getVerifiedBinanceOrderByClientOrderId(supabase, userId, {
+            symbol: intent.pair,
+            clientOrderId: clientOrderId as string,
+          })
       const binanceStatus = typeof order.status === 'string' ? order.status : null
       if (!binanceStatus) continue
 
@@ -347,8 +357,10 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
       const nextReadings = {
         ...readings,
+        clientOrderId:
+          typeof order.clientOrderId === 'string' ? order.clientOrderId : clientOrderId,
         status: binanceStatus,
-        orderId,
+        orderId: typeof order.orderId === 'number' ? order.orderId : orderId,
         executedQty: typeof order.executedQty === 'string' ? Number(order.executedQty) : null,
         cummulativeQuoteQty:
           typeof order.cummulativeQuoteQty === 'string'
@@ -384,8 +396,8 @@ export async function getTelemetry(supabase: Client, userId: string) {
         intent.readings = nextReadings
       }
     } catch (error) {
-      // A temporary reconciliation failure must not erase a confirmed
-      // submission or turn it into a false failure.
+      // An unavailable/unknown clientOrderId means Binance has no order we can
+      // prove exists yet. Keep pending rather than inventing a failure or retry.
       if (error instanceof ApiError && error.status >= 500) throw error
     }
   }
