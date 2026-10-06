@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - run: npm install --package-lock-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-package-lock
+          path: package-lock.json
+          retention-days: 1
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm run build
