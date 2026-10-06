@@ -519,23 +519,14 @@ export const useBot4xStore = create<State>()(
               status?: State["status"];
               dailyPnL?: number;
               circuitBreaker?: State["circuitBreaker"];
-              execution?: BackendBot4xExecution;
             };
             const patch: Partial<State> = {};
             if (ev.status) patch.status = ev.status;
             if (typeof ev.dailyPnL === "number") patch.dailyPnlPct = ev.dailyPnL;
             if (ev.circuitBreaker) patch.circuitBreaker = ev.circuitBreaker;
             if (Object.keys(patch).length > 0) set(patch as State);
-            if (ev.execution) {
-              const s = get();
-              const trade = executionToTrade(ev.execution, s.profile, s.leverage);
-              set((prev) => ({ history: [trade, ...prev.history].slice(0, 500) }));
-              if (s.userId) {
-                void saveTradeWithOutbox(s.userId, trade).catch((err) =>
-                  logger.error("[Bot4x] saveTradeWithOutbox failed", { error: err, tradeId: trade.id }),
-                );
-              }
-            }
+            // Histórico REAL não é alimentado por eventos de UI nem por bot4x_trades.
+            // O ledger verificado é a única fonte; o próximo polling o recarrega.
           });
           wsUnsubs = [offShutdown, offProfitLock, offStatus];
 
