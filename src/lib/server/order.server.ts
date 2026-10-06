@@ -25,6 +25,7 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
   if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem DEMO é obrigatória.', 409)
 
   const config = await getOrCreateConfig(supabase, userId)
+  if (getBinanceEnvironment() !== 'production') throw new ApiError('Ordens REAL estão bloqueadas fora do ambiente de produção.', 409)
   const exchange = await getExchangeStatus(supabase, userId)
   if (!exchange.verified) throw new ApiError('Binance não conectada ou não verificada.', 409)
   const account = await getVerifiedBinanceAccount(supabase, userId)
