@@ -314,7 +314,7 @@ export async function getTelemetry(supabase: Client, userId: string) {
     .from('bot4x_execution_intents')
     .select('id, status, pair, side, created_at, readings')
     .eq('user_id', userId)
-    .gte('created_at', dayStart)
+    .gte('created_at', new Date(new Date().getTime() - 48 * 60 * 60 * 1000).toISOString())
     .order('created_at', { ascending: false })
     .limit(200)
   if (intentsError) throw new ApiError(intentsError.message, 500)
