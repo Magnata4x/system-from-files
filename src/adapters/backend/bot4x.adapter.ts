@@ -37,6 +37,22 @@ export interface BackendBot4xExecution {
   createdAt?: string;
 }
 
+export interface BackendBot4xVerifiedHistory {
+  id: string;
+  pair: string;
+  side: "BUY" | "SELL";
+  status: "completed" | "submitted";
+  entryPrice: number | null;
+  executedQty: number | null;
+  realizedPnl: number | null;
+  profile: string;
+  leverage: number;
+  createdAt: string;
+  lifecycle: string | null;
+  clientOrderId: string | null;
+  orderId: number | null;
+}
+
 export interface BackendBot4xExecutionRich extends BackendBot4xExecution {
   stopLoss?: number;
   takeProfit?: number;
@@ -105,6 +121,12 @@ export const bot4xAdapter = {
     } catch {
       return null;
     }
+  },
+  async verifiedHistory(limit = 500): Promise<BackendBot4xVerifiedHistory[]> {
+    return api.get<BackendBot4xVerifiedHistory[]>(
+      \
+`${endpoints.bot4x.history}?limit=${encodeURIComponent(String(limit))}\`,
+    );
   },
   async executions(): Promise<BackendBot4xExecution[]> {
     try {
