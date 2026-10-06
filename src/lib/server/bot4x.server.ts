@@ -153,6 +153,56 @@ export async function listExecutions(supabase: Client, userId: string, limit = 5
   }))
 }
 
+/** Histórico financeiro oficial: somente intenções do ledger com execução Binance verificada.
+ * Não consulta bot4x_trades, que permanece legado/compatibilidade.
+ * Registros sem metadados históricos essenciais são omitidos em vez de inventados.
+ */
+export async function listVerifiedHistory(supabase: Client, userId: string, limit = 500) {
+  const safeLimit = Math.min(Math.max(Number(limit) || 500, 1), 500);
+  const { data, error } = await supabase
+    .from('bot4x_execution_intents')
+    .select('id, pair, side, status, created_at, readings')
+    .eq('user_id', userId)
+    .in('status', ['completed', 'submitted'])
+    .order('created_at', { ascending: false })
+    .limit(safeLimit);
+  if (error) throw new ApiError(error.message, 500);
+
+  return (data ?? []).flatMap((row) => {
+    const readings = (row.readings ?? {}) as Record<string, unknown>;
+    const profile = typeof readings.profile === 'string' ? readings.profile : null;
+    const leverage = typeof readings.leverage === 'number' ? readings.leverage : null;
+    if (!profile || !Number.isFinite(leverage)) return [];
+
+    const realizedPnl = typeof readings.realizedPnl === 'number' && Number.isFinite(readings.realizedPnl)
+      ? readings.realizedPnl
+      : null;
+    const entryPrice = typeof readings.averageFillPrice === 'number' && Number.isFinite(readings.averageFillPrice)
+      ? readings.averageFillPrice
+      : null;
+    const executedQty = typeof readings.executedQty === 'number' && Number.isFinite(readings.executedQty)
+      ? readings.executedQty
+      : null;
+    const pair = row.pair.includes('/') ? row.pair : row.pair.replace(/(USDT|USDC|FDUSD|TUSD|USDP|BUSD)$/, '/$1');
+
+    return [{
+      id: row.id,
+      pair,
+      side: row.side as 'BUY' | 'SELL',
+      status: row.status,
+      entryPrice,
+      executedQty,
+      realizedPnl,
+      profile,
+      leverage,
+      createdAt: row.created_at,
+      lifecycle: typeof readings.lifecycle === 'string' ? readings.lifecycle : null,
+      clientOrderId: typeof readings.clientOrderId === 'string' ? readings.clientOrderId : null,
+      orderId: typeof readings.orderId === 'number' ? readings.orderId : null,
+    }];
+  });
+}
+
 export interface ExecutionQuery {
   limit?: number
   offset?: number
