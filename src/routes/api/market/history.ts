@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/market/history")({
             periodStart,
             generatedAt: new Date().toISOString(),
             source: data[0]?.source ?? "coingecko",
-            points: data.map((row) => ({
+            points: (data as any[]).map((row: any) => ({
               capturedAt: row.captured_at,
               totalMarketCap: row.total_market_cap,
               totalVolume: row.total_volume,
