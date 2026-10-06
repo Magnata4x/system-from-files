@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, X, Shield, ShieldAlert, Lock } from "lucide-react";
 import {
@@ -6,12 +6,33 @@ import {
 } from "@/lib/bot4x-store";
 import { leverageRisk, slTpFromLeverage, fmt } from "@/lib/bot4x-data";
 import { useLivePrices } from "@/hooks/useLivePrices";
+import { bot4xAdapter, type Bot4xTelemetry, type Bot4xUsdtBalance } from "@/adapters/backend/bot4x.adapter";
 
 
 export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) {
+  const mode = useBot4xStore((s) => s.mode);
+  const [telemetry, setTelemetry] = useState<Bot4xTelemetry | null>(null);
+  const [balance, setBalance] = useState<Bot4xUsdtBalance | null>(null);
+  const [stateError, setStateError] = useState<string | null>(null);
+  useEffect(() => {
+    if (mode !== "REAL") { setTelemetry(null); setBalance(null); setStateError(null); return; }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const [nextTelemetry, nextBalance] = await Promise.all([bot4xAdapter.telemetry(), bot4xAdapter.balance()]);
+        if (!cancelled) { setTelemetry(nextTelemetry); setBalance(nextBalance); setStateError(null); }
+      } catch (error) {
+        if (!cancelled) setStateError(error instanceof Error ? error.message : "Estado operacional indisponível");
+      }
+    };
+    void load();
+    const id = window.setInterval(() => void load(), 15000);
+    return () => { cancelled = true; window.clearInterval(id); };
+  }, [mode]);
   return (
     <div className="space-y-5">
       <ExecutionMode exchangeVerified={exchangeVerified} />
+      <OperationalState mode={mode} telemetry={telemetry} balance={balance} error={stateError} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <CapitalConfig />
         <AllocationConfig />
@@ -21,12 +42,39 @@ export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) 
         <CircuitBreakerLoss />
         <CircuitBreakerProfit />
       </div>
-      <OrderGrid />
-      <TodayPnlRow />
+      {mode === "DEMO" ? <OrderGrid /> : <RealPositions />}
+      {mode === "DEMO" ? <TodayPnlRow /> : <RealPnl telemetry={telemetry} />}
     </div>
   );
 }
 
+function OperationalState({ mode, telemetry, balance, error }: { mode: "DEMO" | "REAL"; telemetry: Bot4xTelemetry | null; balance: Bot4xUsdtBalance | null; error: string | null }) {
+  if (mode === "DEMO") return <section className="rounded-lg border border-border bg-card p-4"><div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Estado do sistema</div><div className="text-xs text-muted-foreground">DEMO isolado: configuração e simulação não são apresentadas como estado operacional REAL.</div></section>;
+  const unavailable = Boolean(error) || !telemetry || !balance;
+  return <section className="rounded-lg border border-border bg-card p-4">
+    <div className="flex items-center justify-between mb-3"><div><div className="text-[11px] uppercase tracking-wider text-muted-foreground">Estado operacional · REAL</div><div className="text-[10px] text-muted-foreground mt-1">Fontes verificadas: backend Bot4x + Binance. Sem fallback local.</div></div><span className="text-[10px] font-semibold">{unavailable ? "INDISPONÍVEL" : "ATUALIZADO"}</span></div>
+    {unavailable ? <div className="rounded-md border border-[#E24B4A55] p-3 text-xs text-[#FF9B9A]">Estado operacional indisponível. Nenhum valor foi substituído por zero ou estimativa.</div> :
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <VerifiedMetric label="Saldo USDT" value={balance.total.toFixed(2)} suffix="USDT" />
+        <VerifiedMetric label="Disponível" value={balance.free.toFixed(2)} suffix="USDT" />
+        <VerifiedMetric label="PnL diário" value={telemetry.dailyPnl.toFixed(2)} suffix="%" />
+        <VerifiedMetric label="Slots" value={String(telemetry.openSlots)} suffix="abertos" />
+        <VerifiedMetric label="Perfil" value={telemetry.profile} />
+        <VerifiedMetric label="Circuit breaker" value={telemetry.circuitBreaker} />
+        <VerifiedMetric label="Bot" value={telemetry.active ? "ATIVO" : "PARADO"} />
+        <VerifiedMetric label="Última atualização" value={new Date(telemetry.serverTime).toLocaleString("pt-BR")} />
+      </div>}
+  </section>;
+}
+function VerifiedMetric({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
+  return <div className="rounded-md border border-border bg-secondary/20 p-2"><div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div><div className="mt-1 text-sm font-semibold tabular-nums">{value}{suffix ? <span className="ml-1 text-[10px] text-muted-foreground">{suffix}</span> : null}</div></div>;
+}
+function RealPositions() {
+  return <section className="rounded-lg border border-border bg-card p-4"><div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Posições / execuções REAL</div><div className="text-xs text-muted-foreground">As posições operacionais são exibidas somente a partir do ledger verificado e da reconciliação Binance. Nenhuma ordem sintética é mostrada.</div></section>;
+}
+function RealPnl({ telemetry }: { telemetry: Bot4xTelemetry | null }) {
+  return <section className="rounded-lg border border-border bg-card p-4"><div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Resultado operacional</div><div className="text-sm font-semibold">{telemetry ? (telemetry.dailyPnl >= 0 ? "+" : "") + telemetry.dailyPnl.toFixed(2) + "%" : "Indisponível"}</div><div className="text-[10px] text-muted-foreground mt-1">Sem fallback para estado local.</div></section>;
+}
 // ----- Execution mode -----
 function ExecutionMode({ exchangeVerified = false }: { exchangeVerified?: boolean }) {
   const mode = useBot4xStore((s) => s.mode);
