@@ -275,6 +275,58 @@ export async function listExecutionsPaged(
   }
 }
 
+export async function listVerifiedExecutionsPaged(
+  supabase: Client,
+  userId: string,
+  query: ExecutionQuery = {},
+) {
+  const limit = Math.min(Math.max(Number(query.limit ?? 20) || 20, 1), 100)
+  const offset = Math.max(Number(query.offset ?? 0) || 0, 0)
+  let builder = supabase
+    .from('bot4x_execution_intents')
+    .select('id, pair, side, status, created_at, readings', { count: 'exact' })
+    .eq('user_id', userId)
+    .in('status', ['completed', 'submitted', 'pending', 'failed'])
+  if (query.pair && query.pair !== 'all') {
+    const normalized = query.pair.replace('/', '').toUpperCase()
+    builder = builder.eq('pair', normalized)
+  }
+  if (query.side && query.side !== 'all') {
+    const ledgerSide = query.side === 'LONG' ? 'BUY' : query.side === 'SHORT' ? 'SELL' : query.side
+    builder = builder.eq('side', ledgerSide)
+  }
+  if (query.from && ISO_DAY.test(query.from)) builder = builder.gte('created_at', query.from + 'T00:00:00.000Z')
+  if (query.to && ISO_DAY.test(query.to)) builder = builder.lte('created_at', query.to + 'T23:59:59.999Z')
+
+  const { data, error, count } = await builder.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
+  if (error) throw new ApiError(error.message, 500)
+
+  const items = (data ?? []).flatMap((row) => {
+    const readings = (row.readings ?? {}) as Record<string, unknown>
+    const profile = typeof readings.profile === 'string' ? readings.profile : null
+    if (query.profile && query.profile !== 'all' && profile !== query.profile) return []
+    const realizedPnl = typeof readings.realizedPnl === 'number' && Number.isFinite(readings.realizedPnl) ? readings.realizedPnl : null
+    const entryPrice = typeof readings.averageFillPrice === 'number' && Number.isFinite(readings.averageFillPrice) ? readings.averageFillPrice : null
+    const result = realizedPnl === null ? 'open' : realizedPnl > 0 ? 'WIN' : realizedPnl < 0 ? 'LOSS' : 'open'
+    return [{
+      id: row.id,
+      pair: row.pair.includes('/') ? row.pair : row.pair.replace(/(USDT|USDC|FDUSD|TUSD|USDP|BUSD)$/, '/$1'),
+      side: row.side === 'BUY' ? 'LONG' as const : 'SHORT' as const,
+      entryPrice: entryPrice ?? 0,
+      stopLoss: undefined,
+      takeProfit: undefined,
+      pnl: realizedPnl ?? 0,
+      pnlPct: 0,
+      status: row.status === 'completed' ? 'closed' : row.status === 'failed' ? 'closed' : 'pending',
+      result,
+      motivo: typeof readings.lifecycle === 'string' ? readings.lifecycle : 'execução registrada no ledger verificado',
+      createdAt: row.created_at,
+    }]
+  })
+
+  return { items, total: count ?? 0, limit, offset }
+}
+
 function quoteAssetForSymbol(symbol: string): string | null {
   const normalized = symbol.toUpperCase()
   for (const suffix of ['USDT', 'USDC', 'FDUSD', 'TUSD', 'USDP', 'BUSD', 'BTC', 'ETH', 'BNB']) {
