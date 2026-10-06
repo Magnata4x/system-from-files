@@ -54,6 +54,8 @@ vi.mock("../bot4x-config-db", () => ({
 import {
   useBot4xStore,
   getEffectiveMode,
+  getBot4xDataSource,
+  getRealModeStateReset,
   REAL_MODE_ENABLED,
   selectActiveCapital,
   selectSlotSize,
@@ -64,6 +66,22 @@ type MockedAuth = typeof supabase.auth & {
   _emit: (event: string, session: unknown) => void;
 };
 const mockAuth = supabase.auth as MockedAuth;
+
+describe("bot4x-store — fonte única de verdade", () => {
+  it("usa backend operacional em REAL e mantém DEMO como fonte sintética isolada", () => {
+    expect(getBot4xDataSource("REAL")).toBe("BACKEND_OPERATIONAL");
+    expect(getBot4xDataSource("DEMO")).toBe("DEMO_SYNTHETIC");
+  });
+
+  it("limpa estado operacional local antes de entrar em REAL", () => {
+    expect(getRealModeStateReset()).toEqual({
+      orders: [],
+      ticks: [],
+      ticksProcessed: 0,
+      history: [],
+    });
+  });
+});
 
 describe("getEffectiveMode", () => {
   it("retorna DEMO quando REAL_MODE_ENABLED é false (default em testes)", () => {
