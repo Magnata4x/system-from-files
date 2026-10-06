@@ -255,28 +255,20 @@ export const useBot4xStore = create<State>()(
         }
         // O backend é a fonte de verdade para liberar REAL.
         if (uid) {
-          void api.get<{ verified?: boolean }>("/exchange/credentials")
-            .then((status) => {
+          void (async () => {
+            try {
+              const status = await api.get<{ verified?: boolean }>("/exchange/credentials");
               const verified = status?.verified === true;
               setExchangeVerified(verified);
-              if (!verified && get().mode === "REAL") {
-                set({ mode: "DEMO", realInited: false, status: "IDLE" });
-              }
-            })
-            .catch(() => {
-              setExchangeVerified(false);
-              if (get().mode === "REAL") {
-                set({ mode: "DEMO", realInited: false, status: "IDLE" });
-              }
-            });
 
-          loadConfig(uid)
-            .then((cfg) => {
+              const cfg = await loadConfig(uid);
               if (!cfg) return;
-              // REAL só pode ser restaurado quando a credencial verificada
-              // pelo backend estiver presente; nunca confiamos no localStorage.
+
+              // Nunca restauramos REAL a partir do localStorage. A credencial
+              // verificada pelo backend precisa existir neste login.
               const executionMode: ExecMode =
-                cfg.executionMode === "REAL" && exchangeVerified ? "REAL" : "DEMO";
+                cfg.executionMode === "REAL" && verified ? "REAL" : "DEMO";
+
               set({
                 mode: executionMode,
                 profile: cfg.profile as CalibProfileType,
@@ -290,15 +282,18 @@ export const useBot4xStore = create<State>()(
                 circuitBreaker: cfg.circuitBreaker as State["circuitBreaker"],
                 dailyPnlPct: cfg.dailyPnl,
               });
+
               if (executionMode !== cfg.executionMode) {
                 void saveConfig(uid, { executionMode });
               }
-            })
-            .catch(() => {
-              /* fallback para localStorage */
-            });
+            } catch {
+              setExchangeVerified(false);
+              if (get().mode === "REAL") {
+                set({ mode: "DEMO", realInited: false, status: "IDLE" });
+              }
+            }
+          })();
         }
-      },
 
       // ─── INIT ─────────────────────────────────────────────────────────────
       init: async () => {
