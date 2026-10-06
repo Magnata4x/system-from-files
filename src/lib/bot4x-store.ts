@@ -551,7 +551,14 @@ export const useBot4xStore = create<State>()(
                   todayStats: telemetry?.today
                     ? { ...telemetry.today, serverTime: telemetry.serverTime ?? null }
                     : get().todayStats,
-                  history: (() => {\n                    let accumulated = 0;\n                    return (verifiedHistory ?? []).map((e) => {\n                      const trade = verifiedHistoryToTrade(e, accumulated);\n                      accumulated = trade.accumulated;\n                      return trade;\n                    });\n                  })(),
+                  history: (() => {
+                    let accumulated = 0;
+                    return (verifiedHistory ?? []).map((e) => {
+                      const trade = verifiedHistoryToTrade(e, accumulated);
+                      accumulated = trade.accumulated;
+                      return trade;
+                    });
+                  })(),
                   errorMsg: null,
                 });
               } catch (err) {
