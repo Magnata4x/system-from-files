@@ -18,3 +18,20 @@ Conectar o Dashboard ao Marketaux usando exclusivamente o segredo server-side `M
 ## Limites
 - Nenhuma alteração no fluxo GitHub/main ou no histórico existente.
 - Nenhuma mudança não relacionada e nenhuma ordem financeira.
+
+## Fechamento da Fase 3 — históricos reais
+
+### Decisões registradas
+- **D4:** coleta de `market_snapshots` a cada hora; retenção operacional de **90 dias**.
+- **D5:** o indicador/fluxo de **trending foi removido** do escopo do Dashboard.
+
+### Pendências fora da Fase 3
+Tratar em PRs separadas, sem reabrir o escopo da Fase 3:
+- correção de `aria-hidden` da Command Palette;
+- remoção dos `?? 0` legados;
+- remoção de hooks mortos;
+- teste anti-mock;
+- ajustes da integração Marketaux;
+- **D1:** calendário;
+- **D2:** Binance/Workers;
+- idioma, mobile e tema.
