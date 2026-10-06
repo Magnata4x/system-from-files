@@ -99,41 +99,18 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
     throw new ApiError(intentError?.message ?? 'Falha ao registrar intenção de execução.', 500)
   }
 
+  let result: Record<string, unknown>
   try {
-    const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
-      symbol: 'BTCUSDT',
-      side: input.side,
-      quoteOrderQty: 6,
-    })
-    const response = {
-      submitted: true,
-      environment: getBinanceEnvironment(),
-      symbol: 'BTCUSDT',
-      side: input.side,
-      quoteOrderQty: 6,
-      orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
-      status: typeof result['status'] === 'string' ? result['status'] : null,
-      executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
-      cummulativeQuoteQty:
-        typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
-    }
-    const { error: updateError } = await supabase
-      .from('bot4x_execution_intents')
-      .update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response })
-      .eq('id', intent.id)
-    if (updateError) throw new ApiError(updateError.message, 500)
-    return response
+    result = await submitVerifiedBinanceMarketOrder(supabase, userId, { symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6 })
   } catch (error) {
-    await supabase
-      .from('bot4x_execution_intents')
-      .update({
-        status: 'failed',
-        processed_at: new Date().toISOString(),
-        readings: { environment: getBinanceEnvironment(), error: error instanceof Error ? error.message : 'Falha desconhecida' },
-      })
-      .eq('id', intent.id)
+    await supabase.from('bot4x_execution_intents').update({ status: 'failed', processed_at: new Date().toISOString(), readings: { environment: getBinanceEnvironment(), error: error instanceof Error ? error.message : 'Falha desconhecida' } }).eq('id', intent.id)
     throw error
   }
+
+  const response = { submitted: true, environment: getBinanceEnvironment(), symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6, orderId: typeof result.orderId === 'number' ? result.orderId : null, status: typeof result.status === 'string' ? result.status : null, executedQty: typeof result.executedQty === 'string' ? Number(result.executedQty) : null, cummulativeQuoteQty: typeof result.cummulativeQuoteQty === 'string' ? Number(result.cummulativeQuoteQty) : null }
+  const { error: updateError } = await supabase.from('bot4x_execution_intents').update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response }).eq('id', intent.id)
+  if (updateError) throw new ApiError('Ordem enviada à Binance, mas o ledger não confirmou a persistência. Não tente reenviar com a mesma idempotency key.', 503)
+  return response
 }
 
 export async function executeAuthorizedSixDollarBtcOrder(
@@ -205,44 +182,18 @@ export async function executeAuthorizedSixDollarBtcOrder(
     throw new ApiError(intentError?.message ?? 'Falha ao registrar intenção de execução REAL.', 500)
   }
 
+  let result: Record<string, unknown>
   try {
-    const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
-      symbol: intent.symbol,
-      side: intent.side,
-      quoteOrderQty: 6,
-    })
-    const response = {
-      submitted: true,
-      environment: 'production' as const,
-      symbol: intent.symbol,
-      side: intent.side,
-      quoteOrderQty: 6,
-      orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
-      status: typeof result['status'] === 'string' ? result['status'] : null,
-      executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
-      cummulativeQuoteQty:
-        typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
-    }
-    const { error: updateError } = await supabase
-      .from('bot4x_execution_intents')
-      .update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response })
-      .eq('id', createdIntent.id)
-    if (updateError) throw new ApiError(updateError.message, 500)
-    return response
+    result = await submitVerifiedBinanceMarketOrder(supabase, userId, { symbol: intent.symbol, side: intent.side, quoteOrderQty: 6 })
   } catch (error) {
-    await supabase
-      .from('bot4x_execution_intents')
-      .update({
-        status: 'failed',
-        processed_at: new Date().toISOString(),
-        readings: {
-          environment: 'production',
-          error: error instanceof Error ? error.message : 'Falha desconhecida',
-        },
-      })
-      .eq('id', createdIntent.id)
+    await supabase.from('bot4x_execution_intents').update({ status: 'failed', processed_at: new Date().toISOString(), readings: { environment: 'production', error: error instanceof Error ? error.message : 'Falha desconhecida' } }).eq('id', createdIntent.id)
     throw error
   }
+
+  const response = { submitted: true, environment: 'production' as const, symbol: intent.symbol, side: intent.side, quoteOrderQty: 6, orderId: typeof result.orderId === 'number' ? result.orderId : null, status: typeof result.status === 'string' ? result.status : null, executedQty: typeof result.executedQty === 'string' ? Number(result.executedQty) : null, cummulativeQuoteQty: typeof result.cummulativeQuoteQty === 'string' ? Number(result.cummulativeQuoteQty) : null }
+  const { error: updateError } = await supabase.from('bot4x_execution_intents').update({ status: 'submitted', processed_at: new Date().toISOString(), readings: response }).eq('id', createdIntent.id)
+  if (updateError) throw new ApiError('Ordem enviada à Binance, mas o ledger não confirmou a persistência. Não tente reenviar com a mesma idempotency key.', 503)
+  return response
 }
 
 export async function validateRealMarketOrder(
