@@ -1,6 +1,6 @@
 // Config e execuções do Bot4x sobre o banco interno.
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/integrations/supabase/types'
+import type { Database, Json } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
 import { getExchangeStatus, getVerifiedBinanceOrder, getVerifiedBinanceTrades } from './exchange.server'
@@ -433,7 +433,7 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   for (const item of completed) {
     if (item.readings.lifecycle === 'closed_verified' || item.readings.lifecycle === 'partially_closed') {
-      const { error: lifecycleError } = await supabase.from('bot4x_execution_intents').update({ readings: item.readings }).eq('id', item.row.id)
+      const { error: lifecycleError } = await supabase.from('bot4x_execution_intents').update({ readings: item.readings as unknown as Json }).eq('id', item.row.id)
       if (lifecycleError) throw new ApiError(lifecycleError.message, 500)
     }
   }
