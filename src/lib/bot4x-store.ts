@@ -23,23 +23,20 @@ import { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from ".
 
 export { BOT4X_CIRCUIT_BREAKER_PNL_PCT, isBot4xCircuitBreakerTriggered } from "./bot4x-breaker";
 
-// ─── FEATURE FLAG ─────────────────────────────────────────────────────────────
-// Quando false, TODA a execução cai em DEMO (simulação client-side com Math.random).
-// A UI deve refletir isso via getEffectiveMode(), nunca o `mode` cru do store.
-export const REAL_MODE_ENABLED = import.meta.env.VITE_BOT4X_REAL_ENABLED === "true";
-
-// Destrave em runtime: só há modo REAL com credenciais de exchange verificadas.
+// ─── REAL MODE GATE ───────────────────────────────────────────────────────────
+// Mantido apenas para compatibilidade com testes/consumidores legados.
+// A flag permanece permanentemente desabilitada: REAL só é liberado após
+// verificação da exchange em runtime pelo backend.
+export const REAL_MODE_ENABLED = false;
 let exchangeVerified = false;
 export function setExchangeVerified(value: boolean) {
   exchangeVerified = value;
 }
 export function isRealModeUnlocked(): boolean {
-  return REAL_MODE_ENABLED || exchangeVerified;
+  return exchangeVerified;
 }
-
-// Fonte de verdade única do modo efetivo. UI e lógica de init() devem usar isto.
 export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
-  return isRealModeUnlocked() ? persistedMode : "DEMO";
+  return exchangeVerified && persistedMode === "REAL" ? "REAL" : "DEMO";
 }
 
 // ─── RISK MODEL CONSTANTS ─────────────────────────────────────────────────────
@@ -239,6 +236,7 @@ export const useBot4xStore = create<State>()(
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
         _currentUserId = uid;
+        setExchangeVerified(false);
         set({ userId: uid, realInited: false });
 
         // O set acima passa a gravar na chave do usuário. Restaure o snapshot
@@ -258,14 +256,22 @@ export const useBot4xStore = create<State>()(
               /* silently ignore — localStorage fallback já foi carregado */
             });
         }
-        // Carrega configuração persistida no banco
+        // O backend é a fonte de verdade para liberar REAL.
         if (uid) {
-          loadConfig(uid)
-            .then((cfg) => {
+          void (async () => {
+            try {
+              const status = await api.get<{ verified?: boolean }>("/exchange/credentials");
+              const verified = status?.verified === true;
+              setExchangeVerified(verified);
+
+              const cfg = await loadConfig(uid);
               if (!cfg) return;
-              // Preserve a previously selected REAL mode from the user's
-              // browser while backfilling the new account-level setting.
-              const executionMode = get().mode === "REAL" ? "REAL" : cfg.executionMode;
+
+              // Nunca restauramos REAL a partir do localStorage. A credencial
+              // verificada pelo backend precisa existir neste login.
+              const executionMode: ExecMode =
+                cfg.executionMode === "REAL" && verified ? "REAL" : "DEMO";
+
               set({
                 mode: executionMode,
                 profile: cfg.profile as CalibProfileType,
@@ -279,13 +285,17 @@ export const useBot4xStore = create<State>()(
                 circuitBreaker: cfg.circuitBreaker as State["circuitBreaker"],
                 dailyPnlPct: cfg.dailyPnl,
               });
+
               if (executionMode !== cfg.executionMode) {
                 void saveConfig(uid, { executionMode });
               }
-            })
-            .catch(() => {
-              /* fallback para localStorage */
-            });
+            } catch {
+              setExchangeVerified(false);
+              if (get().mode === "REAL") {
+                set({ mode: "DEMO", realInited: false, status: "IDLE" });
+              }
+            }
+          })();
         }
       },
 
@@ -546,6 +556,7 @@ export const useBot4xStore = create<State>()(
 
       // ─── SETTERS ──────────────────────────────────────────────────────────
       setMode: (mode) => {
+        // REAL é impossível sem credencial Binance verificada pelo backend.
         if (mode === "REAL" && !isRealModeUnlocked()) return;
         if (get().mode === mode) return;
         get().cleanup();

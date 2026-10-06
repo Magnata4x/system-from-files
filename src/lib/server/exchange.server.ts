@@ -164,6 +164,46 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
   }
 }
 
+export interface VerifiedBinanceAccount {
+  canTrade: boolean
+  balances: { asset: string; free: number; locked: number }[]
+}
+
+async function getStoredCredentials(supabase: Client, userId: string) {
+  const { data, error } = await supabase
+    .from('exchange_credentials')
+    .select('api_key_cipher, api_secret_cipher, verified')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) throw new ApiError(error.message, 500)
+  if (!data || !data.verified) {
+    throw new ApiError('Binance não conectada ou não verificada.', 409)
+  }
+  return {
+    apiKey: await decryptSecret(data.api_key_cipher),
+    apiSecret: await decryptSecret(data.api_secret_cipher),
+  }
+}
+
+export async function getVerifiedBinanceAccount(
+  supabase: Client,
+  userId: string,
+): Promise<VerifiedBinanceAccount> {
+  const credentials = await getStoredCredentials(supabase, userId)
+  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/api/v3/account')) as {
+    canTrade?: boolean
+    balances?: Array<{ asset: string; free: string; locked: string }>
+  }
+  return {
+    canTrade: account.canTrade === true,
+    balances: (account.balances ?? []).map((item) => ({
+      asset: item.asset,
+      free: Number(item.free),
+      locked: Number(item.locked),
+    })),
+  }
+}
+
 /** Salva (ou substitui) as chaves e verifica imediatamente contra a exchange. */
 export async function saveExchangeCredentials(
   supabase: Client,

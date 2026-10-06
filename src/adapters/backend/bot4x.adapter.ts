@@ -8,6 +8,9 @@ export interface BackendBot4xConfig {
   dailyPnl?: number;
   openSlots?: number;
   circuitBreaker?: "none" | "emergency" | "profitLock";
+  executionMode?: "DEMO" | "REAL";
+  exchange?: string;
+  apiKeySet?: boolean;
   [k: string]: unknown;
 }
 
@@ -18,6 +21,9 @@ export interface Bot4xConfigUI {
   dailyPnl?: number;
   openSlots?: number;
   circuitBreaker?: BackendBot4xConfig["circuitBreaker"];
+  executionMode: "DEMO" | "REAL";
+  exchange: string;
+  apiKeySet: boolean;
   raw?: BackendBot4xConfig;
 }
 
@@ -74,6 +80,9 @@ export function mapBot4xConfig(c: BackendBot4xConfig): Bot4xConfigUI {
     dailyPnl: c.dailyPnl,
     openSlots: c.openSlots,
     circuitBreaker: c.circuitBreaker ?? "none",
+    executionMode: c.executionMode === "REAL" ? "REAL" : "DEMO",
+    exchange: typeof c.exchange === "string" ? c.exchange : "binance",
+    apiKeySet: c.apiKeySet === true,
     raw: c,
   };
 }
