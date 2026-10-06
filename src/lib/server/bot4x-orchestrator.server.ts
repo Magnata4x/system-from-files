@@ -28,6 +28,9 @@ export interface Bot4xCycleResult {
     decision: Bot4xCycleDecision;
     reason: string;
     mode: Bot4xMode;
+    profile: string;
+    circuitBreaker: string;
+    openSlots: number;
     executionSubmitted: false;
   }>;
 }
