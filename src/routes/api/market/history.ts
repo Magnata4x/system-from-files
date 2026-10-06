@@ -24,7 +24,15 @@ export const Route = createFileRoute("/api/market/history")({
             .order("captured_at", { ascending: true })
             .limit(10_000);
 
-          if (error) throw new Error(`Histórico de mercado indisponível: ${error.message}`);
+          if (error) {
+            console.warn(`[api] Histórico de mercado indisponível: ${error.message}`);
+            return {
+              periodStart,
+              generatedAt: new Date().toISOString(),
+              source: "coingecko",
+              points: [],
+            };
+          }
 
           return {
             periodStart,
