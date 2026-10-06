@@ -310,16 +310,33 @@ export async function getTelemetry(supabase: Client, userId: string) {
     new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(r.created_at)) === localDay
   )
 
-  const { data: intents, error: intentsError } = await supabase
-    .from('bot4x_execution_intents')
-    .select('id, status, pair, side, created_at, readings')
-    .eq('user_id', userId)
-    .gte('created_at', new Date(new Date().getTime() - 48 * 60 * 60 * 1000).toISOString())
-    .order('created_at', { ascending: false })
-    .limit(200)
-  if (intentsError) throw new ApiError(intentsError.message, 500)
+  const recentIntentsStart = new Date(new Date().getTime() - 48 * 60 * 60 * 1000).toISOString()
+  const executionRows: Array<{
+    id: string
+    status: string
+    pair: string
+    side: string
+    created_at: string
+    readings: Json
+  }> = []
+  const pageSize = 500
+  for (let offset = 0; ; offset += pageSize) {
+    const { data: page, error: intentsError } = await supabase
+      .from('bot4x_execution_intents')
+      .select('id, status, pair, side, created_at, readings')
+      .eq('user_id', userId)
+      .gte('created_at', recentIntentsStart)
+      .in('status', ['pending', 'submitted', 'completed', 'failed'])
+      .order('created_at', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+    if (intentsError) throw new ApiError(intentsError.message, 500)
+    executionRows.push(...(page ?? []))
+    if (!page || page.length < pageSize) break
+  }
 
-  const executionRows = intents ?? []
+  // Reconciliation is intentionally paginated: an arbitrary row limit could
+  // hide an older pending/submitted intent and make recovery incomplete.
+
 
   // Reconcile submitted orders and recover pending intents using the deterministic
   // Binance clientOrderId. This is read-only: it never submits, cancels, or modifies.
@@ -407,7 +424,6 @@ export async function getTelemetry(supabase: Client, userId: string) {
   // no ledger. Isso evita atribuir manualmente/externalmente uma venda à compra.
   const completed = executionRows
     .filter((r) => r.status === 'completed')
-    .slice(0, 50)
     .map((r) => ({ row: r, readings: ((r.readings ?? {}) as Record<string, unknown>) }))
 
   for (const item of completed) {
