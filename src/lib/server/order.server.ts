@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
-import { getExchangeStatus, getVerifiedBinanceAccount, placeVerifiedBinanceMarketOrder } from './exchange.server'
+import { getExchangeStatus, getVerifiedBinanceAccount } from './exchange.server'
 import { validateRealOrderRisk, type RealOrderSide } from './order-risk'
 
 type Client = SupabaseClient<Database>
@@ -14,7 +14,7 @@ export interface ExecuteRealOrderInput {
   confirmed: boolean
 }
 
-export async function executeRealMarketOrder(
+export async function validateRealMarketOrder(
   supabase: Client,
   userId: string,
   input: ExecuteRealOrderInput,
@@ -43,9 +43,17 @@ export async function executeRealMarketOrder(
   })
   if (!risk.ok) throw new ApiError(risk.reason, 409)
 
-  return placeVerifiedBinanceMarketOrder(supabase, userId, {
+  // This phase deliberately stops at a validated server-side execution intent.
+  // No BUY/SELL is submitted to Binance. The live submission step is isolated
+  // for the later, explicitly authorized manual US$6 validation.
+  return {
+    ready: true,
+    executionMode: config.executionMode,
+    exchange: config.exchange,
     symbol: input.symbol.toUpperCase(),
     side: input.side,
     quoteOrderQty: input.quoteOrderQty,
-  })
+    maxQuoteOrderQty: risk.maxQuoteOrderQty,
+    usdtFree: usdt?.free ?? 0,
+  }
 }
