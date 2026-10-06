@@ -204,6 +204,8 @@ export async function executeAuthorizedSixDollarBtcOrder(
     throw new ApiError('Esta idempotency key já foi utilizada por uma ordem com falha.', 409)
   }
 
+  const config = await getOrCreateConfig(supabase, userId)
+
   const intent = await validateRealMarketOrder(supabase, userId, {
     symbol: 'BTCUSDT',
     side: input.side,
