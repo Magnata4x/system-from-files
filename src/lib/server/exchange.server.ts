@@ -56,6 +56,20 @@ export interface ExchangeStatus {
   lastError: string | null
 }
 
+export type BinanceEnvironment = 'demo' | 'testnet' | 'production'
+
+export function getBinanceEnvironment(): BinanceEnvironment {
+  const value = process.env['BINANCE_TRADING_ENV']?.trim().toLowerCase()
+  if (value === 'production' || value === 'testnet' || value === 'demo') return value
+  return 'demo'
+}
+
+export function getBinanceBaseUrl(environment = getBinanceEnvironment()): string {
+  if (environment === 'production') return 'https://api.binance.com/api'
+  if (environment === 'testnet') return 'https://testnet.binance.vision/api'
+  return 'https://demo-api.binance.com/api'
+}
+
 const EMPTY: ExchangeStatus = {
   connected: false,
   exchange: 'binance',
@@ -91,7 +105,7 @@ async function binanceSignedRequest(
   const key = await crypto.subtle.importKey('raw', enc.encode(apiSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
   const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
-  const res = await fetch('https://api.binance.com' + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey } })
+  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey } })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), 400)
   return body
@@ -111,7 +125,7 @@ async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
   const signature = Array.from(sigBytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
-  const res = await fetch(`https://api.binance.com${path}?${query}&signature=${signature}`, {
+  const res = await fetch(`${getBinanceBaseUrl()}${path}?${query}&signature=${signature}`, {
     headers: { 'X-MBX-APIKEY': apiKey },
   })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
