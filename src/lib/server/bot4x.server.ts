@@ -297,6 +297,7 @@ export async function listVerifiedExecutionsPaged(
   }
   if (query.from && ISO_DAY.test(query.from)) builder = builder.gte('created_at', query.from + 'T00:00:00.000Z')
   if (query.to && ISO_DAY.test(query.to)) builder = builder.lte('created_at', query.to + 'T23:59:59.999Z')
+  if (query.profile && query.profile !== 'all') builder = builder.eq('readings->>profile', query.profile)
 
   const { data, error, count } = await builder.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
   if (error) throw new ApiError(error.message, 500)
@@ -304,7 +305,7 @@ export async function listVerifiedExecutionsPaged(
   const items = (data ?? []).flatMap((row) => {
     const readings = (row.readings ?? {}) as Record<string, unknown>
     const profile = typeof readings.profile === 'string' ? readings.profile : null
-    if (query.profile && query.profile !== 'all' && profile !== query.profile) return []
+    if (!profile && query.profile && query.profile !== 'all') return []
     const realizedPnl = typeof readings.realizedPnl === 'number' && Number.isFinite(readings.realizedPnl) ? readings.realizedPnl : null
     const entryPrice = typeof readings.averageFillPrice === 'number' && Number.isFinite(readings.averageFillPrice) ? readings.averageFillPrice : null
     const result = realizedPnl === null ? 'open' : realizedPnl > 0 ? 'WIN' : realizedPnl < 0 ? 'LOSS' : 'open'
