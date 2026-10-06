@@ -101,7 +101,7 @@
     },
   },
   "overrides": {
-    "seroval": "1.6.4",
+    "seroval": "1.6.7",
     "sharp": "0.35.5",
     "source-map-js": "1.2.2",
     "undici": "7.29.1",
@@ -1813,7 +1813,7 @@
 
     "serialize-javascript": ["serialize-javascript@7.0.6", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/serialize-javascript/-/serialize-javascript-7.0.6.tgz", {}, "sha512-ATTK5Q4gFVg0YDp1my2vqygyvhcklD/UV5GIlYHooGTn/NogJqIzpetkD6E5kmuVULqz/S9inUL25XcAgDRJQg=="],
 
-    "seroval": ["seroval@1.6.4", "", {}, "sha512-LErWMNS2RRFdu2RMA5u/PA59/IWs0XsikyEXGQ2/36iEWFrdG0ABmg17E17cikrv76891kOAMq3TkTFXpwAHXw=="],
+    "seroval": ["seroval@1.6.7", "", {}, "sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ=="],
 
     "seroval-plugins": ["seroval-plugins@1.6.8", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/seroval-plugins/-/seroval-plugins-1.6.8.tgz", { "peerDependencies": { "seroval": "^1.0" } }, "sha512-N7mWAMydj89EnYTHtRpS3LBrAz3J9O6oVrqpuXuvlAHfAUG8WEKqtbAd7SBiJNY5NfCAFhSdyAh7wI4Shjqy4g=="],
 
