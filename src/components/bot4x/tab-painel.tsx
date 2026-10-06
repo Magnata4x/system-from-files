@@ -38,10 +38,7 @@ export function TabPainel({ exchangeVerified }: { exchangeVerified?: boolean }) 
         <AllocationConfig />
       </div>
       <LeverageSelector />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <CircuitBreakerLoss />
-        <CircuitBreakerProfit />
-      </div>
+      {mode === "DEMO" && <div className="grid grid-cols-1 lg:grid-cols-2 gap-4"><CircuitBreakerLoss /><CircuitBreakerProfit /></div>}
       {mode === "DEMO" ? <OrderGrid /> : <RealPositions />}
       {mode === "DEMO" ? <TodayPnlRow /> : <RealPnl telemetry={telemetry} />}
     </div>
