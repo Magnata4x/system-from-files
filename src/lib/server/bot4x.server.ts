@@ -225,6 +225,20 @@ export async function listExecutionsPaged(
   }
 }
 
+function quoteAssetForSymbol(symbol: string): string | null {
+  const normalized = symbol.toUpperCase()
+  for (const suffix of ['USDT', 'USDC', 'FDUSD', 'TUSD', 'USDP', 'BUSD', 'BTC', 'ETH', 'BNB']) {
+    if (normalized.endsWith(suffix) && normalized.length > suffix.length) return suffix
+  }
+  return null
+}
+
+function baseAssetForSymbol(symbol: string, quoteAsset: string | null): string | null {
+  if (!quoteAsset) return null
+  const normalized = symbol.toUpperCase()
+  return normalized.endsWith(quoteAsset) ? normalized.slice(0, -quoteAsset.length) : null
+}
+
 function csvCell(value: unknown): string {
   const s = value === null || value === undefined ? '' : String(value)
   return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -375,23 +389,68 @@ export async function getTelemetry(supabase: Client, userId: string) {
     try {
       const raw = await getVerifiedBinanceTrades(supabase, userId, { symbol: item.row.pair, orderId })
       const fills = Array.isArray(raw) ? raw : []
-      const normalized = fills.map((fill) => ({
-        qty: typeof fill.qty === 'string' ? Number(fill.qty) : NaN,
-        quoteQty: typeof fill.quoteQty === 'string' ? Number(fill.quoteQty) : NaN,
-        commission: typeof fill.commission === 'string' ? Number(fill.commission) : NaN,
-        commissionAsset: typeof fill.commissionAsset === 'string' ? fill.commissionAsset : null,
-        time: typeof fill.time === 'number' ? fill.time : null,
-      })).filter((f) => Number.isFinite(f.qty) && f.qty > 0 && Number.isFinite(f.quoteQty) && f.quoteQty >= 0)
+      const quoteAsset = quoteAssetForSymbol(item.row.pair)
+      const baseAsset = baseAssetForSymbol(item.row.pair, quoteAsset)
+      const isBuy = item.row.side === 'BUY'
+      const normalized = fills.map((fill) => {
+        const qty = typeof fill.qty === 'string' ? Number(fill.qty) : NaN
+        const quoteQty = typeof fill.quoteQty === 'string' ? Number(fill.quoteQty) : NaN
+        const commission = typeof fill.commission === 'string' ? Number(fill.commission) : NaN
+        const commissionAsset = typeof fill.commissionAsset === 'string' ? fill.commissionAsset.toUpperCase() : null
+        const hasCommission = Number.isFinite(commission) && commission > 0
+        const commissionInBase = hasCommission && commissionAsset === baseAsset
+        const commissionInQuote = hasCommission && commissionAsset === quoteAsset
+        const supportedFee = !hasCommission || commissionInBase || commissionInQuote
+
+        let netQty = qty
+        let netQuoteQty = quoteQty
+
+        if (hasCommission && commissionInBase && isBuy) {
+          netQty = qty - commission
+        } else if (hasCommission && commissionInQuote) {
+          netQuoteQty = isBuy ? quoteQty + commission : quoteQty - commission
+        } else if (hasCommission && commissionInBase && !isBuy) {
+          // A base-asset SELL fee changes the asset accounting but cannot be
+          // valued safely without an additional verified fee valuation source.
+          netQty = NaN
+          netQuoteQty = NaN
+        }
+
+        return {
+          qty,
+          quoteQty,
+          netQty,
+          netQuoteQty,
+          commission,
+          commissionAsset,
+          supportedFee,
+          time: typeof fill.time === 'number' ? fill.time : null,
+        }
+      }).filter((f) =>
+        Number.isFinite(f.qty) &&
+        f.qty > 0 &&
+        Number.isFinite(f.quoteQty) &&
+        f.quoteQty >= 0 &&
+        (!Number.isFinite(f.netQty) || f.netQty > 0)
+      )
       const grossQty = normalized.reduce((sum, f) => sum + f.qty, 0)
       const grossQuote = normalized.reduce((sum, f) => sum + f.quoteQty, 0)
-      const unsupportedFee = normalized.some((f) => f.commissionAsset && Number.isFinite(f.commission) && f.commission !== 0 && !item.row.pair.endsWith(f.commissionAsset))
+      const netQty = normalized.every((f) => Number.isFinite(f.netQty))
+        ? normalized.reduce((sum, f) => sum + Number(f.netQty), 0)
+        : null
+      const netQuote = normalized.every((f) => Number.isFinite(f.netQuoteQty))
+        ? normalized.reduce((sum, f) => sum + Number(f.netQuoteQty), 0)
+        : null
+      const feeAware = normalized.length > 0 && normalized.every((f) => f.supportedFee && Number.isFinite(f.netQty) && Number.isFinite(f.netQuoteQty) && f.netQty > 0 && f.netQuoteQty >= 0)
       const nextReadings = {
         ...item.readings,
         verifiedFills: normalized,
         verifiedFillCount: normalized.length,
         verifiedFillQty: Number(grossQty.toFixed(12)),
         verifiedFillQuoteQty: Number(grossQuote.toFixed(12)),
-        feeAware: !unsupportedFee,
+        feeAware,
+        netFillQty: netQty === null ? null : Number(netQty.toFixed(12)),
+        netFillQuoteQty: netQuote === null ? null : Number(netQuote.toFixed(12)),
         fillsReconciledAt: new Date().toISOString(),
       }
       const { error: fillUpdateError } = await supabase
@@ -410,22 +469,49 @@ export async function getTelemetry(supabase: Client, userId: string) {
   // efetivamente confirmados pela Binance. Sem contraparte registrada, o
   // estado continua filled_unrealized e realizedPnl permanece indisponível.
   const fifo = completed
-    .filter((item) => typeof item.readings.verifiedFillQty === 'number' && item.readings.verifiedFillQty > 0)
+    .filter((item) =>
+      item.readings.feeAware === true &&
+      typeof item.readings.netFillQty === 'number' &&
+      item.readings.netFillQty > 0 &&
+      typeof item.readings.netFillQuoteQty === 'number' &&
+      item.readings.netFillQuoteQty >= 0,
+    )
     .sort((a, b) => new Date(a.row.created_at).getTime() - new Date(b.row.created_at).getTime())
-    .map((item) => ({ item, remainingQty: Number(item.readings.verifiedFillQty), quoteQty: Number(item.readings.verifiedFillQuoteQty ?? 0) }))
+    .map((item) => ({
+      item,
+      remainingQty: Number(item.readings.netFillQty),
+      quoteQty: Number(item.readings.netFillQuoteQty),
+    }))
 
   for (const sell of fifo.filter((x) => x.item.row.side === 'SELL')) {
-    for (const buy of fifo.filter((x) => x.item.row.side === 'BUY' && x.item.row.pair === sell.item.row.pair && x.remainingQty > 0 && new Date(x.item.row.created_at).getTime() <= new Date(sell.item.row.created_at).getTime())) {
+    for (const buy of fifo.filter((x) =>
+      x.item.row.side === 'BUY' &&
+      x.item.row.pair === sell.item.row.pair &&
+      x.remainingQty > 0 &&
+      new Date(x.item.row.created_at).getTime() <= new Date(sell.item.row.created_at).getTime()
+    )) {
       if (sell.remainingQty <= 0) break
       const matchedQty = Math.min(buy.remainingQty, sell.remainingQty)
       if (matchedQty <= 0) continue
-      const buyUnit = buy.quoteQty / Number(buy.item.readings.verifiedFillQty)
-      const sellUnit = sell.quoteQty / Number(sell.item.readings.verifiedFillQty)
+      const buyUnit = buy.quoteQty / Number(buy.item.readings.netFillQty)
+      const sellUnit = sell.quoteQty / Number(sell.item.readings.netFillQty)
       const pnl = (sellUnit - buyUnit) * matchedQty
       const existingBuy = Number(buy.item.readings.realizedPnl ?? 0)
       const existingSell = Number(sell.item.readings.realizedPnl ?? 0)
-      buy.item.readings = { ...buy.item.readings, matchedQty: Number(((Number(buy.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)), realizedPnl: Number((existingBuy + pnl).toFixed(8)), lifecycle: matchedQty >= Number(buy.item.readings.verifiedFillQty) ? 'closed_verified' : 'partially_closed' }
-      sell.item.readings = { ...sell.item.readings, matchedQty: Number(((Number(sell.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)), realizedPnl: Number((existingSell + pnl).toFixed(8)), lifecycle: matchedQty >= Number(sell.item.readings.verifiedFillQty) ? 'closed_verified' : 'partially_closed' }
+      buy.item.readings = {
+        ...buy.item.readings,
+        matchedQty: Number(((Number(buy.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)),
+        realizedPnl: Number((existingBuy + pnl).toFixed(8)),
+        realizedPnlType: 'net_of_verified_fees',
+        lifecycle: matchedQty >= Number(buy.item.readings.netFillQty) ? 'closed_verified' : 'partially_closed',
+      }
+      sell.item.readings = {
+        ...sell.item.readings,
+        matchedQty: Number(((Number(sell.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)),
+        realizedPnl: Number((existingSell + pnl).toFixed(8)),
+        realizedPnlType: 'net_of_verified_fees',
+        lifecycle: matchedQty >= Number(sell.item.readings.netFillQty) ? 'closed_verified' : 'partially_closed',
+      }
       buy.remainingQty -= matchedQty
       sell.remainingQty -= matchedQty
     }
