@@ -234,6 +234,7 @@ export const useBot4xStore = create<State>()(
         // do usuário anterior nem misturar streams entre contas.
         get().cleanup();
         _currentUserId = uid;
+        setExchangeVerified(false);
         set({ userId: uid, realInited: false });
 
         // O set acima passa a gravar na chave do usuário. Restaure o snapshot
