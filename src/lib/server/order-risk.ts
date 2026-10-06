@@ -21,13 +21,13 @@ export type RealOrderRiskResult =
 
 const SYMBOL = /^[A-Z0-9]{2,20}USDT$/;
 
-export function validateRealOrderRisk(input: RealOrderRiskInput): RealOrderRiskResult {
-  if (input.executionMode !== "REAL") return { ok: false, reason: "Modo REAL não está ativo." };
+function validateOrderRisk(input: RealOrderRiskInput, mode: "DEMO" | "REAL"): RealOrderRiskResult {
+  if (input.executionMode !== mode) return { ok: false, reason: `Modo ${mode} não está ativo.` };
   if (input.exchange !== "binance") return { ok: false, reason: "Somente Binance é suportada." };
   if (!input.credentialsVerified) return { ok: false, reason: "Credencial Binance não verificada." };
   if (!input.canTrade) return { ok: false, reason: "A conta Binance não possui permissão de trade." };
   if (input.circuitBreaker !== "none") return { ok: false, reason: "Circuit breaker impede novas ordens." };
-  if (!input.confirmed) return { ok: false, reason: "Confirmação explícita da ordem REAL é obrigatória." };
+  if (!input.confirmed) return { ok: false, reason: `Confirmação explícita da ordem ${mode} é obrigatória.` };
   if (!SYMBOL.test(input.symbol)) return { ok: false, reason: "Símbolo inválido para ordem spot USDT." };
   if (!Number.isFinite(input.quoteOrderQty) || input.quoteOrderQty <= 0) {
     return { ok: false, reason: "Valor da ordem deve ser maior que zero." };
@@ -48,4 +48,13 @@ export function validateRealOrderRisk(input: RealOrderRiskInput): RealOrderRiskR
   }
 
   return { ok: true, maxQuoteOrderQty };
+}
+
+
+export function validateRealOrderRisk(input: RealOrderRiskInput): RealOrderRiskResult {
+  return validateOrderRisk(input, "REAL");
+}
+
+export function validateDemoOrderRisk(input: RealOrderRiskInput): RealOrderRiskResult {
+  return validateOrderRisk(input, "DEMO");
 }
