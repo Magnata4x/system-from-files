@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
+import { getExchangeStatus } from './exchange.server'
 
 type Client = SupabaseClient<Database>
 type ConfigRow = Database['public']['Tables']['bot4x_configs']['Row']
@@ -99,7 +100,18 @@ export async function updateConfig(
   userId: string,
   patch: Record<string, unknown>,
 ) {
-  await getOrCreateConfig(supabase, userId)
+  const current = await getOrCreateConfig(supabase, userId)
+  const requestedMode = patch.executionMode === 'REAL' ? 'REAL' : patch.executionMode === 'DEMO' ? 'DEMO' : current.executionMode
+  const requestedActive = patch.active === true
+  if (requestedMode === 'REAL' || (requestedActive && current.executionMode === 'REAL')) {
+    const exchange = await getExchangeStatus(supabase, userId)
+    if (!exchange.verified) {
+      throw new ApiError('Modo REAL exige credencial Binance verificada.', 409)
+    }
+    if (requestedMode === 'REAL' && exchange.exchange !== 'binance') {
+      throw new ApiError('Modo REAL exige Binance.', 409)
+    }
+  }
   const update: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(patch)) {
     const column = PATCHABLE[key] ?? (key in PATCHABLE ? undefined : undefined)
