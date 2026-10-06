@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/market/history")({
             : 30;
           const periodStart = new Date(Date.now() - days * 24 * 60 * 60_000).toISOString();
 
-          const { data, error } = await user.supabase
+          const { data, error } = await (user.supabase as any)
             .from("market_snapshots")
             .select(
               "captured_at,source,total_market_cap,total_volume,btc_dominance,market_cap_change_24h",
