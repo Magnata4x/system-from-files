@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
-import { getExchangeStatus, getVerifiedBinanceOrder } from './exchange.server'
+import { getExchangeStatus, getVerifiedBinanceOrder, getVerifiedBinanceTrades } from './exchange.server'
 
 type Client = SupabaseClient<Database>
 type ConfigRow = Database['public']['Tables']['bot4x_configs']['Row']
@@ -358,6 +358,83 @@ export async function getTelemetry(supabase: Client, userId: string) {
       // A temporary reconciliation failure must not erase a confirmed
       // submission or turn it into a false failure.
       if (error instanceof ApiError && error.status >= 500) throw error
+    }
+  }
+
+  // Fase 15: consulta os fills reais de cada ordem concluída e só calcula
+  // PnL realizado quando existe uma contraparte OPPOSTA também registrada
+  // no ledger. Isso evita atribuir manualmente/externalmente uma venda à compra.
+  const completed = executionRows
+    .filter((r) => r.status === 'completed')
+    .slice(0, 50)
+    .map((r) => ({ row: r, readings: ((r.readings ?? {}) as Record<string, unknown>) }))
+
+  for (const item of completed) {
+    const orderId = typeof item.readings.orderId === 'number' ? item.readings.orderId : null
+    if (!orderId) continue
+    try {
+      const raw = await getVerifiedBinanceTrades(supabase, userId, { symbol: item.row.pair, orderId })
+      const fills = Array.isArray(raw) ? raw : []
+      const normalized = fills.map((fill) => ({
+        qty: typeof fill.qty === 'string' ? Number(fill.qty) : NaN,
+        quoteQty: typeof fill.quoteQty === 'string' ? Number(fill.quoteQty) : NaN,
+        commission: typeof fill.commission === 'string' ? Number(fill.commission) : NaN,
+        commissionAsset: typeof fill.commissionAsset === 'string' ? fill.commissionAsset : null,
+        time: typeof fill.time === 'number' ? fill.time : null,
+      })).filter((f) => Number.isFinite(f.qty) && f.qty > 0 && Number.isFinite(f.quoteQty) && f.quoteQty >= 0)
+      const grossQty = normalized.reduce((sum, f) => sum + f.qty, 0)
+      const grossQuote = normalized.reduce((sum, f) => sum + f.quoteQty, 0)
+      const unsupportedFee = normalized.some((f) => f.commissionAsset && Number.isFinite(f.commission) && f.commission !== 0 && !item.row.pair.endsWith(f.commissionAsset))
+      const nextReadings = {
+        ...item.readings,
+        verifiedFills: normalized,
+        verifiedFillCount: normalized.length,
+        verifiedFillQty: Number(grossQty.toFixed(12)),
+        verifiedFillQuoteQty: Number(grossQuote.toFixed(12)),
+        feeAware: !unsupportedFee,
+        fillsReconciledAt: new Date().toISOString(),
+      }
+      const { error: fillUpdateError } = await supabase
+        .from('bot4x_execution_intents')
+        .update({ readings: nextReadings })
+        .eq('id', item.row.id)
+      if (fillUpdateError) throw new ApiError(fillUpdateError.message, 500)
+      item.readings = nextReadings
+      item.row.readings = nextReadings
+    } catch (error) {
+      if (error instanceof ApiError && error.status >= 500) throw error
+    }
+  }
+
+  // FIFO apenas entre execuções do próprio ledger, usando quantidade e quote
+  // efetivamente confirmados pela Binance. Sem contraparte registrada, o
+  // estado continua filled_unrealized e realizedPnl permanece indisponível.
+  const fifo = completed
+    .filter((item) => typeof item.readings.verifiedFillQty === 'number' && item.readings.verifiedFillQty > 0)
+    .sort((a, b) => new Date(a.row.created_at).getTime() - new Date(b.row.created_at).getTime())
+    .map((item) => ({ item, remainingQty: Number(item.readings.verifiedFillQty), quoteQty: Number(item.readings.verifiedFillQuoteQty ?? 0) }))
+
+  for (const sell of fifo.filter((x) => x.item.row.side === 'SELL')) {
+    for (const buy of fifo.filter((x) => x.item.row.side === 'BUY' && x.item.row.pair === sell.item.row.pair && x.remainingQty > 0 && new Date(x.item.row.created_at).getTime() <= new Date(sell.item.row.created_at).getTime())) {
+      if (sell.remainingQty <= 0) break
+      const matchedQty = Math.min(buy.remainingQty, sell.remainingQty)
+      if (matchedQty <= 0) continue
+      const buyUnit = buy.quoteQty / Number(buy.item.readings.verifiedFillQty)
+      const sellUnit = sell.quoteQty / Number(sell.item.readings.verifiedFillQty)
+      const pnl = (sellUnit - buyUnit) * matchedQty
+      const existingBuy = Number(buy.item.readings.realizedPnl ?? 0)
+      const existingSell = Number(sell.item.readings.realizedPnl ?? 0)
+      buy.item.readings = { ...buy.item.readings, matchedQty: Number(((Number(buy.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)), realizedPnl: Number((existingBuy + pnl).toFixed(8)), lifecycle: matchedQty >= Number(buy.item.readings.verifiedFillQty) ? 'closed_verified' : 'partially_closed' }
+      sell.item.readings = { ...sell.item.readings, matchedQty: Number(((Number(sell.item.readings.matchedQty ?? 0)) + matchedQty).toFixed(12)), realizedPnl: Number((existingSell + pnl).toFixed(8)), lifecycle: matchedQty >= Number(sell.item.readings.verifiedFillQty) ? 'closed_verified' : 'partially_closed' }
+      buy.remainingQty -= matchedQty
+      sell.remainingQty -= matchedQty
+    }
+  }
+
+  for (const item of completed) {
+    if (item.readings.lifecycle === 'closed_verified' || item.readings.lifecycle === 'partially_closed') {
+      const { error: lifecycleError } = await supabase.from('bot4x_execution_intents').update({ readings: item.readings }).eq('id', item.row.id)
+      if (lifecycleError) throw new ApiError(lifecycleError.message, 500)
     }
   }
 
