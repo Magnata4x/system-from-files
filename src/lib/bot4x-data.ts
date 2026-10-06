@@ -270,7 +270,7 @@ export type Trade = {
   entry: number;
   stop: number;
   target: number;
-  result: "WIN" | "LOSS" | "BLOCKED" | "SHUTDOWN";
+  result: "WIN" | "LOSS" | "BLOCKED" | "SHUTDOWN" | "OPEN";
   pnl: number;
   pnlPct: number;
   accumulated: number;

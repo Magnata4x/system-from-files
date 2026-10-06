@@ -11,7 +11,7 @@ import {
   genHistory,
 } from "./bot4x-data";
 import { PROFILES } from "./bot4x-data";
-import { bot4xAdapter, type BackendBot4xExecution } from "@/adapters/backend/bot4x.adapter";
+import { bot4xAdapter, type BackendBot4xVerifiedHistory } from "@/adapters/backend/bot4x.adapter";
 import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
@@ -167,12 +167,12 @@ function mapBackendProfile(p: string | undefined): CalibProfile {
   return "conservador";
 }
 
-function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, leverage: number): Trade {
-  const openedAt = e.createdAt ? new Date(e.createdAt).getTime() : Date.now();
-  const pnl = e.pnl ?? 0;
-  const side: Side = e.side === "BUY" || e.side === "LONG" ? "LONG" : "SHORT";
-  const result: Trade["result"] = e.status === "open" || e.status === "pending" ? "BLOCKED" : pnl >= 0 ? "WIN" : "LOSS";
+export function verifiedHistoryToTrade(e: BackendBot4xVerifiedHistory, accumulated: number): Trade {
+  const openedAt = new Date(e.createdAt).getTime();
+  const pnl = e.realizedPnl;
+  const side: Side = e.side === "BUY" ? "LONG" : "SHORT";
   const entry = e.entryPrice ?? 0;
+  const result: Trade["result"] = pnl === null ? "OPEN" : pnl >= 0 ? "WIN" : "LOSS";
   return {
     id: e.id,
     day: new Date(openedAt).toISOString().slice(0, 10),
@@ -182,12 +182,12 @@ function executionToTrade(e: BackendBot4xExecution, profile: CalibProfile, lever
     stop: entry,
     target: entry,
     result,
-    pnl,
-    pnlPct: pnl,
-    accumulated: 0,
-    profile,
-    leverage,
-    motivo: "",
+    pnl: pnl ?? 0,
+    pnlPct: 0,
+    accumulated: pnl === null ? accumulated : accumulated + pnl,
+    profile: mapBackendProfile(e.profile),
+    leverage: e.leverage,
+    motivo: e.lifecycle ?? "execução Binance verificada",
     hour: new Date(openedAt).getHours(),
   };
 }
@@ -466,18 +466,19 @@ export const useBot4xStore = create<State>()(
           const uid = user?.id;
           if (!uid) throw new Error("Usuário não autenticado");
 
-          const [config, executions, telemetry] = await Promise.all([
+          const [config, verifiedHistory, telemetry] = await Promise.all([
             bot4xAdapter.getConfig(uid),
-            bot4xAdapter.executions(),
+            bot4xAdapter.verifiedHistory(),
             bot4xAdapter.telemetry(),
           ]);
 
           const profile = mapBackendProfile(config?.profile);
-          const leverage = get().leverage;
-
-          const mappedHistory: Trade[] = (executions ?? []).map((e: BackendBot4xExecution) =>
-            executionToTrade(e, profile, leverage),
-          );
+          let accumulated = 0;
+          const mappedHistory: Trade[] = (verifiedHistory ?? []).map((e) => {
+            const trade = verifiedHistoryToTrade(e, accumulated);
+            accumulated = trade.accumulated;
+            return trade;
+          });
 
           set({
             status: config?.active ? "RUNNING" : "IDLE",
@@ -518,23 +519,14 @@ export const useBot4xStore = create<State>()(
               status?: State["status"];
               dailyPnL?: number;
               circuitBreaker?: State["circuitBreaker"];
-              execution?: BackendBot4xExecution;
             };
             const patch: Partial<State> = {};
             if (ev.status) patch.status = ev.status;
             if (typeof ev.dailyPnL === "number") patch.dailyPnlPct = ev.dailyPnL;
             if (ev.circuitBreaker) patch.circuitBreaker = ev.circuitBreaker;
             if (Object.keys(patch).length > 0) set(patch as State);
-            if (ev.execution) {
-              const s = get();
-              const trade = executionToTrade(ev.execution, s.profile, s.leverage);
-              set((prev) => ({ history: [trade, ...prev.history].slice(0, 500) }));
-              if (s.userId) {
-                void saveTradeWithOutbox(s.userId, trade).catch((err) =>
-                  logger.error("[Bot4x] saveTradeWithOutbox failed", { error: err, tradeId: trade.id }),
-                );
-              }
-            }
+            // Histórico REAL não é alimentado por eventos de UI nem por bot4x_trades.
+            // O ledger verificado é a única fonte; o próximo polling o recarrega.
           });
           wsUnsubs = [offShutdown, offProfitLock, offStatus];
 
@@ -544,9 +536,9 @@ export const useBot4xStore = create<State>()(
           realPoller = setInterval(() => {
             void (async () => {
               try {
-                const [cfg, execs, telemetry] = await Promise.all([
+                const [cfg, verifiedHistory, telemetry] = await Promise.all([
                   bot4xAdapter.getConfig(uid),
-                  bot4xAdapter.executions(),
+                  bot4xAdapter.verifiedHistory(),
                   bot4xAdapter.telemetry(),
                 ]);
                 if (!cfg) return;
@@ -559,7 +551,14 @@ export const useBot4xStore = create<State>()(
                   todayStats: telemetry?.today
                     ? { ...telemetry.today, serverTime: telemetry.serverTime ?? null }
                     : get().todayStats,
-                  history: (execs ?? []).map((e) => executionToTrade(e, prof, get().leverage)),
+                  history: (() => {
+                    let accumulated = 0;
+                    return (verifiedHistory ?? []).map((e) => {
+                      const trade = verifiedHistoryToTrade(e, accumulated);
+                      accumulated = trade.accumulated;
+                      return trade;
+                    });
+                  })(),
                   errorMsg: null,
                 });
               } catch (err) {

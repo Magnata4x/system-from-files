@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { handleApi } from '@/lib/server/api-auth.server'
-import { listExecutions, listExecutionsPaged } from '@/lib/server/bot4x.server'
+import { listExecutions, listExecutionsPaged, listVerifiedHistory } from '@/lib/server/bot4x.server'
 
 export const Route = createFileRoute('/api/bot4x/executions')({
   server: {
@@ -9,6 +9,7 @@ export const Route = createFileRoute('/api/bot4x/executions')({
         handleApi(request, (user) => {
           const url = new URL(request.url)
           const p = url.searchParams
+          if (p.get('source') === 'verified') return listVerifiedHistory(user.supabase, user.userId, p.get('limit') ? Number(p.get('limit')) : undefined)
           // Sem parâmetros de paginação mantemos o formato legado (array).
           if (!p.has('limit') && !p.has('offset') && !p.has('result') && !p.has('pair') && !p.has('side')) {
             return listExecutions(user.supabase, user.userId)
