@@ -62,11 +62,9 @@ function minimumScore(config: ReturnType<typeof mapConfig>): number {
  */
 export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xCycleResult> {
   const startedAt = new Date().toISOString();
-  const { data: configRows, error: configError } = await supabaseAdmin
-    .from("bot4x_configs")
-    .select("*")
-    .eq("active", true)
-    .then((result) => userId ? { ...result, data: (result.data ?? []).filter((row) => row.user_id === userId) } : result);
+  let configQuery = supabaseAdmin.from("bot4x_configs").select("*").eq("active", true);
+  if (userId) configQuery = configQuery.eq("user_id", userId);
+  const { data: configRows, error: configError } = await configQuery;
 
   if (configError) throw new Error(`Bot4x config scan failed: ${configError.message}`);
 
