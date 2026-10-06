@@ -20,6 +20,7 @@ export const endpoints = {
     config: "/bot4x/config",
     updateConfig: "/bot4x/config",
     executions: "/bot4x/executions",
+    history: "/bot4x/history",
     telemetry: "/bot4x/telemetry",
     balance: "/bot4x/balance",
     start: "/bot4x/start",
