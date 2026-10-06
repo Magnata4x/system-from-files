@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
-import { getBinanceEnvironment, getExchangeStatus, getVerifiedBinanceAccount, submitVerifiedBinanceMarketOrder } from './exchange.server'
+import { getBinanceEnvironment, getExchangeStatus, getVerifiedBinanceAccount, getVerifiedBinanceOrderByClientOrderId, submitVerifiedBinanceMarketOrder } from './exchange.server'
 import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from './order-risk'
 
 type Client = SupabaseClient<Database>
@@ -106,7 +106,47 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
   try {
     result = await submitVerifiedBinanceMarketOrder(supabase, userId, { symbol: 'BTCUSDT', side: input.side, quoteOrderQty: 6, clientOrderId: intent.id })
   } catch (error) {
-    await supabase.from('bot4x_execution_intents').update({ status: 'failed', processed_at: new Date().toISOString(), readings: { environment: getBinanceEnvironment(), error: error instanceof Error ? error.message : 'Falha desconhecida' } }).eq('id', intent.id)
+    // A submission error is ambiguous: Binance may have accepted the order
+    // before the transport failed. Recover by clientOrderId before deciding
+    // whether the intent can safely become failed.
+    try {
+      const recovered = await getVerifiedBinanceOrderByClientOrderId(supabase, userId, {
+        symbol: 'BTCUSDT',
+        clientOrderId: intent.id,
+      })
+      const recoveredStatus = typeof recovered.status === 'string' ? recovered.status : null
+      if (recoveredStatus) {
+        const recoveredReadings = {
+          environment: getBinanceEnvironment(),
+          clientOrderId: intent.id,
+          orderId: typeof recovered.orderId === 'number' ? recovered.orderId : null,
+          status: recoveredStatus,
+          executedQty: typeof recovered.executedQty === 'string' ? Number(recovered.executedQty) : null,
+          cummulativeQuoteQty: typeof recovered.cummulativeQuoteQty === 'string' ? Number(recovered.cummulativeQuoteQty) : null,
+          recoveredAt: new Date().toISOString(),
+        }
+        const recoveredLedgerStatus =
+          recoveredStatus === 'FILLED' ? 'completed'
+            : recoveredStatus === 'CANCELED' || recoveredStatus === 'REJECTED' || recoveredStatus === 'EXPIRED' ? 'failed'
+              : 'submitted'
+        await supabase.from('bot4x_execution_intents').update({
+          status: recoveredLedgerStatus,
+          processed_at: new Date().toISOString(),
+          readings: recoveredReadings,
+        }).eq('id', intent.id)
+        throw new ApiError('A Binance recebeu a ordem, mas a resposta original foi perdida. O ledger foi recuperado; não tente reenviar.', 503)
+      }
+    } catch (recoveryError) {
+      if (recoveryError instanceof ApiError && recoveryError.status === 503) throw recoveryError
+      if (!(recoveryError instanceof ApiError) || recoveryError.status !== 404) {
+        throw new ApiError('Não foi possível confirmar o resultado da submissão na Binance. A intenção permanece pendente; não tente reenviar.', 503)
+      }
+    }
+    await supabase.from('bot4x_execution_intents').update({
+      status: 'failed',
+      processed_at: new Date().toISOString(),
+      readings: { environment: getBinanceEnvironment(), error: error instanceof Error ? error.message : 'Falha desconhecida', recovery: 'not_found' },
+    }).eq('id', intent.id)
     throw error
   }
 
@@ -192,7 +232,47 @@ export async function executeAuthorizedSixDollarBtcOrder(
   try {
     result = await submitVerifiedBinanceMarketOrder(supabase, userId, { symbol: intent.symbol, side: intent.side, quoteOrderQty: 6, clientOrderId: createdIntent.id })
   } catch (error) {
-    await supabase.from('bot4x_execution_intents').update({ status: 'failed', processed_at: new Date().toISOString(), readings: { environment: 'production', error: error instanceof Error ? error.message : 'Falha desconhecida' } }).eq('id', createdIntent.id)
+    // A submission error is ambiguous. Check the deterministic clientOrderId
+    // before marking the intent failed so a transport error cannot cause a
+    // duplicate REAL order on retry.
+    try {
+      const recovered = await getVerifiedBinanceOrderByClientOrderId(supabase, userId, {
+        symbol: intent.symbol,
+        clientOrderId: createdIntent.id,
+      })
+      const recoveredStatus = typeof recovered.status === 'string' ? recovered.status : null
+      if (recoveredStatus) {
+        const recoveredReadings = {
+          environment: 'production',
+          clientOrderId: createdIntent.id,
+          orderId: typeof recovered.orderId === 'number' ? recovered.orderId : null,
+          status: recoveredStatus,
+          executedQty: typeof recovered.executedQty === 'string' ? Number(recovered.executedQty) : null,
+          cummulativeQuoteQty: typeof recovered.cummulativeQuoteQty === 'string' ? Number(recovered.cummulativeQuoteQty) : null,
+          recoveredAt: new Date().toISOString(),
+        }
+        const recoveredLedgerStatus =
+          recoveredStatus === 'FILLED' ? 'completed'
+            : recoveredStatus === 'CANCELED' || recoveredStatus === 'REJECTED' || recoveredStatus === 'EXPIRED' ? 'failed'
+              : 'submitted'
+        await supabase.from('bot4x_execution_intents').update({
+          status: recoveredLedgerStatus,
+          processed_at: new Date().toISOString(),
+          readings: recoveredReadings,
+        }).eq('id', createdIntent.id)
+        throw new ApiError('A Binance recebeu a ordem, mas a resposta original foi perdida. O ledger REAL foi recuperado; não tente reenviar.', 503)
+      }
+    } catch (recoveryError) {
+      if (recoveryError instanceof ApiError && recoveryError.status === 503) throw recoveryError
+      if (!(recoveryError instanceof ApiError) || recoveryError.status !== 404) {
+        throw new ApiError('Não foi possível confirmar o resultado da submissão REAL na Binance. A intenção permanece pendente; não tente reenviar.', 503)
+      }
+    }
+    await supabase.from('bot4x_execution_intents').update({
+      status: 'failed',
+      processed_at: new Date().toISOString(),
+      readings: { environment: 'production', error: error instanceof Error ? error.message : 'Falha desconhecida', recovery: 'not_found' },
+    }).eq('id', createdIntent.id)
     throw error
   }
 
