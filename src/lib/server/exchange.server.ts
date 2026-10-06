@@ -204,47 +204,6 @@ export async function getVerifiedBinanceAccount(
   }
 }
 
-export interface BinanceMarketOrderInput {
-  symbol: string
-  side: 'BUY' | 'SELL'
-  quoteOrderQty: number
-}
-
-export async function placeVerifiedBinanceMarketOrder(
-  supabase: Client,
-  userId: string,
-  input: BinanceMarketOrderInput,
-) {
-  const credentials = await getStoredCredentials(supabase, userId)
-  const query = new URLSearchParams({
-    symbol: input.symbol,
-    side: input.side,
-    type: 'MARKET',
-    quoteOrderQty: input.quoteOrderQty.toFixed(8),
-    timestamp: String(Date.now()),
-    recvWindow: '10000',
-  })
-  const key = await crypto.subtle.importKey(
-    'raw',
-    enc.encode(credentials.apiSecret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
-  const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query.toString())))
-  query.set('signature', Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join(''))
-
-  const res = await fetch(`https://api.binance.com/api/v3/order?${query.toString()}`, {
-    method: 'POST',
-    headers: { 'X-MBX-APIKEY': credentials.apiKey },
-  })
-  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
-  if (!res.ok) {
-    throw new ApiError(String(body['msg'] ?? `Binance respondeu ${res.status}`), 400)
-  }
-  return body
-}
-
 /** Salva (ou substitui) as chaves e verifica imediatamente contra a exchange. */
 export async function saveExchangeCredentials(
   supabase: Client,
