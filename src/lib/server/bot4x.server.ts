@@ -310,6 +310,10 @@ export async function getTelemetry(supabase: Client, userId: string) {
     new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(r.created_at)) === localDay
   )
 
+  // Operationally active intents must be reconciled regardless of age. A
+  // transport outage or a long-lived Binance order must never become invisible
+  // merely because it crossed the 48h telemetry window. Completed/failed rows
+  // remain bounded to the recent financial reporting window.
   const recentIntentsStart = new Date(new Date().getTime() - 48 * 60 * 60 * 1000).toISOString()
   const executionRows: Array<{
     id: string
@@ -319,19 +323,48 @@ export async function getTelemetry(supabase: Client, userId: string) {
     created_at: string
     readings: Json
   }> = []
+  const seenIntentIds = new Set<string>()
   const pageSize = 500
-  for (let offset = 0; ; offset += pageSize) {
-    const { data: page, error: intentsError } = await supabase
-      .from('bot4x_execution_intents')
-      .select('id, status, pair, side, created_at, readings')
-      .eq('user_id', userId)
-      .gte('created_at', recentIntentsStart)
-      .in('status', ['pending', 'submitted', 'completed', 'failed'])
-      .order('created_at', { ascending: false })
-      .range(offset, offset + pageSize - 1)
-    if (intentsError) throw new ApiError(intentsError.message, 500)
-    executionRows.push(...(page ?? []))
-    if (!page || page.length < pageSize) break
+
+  for (const status of ['pending', 'submitted'] as const) {
+    for (let offset = 0; ; offset += pageSize) {
+      const { data: page, error: intentsError } = await supabase
+        .from('bot4x_execution_intents')
+        .select('id, status, pair, side, created_at, readings')
+        .eq('user_id', userId)
+        .eq('status', status)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1)
+      if (intentsError) throw new ApiError(intentsError.message, 500)
+      for (const row of page ?? []) {
+        if (!seenIntentIds.has(row.id)) {
+          executionRows.push(row)
+          seenIntentIds.add(row.id)
+        }
+      }
+      if (!page || page.length < pageSize) break
+    }
+  }
+
+  for (const status of ['completed', 'failed'] as const) {
+    for (let offset = 0; ; offset += pageSize) {
+      const { data: page, error: intentsError } = await supabase
+        .from('bot4x_execution_intents')
+        .select('id, status, pair, side, created_at, readings')
+        .eq('user_id', userId)
+        .gte('created_at', recentIntentsStart)
+        .eq('status', status)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1)
+      if (intentsError) throw new ApiError(intentsError.message, 500)
+      for (const row of page ?? []) {
+        if (!seenIntentIds.has(row.id)) {
+          executionRows.push(row)
+          seenIntentIds.add(row.id)
+        }
+      }
+      if (!page || page.length < pageSize) break
+    }
   }
 
   // Reconciliation is intentionally paginated: an arbitrary row limit could
