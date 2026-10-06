@@ -221,8 +221,13 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
     setLoading(true);
     setErr(null);
     setSim(null);
+    if (!user?.id) {
+      setErr("É necessário estar autenticado para executar e registrar uma simulação.");
+      setLoading(false);
+      return;
+    }
     calibratorAdapter
-      .simulate(user?.id ?? "local", {
+      .simulate(user.id, {
         profile: profile.id,
         symbol: "BTCUSDT",
         period_days: 30,
@@ -346,6 +351,16 @@ function SimulationModal({ profile, onClose }: { profile: ProfileSpec; onClose: 
                 </div>
                 {sim.commentary && (
                   <p className="text-[11px] text-muted-foreground">{sim.commentary}</p>
+                )}
+                {sim.persistence.status === "failed" && (
+                  <div className="rounded-md border border-[#EF9F2755] bg-[#EF9F2714] px-3 py-2 text-[11px] text-[#F2C46B]">
+                    Simulação calculada, mas <b>não persistida no histórico</b>. O resultado não será tratado como execução nem como histórico persistido.
+                  </div>
+                )}
+{sim.persistence.status === "failed" && (
+                  <div className="rounded-md border border-[#EF9F2755] bg-[#EF9F2714] px-3 py-2 text-[11px] text-[#F2C46B]">
+                    Simulação calculada, mas <b>não persistida no histórico</b>. O resultado não será tratado como execução nem como histórico persistido.
+                  </div>
                 )}
                 <DnaCorrectionsPanel sim={sim} profileId={profile.id} color={profile.color} />
                 <p className="text-[10.5px] text-muted-foreground/80">

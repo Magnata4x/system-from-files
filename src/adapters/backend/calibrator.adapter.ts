@@ -106,6 +106,7 @@ export interface BackendSimulationResponse {
   equity_curve: BackendSimulationPoint[];
   dna_feedback?: BackendCalibratorPayload["dna_feedback"];
   commentary?: string;
+  persistence?: { status: "persisted" | "failed"; run_id?: string; reason?: string };
 }
 
 export interface PairStatUI {
@@ -141,6 +142,7 @@ export interface SimulationResultUI {
   byPair?: PairStatUI[];
   risk?: RiskSummaryUI;
   raw?: BackendSimulationResponse;
+  persistence: { status: "persisted" | "failed"; runId?: string; reason?: string };
 }
 
 export function mapSimulationResult(
@@ -165,6 +167,9 @@ export function mapSimulationResult(
     byPair: r.by_pair,
     risk: r.risk,
     raw: r,
+    persistence: r.persistence?.status === "persisted"
+      ? { status: "persisted", runId: r.persistence.run_id }
+      : { status: "failed", reason: r.persistence?.reason ?? "A simulação não foi persistida." },
   };
 }
 
@@ -207,7 +212,7 @@ export const calibratorAdapter = {
         initialBalance: req.initial_balance ?? 10000,
         leverage: req.leverage ?? 1,
       });
-      return mapSimulationResult(result);
+      return mapSimulationResult({ ...result, persistence: { status: "failed", reason: "Backtest local: backend indisponível; resultado não foi persistido." } });
     }
   },
   /**
@@ -247,6 +252,6 @@ export const calibratorAdapter = {
       initialBalance: req.initial_balance ?? 10000,
       leverage: req.leverage ?? 1,
     });
-    return mapSimulationResult(result);
+    return mapSimulationResult({ ...result, persistence: { status: "failed", reason: "Backtest local: resultado não foi persistido." } });
   },
 };
