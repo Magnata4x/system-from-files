@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
-import { getExchangeStatus, getVerifiedBinanceAccount } from './exchange.server'
+import { getExchangeStatus, getVerifiedBinanceAccount, submitVerifiedBinanceMarketOrder } from './exchange.server'
 import { validateRealOrderRisk, type RealOrderSide } from './order-risk'
 
 type Client = SupabaseClient<Database>
@@ -12,6 +12,39 @@ export interface ExecuteRealOrderInput {
   side: RealOrderSide
   quoteOrderQty: number
   confirmed: boolean
+}
+
+export async function executeAuthorizedSixDollarBtcOrder(
+  supabase: Client,
+  userId: string,
+  input: { side: RealOrderSide; confirmed: boolean },
+) {
+  if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem REAL é obrigatória.', 409)
+
+  const intent = await validateRealMarketOrder(supabase, userId, {
+    symbol: 'BTCUSDT',
+    side: input.side,
+    quoteOrderQty: 6,
+    confirmed: true,
+  })
+
+  const result = await submitVerifiedBinanceMarketOrder(supabase, userId, {
+    symbol: 'BTCUSDT',
+    side: input.side,
+    quoteOrderQty: 6,
+  })
+
+  return {
+    submitted: true,
+    symbol: intent.symbol,
+    side: intent.side,
+    quoteOrderQty: 6,
+    orderId: typeof result['orderId'] === 'number' ? result['orderId'] : null,
+    status: typeof result['status'] === 'string' ? result['status'] : null,
+    executedQty: typeof result['executedQty'] === 'string' ? Number(result['executedQty']) : null,
+    cummulativeQuoteQty:
+      typeof result['cummulativeQuoteQty'] === 'string' ? Number(result['cummulativeQuoteQty']) : null,
+  }
 }
 
 export async function validateRealMarketOrder(
