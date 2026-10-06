@@ -39,6 +39,25 @@ export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
   return exchangeVerified && persistedMode === "REAL" ? "REAL" : "DEMO";
 }
 
+// ─── DATA SOURCE CONTRACT ────────────────────────────────────────────────────
+// O store continua suportando DEMO sintético, mas essa fonte nunca pode
+// atravessar a fronteira operacional. Em REAL, o backend/orquestrador e o
+// ledger verificado são a única fonte operacional.
+export type Bot4xDataSource = "DEMO_SYNTHETIC" | "BACKEND_OPERATIONAL";
+
+export function getBot4xDataSource(mode: ExecMode): Bot4xDataSource {
+  return mode === "REAL" ? "BACKEND_OPERATIONAL" : "DEMO_SYNTHETIC";
+}
+
+export function getRealModeStateReset(): Pick<State, "orders" | "ticks" | "ticksProcessed" | "history"> {
+  return {
+    orders: [],
+    ticks: [],
+    ticksProcessed: 0,
+    history: [],
+  };
+}
+
 // ─── RISK MODEL CONSTANTS ─────────────────────────────────────────────────────
 export const MAX_SLOTS = 10;
 export const RISK_PER_SLOT = 0.1;
@@ -274,7 +293,9 @@ export const useBot4xStore = create<State>()(
               const executionMode: ExecMode =
                 cfg.executionMode === "REAL" && verified ? "REAL" : "DEMO";
 
+              const sourceReset = executionMode === "REAL" ? getRealModeStateReset() : {};
               set({
+                ...sourceReset,
                 mode: executionMode,
                 profile: cfg.profile as CalibProfileType,
                 leverage: cfg.leverage,
@@ -433,7 +454,10 @@ export const useBot4xStore = create<State>()(
 
         // ── REAL MODE ────────────────────────────────────────────────────────
         if (get().realInited) return;
-        set({ status: "LOADING", realInited: true });
+        // Barreira de fonte: nenhum estado sintético persistido pode entrar no
+        // ciclo operacional. A partir daqui, history/orders/ticks vêm somente
+        // do backend operacional/ledger; o DEMO continua isolado acima.
+        set({ ...getRealModeStateReset(), status: "LOADING", realInited: true });
 
         try {
           const {
@@ -574,7 +598,8 @@ export const useBot4xStore = create<State>()(
         if (mode === "REAL" && !isRealModeUnlocked()) return;
         if (get().mode === mode) return;
         get().cleanup();
-        set({ mode, realInited: false, status: "IDLE", errorMsg: null });
+        const sourceReset = mode === "REAL" ? getRealModeStateReset() : {};
+        set({ ...sourceReset, mode, realInited: false, status: "IDLE", errorMsg: null });
         const uid = get().userId;
         if (uid) {
           void saveConfig(uid, { executionMode: mode }).catch((error) =>
