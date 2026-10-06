@@ -3,7 +3,7 @@
 //
 // Mocks necessários: adapters/db helpers e ws-client são importados no
 // top-level do store e disparam efeitos de rede/persistência.
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { verifiedHistoryToTrade, describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/integrations/supabase/client", () => {
   const listeners = new Set<(event: string, session: unknown) => void>();
@@ -80,6 +80,25 @@ describe("bot4x-store — fonte única de verdade", () => {
       ticksProcessed: 0,
       history: [],
     });
+  });
+});
+
+describe("Fase 29 — histórico verificado", () => {
+  it("converte PnL realizado do ledger sem inventar PnL para execução aberta", async () => {
+    const base = {
+      id: "intent-1", pair: "BTC/USDT", side: "SELL" as const, status: "completed" as const,
+      entryPrice: 100, executedQty: 0.1, profile: "conservador", leverage: 5,
+      createdAt: "2026-10-06T12:00:00.000Z", lifecycle: "closed_verified",
+      clientOrderId: "intent-1", orderId: 123,
+    };
+    const closed = verifiedHistoryToTrade({ ...base, realizedPnl: 2 }, 10);
+    const open = verifiedHistoryToTrade({ ...base, realizedPnl: null }, 10);
+    expect(closed.result).toBe("WIN");
+    expect(closed.pnl).toBe(2);
+    expect(closed.accumulated).toBe(12);
+    expect(open.result).toBe("OPEN");
+    expect(open.pnl).toBe(0);
+    expect(open.accumulated).toBe(10);
   });
 });
 
