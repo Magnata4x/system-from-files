@@ -7,18 +7,23 @@ import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from
 
 type Client = SupabaseClient<Database>
 
-export interface ExecuteRealOrderInput {
+export interface RealOrderValidationInput {
   symbol: string
   side: RealOrderSide
   quoteOrderQty: number
   confirmed: boolean
-  idempotencyKey?: string
+}
+
+interface RealOrderExecutionInput {
+  side: RealOrderSide
+  confirmed: boolean
+  idempotencyKey: string
 }
 
 export async function executeAuthorizedSixDollarBtcDemoOrder(
   supabase: Client,
   userId: string,
-  input: { side: RealOrderSide; confirmed: boolean; idempotencyKey: string },
+  input: RealOrderExecutionInput,
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
@@ -286,7 +291,7 @@ export async function executeAuthorizedSixDollarBtcOrder(
 export async function validateRealMarketOrder(
   supabase: Client,
   userId: string,
-  input: ExecuteRealOrderInput,
+  input: RealOrderValidationInput,
 ) {
   const config = await getOrCreateConfig(supabase, userId)
   const exchange = await getExchangeStatus(supabase, userId)
