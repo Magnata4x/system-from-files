@@ -376,6 +376,22 @@ export async function exportExecutionsCsv(
 }
 
 /** Telemetria do bot: estado atual + agregados do dia, para polling da UI. */
+export interface VerifiedExecutionTelemetryRow { status: string; side: string; realizedPnl: number | null }
+
+export function summarizeVerifiedExecutionTelemetry(rows: VerifiedExecutionTelemetryRow[]) {
+  const realized = rows.filter((row) => row.status === 'completed' && row.side === 'SELL' && row.realizedPnl !== null && Number.isFinite(row.realizedPnl))
+  const pnl = realized.reduce((sum, row) => sum + Number(row.realizedPnl), 0)
+  return {
+    wins: realized.filter((row) => Number(row.realizedPnl) > 0).length,
+    losses: realized.filter((row) => Number(row.realizedPnl) < 0).length,
+    pnl: Number(pnl.toFixed(2)),
+    completed: rows.filter((row) => row.status === 'completed').length,
+    submitted: rows.filter((row) => row.status === 'submitted').length,
+    pending: rows.filter((row) => row.status === 'pending').length,
+    failed: rows.filter((row) => row.status === 'failed').length,
+  }
+}
+
 export async function getTelemetry(supabase: Client, userId: string) {
   const config = await getOrCreateConfig(supabase, userId)
 
@@ -704,20 +720,16 @@ export async function getTelemetry(supabase: Client, userId: string) {
     }
   }
 
-  const verifiedRealizedRows = executionRows
-    .filter((r) => r.status === 'completed' && r.side === 'SELL')
-    .map((r) => Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl))
-    .filter((value) => Number.isFinite(value))
-    .map((value) => ({ pnl: value }))
-
-  const wins = verifiedRealizedRows.filter((r) => r.pnl > 0).length
-  const losses = verifiedRealizedRows.filter((r) => r.pnl < 0).length
-  const pnl = verifiedRealizedRows.reduce((acc, r) => acc + r.pnl, 0)
-
-  const completed = executionRows.filter((r) => r.status === 'completed').length
-  const submitted = executionRows.filter((r) => r.status === 'submitted').length
-  const pending = executionRows.filter((r) => r.status === 'pending').length
-  const failed = executionRows.filter((r) => r.status === 'failed').length
+  const verifiedTelemetry = summarizeVerifiedExecutionTelemetry(
+    executionRows.map((r) => ({
+      status: r.status,
+      side: r.side,
+      realizedPnl: typeof ((r.readings ?? {}) as Record<string, unknown>).realizedPnl === 'number'
+        ? Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl)
+        : null,
+    })),
+  )
+  const { wins, losses, pnl, completed, submitted, pending, failed } = verifiedTelemetry
   const open = submitted + pending
 
   return {
