@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { summarizeVerifiedExecutionTelemetry } from './bot4x.server'
+import { summarizeVerifiedExecutionTelemetry } from './execution-telemetry.server'
 
 describe('Fase 48 — telemetria do ledger verificado', () => {
   it('ignora PnL ausente e usa somente PnL realizado de SELL concluído', () => {
