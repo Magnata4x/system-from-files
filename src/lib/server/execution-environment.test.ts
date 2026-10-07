@@ -4,6 +4,7 @@ import {
   createExecutionContext,
   assertExecutionContext,
   isRealExecutionAuthorized,
+  assertRealExecutionAuthorized,
 } from './execution-environment'
 
 describe('Fase 45 — ambiente DEMO/REAL', () => {
@@ -22,5 +23,18 @@ describe('Fase 45 — ambiente DEMO/REAL', () => {
     expect(() => assertExecutionContext({ mode: 'DEMO', environment: 'PRODUCTION' })).toThrow(
       'Ambiente de execução incompatível com o modo DEMO',
     )
+  })
+})
+
+
+describe('Fase 54 — gate REAL', () => {
+  it('mantém REAL bloqueado mesmo com contexto PRODUCTION', () => {
+    expect(() => assertRealExecutionAuthorized(createExecutionContext('REAL'))).toThrow(
+      'Execução REAL não autorizada pelo gate operacional.',
+    )
+  })
+
+  it('não permite DEMO alcançar o gate PRODUCTION', () => {
+    expect(() => assertRealExecutionAuthorized(createExecutionContext('DEMO'))).toThrow()
   })
 })
