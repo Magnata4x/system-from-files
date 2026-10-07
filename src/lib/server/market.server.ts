@@ -58,16 +58,33 @@ export async function getTickers(pairs: readonly string[] = TARGET_PAIRS): Promi
     const raw = await binanceFetch<Array<Record<string, string>>>(
       `/api/v3/ticker/24hr?symbols=${query}`,
     )
-    return raw.map((t) => ({
-      pair: toPair(t['symbol'] ?? ''),
-      symbol: t['symbol'] ?? '',
-      price: Number(t['lastPrice'] ?? 0),
-      changePct: Number(t['priceChangePercent'] ?? 0),
-      volume: Number(t['volume'] ?? 0),
-      quoteVolume: Number(t['quoteVolume'] ?? 0),
-      high: Number(t['highPrice'] ?? 0),
-      low: Number(t['lowPrice'] ?? 0),
-    }))
+    if (!Array.isArray(raw) || raw.length !== symbols.length) {
+      throw new Error('Binance retornou dados de mercado incompletos em /api/v3/ticker/24hr')
+    }
+
+    return raw.map((t, index) => {
+      const symbol = t['symbol']
+      const price = Number(t['lastPrice'])
+      const changePct = Number(t['priceChangePercent'])
+      const volume = Number(t['volume'])
+      const quoteVolume = Number(t['quoteVolume'])
+      const high = Number(t['highPrice'])
+      const low = Number(t['lowPrice'])
+
+      if (
+        symbol !== symbols[index] ||
+        !Number.isFinite(price) || price <= 0 ||
+        !Number.isFinite(changePct) ||
+        !Number.isFinite(volume) || volume < 0 ||
+        !Number.isFinite(quoteVolume) || quoteVolume < 0 ||
+        !Number.isFinite(high) || high <= 0 ||
+        !Number.isFinite(low) || low <= 0
+      ) {
+        throw new Error('Binance retornou ticker inválido para ' + (symbols[index] ?? 'símbolo desconhecido'))
+      }
+
+      return { pair: toPair(symbol), symbol, price, changePct, volume, quoteVolume, high, low }
+    })
   })
 }
 
@@ -82,14 +99,33 @@ export async function getKlines(pair: string, interval = '4h', limit = 200): Pro
     const raw = await binanceFetch<Array<Array<string | number>>>(
       `/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
     )
-    return raw.map((k) => ({
-      openTime: Number(k[0]),
-      open: Number(k[1]),
-      high: Number(k[2]),
-      low: Number(k[3]),
-      close: Number(k[4]),
-      volume: Number(k[5]),
-    }))
+    if (!Array.isArray(raw) || raw.length === 0) {
+      throw new Error('Binance retornou histórico de candles vazio para ' + symbol)
+    }
+
+    return raw.map((k, index) => {
+      const openTime = Number(k[0])
+      const open = Number(k[1])
+      const high = Number(k[2])
+      const low = Number(k[3])
+      const close = Number(k[4])
+      const volume = Number(k[5])
+
+      if (
+        !Number.isFinite(openTime) || openTime <= 0 ||
+        !Number.isFinite(open) || open <= 0 ||
+        !Number.isFinite(high) || high <= 0 ||
+        !Number.isFinite(low) || low <= 0 ||
+        !Number.isFinite(close) || close <= 0 ||
+        !Number.isFinite(volume) || volume < 0 ||
+        high < Math.max(open, close) ||
+        low > Math.min(open, close)
+      ) {
+        throw new Error('Binance retornou candle inválido para ' + symbol + ' na posição ' + index)
+      }
+
+      return { openTime, open, high, low, close, volume }
+    })
   })
 }
 
@@ -144,7 +180,8 @@ export interface MarketRegime {
 export async function getMarketRegime(pair: string): Promise<MarketRegime> {
   const candles = await getKlines(pair, '4h', 200)
   const closes = candles.map((c) => c.close)
-  const price = closes.at(-1) ?? 0
+  const price = closes.at(-1)
+  if (price == null || price <= 0) throw new Error('Dados de mercado indisponíveis para ' + pair)
   const fast = ema(closes.slice(-40), 20)
   const slow = ema(closes.slice(-100), 50)
   const r = rsi(closes)
