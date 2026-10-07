@@ -62,7 +62,7 @@ export async function handleApi(
 ): Promise<Response> {
   try {
     const user = await requireApiUser(request)
-    const action = new URL(request.url).pathname.replace(/^\\/api\\//, "") || "api"
+    const action = new URL(request.url).pathname.replace(/^\/api\//, "") || "api"
     const { data: allowed, error: rateLimitError } = await user.supabase.rpc("check_rate_limit", {
       p_user_id: user.userId,
       p_action: action,
