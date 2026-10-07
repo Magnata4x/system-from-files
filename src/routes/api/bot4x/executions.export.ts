@@ -10,6 +10,7 @@ export const Route = createFileRoute('/api/bot4x/executions/export')({
           const user = await requireApiUser(request)
           const p = new URL(request.url).searchParams
           const csv = await exportExecutionsCsv(user.supabase, user.userId, {
+            source: p.get('source') === 'legacy' ? 'legacy' : 'verified',
             result: p.get('result') ?? undefined,
             pair: p.get('pair') ?? undefined,
             side: p.get('side') ?? undefined,
