@@ -24,7 +24,8 @@ export async function reconcileUserExecutionIntents(supabase: SupabaseClient<Dat
   const { data, error } = await supabase.from('bot4x_execution_intents').select('id,user_id,mode,pair,side,status,readings').eq('user_id', userId).in('status', ['pending', 'submitted']).order('created_at', { ascending: true }).limit(50)
   if (error) throw new Error('Falha ao carregar intenções para reconciliação: ' + error.message)
   const results: ReconciliationResult[] = []
-  for (const intent of (data ?? []) as ExecutionIntentRow[]) {
+  const intents: ExecutionIntentRow[] = (data ?? []).map((row) => ({ id: row.id, user_id: row.user_id, mode: row.mode, pair: row.pair, side: row.side, status: row.status, readings: row.readings }))
+  for (const intent of intents) {
     if (intent.mode !== 'DEMO' || intent.pair !== 'BTCUSDT') {
       results.push({ intentId: intent.id, status: 'pending', reconciled: false, exchangeStatus: null, orderId: null })
       continue
