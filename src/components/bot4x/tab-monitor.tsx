@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Clock3, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, RefreshCw, XCircle } from "lucide-react";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xAdapter, type BackendBot4xCycle } from "@/adapters/backend/bot4x.adapter";
 
