@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/integrations/supabase/types'
 import { getVerifiedBinanceOrderByClientOrderId } from './exchange.server'
 
 interface ExecutionIntentRow { id: string; user_id: string; mode: string; pair: string; side: string; status: string; readings: unknown }
