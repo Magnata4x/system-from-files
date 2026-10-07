@@ -391,13 +391,6 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   const timezone = profile?.timezone || 'UTC'
   const now = new Date()
-  const localDay = new Intl.DateTimeFormat('en-CA', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now)
-  const recentStart = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
 
   // Operationally active intents must be reconciled regardless of age. A
   // transport outage or a long-lived Binance order must never become invisible
