@@ -13,10 +13,11 @@ export const Route = createFileRoute('/api/bot4x/executions')({
           const url = new URL(request.url)
           const p = url.searchParams
           if (p.get('source') === 'verified') return listVerifiedHistory(user.supabase, user.userId, p.get('limit') ? Number(p.get('limit')) : undefined)
-          // Sem parâmetros de paginação mantemos o formato legado (array).
+          // Histórico operacional padrão: somente ledger verificado.
           if (!p.has('limit') && !p.has('offset') && !p.has('result') && !p.has('pair') && !p.has('side') && !p.has('profile') && !p.has('from') && !p.has('to')) {
-            return listExecutions(user.supabase, user.userId)
+            return listVerifiedHistory(user.supabase, user.userId)
           }
+          if (p.get('source') === 'legacy') return listExecutions(user.supabase, user.userId, p.get('limit') ? Number(p.get('limit')) : undefined)
           return listVerifiedExecutionsPaged(user.supabase, user.userId, {
             limit: p.get('limit') ? Number(p.get('limit')) : undefined,
             offset: p.get('offset') ? Number(p.get('offset')) : undefined,
