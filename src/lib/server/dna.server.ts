@@ -1,4 +1,4 @@
-// Cálculo do DNA do trader a partir do histórico real de trades (bot4x_trades).
+// Cálculo do DNA financeiro exclusivamente a partir do ledger de execuções verificadas.
 import type { ApiUser } from './api-auth.server'
 
 export interface DnaStatsResponse {
@@ -24,9 +24,32 @@ type TradeRow = {
   pair: string
   result: string
   pnl: number
-  pnl_pct: number
+  pnl_pct: number | null
   hour: number | null
   created_at: string
+}
+
+export function verifiedTradeRows(data: Array<{ created_at: string; pair: string; status: string; readings: unknown }>): TradeRow[] {
+  return data.flatMap((r) => {
+    if (r.status !== 'completed') return []
+    const readings = (r.readings ?? {}) as Record<string, unknown>
+    const pnl = typeof readings.realizedPnl === 'number' && Number.isFinite(readings.realizedPnl)
+      ? readings.realizedPnl
+      : null
+    if (pnl === null) return []
+    const created = new Date(r.created_at)
+    if (!Number.isFinite(created.getTime())) return []
+    const result = pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'flat'
+    return [{
+      day: r.created_at.slice(0, 10),
+      pair: r.pair,
+      result,
+      pnl,
+      pnl_pct: typeof readings.realizedPnlPct === 'number' && Number.isFinite(readings.realizedPnlPct) ? readings.realizedPnlPct : null,
+      hour: created.getUTCHours(),
+      created_at: r.created_at,
+    }]
+  })
 }
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)))
@@ -55,23 +78,16 @@ function groupBest(
 export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> {
   const since = new Date(Date.now() - 180 * 86_400_000).toISOString()
   const { data, error } = await user.supabase
-    .from('bot4x_trades')
-    .select('day, pair, result, pnl, pnl_pct, hour, created_at')
+    .from('bot4x_execution_intents')
+    .select('created_at, pair, status, readings')
     .eq('user_id', user.userId)
+    .eq('status', 'completed')
     .gte('created_at', since)
     .order('created_at', { ascending: true })
     .limit(5000)
   if (error) throw new Error(error.message)
 
-  const rows: TradeRow[] = (data ?? []).map((r) => ({
-    day: String(r.day),
-    pair: String(r.pair),
-    result: String(r.result ?? ''),
-    pnl: Number(r.pnl ?? 0),
-    pnl_pct: Number(r.pnl_pct ?? 0),
-    hour: r.hour === null || r.hour === undefined ? null : Number(r.hour),
-    created_at: String(r.created_at),
-  }))
+  const rows = verifiedTradeRows((data ?? []) as Array<{ created_at: string; pair: string; status: string; readings: unknown }>)
 
   const total = rows.length
   if (total === 0) {
@@ -97,7 +113,8 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   const wins = rows.filter(isWin).length
   const winRate = (wins / total) * 100
   const totalPnl = rows.reduce((s, t) => s + t.pnl, 0)
-  const avgPnlPct = rows.reduce((s, t) => s + t.pnl_pct, 0) / total
+  const pnlPctRows = rows.filter((t) => t.pnl_pct !== null)
+  const avgPnlPct = pnlPctRows.length > 0 ? pnlPctRows.reduce((s, t) => s + Number(t.pnl_pct), 0) / pnlPctRows.length : null
 
   // Drawdown sobre a curva acumulada de PnL
   let acc = 0
@@ -265,7 +282,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
     hasData: true,
     totalTrades: total,
     winRate: Number(winRate.toFixed(2)),
-    avgPnlPct: Number(avgPnlPct.toFixed(2)),
+    avgPnlPct: avgPnlPct === null ? 0 : Number(avgPnlPct.toFixed(2)),
     bestPair: pairs.best,
     worstPair: pairs.worst,
     bestHour: hours.best === null ? null : Number(hours.best),
