@@ -391,26 +391,6 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   const timezone = profile?.timezone || 'UTC'
   const now = new Date()
-  const localDay = new Intl.DateTimeFormat('en-CA', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now)
-  const recentStart = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString()
-
-  const { data, error } = await supabase
-    .from('bot4x_trades')
-    .select('result, pnl, pair, side, created_at, motivo')
-    .eq('user_id', userId)
-    .gte('created_at', recentStart)
-    .order('created_at', { ascending: false })
-    .limit(500)
-  if (error) throw new ApiError(error.message, 500)
-
-  const rows = (data ?? []).filter((r) =>
-    new Intl.DateTimeFormat('en-CA', { timeZone: timezone }).format(new Date(r.created_at)) === localDay
-  )
 
   // Operationally active intents must be reconciled regardless of age. A
   // transport outage or a long-lived Binance order must never become invisible
@@ -738,7 +718,6 @@ export async function getTelemetry(supabase: Client, userId: string) {
       submitted,
       pending,
       failed,
-      legacyTradeRows: rows.length,
     },
     logs: [
       ...executionRows.slice(0, 20).map((r) => ({
@@ -748,13 +727,6 @@ export async function getTelemetry(supabase: Client, userId: string) {
         detail: ((r.readings ?? {}) as Record<string, unknown>).orderId
           ? 'orderId=' + String(((r.readings ?? {}) as Record<string, unknown>).orderId)
           : 'Execução registrada no ledger',
-      })),
-      ...rows.slice(0, 20).map((r) => ({
-        at: r.created_at,
-        level: r.result === 'LOSS' ? 'warn' : 'info',
-        message: r.pair + ' ' + r.side + ' · ' + r.result + ' · ' +
-          (Number(r.pnl ?? 0) >= 0 ? '+' : '') + Number(r.pnl ?? 0).toFixed(2),
-        detail: r.motivo ?? '',
       })),
     ].slice(0, 20),
   }
