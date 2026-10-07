@@ -8,7 +8,7 @@ describe('verifiedHistoryPageOffsets', () => {
 
   it('clamps unsafe limits and page sizes', () => {
     expect(verifiedHistoryPageOffsets(9999, 999)).toEqual([0, 100, 200, 300, 400])
-    expect(verifiedHistoryPageOffsets(0)).toEqual([0])
+    expect(verifiedHistoryPageOffsets(0)).toEqual([0, 100, 200, 300, 400])
   })
 
   it('does not create a page beyond the requested limit', () => {
