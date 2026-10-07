@@ -2,6 +2,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
+import { getSupabaseAdmin } from './supabase-admin.server'
 
 type Client = SupabaseClient<Database>
 
@@ -80,7 +81,7 @@ const EMPTY: ExchangeStatus = {
 }
 
 export async function getExchangeStatus(supabase: Client, userId: string): Promise<ExchangeStatus> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
     .select('exchange, key_preview, verified, verified_at, last_error')
     .eq('user_id', userId)
@@ -166,7 +167,7 @@ async function verify(apiKey: string, apiSecret: string) {
 
 /** Lê o saldo Spot em USDT sem expor as credenciais ou outros ativos. */
 export async function getUsdtBalance(supabase: Client, userId: string): Promise<UsdtBalance> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
@@ -198,7 +199,7 @@ export interface VerifiedBinanceAccount {
 }
 
 async function getStoredCredentials(supabase: Client, userId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
@@ -308,7 +309,7 @@ export async function saveExchangeCredentials(
     throw new ApiError(message, 400)
   }
 
-  const { error } = await supabase.from('exchange_credentials').upsert(
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').upsert(
     {
       user_id: userId,
       exchange,
@@ -333,7 +334,7 @@ export async function testExchangeCredentials(
   supabase: Client,
   userId: string,
 ): Promise<VerifyResult> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher')
     .eq('user_id', userId)
@@ -362,7 +363,7 @@ export async function testExchangeCredentials(
 }
 
 export async function deleteExchangeCredentials(supabase: Client, userId: string) {
-  const { error } = await supabase.from('exchange_credentials').delete().eq('user_id', userId)
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId)
   if (error) throw new ApiError(error.message, 500)
   await supabase.from('bot4x_configs').update({ api_key_set: false }).eq('user_id', userId)
   return EMPTY
