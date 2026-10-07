@@ -158,17 +158,29 @@ export async function listExecutions(supabase: Client, userId: string, limit = 5
  * Não consulta bot4x_trades, que permanece legado/compatibilidade.
  * Registros sem metadados históricos essenciais são omitidos em vez de inventados.
  */
+export function verifiedHistoryPageOffsets(limit = 500, pageSize = 100) {
+  const safeLimit = Math.min(Math.max(Number(limit) || 500, 1), 500);
+  const safePageSize = Math.min(Math.max(Number(pageSize) || 100, 1), 100);
+  const offsets: number[] = [];
+  for (let offset = 0; offset < safeLimit; offset += safePageSize) offsets.push(offset);
+  return offsets;
+}
+
 export async function listVerifiedHistory(supabase: Client, userId: string, limit = 500) {
   // O histórico simples e o histórico paginado compartilham exatamente o mesmo
-  // ledger e o mesmo contrato de status. Nenhum registro pendente/falho é
-  // descartado apenas por faltar um campo opcional de apresentação.
-  const safeLimit = Math.min(Math.max(Number(limit) || 500, 1), 500);
-  const result = await listVerifiedExecutionsPaged(supabase, userId, {
-    limit: safeLimit,
-    offset: 0,
-  });
+  // ledger e o mesmo contrato de status. A consulta é paginada para que o
+  // limite público de 500 não seja truncado pelo limite interno de 100 por página.
+  const items: Awaited<ReturnType<typeof listVerifiedExecutionsPaged>>['items'] = [];
+  for (const offset of verifiedHistoryPageOffsets(limit)) {
+    const result = await listVerifiedExecutionsPaged(supabase, userId, {
+      limit: Math.min(100, Math.max(1, Number(limit) - offset)),
+      offset,
+    });
+    items.push(...result.items);
+    if (result.items.length < Math.min(100, Math.max(1, Number(limit) - offset))) break;
+  }
 
-  return result.items.map((item) => ({
+  return items.map((item) => ({
     ...item,
     clientOrderId: null,
     orderId: null,
