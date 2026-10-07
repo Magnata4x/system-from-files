@@ -12,11 +12,11 @@ export type Bot4xCycleDecision =
   | "BLOCKED"
   | "INACTIVE";
 
-function demoAutoExecutionEnabled(): boolean {
+export function demoAutoExecutionEnabled(): boolean {
   return process.env["BOT4X_DEMO_AUTO_EXECUTION"]?.trim().toLowerCase() === "true";
 }
 
-function demoIdempotencyKey(signal: BackendSignal): string {
+export function demoIdempotencyKey(signal: BackendSignal): string {
   const raw = [
     "demo", signal.pair, signal.side, signal.entryPrice, signal.stopLoss,
     signal.takeProfit1, signal.takeProfit2, signal.score, signal.aiScore,
