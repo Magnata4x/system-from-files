@@ -230,7 +230,7 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
     candidates,
     blocked,
     ignored,
-    executionSubmitted: false,
+    executionSubmitted: result.decisions.some((d) => d.executionSubmitted),
   });
 
   return result;
