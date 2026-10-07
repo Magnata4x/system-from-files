@@ -113,7 +113,8 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   const wins = rows.filter(isWin).length
   const winRate = (wins / total) * 100
   const totalPnl = rows.reduce((s, t) => s + t.pnl, 0)
-  const pnlPctRows = rows.filter((t) => t.pnl_pct !== null)\n  const avgPnlPct = pnlPctRows.length > 0 ? pnlPctRows.reduce((s, t) => s + Number(t.pnl_pct), 0) / pnlPctRows.length : null
+  const pnlPctRows = rows.filter((t) => t.pnl_pct !== null)
+  const avgPnlPct = pnlPctRows.length > 0 ? pnlPctRows.reduce((s, t) => s + Number(t.pnl_pct), 0) / pnlPctRows.length : null
 
   // Drawdown sobre a curva acumulada de PnL
   let acc = 0
