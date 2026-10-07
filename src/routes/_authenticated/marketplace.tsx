@@ -40,8 +40,8 @@ function MarketplacePage() {
   const { data: products, isPending, isError, refetch } = useMarketplaceProducts();
   const { data: history } = useMarketplaceHistory();
   const trackView = useTrackMarketplaceView();
-  const catalog: MarketplaceProduct[] = products && products.length > 0 ? products : PRODUCTS;
-  const live = !!products && products.length > 0;
+  const catalog: MarketplaceProduct[] = products ?? [];
+  const live = products !== undefined;
 
   const filtered = useMemo(() => {
     let list = catalog;
