@@ -1,3 +1,4 @@
+import { summarizeVerifiedExecutionTelemetry } from './execution-telemetry.server'
 // Config e execuções do Bot4x sobre o banco interno.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '@/integrations/supabase/types'
@@ -704,30 +705,28 @@ export async function getTelemetry(supabase: Client, userId: string) {
     }
   }
 
-  const verifiedRealizedRows = executionRows
-    .filter((r) => r.status === 'completed' && r.side === 'SELL')
-    .map((r) => Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl))
-    .filter((value) => Number.isFinite(value))
-    .map((value) => ({ pnl: value }))
-
-  const wins = verifiedRealizedRows.filter((r) => r.pnl > 0).length
-  const losses = verifiedRealizedRows.filter((r) => r.pnl < 0).length
-  const open = rows.filter((r) => r.result === 'open').length
-  const pnl = verifiedRealizedRows.reduce((acc, r) => acc + r.pnl, 0)
-
-  const submitted = executionRows.filter((r) => r.status === 'submitted' || r.status === 'completed').length
-  const pending = executionRows.filter((r) => r.status === 'pending').length
-  const failed = executionRows.filter((r) => r.status === 'failed').length
+  const verifiedTelemetry = summarizeVerifiedExecutionTelemetry(
+    executionRows.map((r) => ({
+      status: r.status,
+      side: r.side,
+      realizedPnl: typeof ((r.readings ?? {}) as Record<string, unknown>).realizedPnl === 'number'
+        ? Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl)
+        : null,
+    })),
+  )
+  const { wins, losses, pnl, completed: completedCount, submitted, pending, failed } = verifiedTelemetry
+  const open = submitted + pending
 
   return {
     serverTime: new Date().toISOString(),
     active: config.active,
     profile: config.profile,
     circuitBreaker: config.circuitBreaker,
-    dailyPnl: config.dailyPnl,
+    dailyPnl: Number(pnl.toFixed(2)),
+    dailyPnlSource: 'verified_binance_execution_ledger',
     openSlots: config.openSlots,
     today: {
-      trades: rows.length,
+      trades: completedCount,
       wins,
       losses,
       open,
@@ -735,9 +734,11 @@ export async function getTelemetry(supabase: Client, userId: string) {
       pnlSource: 'verified_binance_execution_ledger',
       timezone,
       executions: executionRows.length,
+      completed,
       submitted,
       pending,
       failed,
+      legacyTradeRows: rows.length,
     },
     logs: [
       ...executionRows.slice(0, 20).map((r) => ({
