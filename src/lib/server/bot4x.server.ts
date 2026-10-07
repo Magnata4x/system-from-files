@@ -712,22 +712,24 @@ export async function getTelemetry(supabase: Client, userId: string) {
 
   const wins = verifiedRealizedRows.filter((r) => r.pnl > 0).length
   const losses = verifiedRealizedRows.filter((r) => r.pnl < 0).length
-  const open = rows.filter((r) => r.result === 'open').length
   const pnl = verifiedRealizedRows.reduce((acc, r) => acc + r.pnl, 0)
 
-  const submitted = executionRows.filter((r) => r.status === 'submitted' || r.status === 'completed').length
+  const completed = executionRows.filter((r) => r.status === 'completed').length
+  const submitted = executionRows.filter((r) => r.status === 'submitted').length
   const pending = executionRows.filter((r) => r.status === 'pending').length
   const failed = executionRows.filter((r) => r.status === 'failed').length
+  const open = submitted + pending
 
   return {
     serverTime: new Date().toISOString(),
     active: config.active,
     profile: config.profile,
     circuitBreaker: config.circuitBreaker,
-    dailyPnl: config.dailyPnl,
+    dailyPnl: Number(pnl.toFixed(2)),
+    dailyPnlSource: 'verified_binance_execution_ledger',
     openSlots: config.openSlots,
     today: {
-      trades: rows.length,
+      trades: completed,
       wins,
       losses,
       open,
@@ -735,9 +737,11 @@ export async function getTelemetry(supabase: Client, userId: string) {
       pnlSource: 'verified_binance_execution_ledger',
       timezone,
       executions: executionRows.length,
+      completed,
       submitted,
       pending,
       failed,
+      legacyTradeRows: rows.length,
     },
     logs: [
       ...executionRows.slice(0, 20).map((r) => ({
