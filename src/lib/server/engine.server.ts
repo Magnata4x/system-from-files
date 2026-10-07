@@ -49,6 +49,45 @@ export function assertSignalMarketData(pair: string, candles: Kline[]): void {
   }
 }
 
+export function assertOperationalSignal(signal: BackendSignal): void {
+  const numericFields = [
+    ['score', signal.score],
+    ['aiScore', signal.aiScore],
+    ['entryPrice', signal.entryPrice],
+    ['stopLoss', signal.stopLoss],
+    ['takeProfit1', signal.takeProfit1],
+    ['takeProfit2', signal.takeProfit2],
+    ['rsi', signal.rsi],
+  ] as const
+
+  for (const [name, value] of numericFields) {
+    if (!Number.isFinite(value)) throw new Error(`Sinal inválido: ${name} não é finito`)
+  }
+
+  if (signal.score < 0 || signal.score > 100 || signal.aiScore < 0 || signal.aiScore > 100) {
+    throw new Error('Sinal inválido: score fora do intervalo permitido')
+  }
+  if (signal.rsi < 0 || signal.rsi > 100) throw new Error('Sinal inválido: RSI fora do intervalo permitido')
+  if (signal.entryPrice <= 0 || signal.stopLoss <= 0 || signal.takeProfit1 <= 0 || signal.takeProfit2 <= 0) {
+    throw new Error('Sinal inválido: preço operacional não positivo')
+  }
+
+  const createdAt = Date.parse(signal.createdAt)
+  if (!Number.isFinite(createdAt) || createdAt <= 0) throw new Error('Sinal inválido: timestamp de criação')
+  if (signal.exchange !== 'binance') throw new Error('Sinal inválido: exchange operacional')
+
+  const expectedStop = signal.side === 'BUY'
+    ? signal.stopLoss < signal.entryPrice
+    : signal.stopLoss > signal.entryPrice
+  const expectedTargets = signal.side === 'BUY'
+    ? signal.takeProfit1 > signal.entryPrice && signal.takeProfit2 > signal.takeProfit1
+    : signal.takeProfit1 < signal.entryPrice && signal.takeProfit2 < signal.takeProfit1
+
+  if (!expectedStop || !expectedTargets) {
+    throw new Error('Sinal inválido: níveis operacionais incompatíveis com a direção')
+  }
+}
+
 function stableId(pair: string, bucket: number): string {
   return `${pair.replace('/', '-').toLowerCase()}-${bucket}`
 }
@@ -90,7 +129,7 @@ export async function generateSignals(): Promise<BackendSignal[]> {
             : []),
         ]
 
-        return {
+        const signal: BackendSignal = {
           id: stableId(pair, bucket),
           pair: toPair(pair),
           side,
@@ -110,6 +149,8 @@ export async function generateSignals(): Promise<BackendSignal[]> {
           setup: side === 'BUY' ? 'Tendência de alta' : 'Tendência de baixa',
           confluences,
         }
+        assertOperationalSignal(signal)
+        return signal
       } catch {
         return null
       }
