@@ -56,3 +56,10 @@ export function isProductionExecution(context: ExecutionContext): boolean {
 export function isRealExecutionAuthorized(_context: ExecutionContext): false {
   return false;
 }
+/** Gate único da submissão REAL. Mantido fechado até aprovação operacional explícita. */
+export function assertRealExecutionAuthorized(context: ExecutionContext): void {
+  assertExecutionContext(context)
+  if (context.mode !== 'REAL' || !isProductionExecution(context) || !isRealExecutionAuthorized(context)) {
+    throw new Error('Execução REAL não autorizada pelo gate operacional.')
+  }
+}
