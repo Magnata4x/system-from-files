@@ -1,6 +1,7 @@
 // Autenticação das rotas internas /api/* — valida o Bearer JWT do Supabase.
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
+import { getSupabaseAdmin } from './supabase-admin.server'
 
 export interface ApiUser {
   userId: string
@@ -63,7 +64,7 @@ export async function handleApi(
   try {
     const user = await requireApiUser(request)
     const action = new URL(request.url).pathname.replace(/^\/api\//, "") || "api"
-    const { data: allowed, error: rateLimitError } = await user.supabase.rpc("check_rate_limit", {
+    const { data: allowed, error: rateLimitError } = await getSupabaseAdmin().rpc("check_rate_limit", {
       p_user_id: user.userId,
       p_action: action,
       p_max: API_RATE_LIMIT_PER_MINUTE,
