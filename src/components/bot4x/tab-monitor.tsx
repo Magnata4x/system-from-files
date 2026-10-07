@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Clock3, RefreshCw, ShieldCheck, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, RefreshCw, XCircle } from "lucide-react";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xAdapter, type BackendBot4xCycle } from "@/adapters/backend/bot4x.adapter";
 
@@ -23,18 +23,13 @@ export function TabMonitor() {
   const [loading, setLoading] = useState(false);
 
   const refresh = async () => {
-    if (mode !== "REAL") {
-      setCycle(null);
-      setError(null);
-      return;
-    }
     setLoading(true);
     try {
       const next = await bot4xAdapter.cycle();
       setCycle(next);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Telemetria operacional indisponível");
+      setError(err instanceof Error ? err.message : "Ciclo operacional indisponível");
     } finally {
       setLoading(false);
     }
@@ -42,36 +37,24 @@ export function TabMonitor() {
 
   useEffect(() => {
     void refresh();
-    if (mode !== "REAL") return;
     const id = window.setInterval(() => void refresh(), 15000);
     return () => window.clearInterval(id);
   }, [mode]);
 
-  if (mode !== "REAL") {
-    return (
-      <section className="rounded-lg border border-border bg-card p-6">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="size-5 text-muted-foreground" />
-          <div>
-            <h2 className="text-sm font-semibold">Monitor operacional</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              O monitor operacional não usa ticks, replay, ordens ou métricas sintéticas.
-              Em DEMO, os dados sintéticos permanecem isolados e não são apresentados como operação.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const isDemo = mode === "DEMO";
+  const title = isDemo ? "Monitor operacional · DEMO · TESTNET" : "Monitor operacional · REAL";
+  const description = isDemo
+    ? "Ciclo automático com mercado real e executor exclusivamente Binance Spot Testnet."
+    : "Ciclo operacional REAL em observação; gate Production permanece fechado e nenhuma ordem REAL é enviada.";
 
   return (
     <div className="space-y-4">
       <section className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-sm font-semibold">Monitor operacional · REAL</h2>
+            <h2 className="text-sm font-semibold">{title}</h2>
             <p className="text-[11px] text-muted-foreground mt-1">
-              Fonte: ciclo Bot4x observação-only · nenhuma ordem é enviada por este monitor.
+              {description}
             </p>
           </div>
           <button
@@ -103,7 +86,7 @@ export function TabMonitor() {
               <Metric label="Candidatos" value={String(cycle.candidates)} />
               <Metric label="Bloqueados" value={String(cycle.blocked)} />
               <Metric label="Ignorados" value={String(cycle.ignored)} />
-              <Metric label="Envio" value="false" danger={cycle.decisions.some((d) => d.executionSubmitted)} />
+              <Metric label="Envios" value={String(cycle.decisions.filter((d) => d.executionSubmitted).length)} />
             </div>
 
             <div className="mt-4 flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -112,7 +95,7 @@ export function TabMonitor() {
               <span>·</span>
               Fim: {formatTime(cycle.finishedAt)}
               <span>·</span>
-              execução submetida: <strong className="text-foreground">false</strong>
+              <strong className="text-foreground">{isDemo ? "DEMO · TESTNET" : "REAL · PRODUCTION · GATE FECHADO"}</strong>
             </div>
           </>
         )}
@@ -137,7 +120,7 @@ function DecisionTable({ cycle }: { cycle: BackendBot4xCycle }) {
       <div className="px-4 py-3 border-b border-border">
         <h3 className="text-xs font-semibold uppercase tracking-wider">Decisões do ciclo</h3>
         <p className="text-[10px] text-muted-foreground mt-1">
-          Candidato ≠ ordem executada. O ciclo atual é explicitamente observation-only.
+          Candidato pode resultar em envio DEMO para Binance Testnet. REAL permanece bloqueado pelo gate.
         </p>
       </div>
       {rows.length === 0 ? (
@@ -171,7 +154,7 @@ function DecisionTable({ cycle }: { cycle: BackendBot4xCycle }) {
                   <td className="px-3 py-2 tabular-nums">{row.openSlots}/10</td>
                   <td className="px-3 py-2">{row.circuitBreaker}</td>
                   <td className="px-3 py-2 text-muted-foreground">{row.reason}</td>
-                  <td className="px-3 py-2 font-semibold">false</td>
+                  <td className="px-3 py-2 font-semibold">{row.executionSubmitted ? "enviado" : "não enviado"}</td>
                 </tr>
               ))}
             </tbody>
@@ -193,11 +176,11 @@ function DecisionBadge({ decision }: { decision: keyof typeof DECISION_LABELS })
   );
 }
 
-function Metric({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
+function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border bg-secondary/20 p-2">
       <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mt-1 text-sm font-semibold tabular-nums ${danger ? "text-red-400" : ""}`}>{value}</div>
+      <div className="mt-1 text-sm font-semibold tabular-nums">{value}</div>
     </div>
   );
 }

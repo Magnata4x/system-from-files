@@ -90,7 +90,7 @@ export interface BackendBot4xCycleDecision {
   profile: string;
   circuitBreaker: string;
   openSlots: number;
-  executionSubmitted: false;
+  executionSubmitted: boolean;
 }
 
 export interface BackendBot4xCycle {
