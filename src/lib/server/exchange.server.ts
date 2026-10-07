@@ -2,6 +2,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
+import { getSupabaseAdmin } from './supabase-admin.server'
 
 type Client = SupabaseClient<Database>
 
@@ -308,7 +309,7 @@ export async function saveExchangeCredentials(
     throw new ApiError(message, 400)
   }
 
-  const { error } = await supabase.from('exchange_credentials').upsert(
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').upsert(
     {
       user_id: userId,
       exchange,
@@ -362,7 +363,7 @@ export async function testExchangeCredentials(
 }
 
 export async function deleteExchangeCredentials(supabase: Client, userId: string) {
-  const { error } = await supabase.from('exchange_credentials').delete().eq('user_id', userId)
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId)
   if (error) throw new ApiError(error.message, 500)
   await supabase.from('bot4x_configs').update({ api_key_set: false }).eq('user_id', userId)
   return EMPTY
