@@ -4,6 +4,7 @@ import type { Database, Json } from '@/integrations/supabase/types'
 import { ApiError } from './api-auth.server'
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from './engine.server'
 import { getExchangeStatus, getVerifiedBinanceOrder, getVerifiedBinanceOrderByClientOrderId, getVerifiedBinanceTrades } from './exchange.server'
+import { getSupabaseAdmin } from './supabase-admin.server'
 
 type Client = SupabaseClient<Database>
 type ConfigRow = Database['public']['Tables']['bot4x_configs']['Row']
@@ -65,7 +66,7 @@ async function applyCircuitBreaker(supabase: Client, row: ConfigRow) {
   }
   if (!next) return mapConfig(row)
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseAdmin()
     .from('bot4x_configs')
     .update(next)
     .eq('user_id', row.user_id)
@@ -91,7 +92,6 @@ const PATCHABLE: Record<string, keyof ConfigRow> = {
   exchange: 'exchange',
   preferredPairs: 'preferred_pairs',
   avoidPairs: 'avoid_pairs',
-  circuitBreaker: 'circuit_breaker',
   executionMode: 'execution_mode',
 }
 
