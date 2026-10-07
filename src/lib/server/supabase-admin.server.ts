@@ -15,3 +15,5 @@ export function getSupabaseAdmin(): SupabaseClient<Database> {
   })
   return cached
 }
+
+// Intentionally server-only: never import this module from client code.
