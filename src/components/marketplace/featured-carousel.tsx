@@ -1,9 +1,9 @@
 import { BadgeCheck } from "lucide-react";
-import { CATEGORY_BADGES, CATEGORY_GRADIENTS, PRODUCTS, type Product } from "@/lib/marketplace-data";
+import { CATEGORY_BADGES, CATEGORY_GRADIENTS, type Product } from "@/lib/marketplace-data";
 import { cn } from "@/lib/utils";
 
-export function FeaturedCarousel({ onOpen }: { onOpen: (p: Product) => void }) {
-  const featured = PRODUCTS.filter((p) => p.featured);
+export function FeaturedCarousel({ products, onOpen }: { products: Product[]; onOpen: (p: Product) => void }) {
+  const featured = products.filter((p) => p.featured);
   return (
     <section className="space-y-3">
       <header className="flex items-baseline justify-between">
@@ -12,6 +12,7 @@ export function FeaturedCarousel({ onOpen }: { onOpen: (p: Product) => void }) {
       </header>
       <div className="overflow-x-auto -mx-5 px-5 pb-2 scrollbar-thin">
         <div className="flex gap-4 min-w-min">
+          {featured.length === 0 && <p className="text-xs text-muted-foreground">Nenhum produto destacado disponível.</p>}
           {featured.map((p) => (
             <button
               key={p.id}
