@@ -275,7 +275,16 @@ export async function listVerifiedExecutionsPaged(
     const readings = (row.readings ?? {}) as Record<string, unknown>
     const profile = typeof readings.profile === 'string' ? readings.profile : null
     const realizedPnl = typeof readings.realizedPnl === 'number' && Number.isFinite(readings.realizedPnl) ? readings.realizedPnl : null
-    const result = realizedPnl === null ? 'open' : realizedPnl > 0 ? 'WIN' : realizedPnl < 0 ? 'LOSS' : 'open'
+    const result =
+      row.status === 'failed'
+        ? 'FAILED'
+        : realizedPnl === null
+          ? 'open'
+          : realizedPnl > 0
+            ? 'WIN'
+            : realizedPnl < 0
+              ? 'LOSS'
+              : 'open'
     if (query.result && query.result !== 'all' && result !== query.result) return []
     const entryPrice = typeof readings.averageFillPrice === 'number' && Number.isFinite(readings.averageFillPrice) ? readings.averageFillPrice : null
     return [{
