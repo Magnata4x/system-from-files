@@ -6,11 +6,11 @@ import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FeaturedCarousel } from "@/components/marketplace/featured-carousel";
-import { CreatorTestimonials } from "@/components/marketplace/creator-testimonials";
 import { ProductCard } from "@/components/marketplace/product-card";
 import { ProductDetailModal } from "@/components/marketplace/product-detail-modal";
 import { CreatorBanner } from "@/components/marketplace/creator-banner";
-import { CATEGORIES, PRODUCTS, type CategoryFilter, type Product } from "@/lib/marketplace-data";
+import { CATEGORIES, type CategoryFilter, type Product } from "@/lib/marketplace-data";
+import { MARKET_ASSETS } from "@/lib/market-symbols";
 import { cn } from "@/lib/utils";
 import { useMarketplaceHistory, useMarketplaceProducts, useTrackMarketplaceView, type MarketplaceProduct } from "@/hooks/useMarketplaceProducts";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -88,9 +88,7 @@ function MarketplacePage() {
               <p className="text-sm text-muted-foreground">Descubra estratégias, indicadores e bots criados pela comunidade.</p>
             </header>
 
-            <FeaturedCarousel onOpen={openProduct} />
-
-            <CreatorTestimonials />
+            <FeaturedCarousel products={catalog} onOpen={openProduct} />
 
 
             <section className="space-y-4">
@@ -130,7 +128,7 @@ function MarketplacePage() {
                   <SelectTrigger className="h-9 w-[130px] text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Todos ativos</SelectItem>
-                    {['BTC', 'ETH', 'SOL', 'BNB'].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                    {MARKET_ASSETS.map((item) => <SelectItem key={item.symbol} value={item.symbol}>{item.symbol}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
@@ -145,7 +143,7 @@ function MarketplacePage() {
                   </SelectContent>
                 </Select>
                 <span className="text-xs text-muted-foreground ml-auto">
-                  {filtered.length} produtos · {live ? "catálogo ao vivo" : "catálogo demo"}
+                  {live ? `${filtered.length} produtos · catálogo ao vivo` : "Catálogo indisponível"}
                 </span>
               </div>
 
