@@ -62,7 +62,9 @@ export async function getTickers(pairs: readonly string[] = TARGET_PAIRS): Promi
       throw new Error('Binance retornou dados de mercado incompletos em /api/v3/ticker/24hr')
     }
 
-    return raw.map((t, index) => {
+    const bySymbol = new Map(raw.map((t) => [t['symbol'], t]))
+    return symbols.map((expected, index) => {
+      const t = bySymbol.get(expected) ?? {}
       const symbol = t['symbol']
       const price = Number(t['lastPrice'])
       const changePct = Number(t['priceChangePercent'])
