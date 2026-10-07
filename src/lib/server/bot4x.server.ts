@@ -728,7 +728,10 @@ export async function getTelemetry(supabase: Client, userId: string) {
       realizedPnl: typeof ((r.readings ?? {}) as Record<string, unknown>).realizedPnl === 'number'
         ? Number(((r.readings ?? {}) as Record<string, unknown>).realizedPnl)
         : null,
+      createdAt: r.created_at,
     })),
+    timezone,
+    now,
   )
   const { wins, losses, pnl, completed: completedCount, submitted, pending, failed } = verifiedTelemetry
   const open = submitted + pending
