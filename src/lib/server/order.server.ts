@@ -4,6 +4,7 @@ import { ApiError } from './api-auth.server'
 import { getOrCreateConfig } from './bot4x.server'
 import { getBinanceEnvironment, getExchangeStatus, getVerifiedBinanceAccount, getVerifiedBinanceOrderByClientOrderId, submitVerifiedBinanceMarketOrder } from './exchange.server'
 import { validateDemoOrderRisk, validateRealOrderRisk, type RealOrderSide } from './order-risk'
+import { binanceEnvironmentForMode } from './execution-environment'
 
 type Client = SupabaseClient<Database>
 
@@ -27,8 +28,9 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
 ) {
   const idempotencyKey = input.idempotencyKey.trim()
   if (!idempotencyKey) throw new ApiError('Idempotency key é obrigatória.', 400)
-  if (getBinanceEnvironment() === 'production') {
-    throw new ApiError('Ambiente de produção bloqueado nesta fase DEMO.', 409)
+  const demoEnvironment = binanceEnvironmentForMode('DEMO')
+  if (getBinanceEnvironment() !== demoEnvironment) {
+    throw new ApiError('DEMO exige Binance Spot Testnet nesta fase.', 409)
   }
   if (!input.confirmed) throw new ApiError('Confirmação explícita da ordem DEMO é obrigatória.', 409)
 
