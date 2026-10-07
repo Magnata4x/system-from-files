@@ -714,7 +714,7 @@ export async function getTelemetry(supabase: Client, userId: string) {
         : null,
     })),
   )
-  const { wins, losses, pnl, completed, submitted, pending, failed } = verifiedTelemetry
+  const { wins, losses, pnl, completed: completedCount, submitted, pending, failed } = verifiedTelemetry
   const open = submitted + pending
 
   return {
@@ -726,7 +726,7 @@ export async function getTelemetry(supabase: Client, userId: string) {
     dailyPnlSource: 'verified_binance_execution_ledger',
     openSlots: config.openSlots,
     today: {
-      trades: completed,
+      trades: completedCount,
       wins,
       losses,
       open,
