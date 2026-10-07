@@ -40,7 +40,7 @@ describe('real Binance market data flow', () => {
     globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
       [Date.now(), '100000', '101000', '99000', 'NaN', '10'],
     ]), { status: 200 }))
-    await expect(getKlines('BTC/USDT', '4h', 1)).rejects.toThrow('candle inválido')
+    await expect(getKlines('BTC/USDT', '4h', 2)).rejects.toThrow('candle inválido')
   })
 
   it('propagates Binance HTTP failures as unavailable market data', async () => {
