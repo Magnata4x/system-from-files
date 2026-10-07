@@ -12,8 +12,16 @@ export type Bot4xCycleDecision =
   | "BLOCKED"
   | "INACTIVE";
 
+export type AutomaticExecutionRoute = "DEMO_TESTNET" | "REAL_BLOCKED" | "NONE";
+
 export function demoAutoExecutionEnabled(): boolean {
   return process.env["BOT4X_DEMO_AUTO_EXECUTION"]?.trim().toLowerCase() === "true";
+}
+
+export function automaticExecutionRoute(mode: Bot4xMode, pair: string): AutomaticExecutionRoute {
+  if (mode === "REAL") return "REAL_BLOCKED";
+  if (pair.replace("/", "").toUpperCase() === "BTCUSDT" && demoAutoExecutionEnabled()) return "DEMO_TESTNET";
+  return "NONE";
 }
 
 export function demoIdempotencyKey(signal: BackendSignal): string {
@@ -156,11 +164,12 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
         : `score_below_profile_minimum_${minScore}`;
 
       if (decision === "EXECUTION_CANDIDATE" && config.executionMode === "DEMO") {
-        if (signal.pair.replace("/", "").toUpperCase() !== "BTCUSDT") {
-          reason = "demo_executor_supports_btcusdt_only";
-        } else if (!demoAutoExecutionEnabled()) {
-          reason = "demo_auto_execution_disabled";
-        } else {
+        const route = automaticExecutionRoute(config.executionMode as Bot4xMode, signal.pair);
+        if (route === "NONE") {
+          reason = signal.pair.replace("/", "").toUpperCase() === "BTCUSDT"
+            ? "demo_auto_execution_disabled"
+            : "demo_executor_supports_btcusdt_only";
+        } else if (route === "DEMO_TESTNET") {
           try {
             await executeAuthorizedSixDollarBtcDemoOrder(supabaseAdmin, config.userId, {
               side: signal.side,
