@@ -5,8 +5,7 @@
  * - DEMO usa o pipeline operacional real, mas aponta para um ambiente TEST.
  * - REAL aponta para PRODUCTION, sujeito aos gates server-side já existentes.
  *
- * Este módulo define apenas o contrato. A ligação efetiva do executor DEMO
- * ao ambiente de teste da Binance será implementada em fase posterior.
+ * A Fase 45 liga explicitamente o executor DEMO ao Binance Spot Testnet.
  */
 
 export const EXECUTION_MODES = ['DEMO', 'REAL'] as const;
@@ -26,6 +25,11 @@ export function environmentForMode(mode: ExecutionMode): ExecutionEnvironment {
 
 export function createExecutionContext(mode: ExecutionMode): ExecutionContext {
   return { mode, environment: environmentForMode(mode) };
+}
+
+/** Mapeia o modo operacional para o ambiente Spot da Binance sem depender de env global. */
+export function binanceEnvironmentForMode(mode: ExecutionMode): 'testnet' | 'production' {
+  return mode === 'REAL' ? 'production' : 'testnet';
 }
 
 export function assertExecutionContext(context: ExecutionContext): void {
