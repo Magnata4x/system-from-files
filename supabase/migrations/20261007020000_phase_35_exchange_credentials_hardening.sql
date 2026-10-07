@@ -9,3 +9,5 @@ drop policy if exists "Users manage own exchange credentials" on public.exchange
 grant select, insert, update, delete on table public.exchange_credentials to service_role;
 
 -- Applied only after the server-only credential path is deployed.
+
+-- Fase 35: no client role receives access to encrypted exchange material.
