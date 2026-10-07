@@ -3,7 +3,8 @@ import { BadgeCheck, Heart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/marketplace/rating";
 import { ProductDetailModal } from "@/components/marketplace/product-detail-modal";
-import { CATEGORY_BADGES, CATEGORY_GRADIENTS, PRODUCTS, type Product } from "@/lib/marketplace-data";
+import { CATEGORY_BADGES, CATEGORY_GRADIENTS, type Product } from "@/lib/marketplace-data";
+import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import { useWishlist } from "@/lib/wishlist-store";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -12,8 +13,17 @@ export function WishlistTab() {
   const { ids, remove } = useWishlist();
   const [selected, setSelected] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
+  const { data: products, isPending, isError } = useMarketplaceProducts();
 
-  const items = useMemo(() => PRODUCTS.filter((p) => ids.includes(p.id)), [ids]);
+  const items = useMemo(() => (products ?? []).filter((p) => ids.includes(p.id)), [ids, products]);
+
+  if (isPending) {
+    return <div className="rounded-lg border border-dashed border-border bg-card/20 p-10 text-center text-sm text-muted-foreground">Carregando wishlist…</div>;
+  }
+
+  if (isError) {
+    return <div className="rounded-lg border border-dashed border-border bg-card/20 p-10 text-center text-sm text-muted-foreground">Wishlist indisponível no momento.</div>;
+  }
 
   if (items.length === 0) {
     return (

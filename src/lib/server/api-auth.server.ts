@@ -9,10 +9,14 @@ export interface ApiUser {
   supabase: SupabaseClient<Database>
 }
 
-export function jsonResponse(body: unknown, status = 200): Response {
+export function jsonResponse(body: unknown, status = 200, extraHeaders?: HeadersInit): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': 'no-store',
+      ...extraHeaders,
+    },
   })
 }
 
@@ -50,12 +54,28 @@ export async function requireApiUser(request: Request): Promise<ApiUser> {
 }
 
 /** Wrapper padrão: autentica, executa e serializa erros como JSON. */
+const API_RATE_LIMIT_PER_MINUTE = 60
+
 export async function handleApi(
   request: Request,
   fn: (user: ApiUser) => Promise<unknown>,
 ): Promise<Response> {
   try {
     const user = await requireApiUser(request)
+    const action = new URL(request.url).pathname.replace(/^\/api\//, "") || "api"
+    const { data: allowed, error: rateLimitError } = await user.supabase.rpc("check_rate_limit", {
+      p_user_id: user.userId,
+      p_action: action,
+      p_max: API_RATE_LIMIT_PER_MINUTE,
+    })
+    if (rateLimitError) throw new ApiError("Rate limiter indisponível", 503)
+    if (!allowed) {
+      return jsonResponse(
+        { statusCode: 429, message: "Rate limit excedido" },
+        429,
+        { "retry-after": "60" },
+      )
+    }
     return jsonResponse(await fn(user))
   } catch (err) {
     const status = err instanceof ApiError ? err.status : 500
