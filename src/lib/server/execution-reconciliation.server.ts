@@ -15,6 +15,10 @@ export function mapBinanceOrderStatus(status: string | null): ReconciliationResu
   }
 }
 
+function jsonRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
 function numeric(value: unknown): number | null {
   const parsed = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN
   return Number.isFinite(parsed) ? parsed : null
@@ -32,7 +36,8 @@ export async function reconcileUserExecutionIntents(supabase: SupabaseClient<Dat
     }
     let order: Record<string, unknown>
     try {
-      order = await getVerifiedBinanceOrderByClientOrderId(supabase, userId, { symbol: intent.pair, clientOrderId: intent.id }) as Record<string, unknown>
+      const rawOrder = await getVerifiedBinanceOrderByClientOrderId(supabase, userId, { symbol: intent.pair, clientOrderId: intent.id })
+      order = jsonRecord(rawOrder)
     } catch (error) {
       const code = error instanceof Error && 'code' in error ? (error as { code?: unknown }).code : undefined
       if (code === -2013) {
@@ -44,7 +49,7 @@ export async function reconcileUserExecutionIntents(supabase: SupabaseClient<Dat
     const exchangeStatus = typeof order.status === 'string' ? order.status : null
     const status = mapBinanceOrderStatus(exchangeStatus)
     const orderId = numeric(order.orderId)
-    const readings = { ...(intent.readings && typeof intent.readings === 'object' ? intent.readings as Record<string, unknown> : {}), environment: 'testnet', clientOrderId: intent.id, orderId, status: exchangeStatus, executedQty: numeric(order.executedQty), cummulativeQuoteQty: numeric(order.cummulativeQuoteQty), reconciledAt: new Date().toISOString() }
+    const readings = { ...jsonRecord(intent.readings), environment: 'testnet', clientOrderId: intent.id, orderId, status: exchangeStatus, executedQty: numeric(order.executedQty), cummulativeQuoteQty: numeric(order.cummulativeQuoteQty), reconciledAt: new Date().toISOString() }
     const { error: updateError } = await supabase.from('bot4x_execution_intents').update({ status, processed_at: new Date().toISOString(), readings }).eq('id', intent.id).eq('user_id', userId)
     if (updateError) throw new Error('Falha ao persistir reconciliação ' + intent.id + ': ' + updateError.message)
     results.push({ intentId: intent.id, status, reconciled: true, exchangeStatus, orderId })
