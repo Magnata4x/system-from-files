@@ -27,7 +27,7 @@ describe('real Binance market data flow', () => {
       { symbol: 'ETHUSDT', lastPrice: '4000', priceChangePercent: '1.25' },
     ]), { status: 200 }))
 
-    await expect(getTickers(['ETH/USDT'])).rejects.toThrow('dados de mercado incompletos')
+    await expect(getTickers(['ETH/USDT'])).rejects.toThrow('ticker inválido')
   })
 
   it('rejects malformed candles instead of passing synthetic values downstream', async () => {
