@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateSignals, type BackendSignal } from "./engine.server";
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from "./engine.server";
 import { mapConfig } from "./bot4x.server";
+import { executeAuthorizedSixDollarBtcDemoOrder } from "./order.server";
 
 type Bot4xMode = "DEMO" | "REAL";
 
@@ -10,6 +11,19 @@ export type Bot4xCycleDecision =
   | "IGNORED"
   | "BLOCKED"
   | "INACTIVE";
+
+function demoAutoExecutionEnabled(): boolean {
+  return process.env["BOT4X_DEMO_AUTO_EXECUTION"]?.trim().toLowerCase() === "true";
+}
+
+function demoIdempotencyKey(signal: BackendSignal): string {
+  const raw = [
+    "demo", signal.pair, signal.side, signal.entryPrice, signal.stopLoss,
+    signal.takeProfit1, signal.takeProfit2, signal.score, signal.aiScore,
+  ].join("|");
+  const encoded = Buffer.from(raw, "utf8").toString("base64url");
+  return `sig-${encoded.slice(0, 180)}`;
+}
 
 export interface Bot4xCycleResult {
   startedAt: string;
@@ -31,7 +45,8 @@ export interface Bot4xCycleResult {
     profile: string;
     circuitBreaker: string;
     openSlots: number;
-    executionSubmitted: false;
+    executionSubmitted: boolean;
+    executionError?: string;
   }>;
 }
 
@@ -53,15 +68,12 @@ function minimumScore(config: ReturnType<typeof mapConfig>): number {
 /**
  * Orquestrador do ciclo Bot4x.
  *
- * Esta primeira integração é deliberadamente OBSERVAÇÃO-ONLY:
- * - usa o motor real de mercado/sinais já existente;
- * - aplica as regras de perfil, pares, slots e circuit breakers já existentes;
- * - não cria execution_intents;
- * - não chama nenhum endpoint de escrita da Binance.
+ * O ciclo usa o motor real de mercado/sinais e aplica os gates do Bot4x.
  *
- * O objetivo é restaurar o ciclo operacional sem alterar a segurança
- * construída nas Fases 18–27. A submissão de ordens será uma etapa posterior,
- * explicitamente autorizada, depois que este ciclo estiver validado.
+ * A execução automática DEMO só existe quando BOT4X_DEMO_AUTO_EXECUTION=true.
+ * Nesse caso, apenas BTCUSDT passa ao executor DEMO, que exige Binance
+ * Testnet, credenciais verificadas, risco aprovado, confirmação e idempotência.
+ * REAL nunca é submetido por este ciclo.
  */
 export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xCycleResult> {
   const startedAt = new Date().toISOString();
@@ -137,20 +149,46 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
     for (const signal of userSignals) {
       const score = effectiveScore(signal);
       const decision: Bot4xCycleDecision = score >= minScore ? "EXECUTION_CANDIDATE" : "IGNORED";
+      let executionSubmitted = false;
+      let executionError: string | undefined;
+      let reason = decision === "EXECUTION_CANDIDATE"
+        ? "signal_passed_bot4x_gates"
+        : `score_below_profile_minimum_${minScore}`;
+
+      if (decision === "EXECUTION_CANDIDATE" && config.executionMode === "DEMO") {
+        if (signal.pair.replace("/", "").toUpperCase() !== "BTCUSDT") {
+          reason = "demo_executor_supports_btcusdt_only";
+        } else if (!demoAutoExecutionEnabled()) {
+          reason = "demo_auto_execution_disabled";
+        } else {
+          try {
+            await executeAuthorizedSixDollarBtcDemoOrder(supabaseAdmin, config.userId, {
+              side: signal.side,
+              confirmed: true,
+              idempotencyKey: demoIdempotencyKey(signal),
+            });
+            executionSubmitted = true;
+            reason = "demo_execution_submitted_to_binance_testnet";
+          } catch (error) {
+            executionError = error instanceof Error ? error.message : "Falha desconhecida na execução DEMO";
+            reason = "demo_execution_blocked_or_failed";
+          }
+        }
+      }
+
       decisions.push({
         userId: config.userId,
         pair: signal.pair,
         side: signal.side,
         score,
         decision,
-        reason: decision === "EXECUTION_CANDIDATE"
-          ? "signal_passed_bot4x_gates"
-          : `score_below_profile_minimum_${minScore}`,
+        reason,
         mode: config.executionMode as Bot4xMode,
         profile: config.profile,
         circuitBreaker: config.circuitBreaker,
         openSlots,
-        executionSubmitted: false,
+        executionSubmitted,
+        ...(executionError ? { executionError } : {}),
       });
     }
 
