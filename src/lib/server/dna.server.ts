@@ -29,7 +29,7 @@ type TradeRow = {
   created_at: string
 }
 
-function verifiedTradeRows(data: Array<{ created_at: string; pair: string; status: string; readings: unknown }>): TradeRow[] {
+export function verifiedTradeRows(data: Array<{ created_at: string; pair: string; status: string; readings: unknown }>): TradeRow[] {
   return data.flatMap((r) => {
     if (r.status !== 'completed') return []
     const readings = (r.readings ?? {}) as Record<string, unknown>
