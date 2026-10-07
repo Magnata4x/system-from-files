@@ -24,10 +24,10 @@ describe('real Binance market data flow', () => {
 
   it('rejects incomplete ticker data instead of manufacturing zero values', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
-      { symbol: 'BTCUSDT', lastPrice: '100000', priceChangePercent: '1.25' },
+      { symbol: 'ETHUSDT', lastPrice: '4000', priceChangePercent: '1.25' },
     ]), { status: 200 }))
 
-    await expect(getTickers(['BTC/USDT'])).rejects.toThrow('dados de mercado incompletos')
+    await expect(getTickers(['ETH/USDT'])).rejects.toThrow('dados de mercado incompletos')
   })
 
   it('rejects malformed candles instead of passing synthetic values downstream', async () => {
@@ -45,6 +45,6 @@ describe('real Binance market data flow', () => {
 
   it('propagates Binance HTTP failures as unavailable market data', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(new Response('rate limited', { status: 429 }))
-    await expect(getKlines('BTC/USDT', '4h', 1)).rejects.toThrow('Binance 429')
+    await expect(getKlines('BTC/USDT', '1h', 1)).rejects.toThrow('Binance 429')
   })
 })
