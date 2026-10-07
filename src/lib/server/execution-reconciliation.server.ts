@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/integrations/supabase/types'
 import { getVerifiedBinanceOrderByClientOrderId } from './exchange.server'
 
 interface ExecutionIntentRow { id: string; user_id: string; mode: string; pair: string; side: string; status: string; readings: unknown }
@@ -24,7 +23,7 @@ function numeric(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
-export async function reconcileUserExecutionIntents(supabase: SupabaseClient<Database>, userId: string): Promise<ReconciliationResult[]> {
+export async function reconcileUserExecutionIntents(supabase: SupabaseClient, userId: string): Promise<ReconciliationResult[]> {
   const { data, error } = await supabase.from('bot4x_execution_intents').select('id,user_id,mode,pair,side,status,readings').eq('user_id', userId).in('status', ['pending', 'submitted']).order('created_at', { ascending: true }).limit(50)
   if (error) throw new Error('Falha ao carregar intenções para reconciliação: ' + error.message)
   const results: ReconciliationResult[] = []
