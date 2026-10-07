@@ -55,14 +55,13 @@ import { Route as ApiCopyFollowsRouteImport } from './routes/api/copy/follows'
 import { Route as ApiCopilotHistoryRouteImport } from './routes/api/copilot/history'
 import { Route as ApiCopilotChatRouteImport } from './routes/api/copilot/chat'
 import { Route as ApiBot4xTelemetryRouteImport } from './routes/api/bot4x/telemetry'
-// Fase 30 operational cycle route
-import { Route as ApiBot4xCycleRouteImport } from './routes/api/bot4x/cycle'
 import { Route as ApiBot4xStopRouteImport } from './routes/api/bot4x/stop'
 import { Route as ApiBot4xStartRouteImport } from './routes/api/bot4x/start'
 import { Route as ApiBot4xExecutionsRouteImport } from './routes/api/bot4x/executions'
+import { Route as ApiBot4xDemoOrderRouteImport } from './routes/api/bot4x/demo-order'
+import { Route as ApiBot4xCycleRouteImport } from './routes/api/bot4x/cycle'
 import { Route as ApiBot4xConfigRouteImport } from './routes/api/bot4x/config'
 import { Route as ApiBot4xBalanceRouteImport } from './routes/api/bot4x/balance'
-import { Route as ApiBot4xDemoOrderRouteImport } from './routes/api/bot4x/demo-order'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAlertsSettingsRouteImport } from './routes/api/alerts/settings'
 import { Route as ApiAlertsFeedRouteImport } from './routes/api/alerts/feed'
@@ -314,11 +313,6 @@ const ApiBot4xTelemetryRoute = ApiBot4xTelemetryRouteImport.update({
   path: '/api/bot4x/telemetry',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBot4xCycleRoute = ApiBot4xCycleRouteImport.update({
-  id: '/api/bot4x/cycle',
-  path: '/api/bot4x/cycle',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiBot4xStopRoute = ApiBot4xStopRouteImport.update({
   id: '/api/bot4x/stop',
   path: '/api/bot4x/stop',
@@ -334,14 +328,19 @@ const ApiBot4xExecutionsRoute = ApiBot4xExecutionsRouteImport.update({
   path: '/api/bot4x/executions',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
-  id: '/api/bot4x/config',
-  path: '/api/bot4x/config',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiBot4xDemoOrderRoute = ApiBot4xDemoOrderRouteImport.update({
   id: '/api/bot4x/demo-order',
   path: '/api/bot4x/demo-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xCycleRoute = ApiBot4xCycleRouteImport.update({
+  id: '/api/bot4x/cycle',
+  path: '/api/bot4x/cycle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBot4xConfigRoute = ApiBot4xConfigRouteImport.update({
+  id: '/api/bot4x/config',
+  path: '/api/bot4x/config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiBot4xBalanceRoute = ApiBot4xBalanceRouteImport.update({
@@ -465,13 +464,13 @@ export interface FileRoutesByFullPath {
   '/api/alerts/settings': typeof ApiAlertsSettingsRoute
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
-  '/api/bot4x/demo-order': typeof ApiBot4xDemoOrderRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/cycle': typeof ApiBot4xCycleRoute
+  '/api/bot4x/demo-order': typeof ApiBot4xDemoOrderRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
   '/api/bot4x/telemetry': typeof ApiBot4xTelemetryRoute
-  '/api/bot4x/cycle': typeof ApiBot4xCycleRoute
   '/api/copilot/chat': typeof ApiCopilotChatRoute
   '/api/copilot/history': typeof ApiCopilotHistoryRoute
   '/api/copy/follows': typeof ApiCopyFollowsRoute
@@ -535,6 +534,8 @@ export interface FileRoutesByTo {
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/cycle': typeof ApiBot4xCycleRoute
+  '/api/bot4x/demo-order': typeof ApiBot4xDemoOrderRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
@@ -547,6 +548,7 @@ export interface FileRoutesByTo {
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/market/calendar': typeof ApiMarketCalendarRoute
   '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
@@ -603,6 +605,8 @@ export interface FileRoutesById {
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/bot4x/balance': typeof ApiBot4xBalanceRoute
   '/api/bot4x/config': typeof ApiBot4xConfigRoute
+  '/api/bot4x/cycle': typeof ApiBot4xCycleRoute
+  '/api/bot4x/demo-order': typeof ApiBot4xDemoOrderRoute
   '/api/bot4x/executions': typeof ApiBot4xExecutionsRouteWithChildren
   '/api/bot4x/start': typeof ApiBot4xStartRoute
   '/api/bot4x/stop': typeof ApiBot4xStopRoute
@@ -615,6 +619,7 @@ export interface FileRoutesById {
   '/api/exchange/test': typeof ApiExchangeTestRoute
   '/api/manipulation/alerts': typeof ApiManipulationAlertsRoute
   '/api/market-regime/current': typeof ApiMarketRegimeCurrentRoute
+  '/api/market/calendar': typeof ApiMarketCalendarRoute
   '/api/market/history': typeof ApiMarketHistoryRoute
   '/api/market/score-distribution': typeof ApiMarketScoreDistributionRoute
   '/api/marketplace/history': typeof ApiMarketplaceHistoryRoute
@@ -671,6 +676,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/bot4x/balance'
     | '/api/bot4x/config'
+    | '/api/bot4x/cycle'
+    | '/api/bot4x/demo-order'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
@@ -683,8 +690,8 @@ export interface FileRouteTypes {
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
-    | '/api/market/history'
     | '/api/market/calendar'
+    | '/api/market/history'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
     | '/api/marketplace/products'
@@ -738,6 +745,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/bot4x/balance'
     | '/api/bot4x/config'
+    | '/api/bot4x/cycle'
+    | '/api/bot4x/demo-order'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
@@ -750,6 +759,7 @@ export interface FileRouteTypes {
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/market/calendar'
     | '/api/market/history'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
@@ -805,6 +815,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/bot4x/balance'
     | '/api/bot4x/config'
+    | '/api/bot4x/cycle'
+    | '/api/bot4x/demo-order'
     | '/api/bot4x/executions'
     | '/api/bot4x/start'
     | '/api/bot4x/stop'
@@ -817,6 +829,7 @@ export interface FileRouteTypes {
     | '/api/exchange/test'
     | '/api/manipulation/alerts'
     | '/api/market-regime/current'
+    | '/api/market/calendar'
     | '/api/market/history'
     | '/api/market/score-distribution'
     | '/api/marketplace/history'
@@ -851,8 +864,9 @@ export interface RootRouteChildren {
   ApiAlertsSettingsRoute: typeof ApiAlertsSettingsRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiBot4xBalanceRoute: typeof ApiBot4xBalanceRoute
-  ApiBot4xDemoOrderRoute: typeof ApiBot4xDemoOrderRoute
   ApiBot4xConfigRoute: typeof ApiBot4xConfigRoute
+  ApiBot4xCycleRoute: typeof ApiBot4xCycleRoute
+  ApiBot4xDemoOrderRoute: typeof ApiBot4xDemoOrderRoute
   ApiBot4xExecutionsRoute: typeof ApiBot4xExecutionsRouteWithChildren
   ApiBot4xStartRoute: typeof ApiBot4xStartRoute
   ApiBot4xStopRoute: typeof ApiBot4xStopRoute
@@ -865,8 +879,8 @@ export interface RootRouteChildren {
   ApiExchangeTestRoute: typeof ApiExchangeTestRoute
   ApiManipulationAlertsRoute: typeof ApiManipulationAlertsRoute
   ApiMarketRegimeCurrentRoute: typeof ApiMarketRegimeCurrentRoute
-  ApiMarketHistoryRoute: typeof ApiMarketHistoryRoute
   ApiMarketCalendarRoute: typeof ApiMarketCalendarRoute
+  ApiMarketHistoryRoute: typeof ApiMarketHistoryRoute
   ApiMarketScoreDistributionRoute: typeof ApiMarketScoreDistributionRoute
   ApiMarketplaceHistoryRoute: typeof ApiMarketplaceHistoryRoute
   ApiMarketplaceProductsRoute: typeof ApiMarketplaceProductsRoute
@@ -1134,18 +1148,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMarketScoreDistributionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/market/calendar': {
-      id: '/api/market/calendar'
-      path: '/api/market/calendar'
-      fullPath: '/api/market/calendar'
-      preLoaderRoute: typeof ApiMarketCalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/market/history': {
       id: '/api/market/history'
       path: '/api/market/history'
       fullPath: '/api/market/history'
       preLoaderRoute: typeof ApiMarketHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/market/calendar': {
+      id: '/api/market/calendar'
+      path: '/api/market/calendar'
+      fullPath: '/api/market/calendar'
+      preLoaderRoute: typeof ApiMarketCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/market-regime/current': {
@@ -1211,13 +1225,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xTelemetryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/bot4x/cycle': {
-      id: '/api/bot4x/cycle'
-      path: '/api/bot4x/cycle'
-      fullPath: '/api/bot4x/cycle'
-      preLoaderRoute: typeof ApiBot4xCycleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/bot4x/stop': {
       id: '/api/bot4x/stop'
       path: '/api/bot4x/stop'
@@ -1239,6 +1246,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xExecutionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot4x/demo-order': {
+      id: '/api/bot4x/demo-order'
+      path: '/api/bot4x/demo-order'
+      fullPath: '/api/bot4x/demo-order'
+      preLoaderRoute: typeof ApiBot4xDemoOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot4x/cycle': {
+      id: '/api/bot4x/cycle'
+      path: '/api/bot4x/cycle'
+      fullPath: '/api/bot4x/cycle'
+      preLoaderRoute: typeof ApiBot4xCycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/bot4x/config': {
       id: '/api/bot4x/config'
       path: '/api/bot4x/config'
@@ -1246,21 +1267,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBot4xConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/bot4x/demo-order'
-    '/api/bot4x/demo-order'
-    '/api/bot4x/demo-order'
     '/api/bot4x/balance': {
       id: '/api/bot4x/balance'
       path: '/api/bot4x/balance'
       fullPath: '/api/bot4x/balance'
       preLoaderRoute: typeof ApiBot4xBalanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/bot4x/demo-order': {
-      id: '/api/bot4x/demo-order'
-      path: '/api/bot4x/demo-order'
-      fullPath: '/api/bot4x/demo-order'
-      preLoaderRoute: typeof ApiBot4xDemoOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/me': {
@@ -1482,13 +1493,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAlertsSettingsRoute: ApiAlertsSettingsRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiBot4xBalanceRoute: ApiBot4xBalanceRoute,
-  ApiBot4xDemoOrderRoute: ApiBot4xDemoOrderRoute,
   ApiBot4xConfigRoute: ApiBot4xConfigRoute,
+  ApiBot4xCycleRoute: ApiBot4xCycleRoute,
+  ApiBot4xDemoOrderRoute: ApiBot4xDemoOrderRoute,
   ApiBot4xExecutionsRoute: ApiBot4xExecutionsRouteWithChildren,
   ApiBot4xStartRoute: ApiBot4xStartRoute,
   ApiBot4xStopRoute: ApiBot4xStopRoute,
   ApiBot4xTelemetryRoute: ApiBot4xTelemetryRoute,
-  ApiBot4xCycleRoute: ApiBot4xCycleRoute,
   ApiCopilotChatRoute: ApiCopilotChatRoute,
   ApiCopilotHistoryRoute: ApiCopilotHistoryRoute,
   ApiCopyFollowsRoute: ApiCopyFollowsRoute,
@@ -1497,8 +1508,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExchangeTestRoute: ApiExchangeTestRoute,
   ApiManipulationAlertsRoute: ApiManipulationAlertsRoute,
   ApiMarketRegimeCurrentRoute: ApiMarketRegimeCurrentRoute,
-  ApiMarketHistoryRoute: ApiMarketHistoryRoute,
   ApiMarketCalendarRoute: ApiMarketCalendarRoute,
+  ApiMarketHistoryRoute: ApiMarketHistoryRoute,
   ApiMarketScoreDistributionRoute: ApiMarketScoreDistributionRoute,
   ApiMarketplaceHistoryRoute: ApiMarketplaceHistoryRoute,
   ApiMarketplaceProductsRoute: ApiMarketplaceProductsRoute,
