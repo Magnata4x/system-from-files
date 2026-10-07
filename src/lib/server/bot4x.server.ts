@@ -199,6 +199,8 @@ export interface ExecutionQuery {
   to?: string
   /** Perfil do bot no momento da execução. */
   profile?: string
+  /** Fonte do histórico: verificado por padrão; legado somente explícito. */
+  source?: 'verified' | 'legacy'
 }
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/
@@ -343,28 +345,70 @@ const CSV_HEADERS = [
   'resultado', 'pnl', 'pnl_pct', 'motivo',
 ] as const
 
-/** Exporta o histórico de execuções filtrado como CSV (máx. 5000 linhas). */
+/** Exporta o histórico oficial como CSV.
+ * Por padrão usa exclusivamente o ledger de execuções verificadas.
+ * O legado só pode ser solicitado explicitamente com source=legacy.
+ */
 export async function exportExecutionsCsv(
   supabase: Client,
   userId: string,
   query: ExecutionQuery = {},
 ): Promise<string> {
-  let builder = supabase.from('bot4x_trades').select('*').eq('user_id', userId)
-  builder = applyFilters(builder, query)
+  if (query.source === 'legacy') {
+    let builder = supabase.from('bot4x_trades').select('*').eq('user_id', userId)
+    builder = applyFilters(builder, query)
 
-  const { data, error } = await builder.order('created_at', { ascending: false }).limit(5000)
-  if (error) throw new ApiError(error.message, 500)
+    const { data, error } = await builder.order('created_at', { ascending: false }).limit(5000)
+    if (error) throw new ApiError(error.message, 500)
+
+    const lines = [CSV_HEADERS.join(',')]
+    for (const t of data ?? []) {
+      lines.push(
+        [
+          t.created_at, t.pair, t.side, t.profile ?? '', t.leverage ?? '',
+          t.entry, t.stop ?? '', t.target ?? '', t.result,
+          Number(t.pnl ?? 0), Number(t.pnl_pct ?? 0), t.motivo ?? '',
+        ].map(csvCell).join(','),
+      )
+    }
+    return lines.join('\n')
+  }
 
   const lines = [CSV_HEADERS.join(',')]
-  for (const t of data ?? []) {
-    lines.push(
-      [
-        t.created_at, t.pair, t.side, t.profile ?? '', t.leverage ?? '',
-        t.entry, t.stop ?? '', t.target ?? '', t.result,
-        Number(t.pnl ?? 0), Number(t.pnl_pct ?? 0), t.motivo ?? '',
-      ].map(csvCell).join(','),
-    )
+  const pageSize = 100
+  const maxRows = 5000
+
+  for (let offset = 0; offset < maxRows; offset += pageSize) {
+    const page = await listVerifiedExecutionsPaged(supabase, userId, {
+      ...query,
+      source: undefined,
+      limit: pageSize,
+      offset,
+    })
+
+    for (const item of page.items) {
+      lines.push(
+        [
+          item.createdAt,
+          item.pair,
+          item.side,
+          item.profile ?? '',
+          '',
+          item.entryPrice ?? '',
+          '',
+          '',
+          item.status,
+          item.result,
+          item.pnl ?? '',
+          item.pnlPct ?? '',
+          item.motivo ?? '',
+        ].map(csvCell).join(','),
+      )
+    }
+
+    if (page.items.length < pageSize || page.total <= offset + pageSize) break
   }
+
   return lines.join('\n')
 }
 
