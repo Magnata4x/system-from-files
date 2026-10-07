@@ -28,7 +28,7 @@ describe('Engine — dados de mercado reais', () => {
       candle({ openTime: 1_700_000_000_000 + i * 14_400_000 }),
     )
 
-    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('dados de mercado insuficientes')
+    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('Dados de mercado insuficientes')
   })
 
   it('rejeita preço final inválido', () => {
@@ -36,7 +36,7 @@ describe('Engine — dados de mercado reais', () => {
       candle({ openTime: 1_700_000_000_000 + i * 14_400_000, close: i === MIN_SIGNAL_CANDLES - 1 ? 0 : 101 }),
     )
 
-    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('dados de mercado inválidos')
+    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('Dados de mercado inválidos')
   })
 
   it('rejeita série sem volatilidade observável', () => {
@@ -44,6 +44,6 @@ describe('Engine — dados de mercado reais', () => {
       candle({ openTime: 1_700_000_000_000 + i * 14_400_000, open: 100, high: 100, low: 100, close: 100 }),
     )
 
-    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('volatilidade de mercado indisponível')
+    expect(() => assertSignalMarketData('BTC/USDT', candles)).toThrow('Volatilidade de mercado indisponível')
   })
 })
