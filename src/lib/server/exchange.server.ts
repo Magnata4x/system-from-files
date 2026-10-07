@@ -81,8 +81,8 @@ const EMPTY: ExchangeStatus = {
 }
 
 export async function getExchangeStatus(supabase: Client, userId: string): Promise<ExchangeStatus> {
-  const { data, error } = await supabase
-    getSupabaseAdmin().from('exchange_credentials')
+  const { data, error } = await getSupabaseAdmin()
+    .from('exchange_credentials')
     .select('exchange, key_preview, verified, verified_at, last_error')
     .eq('user_id', userId)
     .maybeSingle()
@@ -167,8 +167,8 @@ async function verify(apiKey: string, apiSecret: string) {
 
 /** Lê o saldo Spot em USDT sem expor as credenciais ou outros ativos. */
 export async function getUsdtBalance(supabase: Client, userId: string): Promise<UsdtBalance> {
-  const { data, error } = await supabase
-    getSupabaseAdmin().from('exchange_credentials')
+  const { data, error } = await getSupabaseAdmin()
+    .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
     .maybeSingle()
@@ -199,8 +199,8 @@ export interface VerifiedBinanceAccount {
 }
 
 async function getStoredCredentials(supabase: Client, userId: string) {
-  const { data, error } = await supabase
-    getSupabaseAdmin().from('exchange_credentials')
+  const { data, error } = await getSupabaseAdmin()
+    .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
     .maybeSingle()
@@ -309,7 +309,7 @@ export async function saveExchangeCredentials(
     throw new ApiError(message, 400)
   }
 
-  const { error } = await supabasegetSupabaseAdmin().from('exchange_credentials').upsert(
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').upsert(
     {
       user_id: userId,
       exchange,
@@ -334,8 +334,8 @@ export async function testExchangeCredentials(
   supabase: Client,
   userId: string,
 ): Promise<VerifyResult> {
-  const { data, error } = await supabase
-    getSupabaseAdmin().from('exchange_credentials')
+  const { data, error } = await getSupabaseAdmin()
+    .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher')
     .eq('user_id', userId)
     .maybeSingle()
@@ -348,14 +348,14 @@ export async function testExchangeCredentials(
   try {
     const check = await verify(apiKey, apiSecret)
     await supabase
-      getSupabaseAdmin().from('exchange_credentials')
+      .from('exchange_credentials')
       .update({ verified: true, verified_at: new Date().toISOString(), last_error: null })
       .eq('user_id', userId)
     return { ...(await getExchangeStatus(supabase, userId)), ...check }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Falha na verificação'
     await supabase
-      getSupabaseAdmin().from('exchange_credentials')
+      .from('exchange_credentials')
       .update({ verified: false, last_error: message })
       .eq('user_id', userId)
     throw new ApiError(message, 400)
@@ -363,7 +363,7 @@ export async function testExchangeCredentials(
 }
 
 export async function deleteExchangeCredentials(supabase: Client, userId: string) {
-  const { error } = await supabasegetSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId)
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId)
   if (error) throw new ApiError(error.message, 500)
   await supabase.from('bot4x_configs').update({ api_key_set: false }).eq('user_id', userId)
   return EMPTY
