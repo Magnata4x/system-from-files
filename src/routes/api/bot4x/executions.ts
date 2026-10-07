@@ -1,10 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { handleApi } from '@/lib/server/api-auth.server'
+import { reconcileUserExecutionIntents } from '@/lib/server/execution-reconciliation.server'
 import { listExecutions, listExecutionsPaged, listVerifiedHistory, listVerifiedExecutionsPaged } from '@/lib/server/bot4x.server'
 
 export const Route = createFileRoute('/api/bot4x/executions')({
   server: {
     handlers: {
+      POST: async ({ request }) =>
+        handleApi(request, (user) => reconcileUserExecutionIntents(user.supabase, user.userId)),
       GET: async ({ request }) =>
         handleApi(request, (user) => {
           const url = new URL(request.url)
