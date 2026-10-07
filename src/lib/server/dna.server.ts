@@ -24,7 +24,7 @@ type TradeRow = {
   pair: string
   result: string
   pnl: number
-  pnl_pct: number
+  pnl_pct: number | null
   hour: number | null
   created_at: string
 }
@@ -45,7 +45,7 @@ function verifiedTradeRows(data: Array<{ created_at: string; pair: string; statu
       pair: r.pair,
       result,
       pnl,
-      pnl_pct: typeof readings.realizedPnlPct === 'number' && Number.isFinite(readings.realizedPnlPct) ? readings.realizedPnlPct : 0,
+      pnl_pct: typeof readings.realizedPnlPct === 'number' && Number.isFinite(readings.realizedPnlPct) ? readings.realizedPnlPct : null,
       hour: created.getUTCHours(),
       created_at: r.created_at,
     }]
@@ -113,7 +113,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
   const wins = rows.filter(isWin).length
   const winRate = (wins / total) * 100
   const totalPnl = rows.reduce((s, t) => s + t.pnl, 0)
-  const avgPnlPct = rows.reduce((s, t) => s + t.pnl_pct, 0) / total
+  const pnlPctRows = rows.filter((t) => t.pnl_pct !== null)\n  const avgPnlPct = pnlPctRows.length > 0 ? pnlPctRows.reduce((s, t) => s + Number(t.pnl_pct), 0) / pnlPctRows.length : null
 
   // Drawdown sobre a curva acumulada de PnL
   let acc = 0
@@ -281,7 +281,7 @@ export async function computeDnaStats(user: ApiUser): Promise<DnaStatsResponse> 
     hasData: true,
     totalTrades: total,
     winRate: Number(winRate.toFixed(2)),
-    avgPnlPct: Number(avgPnlPct.toFixed(2)),
+    avgPnlPct: avgPnlPct === null ? 0 : Number(avgPnlPct.toFixed(2)),
     bestPair: pairs.best,
     worstPair: pairs.worst,
     bestHour: hours.best === null ? null : Number(hours.best),
