@@ -27,6 +27,28 @@ export interface BackendSignal {
   confluences: string[]
 }
 
+export const MIN_SIGNAL_CANDLES = 100
+
+/**
+ * Sinais só podem ser derivados de uma amostra de mercado completa e válida.
+ * Dados insuficientes não são preenchidos com indicadores neutros/sintéticos.
+ */
+export function assertSignalMarketData(pair: string, candles: Kline[]): void {
+  if (candles.length < MIN_SIGNAL_CANDLES) {
+    throw new Error(`Dados de mercado insuficientes para o Engine em ${pair}: esperado pelo menos ${MIN_SIGNAL_CANDLES} candles`)
+  }
+
+  const last = candles.at(-1)
+  if (!last || !Number.isFinite(last.close) || last.close <= 0 || !Number.isFinite(last.openTime) || last.openTime <= 0) {
+    throw new Error(`Dados de mercado inválidos para o Engine em ${pair}`)
+  }
+
+  const range = atr(candles)
+  if (!Number.isFinite(range) || range <= 0) {
+    throw new Error(`Volatilidade de mercado indisponível para o Engine em ${pair}`)
+  }
+}
+
 function stableId(pair: string, bucket: number): string {
   return `${pair.replace('/', '-').toLowerCase()}-${bucket}`
 }
@@ -39,8 +61,8 @@ export async function generateSignals(): Promise<BackendSignal[]> {
           getMarketRegime(pair),
           getKlines(pair, '4h', 200),
         ])
-        const last = candles.at(-1)
-        if (!last) return null
+        assertSignalMarketData(pair, candles)
+        const last = candles.at(-1)!
         const price = last.close
         const range = atr(candles)
         const r = regime.rsi
