@@ -1,4 +1,4 @@
-import { Search, LayoutGrid, Table as TableIcon, Radar, SlidersHorizontal, ChevronDown, Play, Pause, Rss, Cpu } from "lucide-react";
+import { Search, LayoutGrid, Table as TableIcon, Radar, SlidersHorizontal, ChevronDown, Rss, Cpu } from "lucide-react";
 import { useSignalsStore } from "@/lib/signals-store";
 
 const assetClasses = ["All", "Crypto"] as const;
@@ -13,7 +13,7 @@ const scoreOptions = [
 const exchanges = ["Binance"];
 
 export function FilterBar() {
-  const { filters, view, sort, live, streamOpen, setView, setSort, setLive, setFilter, toggleAdv, toggleStream, toggleExchange } = useSignalsStore();
+  const { filters, view, sort, streamOpen, setView, setSort, setFilter, toggleAdv, toggleStream, toggleExchange } = useSignalsStore();
   const bot4xOnly = filters.bot4xOnly;
 
   return (
