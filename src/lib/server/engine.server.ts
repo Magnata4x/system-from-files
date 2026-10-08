@@ -119,7 +119,7 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
         if (r < 30 || r > 70) score += 8
         if (regime.volatility > 0.4 && regime.volatility < 6) score += 6
         score = Math.max(0, Math.min(100, Math.round(score)))
-        if (regime.regime === 'SIDEWAYS' || score < 60) return { pair, signal: null }
+        if (regime.regime === 'SIDEWAYS' || score < 60) return { pair, signal: null, failed: false }
 
         const side: 'BUY' | 'SELL' = regime.regime === 'BULLISH' ? 'BUY' : 'SELL'
         const dir = side === 'BUY' ? 1 : -1
@@ -152,7 +152,7 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
           confluences,
         }
         assertOperationalSignal(signal)
-        return { pair, signal }
+        return { pair, signal, failed: false }
       } catch {
         return { pair, signal: null }
       }
@@ -160,7 +160,7 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
   )
   const signals = results.flatMap((r) => r.signal ? [r.signal] : [])
     .sort((a, b) => b.score - a.score)
-  const failedPairs = results.filter((r) => !r.signal).map((r) => r.pair)
+  const failedPairs = results.filter((r) => r.failed).map((r) => r.pair)
   return { signals, analyzedPairs, failedPairs }
 }
 
