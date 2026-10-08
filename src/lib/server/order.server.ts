@@ -175,7 +175,13 @@ export async function executeAuthorizedSixDollarBtcOrder(
   if (getBinanceEnvironment() !== 'production') {
     throw new ApiError('Ordens REAL estão bloqueadas fora do ambiente de produção.', 409)
   }
-  // Gate operacional obrigatório: mesmo com ambiente/configuração REAL, a Fase 54 mantém a submissão Production bloqueada.\n  try {\n    assertRealExecutionAuthorized(createExecutionContext('REAL'))\n  } catch (error) {\n    throw new ApiError(error instanceof Error ? error.message : 'Execução REAL não autorizada pelo gate operacional.', 409)\n  }\n
+  // Gate operacional obrigatório: a submissão REAL permanece bloqueada até aprovação operacional explícita.
+  try {
+    assertRealExecutionAuthorized(createExecutionContext('REAL'))
+  } catch (error) {
+    throw new ApiError(error instanceof Error ? error.message : 'Execução REAL não autorizada pelo gate operacional.', 409)
+  }
+
   const { data: existingIntent, error: existingIntentError } = await supabase
     .from('bot4x_execution_intents')
     .select('status, readings, mode, pair, side, quote_amount')
