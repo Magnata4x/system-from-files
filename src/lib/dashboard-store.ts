@@ -18,9 +18,9 @@ export type Signal = {
   rr: number | null;
   tf: string;
   time: string;
-  type?: string;
-  setup?: string;
-  confluences?: string[];
+  type?: string | null;
+  setup?: string | null;
+  confluences?: string[] | null;
 };
 
 export type RiskStatus = {
