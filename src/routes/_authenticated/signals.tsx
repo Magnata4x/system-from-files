@@ -15,12 +15,13 @@ import { SignalDetailDrawer } from "@/components/signals/signal-detail-drawer";
 import { useSignalsStore, useFilteredSignals } from "@/lib/signals-store";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xEligibility } from "@/lib/bot4x-eligibility";
+import { DataStatusBadge } from "@/components/dashboard/data-status";
 
 export const Route = createFileRoute("/_authenticated/signals")({
   head: () => ({
     meta: [
       { title: "Signal Radar — AISignalRadar" },
-      { name: "description", content: "Live institutional trading signals across crypto, forex, indices, and stocks." },
+      { name: "description", content: "Sinais de mercado reais fornecidos pelo motor de análise." },
     ],
   }),
   component: SignalsPage,
@@ -34,6 +35,8 @@ function SignalsPage() {
   const toggleAdv = useSignalsStore((s) => s.toggleAdv);
   const setLive = useSignalsStore((s) => s.setLive);
   const live = useSignalsStore((s) => s.live);
+  const sourceStatus = useSignalsStore((s) => s.sourceStatus);
+  const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);
   const pin = useSignalsStore((s) => s.pin);
   const bot4xOnly = useSignalsStore((s) => s.filters.bot4xOnly);
   const bot4xMode = useBot4xStore((s) => s.mode);
@@ -84,7 +87,7 @@ function SignalsPage() {
         <SignalStream />
         <div className="flex-1 min-w-0">
           <FilterBar />
-          <StatsBar />
+          <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>\n          <StatsBar />
           <div className="flex">
             <main className="flex-1 min-w-0 p-5">
               {view === "cards" && <CardGrid signals={filtered} />}
