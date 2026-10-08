@@ -63,7 +63,7 @@ function StreamRow({ s, onHover, onLeave, onClick }: { s: Signal; onHover: () =>
         <span className="tabular-nums">{s.score}</span>
       </div>
       <div className="flex items-center justify-between text-muted-foreground/70 text-[9px]">
-        <span>{s.tf}</span>
+        <span>{s.tf ?? "—"}</span>
         <span>{formatAge(s.ageMin)}</span>
       </div>
     </div>
