@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('./api-auth.server', () => ({
@@ -47,5 +48,14 @@ describe('S0 — gate REAL no executor', () => {
     })
 
     expect(supabase.from).not.toHaveBeenCalled()
+  })
+
+  it('não mantém o gate dentro de comentário com \\n literal', () => {
+    const source = readFileSync(new URL('./order.server.ts', import.meta.url), 'utf8')
+    const commentedLiteralNewline = source
+      .split('\\n')
+      .filter((line) => /^\\s*\\/\\//.test(line) && line.includes('\\\\n'))
+
+    expect(commentedLiteralNewline).toEqual([])
   })
 })
