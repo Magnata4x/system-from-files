@@ -34,7 +34,8 @@ import { executeAuthorizedSixDollarBtcOrder } from './order.server'
 
 describe('S0 — gate REAL no executor', () => {
   it('rejeita antes de qualquer chamada ao Supabase ou à exchange', async () => {
-    const supabase = { from: vi.fn() } as never
+    const from = vi.fn()
+    const supabase = { from } as never
 
     await expect(
       executeAuthorizedSixDollarBtcOrder(supabase, 'user-1', {
@@ -47,7 +48,7 @@ describe('S0 — gate REAL no executor', () => {
       message: 'Execução REAL não autorizada pelo gate operacional.',
     })
 
-    expect(supabase.from).not.toHaveBeenCalled()
+    expect(from).not.toHaveBeenCalled()
   })
 
   it('não mantém o gate dentro de comentário com literal \\n', () => {
