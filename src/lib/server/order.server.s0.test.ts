@@ -50,11 +50,11 @@ describe('S0 — gate REAL no executor', () => {
     expect(supabase.from).not.toHaveBeenCalled()
   })
 
-  it('não mantém o gate dentro de comentário com \\n literal', () => {
+  it('não mantém o gate dentro de comentário com literal \\n', () => {
     const source = readFileSync(new URL('./order.server.ts', import.meta.url), 'utf8')
     const commentedLiteralNewline = source
-      .split('\\n')
-      .filter((line) => /^\\s*\\/\\//.test(line) && line.includes('\\\\n'))
+      .split('\n')
+      .filter((line) => /^\s*\/\//.test(line) && line.includes('\\n'))
 
     expect(commentedLiteralNewline).toEqual([])
   })
