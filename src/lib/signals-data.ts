@@ -11,7 +11,7 @@ export type Signal = {
   exchange: string;
   direction: SignalDirection;
   score: number;
-  tf: "1H" | "4H";
+  tf: "1m" | "5m" | "15m" | "1H" | "4H" | "1D";
   entry: number | null;
   stop: number | null;
   target: number | null;
@@ -23,7 +23,7 @@ export type Signal = {
   manipRisk: "low" | "medium" | "high" | null;
   setup: SetupType | string | null;
   session: Session | string | null;
-  createdAt: string | null;
+  createdAt?: string | null;
   ageMin: number | null;
   status: SignalStatus | null;
   isMock?: boolean;
