@@ -177,7 +177,7 @@ function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKe
     if (exchSet.size && !exchSet.has(s.exchange.toLowerCase())) return false;
     if (s.score < filters.scoreRange[0] || s.score > filters.scoreRange[1]) return false;
     if (filters.minRR > 0 && (s.rr == null || s.rr < filters.minRR)) return false;
-    if (s.manipRisk == null || !filters.manipRisk[s.manipRisk]) return false;
+    if (s.manipRisk != null && !filters.manipRisk[s.manipRisk]) return false;
     if (setupKeys.length && (s.setup == null || !setupKeys.includes(s.setup))) return false;
     if (filters.session !== "All" && s.session !== filters.session) return false;
     if (filters.dnaCompat70 && (s.dnaMatch == null || s.dnaMatch < 70)) return false;
