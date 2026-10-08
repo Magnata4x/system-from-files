@@ -113,7 +113,7 @@ export function FilterBar() {
         <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">TF</span>
         <Pills
           options={[...timeframes]}
-          value={filters.timeframe}
+          value={filters.timeframe ?? "All"}
           onChange={(v) => setFilter("timeframe", v as typeof filters.timeframe)}
         />
         <Divider />
