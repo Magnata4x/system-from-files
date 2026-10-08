@@ -47,7 +47,7 @@ const COLUMNS: Record<ColKey, ColDef> = {
   rr: { key: "rr", label: "R/R", render: (s) => <span className="tabular-nums font-medium">{s.rr == null ? "—" : s.rr.toFixed(1)}</span> },
   risk: { key: "risk", label: "Risk%", render: (s) => <span className="tabular-nums">{s.riskPct == null ? "—" : s.riskPct + "%"}</span> },
   tf: { key: "tf", label: "TF", render: (s) => s.tf },
-  exchange: { key: "exchange", label: "Exchange", render: (s) => <span className="text-muted-foreground">{s.exchange}</span> },
+  exchange: { key: "exchange", label: "Exchange", render: (s) => <span className="text-muted-foreground">{s.exchange === "binance" ? "Binance" : "—"}</span> },
   setup: { key: "setup", label: "Setup", render: (s) => <span className="text-muted-foreground">{s.setup}</span> },
   confirms: { key: "confirms", label: "Confirms", render: (s) => <span className="tabular-nums">{s.confirms ? Object.values(s.confirms).filter(Boolean).length + "/5" : "—"}</span> },
   dna: { key: "dna", label: "DNA%", render: (s) => <span className="tabular-nums">{s.dnaMatch == null ? "—" : s.dnaMatch + "%"}</span> },

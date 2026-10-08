@@ -20,7 +20,7 @@ export function QuickViewPanel() {
     <AnimatePresence mode="wait">
       {signal ? <motion.div key={signal.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 space-y-4">
         <div className="flex items-center gap-2"><span className="text-[15px] font-semibold">{signal.asset}</span><span className="text-[10px]">{signal.direction}</span><div className="ml-auto"><ScoreBadge score={signal.score} /></div></div>
-        <div className="text-[11px] text-muted-foreground">{signal.exchange === "binance" ? "Binance" : "—"} · {signal.tf} · {signal.setup ?? "—"}</div>
+        <div className="text-[11px] text-muted-foreground">{signal.exchange === "binance" ? "Binance" : "—"} · {signal.tf ?? "—"} · {signal.setup ?? "—"}</div>
         <div className="space-y-1">
           <Row label="Entrada" value={signal.entry == null ? "—" : "$" + formatPrice(signal.entry)} />
           <Row label="Stop" value={signal.stop == null ? "—" : "$" + formatPrice(signal.stop)} />
