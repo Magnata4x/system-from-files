@@ -56,7 +56,7 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
           <span className="text-[11px] text-muted-foreground">{formatAge(signal.ageMin)}</span>
           <ScoreBadge score={signal.score} size="lg" />
         </div>
-        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={signal.createdAt} status={signal.createdAt ? "ok" : "unavailable"} /></div>
+        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={signal.createdAt ? Date.parse(signal.createdAt) : null} status={signal.createdAt ? "ok" : "unavailable"} /></div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
