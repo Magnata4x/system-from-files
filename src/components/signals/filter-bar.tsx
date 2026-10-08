@@ -1,8 +1,8 @@
 import { Search, LayoutGrid, Table as TableIcon, Radar, SlidersHorizontal, ChevronDown, Play, Pause, Rss, Cpu } from "lucide-react";
 import { useSignalsStore } from "@/lib/signals-store";
 
-const assetClasses = ["All", "Crypto", "Forex", "Indices", "Stocks"] as const;
-const timeframes = ["All", "1m", "5m", "15m", "1H", "4H", "1D"] as const;
+const assetClasses = ["All", "Crypto"] as const;
+const timeframes = ["All", "1H", "4H"] as const;
 const directions = ["All", "BUY", "SELL"] as const;
 const scoreOptions = [
   { label: "All", value: 0 },
@@ -10,7 +10,7 @@ const scoreOptions = [
   { label: "≥75", value: 75 },
   { label: "≥90", value: 90 },
 ] as const;
-const exchanges = ["Binance", "Bybit", "OKX", "Coinbase"];
+const exchanges = ["Binance"];
 
 export function FilterBar() {
   const { filters, view, sort, live, streamOpen, setView, setSort, setLive, setFilter, toggleAdv, toggleStream, toggleExchange } = useSignalsStore();
@@ -63,8 +63,8 @@ export function FilterBar() {
           >
             <option value="score">Sort: Score</option>
             <option value="rr">Sort: R/R</option>
-            <option value="age">Sort: Newest</option>
-            <option value="volDelta">Sort: Volume</option>
+            {filters.timeframe === "All" && filters.timeframe /* noop */}\n            {false && <option value="age">Sort: Newest</option>}
+            {false && <option value="volDelta">Sort: Volume</option>}
           </select>
           <ChevronDown className="size-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
@@ -118,7 +118,7 @@ export function FilterBar() {
             <span className="size-2 rounded-full bg-muted-foreground" />
           )}
           {live ? <Pause className="size-3" /> : <Play className="size-3" />}
-          {live ? "Live" : "Paused"}
+          {live ? "Atualização" : "Pausado"}
         </button>
       </div>
 
@@ -151,7 +151,7 @@ export function FilterBar() {
         <Divider />
         <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">Exch</span>
         {exchanges.map((e) => {
-          const active = filters.exchanges.includes(e);
+          const active = filters.exchanges.includes(e.toLowerCase());
           return (
             <button
               key={e}
