@@ -12,7 +12,7 @@ export type Signal = {
   asset: string;
   direction: "BUY" | "SELL";
   score: number;
-  entry: number;
+  entry: number | null;
   stop: number | null;
   target: number | null;
   rr: number | null;
@@ -72,11 +72,11 @@ interface DashboardState {
 export type DashboardDataStatus = "loading" | "ok" | "stale" | "unavailable";
 
 export function calculateRiskReward(
-  entry: number,
+  entry: number | null,
   stop: number | null,
   target: number | null,
 ): number | null {
-  if (stop == null || target == null || entry - stop === 0) return null;
+  if (entry == null || stop == null || target == null || entry - stop === 0) return null;
   return +Math.abs((target - entry) / (entry - stop)).toFixed(2);
 }
 
