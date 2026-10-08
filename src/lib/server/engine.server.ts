@@ -154,7 +154,7 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
         assertOperationalSignal(signal)
         return { pair, signal, failed: false }
       } catch {
-        return { pair, signal: null }
+        return { pair, signal: null, failed: true }
       }
     }),
   )
