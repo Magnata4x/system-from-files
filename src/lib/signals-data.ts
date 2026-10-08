@@ -12,27 +12,22 @@ export type Signal = {
   direction: SignalDirection;
   score: number;
   tf: "1m" | "5m" | "15m" | "1H" | "4H" | "1D";
-  entry: number;
-  stop: number;
-  target: number;
-  rr: number;
-  riskPct: number;
-  volDelta: number; // % vol vs avg
-  confirms: { rsi: boolean; macd: boolean; volume: boolean; structure: boolean; vwap: boolean };
-  dnaMatch: number; // 0-100
-  manipRisk: "low" | "medium" | "high";
-  setup: SetupType;
-  session: Session;
-  ageMin: number;
-  status: SignalStatus;
-  /** true = dado de demonstração, não usar para trading real */
+  entry: number | null;
+  stop: number | null;
+  target: number | null;
+  rr: number | null;
+  riskPct: number | null;
+  volDelta: number | null;
+  confirms: { rsi: boolean | null; macd: boolean | null; volume: boolean | null; structure: boolean | null; vwap: boolean | null } | null;
+  dnaMatch: number | null;
+  manipRisk: "low" | "medium" | "high" | null;
+  setup: SetupType | string | null;
+  session: Session | string | null;
+  createdAt?: string | null;
+  ageMin: number | null;
+  status: SignalStatus | null;
   isMock?: boolean;
 };
-
-// Dados de demonstração foram extraídos para `signals-data.mock.ts` e são
-// carregados via import dinâmico atrás de `import.meta.env.DEV` no store.
-// Mantemos aqui apenas tipos e helpers de formatação para que o bundle de
-// produção não contenha nenhum mock.
 
 export function formatPrice(p: number): string {
   if (p >= 1000) return p.toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -41,9 +36,10 @@ export function formatPrice(p: number): string {
   return p.toFixed(4);
 }
 
-export function formatAge(min: number): string {
-  if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
+export function formatAge(min: number | null): string {
+  if (min == null || !Number.isFinite(min)) return "—";
+  if (min < 1) return "agora";
+  if (min < 60) return `${min}m atrás`;
   const h = Math.floor(min / 60);
-  return `${h}h ago`;
+  return `${h}h atrás`;
 }

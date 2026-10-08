@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useSignalsStore } from "@/lib/signals-store";
 
-const setups = ["BOS+OB", "CHoCH+FVG", "VWAP", "S/R", "Breakout", "Reversal"];
+const setups = ["Tendência de alta", "Tendência de baixa"];
 const sessions = ["All", "Asia", "London", "NY"] as const;
 
 export function AdvancedFiltersDrawer() {
@@ -67,17 +67,6 @@ export function AdvancedFiltersDrawer() {
                 ))}
               </Section>
 
-              <Section title="Volatility">
-                {(["low", "med", "high"] as const).map((k) => (
-                  <Check
-                    key={k}
-                    label={k === "med" ? "Medium" : k.charAt(0).toUpperCase() + k.slice(1)}
-                    checked={filters.volatility[k]}
-                    onChange={(c) => setFilter("volatility", { ...filters.volatility, [k]: c })}
-                  />
-                ))}
-              </Section>
-
               <Section title="Setup type">
                 {setups.map((s) => (
                   <Check
@@ -87,24 +76,6 @@ export function AdvancedFiltersDrawer() {
                     onChange={(c) => setFilter("setups", { ...filters.setups, [s]: c })}
                   />
                 ))}
-              </Section>
-
-              <Section title="Session">
-                <div className="flex gap-1">
-                  {sessions.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setFilter("session", s)}
-                      className={`flex-1 h-8 rounded-md text-[12px] border transition-colors ${
-                        filters.session === s
-                          ? "border-[var(--brand-cyan)] bg-[color-mix(in_oklab,var(--brand-cyan)_15%,transparent)] text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
               </Section>
 
               <Section title="DNA Compatibility">

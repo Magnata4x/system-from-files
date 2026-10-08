@@ -7,7 +7,6 @@ export function StatsBar() {
     { label: "Total", value: s.total },
     { label: "BUY", value: s.buy, color: "#1D9E75" },
     { label: "SELL", value: s.sell, color: "#E24B4A" },
-    { label: "Avg score", value: s.avg },
     { label: "Institutional (≥90)", value: s.inst, color: "#7F77DD" },
     { label: "High prob", value: s.high, color: "#378ADD" },
     { label: "Expired", value: s.expired, color: "#888780" },

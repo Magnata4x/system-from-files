@@ -77,7 +77,9 @@ export async function handleApi(
         { "retry-after": "60" },
       )
     }
-    return jsonResponse(await fn(user))
+    const result = await fn(user)
+    if (result instanceof Response) return result
+    return jsonResponse(result)
   } catch (err) {
     const status = err instanceof ApiError ? err.status : 500
     const message = err instanceof Error ? err.message : 'Erro interno'

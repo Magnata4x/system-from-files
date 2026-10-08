@@ -34,7 +34,7 @@ export function SignalCard({ signal }: { signal: Signal }) {
       onMouseLeave={() => setHover(null)}
       onClick={() => pin(signal.id)}
       className="relative rounded-xl border border-border bg-card overflow-hidden cursor-pointer"
-      style={{ boxShadow: ringByStatus[signal.status] || undefined }}
+      style={{ boxShadow: (signal.status ? ringByStatus[signal.status] : undefined) }}
     >
       {/* Left accent bar */}
       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: accent }} />
@@ -89,27 +89,27 @@ export function SignalCard({ signal }: { signal: Signal }) {
           <motion.div animate={flashing ? { scale: [1, 1.15, 1] } : {}} transition={{ duration: 0.6 }}>
             <ScoreBadge score={signal.score} />
           </motion.div>
-          <span className="ml-auto text-[10px] text-muted-foreground uppercase tracking-wide">{signal.setup}</span>
+          <span className="ml-auto text-[10px] text-muted-foreground uppercase tracking-wide">{signal.setup ?? "—"}</span>
         </div>
 
         {/* Prices */}
         <div className="grid grid-cols-3 gap-2 mt-3">
-          <PriceCell label="Entry" value={formatPrice(signal.entry)} />
-          <PriceCell label="Stop" value={formatPrice(signal.stop)} color="#E24B4A" />
-          <PriceCell label="Target" value={formatPrice(signal.target)} color="#1D9E75" />
+          <PriceCell label="Entry" value={signal.entry == null ? "—" : formatPrice(signal.entry)} />
+          <PriceCell label="Stop" value={signal.stop == null ? "—" : formatPrice(signal.stop)} color="#E24B4A" />
+          <PriceCell label="Target" value={signal.target == null ? "—" : formatPrice(signal.target)} color="#1D9E75" />
         </div>
 
         {/* Stats row */}
         <div className="flex items-center justify-between mt-3 text-[11px] tabular-nums">
-          <span className="text-muted-foreground">R/R <span className="text-foreground font-semibold">{signal.rr.toFixed(1)}</span></span>
-          <span className="text-muted-foreground">Risk <span className="text-foreground font-semibold">{signal.riskPct}%</span></span>
-          <span className="text-muted-foreground">Vol <span className="text-[#1D9E75] font-semibold">↑{signal.volDelta}%</span></span>
+          <span className="text-muted-foreground">R/R <span className="text-foreground font-semibold">{signal.rr == null ? "—" : signal.rr.toFixed(1)}</span></span>
+          <span className="text-muted-foreground">Risk <span className="text-foreground font-semibold">{signal.riskPct == null ? "—" : signal.riskPct + "%"}</span></span>
+          <span className="text-muted-foreground">Vol <span className="text-[#1D9E75] font-semibold">{signal.volDelta == null ? "—" : "↑" + signal.volDelta + "%"}</span></span>
         </div>
 
         {/* Confirmations */}
         <div className="flex flex-wrap gap-1 mt-3">
           {(["rsi", "macd", "volume", "structure", "vwap"] as const).map((k) => {
-            const ok = signal.confirms[k];
+            const ok = signal.confirms?.[k] ?? null;
             return (
               <span
                 key={k}
@@ -130,14 +130,14 @@ export function SignalCard({ signal }: { signal: Signal }) {
           <div className="flex-1">
             <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
               <span>DNA match</span>
-              <span className="tabular-nums text-foreground">{signal.dnaMatch}%</span>
+              <span className="tabular-nums text-foreground">{signal.dnaMatch == null ? "—" : signal.dnaMatch + "%"}</span>
             </div>
             <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
-                  width: `${signal.dnaMatch}%`,
-                  background: `linear-gradient(90deg, var(--brand-blue), ${scoreColor(signal.dnaMatch)})`,
+                  width: `${signal.dnaMatch ?? 0}%`,
+                  background: `linear-gradient(90deg, var(--brand-blue), ${scoreColor(signal.dnaMatch ?? 0)})`,
                 }}
               />
             </div>
@@ -181,7 +181,8 @@ function FooterBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
-function ManipIcon({ risk }: { risk: "low" | "medium" | "high" }) {
+function ManipIcon({ risk }: { risk: "low" | "medium" | "high" | null }) {
+  if (risk == null) return <span className="text-[10px] text-muted-foreground">—</span>;
   if (risk === "low") return <ShieldCheck className="size-4 text-[#1D9E75]" />;
   if (risk === "medium") return <Shield className="size-4 text-[#EF9F27]" />;
   return <ShieldAlert className="size-4 text-[#E24B4A]" />;

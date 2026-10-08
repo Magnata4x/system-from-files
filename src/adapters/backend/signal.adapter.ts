@@ -1,4 +1,3 @@
-// Tradutor entre o shape do backend (Signal) e o shape esperado pela UI (SignalUI).
 import { api, endpoints } from "./api.adapter";
 
 export interface BackendSignal {
@@ -6,19 +5,26 @@ export interface BackendSignal {
   pair: string;
   side: "BUY" | "SELL" | "LONG" | "SHORT";
   score: number;
-  aiScore?: number;
-  entryPrice: number;
-  stopLoss?: number;
-  takeProfit1?: number;
-  takeProfit2?: number;
-  takeProfit3?: number;
-  status?: "active" | "closed" | "pending" | string;
-  tf?: string;
-  exchange?: string;
-  createdAt?: string;
-  type?: string;
-  setup?: string;
-  confluences?: string[];
+  aiScore?: number | null;
+  entryPrice?: number | null;
+  stopLoss?: number | null;
+  takeProfit1?: number | null;
+  takeProfit2?: number | null;
+  takeProfit3?: number | null;
+  status?: "active" | "closed" | "pending" | string | null;
+  tf?: string | null;
+  exchange?: string | null;
+  createdAt?: string | null;
+  type?: string | null;
+  setup?: string | null;
+  confluences?: string[] | null;
+  dnaMatch?: number | null;
+  manipRisk?: "low" | "medium" | "high" | null;
+  session?: string | null;
+  riskPct?: number | null;
+  volDelta?: number | null;
+  rr?: number | null;
+  confirms?: { rsi: boolean | null; macd: boolean | null; volume: boolean | null; structure: boolean | null; vwap: boolean | null } | null;
 }
 
 export interface SignalUI {
@@ -26,57 +32,90 @@ export interface SignalUI {
   symbol: string;
   direction: "BUY" | "SELL";
   confidence: number;
-  entry: number;
-  sl?: number;
-  tp?: number;
-  tp2?: number;
-  tp3?: number;
-  state: "active" | "closed" | "pending";
-  tf?: string;
-  exchange?: string;
-  createdAt?: string;
-  type?: string;
-  setup?: string;
-  confluences?: string[];
-  // raw passthrough para componentes que precisem de campos extras
+  entry: number | null;
+  sl: number | null;
+  tp: number | null;
+  tp2?: number | null;
+  tp3?: number | null;
+  state: "active" | "closed" | "pending" | null;
+  tf?: string | null;
+  exchange?: string | null;
+  createdAt?: string | null;
+  type?: string | null;
+  setup?: string | null;
+  confluences?: string[] | null;
+  dnaMatch?: number | null;
+  manipRisk?: "low" | "medium" | "high" | null;
+  session?: string | null;
+  riskPct?: number | null;
+  volDelta?: number | null;
+  rr?: number | null;
+  confirms?: BackendSignal["confirms"];
   raw?: BackendSignal;
+}
+
+export function normalizeExchange(exchange: string | null | undefined): string | null {
+  if (!exchange) return null;
+  const normalized = exchange.trim().toLowerCase();
+  return normalized === "binance" ? "binance" : normalized || null;
 }
 
 export function mapSignal(s: BackendSignal): SignalUI {
   if (s.side !== "BUY" && s.side !== "SELL" && s.side !== "LONG" && s.side !== "SHORT") {
     throw new Error(`Sinal ${s.id} possui side inválido`);
   }
+  if (!s.id || !s.pair || !Number.isFinite(s.score) || !Number.isFinite(s.entryPrice ?? NaN)) {
+    throw new Error(`Sinal ${s.id || "desconhecido"} possui campos obrigatórios inválidos`);
+  }
 
   const side = s.side === "LONG" || s.side === "BUY" ? "BUY" : "SELL";
-  const state =
-    s.status === "closed" || s.status === "pending" || s.status === "active"
-      ? s.status
-      : "active";
+  const state = s.status === "closed" || s.status === "pending" || s.status === "active" ? s.status : null;
   return {
     id: s.id,
     symbol: s.pair,
     direction: side,
-    confidence: s.aiScore ?? s.score ?? 0,
-    entry: s.entryPrice,
-    sl: s.stopLoss,
-    tp: s.takeProfit1,
-    tp2: s.takeProfit2,
-    tp3: s.takeProfit3,
+    confidence: s.score,
+    entry: s.entryPrice ?? null,
+    sl: s.stopLoss ?? null,
+    tp: s.takeProfit1 ?? null,
+    tp2: s.takeProfit2 ?? null,
+    tp3: s.takeProfit3 ?? null,
     state,
-    tf: s.tf,
-    exchange: s.exchange,
-    createdAt: s.createdAt,
-    type: s.type,
-    setup: s.setup,
-    confluences: s.confluences,
+    tf: s.tf ?? null,
+    exchange: normalizeExchange(s.exchange),
+    createdAt: s.createdAt ?? null,
+    type: s.type ?? null,
+    setup: s.setup ?? null,
+    confluences: s.confluences ?? null,
+    dnaMatch: s.dnaMatch ?? null,
+    manipRisk: s.manipRisk ?? null,
+    session: s.session ?? null,
+    riskPct: s.riskPct ?? null,
+    volDelta: s.volDelta ?? null,
+    rr: s.rr ?? null,
+    confirms: s.confirms ?? null,
     raw: s,
   };
 }
 
+export function mapSignalList(data: BackendSignal[]): { signals: SignalUI[]; discardedCount: number } {
+  const signals: SignalUI[] = [];
+  let discardedCount = 0;
+  for (const item of data) {
+    try { signals.push(mapSignal(item)); }
+    catch { discardedCount++; }
+  }
+  return { signals, discardedCount };
+}
+
+let lastDiscardedCount = 0;
 export const signalAdapter = {
+  getLastDiscardedCount: () => lastDiscardedCount,
   async list(): Promise<SignalUI[]> {
     const data = await api.get<BackendSignal[]>(endpoints.signals.list);
-    return (data ?? []).map(mapSignal);
+    const mapped = mapSignalList(data ?? []);
+    lastDiscardedCount = mapped.discardedCount;
+    return mapped.signals;
   },
   async byId(id: string): Promise<SignalUI | null> {
     const data = await api.get<BackendSignal | null>(endpoints.signals.byId(id));

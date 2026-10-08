@@ -22,6 +22,11 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm run build
+      - name: S1 fabricated-data guard
+        run: |
+          if grep -R -n -E 'mockSignals|ETF inflows|Fed speech|Accumulation phase|OB ZONE|80% win rate|seedRand|mockChange' dist src/components/signals; then
+            exit 1
+          fi
       - run: >-
           npx eslint --rule "prettier/prettier: off"
           src/lib/dashboard-store.ts
