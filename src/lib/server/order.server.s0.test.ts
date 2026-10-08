@@ -52,7 +52,7 @@ describe('S0 — gate REAL no executor', () => {
   })
 
   it('não mantém o gate dentro de comentário com literal \\n', () => {
-    const source = readFileSync(new URL('./order.server.ts', import.meta.url), 'utf8')
+    const source = readFileSync('src/lib/server/order.server.ts', 'utf8')
     const commentedLiteralNewline = source
       .split('\n')
       .filter((line) => /^\s*\/\//.test(line) && line.includes('\\n'))
