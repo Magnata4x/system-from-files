@@ -92,9 +92,16 @@ function stableId(pair: string, bucket: number): string {
   return `${pair.replace('/', '-').toLowerCase()}-${bucket}`
 }
 
-export async function generateSignals(): Promise<BackendSignal[]> {
-  const results = await Promise.all<BackendSignal | null>(
-    TARGET_PAIRS.map(async (pair): Promise<BackendSignal | null> => {
+export interface SignalGenerationResult {
+  signals: BackendSignal[];
+  analyzedPairs: string[];
+  failedPairs: string[];
+}
+
+export async function generateSignalsDetailed(): Promise<SignalGenerationResult> {
+  const analyzedPairs = [...TARGET_PAIRS];
+  const results = await Promise.all(
+    TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null }> => {
       try {
         const [regime, candles] = await Promise.all([
           getMarketRegime(pair),
@@ -106,27 +113,22 @@ export async function generateSignals(): Promise<BackendSignal[]> {
         const range = atr(candles)
         const r = regime.rsi
 
-        // Score: alinhamento tendência + RSI + volatilidade saudável.
         let score = 50 + regime.strength / 2
         if (regime.regime === 'BULLISH' && r < 65) score += 12
         if (regime.regime === 'BEARISH' && r > 35) score += 12
         if (r < 30 || r > 70) score += 8
         if (regime.volatility > 0.4 && regime.volatility < 6) score += 6
         score = Math.max(0, Math.min(100, Math.round(score)))
-        if (regime.regime === 'SIDEWAYS' || score < 60) return null
+        if (regime.regime === 'SIDEWAYS' || score < 60) return { pair, signal: null }
 
         const side: 'BUY' | 'SELL' = regime.regime === 'BULLISH' ? 'BUY' : 'SELL'
         const dir = side === 'BUY' ? 1 : -1
         const bucket = Math.floor(last.openTime / 1000)
         const confluences = [
           'Tendência de mercado confirmada',
-          ...( (side === 'BUY' && r < 65) || (side === 'SELL' && r > 35)
-            ? ['RSI alinhado à direção']
-            : []),
+          ...(((side === 'BUY' && r < 65) || (side === 'SELL' && r > 35)) ? ['RSI alinhado à direção'] : []),
           ...(r < 30 || r > 70 ? ['RSI em região extrema'] : []),
-          ...(regime.volatility > 0.4 && regime.volatility < 6
-            ? ['Volatilidade dentro da faixa do motor']
-            : []),
+          ...(regime.volatility > 0.4 && regime.volatility < 6 ? ['Volatilidade dentro da faixa do motor'] : []),
         ]
 
         const signal: BackendSignal = {
@@ -134,12 +136,12 @@ export async function generateSignals(): Promise<BackendSignal[]> {
           pair: toPair(pair),
           side,
           score,
-          aiScore: Math.min(100, score + (regime.strength > 60 ? 4 : 0)),
+          aiScore: score,
           entryPrice: Number(price.toFixed(6)),
           stopLoss: Number((price - dir * range * 1.5).toFixed(6)),
           takeProfit1: Number((price + dir * range * 2).toFixed(6)),
           takeProfit2: Number((price + dir * range * 3.5).toFixed(6)),
-          status: 'active' as const,
+          status: 'active',
           tf: '4H',
           exchange: 'binance',
           createdAt: new Date(last.openTime).toISOString(),
@@ -150,15 +152,20 @@ export async function generateSignals(): Promise<BackendSignal[]> {
           confluences,
         }
         assertOperationalSignal(signal)
-        return signal
+        return { pair, signal }
       } catch {
-        return null
+        return { pair, signal: null }
       }
     }),
   )
-  return results
-    .filter((s): s is BackendSignal => s !== null)
-    .sort((a, b) => b.aiScore - a.aiScore)
+  const signals = results.flatMap((r) => r.signal ? [r.signal] : [])
+    .sort((a, b) => b.score - a.score)
+  const failedPairs = results.filter((r) => !r.signal).map((r) => r.pair)
+  return { signals, analyzedPairs, failedPairs }
+}
+
+export async function generateSignals(): Promise<BackendSignal[]> {
+  return (await generateSignalsDetailed()).signals
 }
 
 // ── Manipulação ───────────────────────────────────────────────────────────
