@@ -84,7 +84,7 @@ function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalU
     session: s.session ?? null,
     createdAt: s.createdAt ?? null,
     ageMin,
-    status: s.state,
+    status: s.state === "active" ? "active" : s.state === "pending" ? "new" : s.state === "closed" ? "expired" : null,
     isMock: false,
   };
 }
