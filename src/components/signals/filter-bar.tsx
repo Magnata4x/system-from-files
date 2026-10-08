@@ -105,21 +105,7 @@ export function FilterBar() {
           <Rss className="size-3.5" /> Stream
         </button>
 
-        <button
-          onClick={() => setLive(!live)}
-          className="h-8 px-3 rounded-md border border-border bg-card text-[12px] text-foreground hover:border-[var(--brand-cyan)] inline-flex items-center gap-2 transition-colors"
-        >
-          {live ? (
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[#1D9E75] opacity-75 animate-ping" />
-              <span className="relative inline-flex size-2 rounded-full bg-[#1D9E75]" />
-            </span>
-          ) : (
-            <span className="size-2 rounded-full bg-muted-foreground" />
-          )}
-          {live ? <Pause className="size-3" /> : <Play className="size-3" />}
-          {live ? "Atualização" : "Pausado"}
-        </button>
+
       </div>
 
       {/* Row 2 */}
