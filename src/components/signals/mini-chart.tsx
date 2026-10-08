@@ -23,7 +23,7 @@ export function MiniChart({ signal }: { signal: Signal }) {
         {levels.map((level) => (
           <g key={level.label}>
             <line x1="20" x2="440" y1={y(level.value)} y2={y(level.value)} stroke={level.color} strokeDasharray="6 3" />
-            <text x="24" y={y(level.value) - 6} fontSize="10" fill={level.color}>{level.label} $&#123;formatPrice(level.value)&#125;</text>
+            <text x="24" y={y(level.value) - 6} fontSize="10" fill={level.color}>{level.label} {"$"}{formatPrice(level.value)}</text>
           </g>
         ))}
       </svg>
