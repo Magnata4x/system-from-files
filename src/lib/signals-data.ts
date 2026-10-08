@@ -8,10 +8,10 @@ export type Signal = {
   id: string;
   asset: string;
   assetClass: AssetClass;
-  exchange: string;
+  exchange: string | null;
   direction: SignalDirection;
   score: number;
-  tf: "1m" | "5m" | "15m" | "1H" | "4H" | "1D";
+  tf: "1m" | "5m" | "15m" | "1H" | "4H" | "1D" | null;
   entry: number | null;
   stop: number | null;
   target: number | null;
