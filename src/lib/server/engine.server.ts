@@ -101,7 +101,7 @@ export interface SignalGenerationResult {
 export async function generateSignalsDetailed(): Promise<SignalGenerationResult> {
   const analyzedPairs = [...TARGET_PAIRS];
   const results = await Promise.all(
-    TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null }> => {
+    TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null; failed: boolean }> => {
       try {
         const [regime, candles] = await Promise.all([
           getMarketRegime(pair),
