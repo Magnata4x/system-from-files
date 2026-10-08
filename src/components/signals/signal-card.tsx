@@ -182,7 +182,8 @@ function FooterBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
 }
 
 function ManipIcon({ risk }: { risk: "low" | "medium" | "high" | null }) {
-  if (risk == null) return <span className="text-[10px] text-muted-foreground">—</span>;\n  if (risk === "low") return <ShieldCheck className="size-4 text-[#1D9E75]" />;
+  if (risk == null) return <span className="text-[10px] text-muted-foreground">—</span>;
+  if (risk === "low") return <ShieldCheck className="size-4 text-[#1D9E75]" />;
   if (risk === "medium") return <Shield className="size-4 text-[#EF9F27]" />;
   return <ShieldAlert className="size-4 text-[#E24B4A]" />;
 }
