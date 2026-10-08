@@ -41,20 +41,20 @@ const COLUMNS: Record<ColKey, ColDef> = {
     },
   },
   score: { key: "score", label: "Score", render: (s) => <ScoreBadge score={s.score} size="sm" /> },
-  entry: { key: "entry", label: "Entry", render: (s) => <span className="tabular-nums">{formatPrice(s.entry)}</span> },
-  stop: { key: "stop", label: "Stop", render: (s) => <span className="tabular-nums text-[#E24B4A]">{formatPrice(s.stop)}</span> },
-  target: { key: "target", label: "Target", render: (s) => <span className="tabular-nums text-[#1D9E75]">{formatPrice(s.target)}</span> },
-  rr: { key: "rr", label: "R/R", render: (s) => <span className="tabular-nums font-medium">{s.rr.toFixed(1)}</span> },
-  risk: { key: "risk", label: "Risk%", render: (s) => <span className="tabular-nums">{s.riskPct}%</span> },
+  entry: { key: "entry", label: "Entry", render: (s) => <span className="tabular-nums">{s.entry == null ? "—" : formatPrice(s.entry)}</span> },
+  stop: { key: "stop", label: "Stop", render: (s) => <span className="tabular-nums text-[#E24B4A]">{s.stop == null ? "—" : formatPrice(s.stop)}</span> },
+  target: { key: "target", label: "Target", render: (s) => <span className="tabular-nums text-[#1D9E75]">{s.target == null ? "—" : formatPrice(s.target)}</span> },
+  rr: { key: "rr", label: "R/R", render: (s) => <span className="tabular-nums font-medium">{s.rr == null ? "—" : s.rr.toFixed(1)}</span> },
+  risk: { key: "risk", label: "Risk%", render: (s) => <span className="tabular-nums">{s.riskPct == null ? "—" : s.riskPct + "%"}</span> },
   tf: { key: "tf", label: "TF", render: (s) => s.tf },
   exchange: { key: "exchange", label: "Exchange", render: (s) => <span className="text-muted-foreground">{s.exchange}</span> },
   setup: { key: "setup", label: "Setup", render: (s) => <span className="text-muted-foreground">{s.setup}</span> },
-  confirms: { key: "confirms", label: "Confirms", render: (s) => <span className="tabular-nums">{Object.values(s.confirms).filter(Boolean).length}/5</span> },
-  dna: { key: "dna", label: "DNA%", render: (s) => <span className="tabular-nums">{s.dnaMatch}%</span> },
+  confirms: { key: "confirms", label: "Confirms", render: (s) => <span className="tabular-nums">{s.confirms ? Object.values(s.confirms).filter(Boolean).length + "/5" : "—"}</span> },
+  dna: { key: "dna", label: "DNA%", render: (s) => <span className="tabular-nums">{s.dnaMatch == null ? "—" : s.dnaMatch + "%"}</span> },
   manip: {
     key: "manip", label: "Manip",
     render: (s) =>
-      s.manipRisk === "low" ? <ShieldCheck className="size-3.5 text-[#1D9E75]" /> :
+      s.manipRisk == null ? <span className="text-[10px] text-muted-foreground">—</span> : s.manipRisk === "low" ? <ShieldCheck className="size-3.5 text-[#1D9E75]" /> :
         s.manipRisk === "medium" ? <Shield className="size-3.5 text-[#EF9F27]" /> :
           <ShieldAlert className="size-3.5 text-[#E24B4A]" />,
   },
