@@ -34,7 +34,7 @@ export function SignalCard({ signal }: { signal: Signal }) {
       onMouseLeave={() => setHover(null)}
       onClick={() => pin(signal.id)}
       className="relative rounded-xl border border-border bg-card overflow-hidden cursor-pointer"
-      style={{ boxShadow: ringByStatus[signal.status] || undefined }}
+      style={{ boxShadow: (signal.status ? ringByStatus[signal.status] : undefined) }}
     >
       {/* Left accent bar */}
       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: accent }} />
