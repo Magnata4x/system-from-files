@@ -59,7 +59,7 @@ function StreamRow({ s, onHover, onLeave, onClick }: { s: Signal; onHover: () =>
         <span className="font-bold" style={{ color: accent }}>{s.direction === "BUY" ? "▲" : "▼"}</span>
       </div>
       <div className="flex items-center justify-between text-muted-foreground">
-        <span className="tabular-nums" style={{ color: accent }}>{formatPrice(s.entry)}</span>
+        <span className="tabular-nums" style={{ color: accent }}>{s.entry == null ? "—" : formatPrice(s.entry)}</span>
         <span className="tabular-nums">{s.score}</span>
       </div>
       <div className="flex items-center justify-between text-muted-foreground/70 text-[9px]">
