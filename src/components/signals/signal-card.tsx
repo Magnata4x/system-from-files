@@ -74,7 +74,7 @@ export function SignalCard({ signal }: { signal: Signal }) {
           </div>
           <div className="flex flex-col">
             <span className="text-[13px] font-semibold text-foreground leading-tight">{signal.asset}</span>
-            <span className="text-[10px] text-muted-foreground">{signal.exchange} · {signal.tf} · {formatAge(signal.ageMin)}</span>
+            <span className="text-[10px] text-muted-foreground">{signal.exchange === "binance" ? "Binance" : "—"} · {signal.tf ?? "—"} · {formatAge(signal.ageMin)}</span>
           </div>
         </div>
 
