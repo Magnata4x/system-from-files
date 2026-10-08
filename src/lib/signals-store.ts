@@ -67,10 +67,10 @@ function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalU
     id: s.id,
     asset: s.symbol,
     assetClass: "Crypto",
-    exchange: s.exchange ?? "binance",
+    exchange: s.exchange ?? null,
     direction: s.direction,
     score: s.confidence,
-    tf: s.tf === "1H" || s.tf === "4H" ? s.tf : "4H",
+    tf: s.tf === "1H" || s.tf === "4H" ? s.tf : null,
     entry: s.entry,
     stop: s.sl,
     target: s.tp,
@@ -174,7 +174,7 @@ function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKe
     if (filters.timeframe !== "All" && s.tf !== filters.timeframe) return false;
     if (filters.direction !== "All" && s.direction !== filters.direction) return false;
     if (s.score < filters.scoreMin) return false;
-    if (exchSet.size && !exchSet.has(s.exchange.toLowerCase())) return false;
+    if (exchSet.size && (s.exchange == null || !exchSet.has(s.exchange.toLowerCase()))) return false;
     if (s.score < filters.scoreRange[0] || s.score > filters.scoreRange[1]) return false;
     if (filters.minRR > 0 && (s.rr == null || s.rr < filters.minRR)) return false;
     if (s.manipRisk != null && !filters.manipRisk[s.manipRisk]) return false;
