@@ -99,7 +99,7 @@ export function mapSignal(s: BackendSignal): SignalUI {
     session: s.session ?? null,
     riskPct: s.riskPct ?? null,
     volDelta: s.volDelta ?? null,
-    rr: s.rr != null && Number.isFinite(s.rr) ? s.rr : deriveRiskReward(s.entryPrice, s.stopLoss, s.takeProfit1),
+    rr: deriveRiskReward(s.entryPrice, s.stopLoss, s.takeProfit1),
     confirms: s.confirms ?? null,
     raw: s,
   };
