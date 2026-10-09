@@ -32,6 +32,11 @@ describe("signal adapter integrity", () => {
     expect(deriveRiskReward(100, 95, Number.NaN)).toBeNull();
   });
 
+  it("does not infer an operational lifecycle from closed or pending states", () => {
+    expect(mapSignal(signal({ status: "closed" })).state).toBeNull();
+    expect(mapSignal(signal({ status: "pending" })).state).toBeNull();
+  });
+
   it("counts invalid items and preserves valid items", () => {
     const result = mapSignalList([
       signal(),
