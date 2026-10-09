@@ -171,7 +171,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
 }));
 
-function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKey): Signal[] {
+export function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKey): Signal[] {
   const exchSet = new Set(filters.exchanges);
   const setupKeys = Object.keys(filters.setups).filter((k) => filters.setups[k]);
   const list = signals.filter((s) => {
