@@ -46,7 +46,7 @@ export function SignalToasts() {
                   </button>
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1">
-                  Entry <span className="text-foreground tabular-nums">{s.entry == null ? "—" : formatPrice(s.entry)}</span> · {s.tf} · {s.exchange}
+                  Entry <span className="text-foreground tabular-nums">{s.entry == null ? "—" : formatPrice(s.entry)}</span> · {s.tf ?? "—"} · {s.exchange ?? "—"}
                 </div>
                 <button onClick={() => { openDetail(s.id); dismiss(t.id); }} className="mt-2 text-[11px] text-[var(--brand-cyan)] hover:underline">View signal →</button>
               </div>
