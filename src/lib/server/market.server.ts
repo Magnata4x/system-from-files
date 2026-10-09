@@ -5,7 +5,21 @@ import { MARKET_PAIRS, toBinanceSymbol as sharedToBinanceSymbol, toMarketPair } 
 
 export const TARGET_PAIRS = MARKET_PAIRS
 
-const BINANCE = "https://api.binance.com"
+const MARKET_DATA_ENDPOINTS = ["https://api.binance.com", "https://data-api.binance.vision"] as const
+const MARKET_DATA_TIMEOUT_MS = 5_000
+
+export type MarketDataErrorCode = "TIMEOUT" | "SOURCE_UNAVAILABLE" | "INVALID_DATA"
+
+export class MarketDataError extends Error {
+  constructor(
+    message: string,
+    readonly code: MarketDataErrorCode,
+    readonly failures: string[] = [],
+  ) {
+    super(message)
+    this.name = "MarketDataError"
+  }
+}
 
 export function toBinanceSymbol(pair: string): string { return sharedToBinanceSymbol(pair) }
 
@@ -45,10 +59,38 @@ export interface Kline {
   volume: number
 }
 
+async function fetchWithTimeout(url: string, timeoutMs = MARKET_DATA_TIMEOUT_MS): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal })
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new MarketDataError(`Timeout após ${timeoutMs}ms em ${new URL(url).host}`, "TIMEOUT")
+    }
+    throw error
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 async function binanceFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${BINANCE}${path}`, { headers: { accept: 'application/json' } })
-  if (!res.ok) throw new Error(`Binance ${res.status} em ${path}`)
-  return (await res.json()) as T
+  const failures: string[] = []
+  for (const endpoint of MARKET_DATA_ENDPOINTS) {
+    try {
+      const res = await fetchWithTimeout(`${endpoint}${path}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status} em ${new URL(endpoint).host}`)
+      return (await res.json()) as T
+    } catch (error) {
+      failures.push(error instanceof Error ? error.message : String(error))
+    }
+  }
+  const timedOut = failures.some((failure) => failure.toLowerCase().includes("timeout"))
+  throw new MarketDataError(
+    `Todas as fontes de mercado falharam em ${path}: ${failures.join("; ")}`,
+    timedOut ? "TIMEOUT" : "SOURCE_UNAVAILABLE",
+    failures,
+  )
 }
 
 export async function getTickers(pairs: readonly string[] = TARGET_PAIRS): Promise<Ticker[]> {
@@ -95,6 +137,17 @@ export async function getTicker(pair: string): Promise<Ticker | null> {
   return t ?? null
 }
 
+export function selectClosedCandles(candles: readonly Kline[]): Kline[] {
+  if (candles.length < 2) {
+    throw new MarketDataError("Histórico insuficiente para excluir a vela aberta", "INVALID_DATA")
+  }
+  return candles.slice(0, -1)
+}
+
+export async function getClosedKlines(pair: string, interval = "4h", limit = 200): Promise<Kline[]> {
+  return selectClosedCandles(await getKlines(pair, interval, limit))
+}
+
 export async function getKlines(pair: string, interval = '4h', limit = 200): Promise<Kline[]> {
   const symbol = toBinanceSymbol(pair)
   return cached(`klines:${symbol}:${interval}:${limit}`, 60_000, async () => {
@@ -134,17 +187,32 @@ export async function getKlines(pair: string, interval = '4h', limit = 200): Pro
 // ── Indicadores ────────────────────────────────────────────────────────────
 
 export function rsi(closes: number[], period = 14): number {
-  if (closes.length <= period) return 50
-  let gain = 0
-  let loss = 0
-  for (let i = closes.length - period; i < closes.length; i++) {
-    const diff = (closes[i] ?? 0) - (closes[i - 1] ?? 0)
-    if (diff >= 0) gain += diff
-    else loss -= diff
+  if (!Number.isInteger(period) || period < 1) throw new RangeError("Período RSI inválido")
+  if (closes.length <= period) throw new MarketDataError("Dados insuficientes para calcular RSI", "INVALID_DATA")
+  if (closes.some((value) => !Number.isFinite(value))) {
+    throw new MarketDataError("Fechamentos inválidos para calcular RSI", "INVALID_DATA")
   }
-  if (loss === 0) return 100
-  const rs = gain / loss
-  return Math.round(100 - 100 / (1 + rs))
+
+  let averageGain = 0
+  let averageLoss = 0
+  for (let i = 1; i <= period; i++) {
+    const change = closes[i]! - closes[i - 1]!
+    averageGain += Math.max(change, 0)
+    averageLoss += Math.max(-change, 0)
+  }
+  averageGain /= period
+  averageLoss /= period
+
+  for (let i = period + 1; i < closes.length; i++) {
+    const change = closes[i]! - closes[i - 1]!
+    averageGain = (averageGain * (period - 1) + Math.max(change, 0)) / period
+    averageLoss = (averageLoss * (period - 1) + Math.max(-change, 0)) / period
+  }
+
+  if (averageLoss === 0) return averageGain === 0 ? 50 : 100
+  if (averageGain === 0) return 0
+  const relativeStrength = averageGain / averageLoss
+  return 100 - 100 / (1 + relativeStrength)
 }
 
 export function ema(values: number[], period: number): number {
@@ -180,7 +248,7 @@ export interface MarketRegime {
 }
 
 export async function getMarketRegime(pair: string): Promise<MarketRegime> {
-  const candles = await getKlines(pair, '4h', 200)
+  const candles = await getClosedKlines(pair, '4h', 200)
   const closes = candles.map((c) => c.close)
   const price = closes.at(-1)
   if (price == null || price <= 0) throw new Error('Dados de mercado indisponíveis para ' + pair)
