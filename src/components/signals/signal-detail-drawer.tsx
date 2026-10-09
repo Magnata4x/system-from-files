@@ -67,7 +67,8 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
           <span className="text-[11px] text-muted-foreground">{formatAge(signal.ageMin)}</span>
           <ScoreBadge score={signal.score} size="lg" />
         </div>
-        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} />\n          <div className="text-[10px] text-muted-foreground mt-1">Preço: {priceAge == null ? "Binance · indisponível" : `Binance · há ${priceAge}s`}</div>
+        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} />
+          <div className="text-[10px] text-muted-foreground mt-1">Preço: {priceAge == null ? "Binance · indisponível" : `Binance · há ${priceAge}s`}</div>
           <div className="text-[10px] text-muted-foreground mt-1">Vela de: {signal.createdAt ? new Date(signal.createdAt).toLocaleString() : "—"}</div></div>
       </header>
 
