@@ -102,10 +102,11 @@ export function SignalCard({ signal }: { signal: Signal }) {
         </div>
 
         {/* Prices */}
-        <div className="grid grid-cols-3 gap-2 mt-3">
-          <PriceCell label="Entry" value={signal.entry == null ? "—" : formatPrice(signal.entry)} />
-          <PriceCell label="Stop" value={signal.stop == null ? "—" : formatPrice(signal.stop)} color="#E24B4A" />
-          <PriceCell label="Target" value={signal.target == null ? "—" : formatPrice(signal.target)} color="#1D9E75" />
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          <PriceCell label="Preço atual" value={currentPrice == null ? "—" : formatPrice(currentPrice)} detail={priceAge == null ? "Binance · —" : `Binance · há ${priceAge}s`} />
+          <PriceCell label="Entrada" value={signal.entry == null ? "—" : formatPrice(signal.entry)} detail={distance(signal.entry)} />
+          <PriceCell label="SL" value={signal.stop == null ? "—" : formatPrice(signal.stop)} detail={distance(signal.stop)} color="#E24B4A" />
+          <PriceCell label="TP1" value={signal.target == null ? "—" : formatPrice(signal.target)} detail={distance(signal.target)} color="#1D9E75" />
         </div>
 
         {/* Stats row */}
