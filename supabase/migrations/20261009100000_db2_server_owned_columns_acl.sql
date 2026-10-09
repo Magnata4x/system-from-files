@@ -5,19 +5,19 @@
 REVOKE INSERT, UPDATE ON TABLE public.bot4x_configs FROM PUBLIC, anon, authenticated;
 GRANT INSERT (
   user_id, active, profile, rsi_threshold_low, rsi_threshold_high, ai_score_min,
-  fomo_limit, leverage, total_trades_today, exchange, api_key_set, sl_pct, tp_pct,
+  fomo_limit, leverage, exchange, sl_pct, tp_pct,
   allocation_pct, total_capital, preferred_pairs, avoid_pairs, execution_mode
 ) ON TABLE public.bot4x_configs TO authenticated;
 GRANT UPDATE (
   active, profile, rsi_threshold_low, rsi_threshold_high, ai_score_min, fomo_limit,
-  leverage, total_trades_today, exchange, api_key_set, sl_pct, tp_pct,
+  leverage, exchange, sl_pct, tp_pct,
   allocation_pct, total_capital, preferred_pairs, avoid_pairs, execution_mode
 ) ON TABLE public.bot4x_configs TO authenticated;
 
 -- These fields are computed/maintained by trusted backend operations.
-REVOKE INSERT (circuit_breaker, daily_pnl, open_slots, active_capital)
+REVOKE INSERT (circuit_breaker, daily_pnl, open_slots, active_capital, total_trades_today, api_key_set)
   ON TABLE public.bot4x_configs FROM PUBLIC, anon, authenticated;
-REVOKE UPDATE (circuit_breaker, daily_pnl, open_slots, active_capital)
+REVOKE UPDATE (circuit_breaker, daily_pnl, open_slots, active_capital, total_trades_today, api_key_set)
   ON TABLE public.bot4x_configs FROM PUBLIC, anon, authenticated;
 
 REVOKE INSERT, UPDATE ON TABLE public.profiles FROM PUBLIC, anon, authenticated;
