@@ -8,7 +8,8 @@ BEGIN
   -- including through any inherited table-level grants.
   FOREACH role_name IN ARRAY ARRAY['anon', 'authenticated'] LOOP
     FOREACH protected_column IN ARRAY ARRAY[
-      'circuit_breaker', 'daily_pnl', 'open_slots', 'active_capital'
+      'circuit_breaker', 'daily_pnl', 'open_slots', 'active_capital',
+      'total_trades_today', 'api_key_set'
     ] LOOP
       IF has_column_privilege(role_name, 'public.bot4x_configs', protected_column, 'INSERT')
          OR has_column_privilege(role_name, 'public.bot4x_configs', protected_column, 'UPDATE') THEN
