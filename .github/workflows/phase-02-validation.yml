@@ -31,7 +31,7 @@ jobs:
         run: |
           pattern='(>|\\}|\\))\\n[[:space:]]*(<|\\{)'
           fixture="$(mktemp)"
-          printf '%s\\n' '</div>\\n   <StatsBar />' > "$fixture"
+          printf '%s\n' '</div>\n   <StatsBar />' > "$fixture"
           if ! grep -nE "$pattern" "$fixture"; then
             echo 'Guard self-test failed: expected fixture was not detected.'
             rm -f "$fixture"
