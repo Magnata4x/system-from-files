@@ -91,7 +91,9 @@ function SignalsPage() {
         <div className="flex-1 min-w-0">
           <FilterBar />
           <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>
-          <StatsBar />
+          <StatsBar signals={filtered} />
+          {sourceStatus === "ok" && failedPairs.length > 0 && <div role="status" className="px-5 py-2 text-xs text-amber-500">Dados parciais: falha ao analisar {failedPairs.join(", ")}.</div>}
+          {discardedCount > 0 && <div role="status" className="px-5 py-1 text-xs text-muted-foreground">{discardedCount} sinal(is) inválido(s) descartado(s) pela validação.</div>}
           <div className="flex">
             <main className="flex-1 min-w-0 p-5">
               {view === "cards" && <CardGrid signals={filtered} sourceStatus={sourceStatus} totalSignals={totalSignals} />}
