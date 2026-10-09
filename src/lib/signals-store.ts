@@ -5,7 +5,7 @@ import { type Signal, type AssetClass } from "./signals-data";
 import { backendWs } from "@/adapters/backend/ws-client";
 
 export type ViewMode = "cards" | "table" | "radar";
-export type SortKey = "score" | "rr" | "age" | "volDelta";
+export type SortKey = "score" | "rr";
 export type SignalSourceStatus = "loading" | "ok" | "stale" | "unavailable";
 
 type SignalToast = { id: string; signal: Signal; createdAt: number };
@@ -40,7 +40,7 @@ type State = {
   flashIds: string[];
   lastSyncAt: number | null;
   sourceStatus: SignalSourceStatus;
-  discardedCount: number;
+  discardedCount: number;\n  failedPairs: string[];
   _intervalIds: Set<number>;
   _wsUnsub: (() => void) | null;
   syncFromBackend: () => Promise<void>;
@@ -100,7 +100,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
   view: "cards", sort: "score", live: true, advOpen: false, streamOpen: false,
   pinnedId: null, hoverId: null, detailId: null, toasts: [], flashIds: [],
-  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, _intervalIds: new Set<number>(), _wsUnsub: null,
+  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], _intervalIds: new Set<number>(), _wsUnsub: null,
   setView: (v) => set({ view: v }),
   setSort: (s) => set({ sort: s }),
   setLive: (v) => set({ live: v }),
@@ -126,11 +126,11 @@ export const useSignalsStore = create<State>((set, get) => ({
         signals: mapped,
         lastSyncAt: Date.now(),
         sourceStatus: "ok",
-        discardedCount: signalAdapter.getLastDiscardedCount(),
+        discardedCount: signalAdapter.getLastDiscardedCount(),\n        failedPairs: signalAdapter.getLastFailedPairs(),
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
-      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable" }));
+      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable", failedPairs: (err as { response?: unknown }) && [] }));
     }
   },
   init: () => {
