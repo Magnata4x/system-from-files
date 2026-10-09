@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, Bookmark, Download, EyeOff, Pin, PinOff, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
 import { ScoreBadge } from "@/components/dashboard/score-badge";
-import { type Signal, formatPrice, formatAge } from "@/lib/signals-data";
+import { type Signal, formatPrice, formatAge, calculateSignalDistancePct } from "@/lib/signals-data";
 import { useSignalsStore } from "@/lib/signals-store";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xEligibility, ELIGIBILITY_META } from "@/lib/bot4x-eligibility";
-import { useLivePrices, type CoinPrice } from "@/hooks/useLivePrices";
+import { useMarketData, type CoinPrice } from "@/lib/market-data-store";
 
 const PAGE = 20;
 
@@ -32,7 +32,7 @@ const COLUMNS: Record<ColKey, ColDef> = {
   },
   num: { key: "num", label: "#", render: (_s, { idx }) => <span className="text-muted-foreground tabular-nums">{idx + 1}</span> },
   asset: { key: "asset", label: "Asset", render: (s) => <span className="font-semibold text-foreground">{s.asset}</span> },
-  price: { key: "price", label: "Preço", render: (s, { prices }) => <LivePriceCell asset={s.asset} prices={prices} /> },
+  price: { key: "price", label: "Preço atual", render: (s, { prices }) => <LivePriceCell signal={s} prices={prices} /> },
   dir: {
     key: "dir", label: "Dir",
     render: (s) => {
@@ -136,7 +136,7 @@ export function TableView({ signals }: { signals: Signal[] }) {
   const [ctx, setCtx] = useState<{ x: number; y: number; col: ColKey } | null>(null);
   const dragKey = useRef<ColKey | null>(null);
 
-  const { prices } = useLivePrices();
+  const { prices } = useMarketData();
   const setHover = useSignalsStore((s) => s.setHover);
   const pin = useSignalsStore((s) => s.pin);
 
