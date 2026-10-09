@@ -36,7 +36,7 @@ describe("signal adapter integrity", () => {
     const result = mapSignalList([
       signal(),
       signal({ id: "bad-entry", entryPrice: null }),
-      signal({ id: "bad-side", side: "HOLD" }),
+      signal({ id: "bad-side", side: "HOLD" as BackendSignal["side"] }),
     ]);
     expect(result.signals.map((item) => item.id)).toEqual(["signal-1"]);
     expect(result.discardedCount).toBe(2);
