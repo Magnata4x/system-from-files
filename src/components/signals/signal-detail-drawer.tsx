@@ -5,7 +5,8 @@ import { X, Bell, Bookmark, LineChart, Share2, TrendingUp, TrendingDown, ShieldA
 import { ScoreBadge } from "@/components/dashboard/score-badge";
 import { DataStatusBadge } from "@/components/dashboard/data-status";
 import { useSignalsStore } from "@/lib/signals-store";
-import { formatPrice, formatAge, type Signal } from "@/lib/signals-data";
+import { formatPrice, formatAge, type Signal, calculateSignalDistancePct } from "@/lib/signals-data";
+import { useMarketData } from "@/lib/market-data-store";
 import { MiniChart } from "./mini-chart";
 import { bot4xEligibility, ELIGIBILITY_META } from "@/lib/bot4x-eligibility";
 import { useBot4xStore } from "@/lib/bot4x-store";
@@ -39,6 +40,14 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
   const dailyPnlPct = useBot4xStore((s) => s.dailyPnlPct);
   const eligibility = bot4xEligibility(signal, { mode, profile, dailyPnlPct });
   const meta = ELIGIBILITY_META[eligibility];
+  const { prices } = useMarketData();
+  const current = prices[signal.asset.split("/")[0] ?? ""] ?? null;
+  const currentPrice = current?.price ?? null;
+  const priceAge = current ? Math.max(0, Math.floor((Date.now() - current.lastUpdated.getTime()) / 1000)) : null;
+  const distance = (level: number | null) => {
+    const pct = calculateSignalDistancePct(currentPrice, level, signal.direction);
+    return pct == null ? "—" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
+  };
 
   return <>
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/60 z-[60]" />
@@ -48,7 +57,7 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
         <div className="flex items-center gap-2 pr-10">
           <span className="text-[18px] font-medium">{signal.asset}</span>
           <span className="px-1.5 py-0.5 rounded text-[10px] border border-border">{signal.exchange === "binance" ? "Binance" : "—"}</span>
-          <span className="text-[14px] font-semibold tabular-nums">{signal.entry == null ? "—" : "$" + formatPrice(signal.entry)}</span>
+          <span className="text-[14px] font-semibold tabular-nums">Preço atual: {currentPrice == null ? "—" : "$" + formatPrice(currentPrice)}</span>
         </div>
         <div className="flex items-center gap-2 mt-3">
           <span className="px-3 py-1.5 rounded-md text-[13px] font-bold" style={{ background: `color-mix(in oklab, ${accent} 22%, transparent)`, color: accent }}>
@@ -58,16 +67,17 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
           <span className="text-[11px] text-muted-foreground">{formatAge(signal.ageMin)}</span>
           <ScoreBadge score={signal.score} size="lg" />
         </div>
-        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} />
+        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} />\n          <div className="text-[10px] text-muted-foreground mt-1">Preço: {priceAge == null ? "Binance · indisponível" : `Binance · há ${priceAge}s`}</div>
           <div className="text-[10px] text-muted-foreground mt-1">Vela de: {signal.createdAt ? new Date(signal.createdAt).toLocaleString() : "—"}</div></div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
         <Section title="Trade Setup">
-          <div className="grid grid-cols-3 gap-2">
-            <Value label="Entrada" value={signal.entry == null ? "—" : "$" + formatPrice(signal.entry)} />
-            <Value label="Stop" value={signal.stop == null ? "—" : "$" + formatPrice(signal.stop)} />
-            <Value label="Target" value={signal.target == null ? "—" : "$" + formatPrice(signal.target)} />
+          <div className="grid grid-cols-2 gap-2">
+            <Value label="Preço atual" value={currentPrice == null ? "—" : "$" + formatPrice(currentPrice)} detail={distance(currentPrice)} />
+            <Value label="Entrada" value={signal.entry == null ? "—" : "$" + formatPrice(signal.entry)} detail={distance(signal.entry)} />
+            <Value label="SL" value={signal.stop == null ? "—" : "$" + formatPrice(signal.stop)} detail={distance(signal.stop)} />
+            <Value label="TP1" value={signal.target == null ? "—" : "$" + formatPrice(signal.target)} detail={distance(signal.target)} />
           </div>
           <p className="text-[10px] text-muted-foreground mt-2">Entrada, SL e TP são referência no momento da análise.</p>
           <div className="grid grid-cols-2 gap-2 mt-2">
@@ -121,8 +131,8 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return <section className="px-5 py-4 border-b border-border"><h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">{title}</h3>{children}</section>;
 }
-function Value({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-md bg-card border border-border px-2.5 py-1.5"><div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div><div className="text-[12px] font-semibold tabular-nums mt-0.5">{value}</div></div>;
+function Value({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return <div className="rounded-md bg-card border border-border px-2.5 py-1.5"><div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div><div className="text-[12px] font-semibold tabular-nums mt-0.5">{value}</div>{detail && <div className="text-[10px] text-muted-foreground">{detail}</div>}</div>;
 }
 function FooterBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
   return <button disabled title="Indisponível nesta fase; será implementado na S5." className="h-9 px-3 rounded-md border border-border bg-card text-muted-foreground opacity-50 cursor-not-allowed text-[12px] inline-flex items-center gap-1.5">{icon}{label}</button>;
