@@ -3,6 +3,7 @@ import { useShallow } from "zustand/react/shallow";
 import { createSelector } from "reselect";
 import { type Signal, type AssetClass } from "./signals-data";
 import { backendWs } from "@/adapters/backend/ws-client";
+import { collectNewSignals } from "@/lib/dashboard-store";
 
 export type ViewMode = "cards" | "table" | "radar";
 export type SortKey = "score" | "rr";
@@ -42,8 +43,11 @@ type State = {
   sourceStatus: SignalSourceStatus;
   discardedCount: number;
   failedPairs: string[];
+  discardedByReason: { sideways: number; below_min_score: number; source_error: number } | null;
+  emptyStatusUnavailable: boolean;
   _intervalIds: Set<number>;
   _wsUnsub: (() => void) | null;
+  _listenerCleanup: (() => void)[];
   syncFromBackend: () => Promise<void>;
   setView: (v: ViewMode) => void;
   setSort: (s: SortKey) => void;
@@ -60,6 +64,10 @@ type State = {
   init: () => void;
   cleanup: () => void;
 };
+
+const POLL_INTERVAL_MS = 10_000;
+const STALE_AFTER_MS = POLL_INTERVAL_MS * 3;
+let seenSignalIds: Set<string> | null = null;
 
 function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalUI): Signal {
   const createdMs = s.createdAt ? Date.parse(s.createdAt) : NaN;
@@ -104,7 +112,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
   view: "cards", sort: "score", live: true, advOpen: false, streamOpen: false,
   pinnedId: null, hoverId: null, detailId: null, toasts: [], flashIds: [],
-  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], _intervalIds: new Set<number>(), _wsUnsub: null,
+  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], discardedByReason: null, emptyStatusUnavailable: false, _intervalIds: new Set<number>(), _wsUnsub: null, _listenerCleanup: [],
   setView: (v) => set({ view: v }),
   setSort: (s) => set({ sort: s }),
   setLive: (v) => set({ live: v }),
@@ -126,6 +134,43 @@ export const useSignalsStore = create<State>((set, get) => ({
       const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
       const backendSignals = await signalAdapter.list();
       const mapped = backendSignals.map(mapBackendSignal);
+      let freshIds: string[] = [];
+      if (seenSignalIds == null) {
+        // First successful load establishes the baseline; never toast initial data.
+        seenSignalIds = new Set(mapped.map((signal) => signal.id));
+      } else {
+        const dashboardSignals = mapped.map((signal) => ({
+          id: signal.id,
+          asset: signal.asset,
+          direction: signal.direction,
+          score: signal.score,
+          entry: signal.entry,
+          stop: signal.stop,
+          target: signal.target,
+          rr: signal.rr,
+          tf: signal.tf ?? "—",
+          time: signal.createdAt ?? "",
+        }));
+        freshIds = collectNewSignals(seenSignalIds, dashboardSignals).map((signal) => signal.id);
+      }
+      const fresh = mapped.filter((signal) => freshIds.includes(signal.id));
+      if (fresh.length) {
+        const timers = new Set(get()._intervalIds);
+        const flashTimer = window.setTimeout(() => {
+          set((state) => ({ flashIds: state.flashIds.filter((id) => !freshIds.includes(id)) }));
+          const next = new Set(get()._intervalIds);
+          next.delete(flashTimer);
+          set({ _intervalIds: next });
+        }, 3_000);
+        timers.add(flashTimer);
+        set((state) => ({
+          toasts: [...fresh.map((signal) => ({ id: signal.id, signal, createdAt: Date.now() })), ...state.toasts]
+            .filter((toast, index, all) => all.findIndex((candidate) => candidate.id === toast.id) === index)
+            .slice(0, 3),
+          flashIds: [...new Set([...state.flashIds, ...freshIds])],
+          _intervalIds: timers,
+        }));
+      }
       set({
         signals: mapped,
         lastSyncAt: Date.now(),
@@ -135,39 +180,114 @@ export const useSignalsStore = create<State>((set, get) => ({
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
-      const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
-      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable", failedPairs: signalAdapter.getLastFailedPairs() }));
+      try {
+        const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
+        set((state) => ({
+          sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt >= STALE_AFTER_MS ? "stale" : state.sourceStatus,
+          failedPairs: signalAdapter.getLastFailedPairs(),
+        }));
+      } catch {
+        set((state) => ({ sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt > STALE_AFTER_MS ? "stale" : state.sourceStatus }));
+      }
     }
   },
   init: () => {
-    if (get()._intervalIds.size > 0 || get()._wsUnsub) return;
-    get().syncFromBackend();
+    if (get()._intervalIds.size > 0 || get()._wsUnsub || get()._listenerCleanup.length > 0) return;
+
+    void get().syncFromBackend();
     const unsub = backendWs.on("signal:new", async (payload) => {
       if (!get().live) return;
       try {
         const { mapSignal } = await import("@/adapters/backend/signal.adapter");
         const signal = mapSignal(payload as import("@/adapters/backend/signal.adapter").BackendSignal);
         const mapped = mapBackendSignal(signal);
-        set((st) => ({
-          signals: [mapped, ...st.signals.filter((x) => x.id !== mapped.id)].slice(0, 60),
-          toasts: [{ id: mapped.id, signal: mapped, createdAt: Date.now() }, ...st.toasts].slice(0, 3),
+        const isNew = seenSignalIds != null && !seenSignalIds.has(mapped.id);
+        seenSignalIds?.add(mapped.id);
+        set((state) => ({
+          signals: [mapped, ...state.signals.filter((item) => item.id !== mapped.id)].slice(0, 60),
+          ...(isNew ? {
+            toasts: [{ id: mapped.id, signal: mapped, createdAt: Date.now() }, ...state.toasts].slice(0, 3),
+            flashIds: [...new Set([...state.flashIds, mapped.id])],
+          } : {}),
           sourceStatus: "ok",
           lastSyncAt: Date.now(),
         }));
+        if (isNew) {
+          const timer = window.setTimeout(() => {
+            set((state) => ({ flashIds: state.flashIds.filter((id) => id !== mapped.id) }));
+            const ids = new Set(get()._intervalIds);
+            ids.delete(timer);
+            set({ _intervalIds: ids });
+          }, 3_000);
+          set((state) => ({ _intervalIds: new Set([...state._intervalIds, timer]) }));
+        }
       } catch (err) {
         if (import.meta.env.DEV) console.warn("[signals] payload WS inválido:", err);
-        set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable" }));
+        set((state) => ({ sourceStatus: state.lastSyncAt ? "stale" : "unavailable" }));
       }
     });
-    const syncInterval = window.setInterval(() => {
-      if (!backendWs.isAuthenticatedOpen()) get().syncFromBackend();
-    }, 60_000);
-    set({ _intervalIds: new Set<number>([syncInterval]), _wsUnsub: unsub });
+
+    let pollTimer: number | null = null;
+    const startPolling = () => {
+      if (pollTimer != null || document.visibilityState === "hidden") return;
+      pollTimer = window.setInterval(() => {
+        if (document.visibilityState !== "hidden") void get().syncFromBackend();
+        const lastSyncAt = get().lastSyncAt;
+        if (lastSyncAt != null && Date.now() - lastSyncAt >= STALE_AFTER_MS && get().sourceStatus === "ok") {
+          set({ sourceStatus: "stale" });
+        }
+      }, POLL_INTERVAL_MS);
+      set((state) => ({ _intervalIds: new Set([...state._intervalIds, pollTimer as number]) }));
+    };
+    const stopPolling = () => {
+      if (pollTimer == null) return;
+      window.clearInterval(pollTimer);
+      const stopped = pollTimer;
+      pollTimer = null;
+      set((state) => {
+        const ids = new Set(state._intervalIds);
+        ids.delete(stopped);
+        return { _intervalIds: ids };
+      });
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        stopPolling();
+      } else {
+        void get().syncFromBackend();
+        startPolling();
+      }
+    };
+    const onFocus = () => {
+      if (document.visibilityState !== "hidden") void get().syncFromBackend();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", onFocus);
+    startPolling();
+    set({
+      _wsUnsub: unsub,
+      _listenerCleanup: [
+        () => document.removeEventListener("visibilitychange", onVisibilityChange),
+        () => window.removeEventListener("focus", onFocus),
+        stopPolling,
+      ],
+    });
   },
   cleanup: () => {
-    get()._intervalIds.forEach((id) => clearInterval(id));
+    get()._intervalIds.forEach((id) => {
+      window.clearInterval(id);
+      window.clearTimeout(id);
+    });
+    get()._listenerCleanup.forEach((remove) => remove());
     get()._wsUnsub?.();
-    set({ _intervalIds: new Set<number>(), _wsUnsub: null });
+    seenSignalIds = null;
+    set({
+      _intervalIds: new Set<number>(),
+      _wsUnsub: null,
+      _listenerCleanup: [],
+      flashIds: [],
+      toasts: [],
+    });
   },
 }));
 

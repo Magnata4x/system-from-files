@@ -12,7 +12,7 @@ const market = vi.hoisted(() => ({
 
 vi.mock("./market.server", () => market)
 
-import { generateSignalsDetailed } from "./engine.server"
+import { generateSignalsDetailed, __resetSignalGenerationMemo } from "./engine.server"
 import type { Kline } from "./market.server"
 
 function candlesWithOpenLast(): Kline[] {
@@ -31,6 +31,7 @@ function candlesWithOpenLast(): Kline[] {
 describe("S2 — motor de sinais determinístico", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    __resetSignalGenerationMemo()
     market.TARGET_PAIRS.splice(0, market.TARGET_PAIRS.length, "BTC/USDT", "ETH/USDT", "FAIL/USDT")
     market.atr.mockReturnValue(1)
     market.getClosedKlines.mockImplementation(async () => candlesWithOpenLast().slice(0, -1))
@@ -92,5 +93,40 @@ describe("S2 — motor de sinais determinístico", () => {
       { pair: "ETH/USDT", reason: "below_min_score" },
       expect.objectContaining({ pair: "FAIL/USDT", reason: "source_error", detail: "market source timeout" }),
     ]))
+  })
+
+  it("shares one engine run across concurrent calls and memoizes for 15 seconds", async () => {
+    vi.useFakeTimers()
+    market.TARGET_PAIRS.splice(0, market.TARGET_PAIRS.length, "BTC/USDT")
+
+    const [first, second] = await Promise.all([
+      generateSignalsDetailed(),
+      generateSignalsDetailed(),
+    ])
+    expect(second).toEqual(first)
+    expect(market.getClosedKlines).toHaveBeenCalledTimes(1)
+
+    await generateSignalsDetailed()
+    expect(market.getClosedKlines).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(15_001)
+    await generateSignalsDetailed()
+    expect(market.getClosedKlines).toHaveBeenCalledTimes(2)
+    vi.useRealTimers()
+  })
+
+
+  it("does not memoize an engine cycle when every market pair fails", async () => {
+    market.TARGET_PAIRS.splice(0, market.TARGET_PAIRS.length, "BTC/USDT")
+    market.getClosedKlines
+      .mockRejectedValueOnce(new Error("temporary market failure"))
+      .mockResolvedValueOnce(candlesWithOpenLast().slice(0, -1))
+
+    const failed = await generateSignalsDetailed()
+    expect(failed.failedPairs).toEqual(["BTC/USDT"])
+
+    const recovered = await generateSignalsDetailed()
+    expect(recovered.failedPairs).toEqual([])
+    expect(market.getClosedKlines).toHaveBeenCalledTimes(2)
   })
 })

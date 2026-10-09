@@ -107,7 +107,7 @@ export interface SignalGenerationResult {
   discarded: SignalDiscard[]
 }
 
-export async function generateSignalsDetailed(): Promise<SignalGenerationResult> {
+async function generateSignalsDetailedUncached(): Promise<SignalGenerationResult> {
   const analyzedPairs = [...TARGET_PAIRS];
   const results = await Promise.all(
     TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null; failed: boolean; discard?: SignalDiscard }> => {
@@ -183,6 +183,38 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
   const failedPairs = results.filter((result) => result.failed).map((result) => result.pair)
   const discarded = results.flatMap((result) => result.discard ? [result.discard] : [])
   return { signals, analyzedPairs, failedPairs, discarded }
+}
+
+
+// Share one engine calculation across /api/signals and /api/signals/status.
+const SIGNAL_GENERATION_TTL_MS = 15_000
+let signalGenerationCache: { expiresAt: number; value: SignalGenerationResult } | null = null
+let signalGenerationInFlight: Promise<SignalGenerationResult> | null = null
+
+export async function generateSignalsDetailed(): Promise<SignalGenerationResult> {
+  if (signalGenerationCache && signalGenerationCache.expiresAt > Date.now()) {
+    return signalGenerationCache.value
+  }
+  if (signalGenerationInFlight) return signalGenerationInFlight
+
+  const request = generateSignalsDetailedUncached()
+  signalGenerationInFlight = request
+  try {
+    const value = await request
+    // Do not pin a fully failed market cycle for the full TTL.
+    if (value.failedPairs.length < value.analyzedPairs.length) {
+      signalGenerationCache = { expiresAt: Date.now() + SIGNAL_GENERATION_TTL_MS, value }
+    }
+    return value
+  } finally {
+    if (signalGenerationInFlight === request) signalGenerationInFlight = null
+  }
+}
+
+// Exported for deterministic unit-test isolation; not used by application routes.
+export function __resetSignalGenerationMemo(): void {
+  signalGenerationCache = null
+  signalGenerationInFlight = null
 }
 
 export async function generateSignals(): Promise<BackendSignal[]> {

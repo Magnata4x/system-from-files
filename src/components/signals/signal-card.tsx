@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Shield, ShieldAlert, ShieldCheck, Bell, Bookmark, ArrowRight } from "lucide-react";
 import { ScoreBadge, scoreColor } from "@/components/dashboard/score-badge";
-import { type Signal, formatPrice, formatAge } from "@/lib/signals-data";
+import { type Signal, formatPrice, formatAge, calculateSignalDistancePct } from "@/lib/signals-data";
+import { useMarketData } from "@/lib/market-data-store";
 import { useSignalsStore } from "@/lib/signals-store";
 
 export function SignalCard({ signal }: { signal: Signal }) {
@@ -12,6 +13,14 @@ export function SignalCard({ signal }: { signal: Signal }) {
   const pin = useSignalsStore((s) => s.pin);
   const openDetail = useSignalsStore((s) => s.openDetail);
   const flashing = flashIds.includes(signal.id);
+  const { prices } = useMarketData();
+  const current = prices[signal.asset.split("/")[0] ?? ""] ?? null;
+  const currentPrice = current?.price ?? null;
+  const distance = (level: number | null) => {
+    const pct = calculateSignalDistancePct(currentPrice, level, signal.direction);
+    return pct == null ? "—" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
+  };
+  const priceAge = current ? Math.max(0, Math.floor((Date.now() - current.lastUpdated.getTime()) / 1000)) : null;
 
   const ringByStatus: Record<string, string> = {
     new: "0 0 0 1px #378ADD, 0 0 22px color-mix(in oklab, #378ADD 35%, transparent)",
@@ -93,10 +102,11 @@ export function SignalCard({ signal }: { signal: Signal }) {
         </div>
 
         {/* Prices */}
-        <div className="grid grid-cols-3 gap-2 mt-3">
-          <PriceCell label="Entry" value={signal.entry == null ? "—" : formatPrice(signal.entry)} />
-          <PriceCell label="Stop" value={signal.stop == null ? "—" : formatPrice(signal.stop)} color="#E24B4A" />
-          <PriceCell label="Target" value={signal.target == null ? "—" : formatPrice(signal.target)} color="#1D9E75" />
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          <PriceCell label="Preço atual" value={currentPrice == null ? "—" : formatPrice(currentPrice)} detail={priceAge == null ? "Binance · —" : `Binance · há ${priceAge}s`} />
+          <PriceCell label="Entrada" value={signal.entry == null ? "—" : formatPrice(signal.entry)} detail={distance(signal.entry)} />
+          <PriceCell label="SL" value={signal.stop == null ? "—" : formatPrice(signal.stop)} detail={distance(signal.stop)} color="#E24B4A" />
+          <PriceCell label="TP1" value={signal.target == null ? "—" : formatPrice(signal.target)} detail={distance(signal.target)} color="#1D9E75" />
         </div>
 
         {/* Stats row */}
@@ -161,11 +171,12 @@ export function SignalCard({ signal }: { signal: Signal }) {
   );
 }
 
-function PriceCell({ label, value, color }: { label: string; value: string; color?: string }) {
+function PriceCell({ label, value, detail, color }: { label: string; value: string; detail?: string; color?: string }) {
   return (
     <div className="rounded-md bg-background/40 border border-border px-2 py-1.5">
       <div className="text-[10px] text-muted-foreground uppercase">{label}</div>
       <div className="text-[12px] font-semibold tabular-nums" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
+      {detail && <div className="text-[9px] text-muted-foreground tabular-nums">{detail}</div>}
     </div>
   );
 }

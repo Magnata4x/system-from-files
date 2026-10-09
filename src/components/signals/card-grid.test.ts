@@ -6,7 +6,7 @@ describe("signal empty states", () => {
     expect(signalEmptyMessage("loading", 0)).toContain("Carregando");
     expect(signalEmptyMessage("unavailable", 0)).toContain("Fonte de sinais indisponível");
     expect(signalEmptyMessage("stale", 0)).toContain("desatualizada");
-    expect(signalEmptyMessage("ok", 0)).toContain("Nenhum sinal válido");
+    expect(signalEmptyMessage("ok", 0)).toBeNull();
     expect(signalEmptyMessage("ok", 3)).toContain("filtros atuais");
   });
 });

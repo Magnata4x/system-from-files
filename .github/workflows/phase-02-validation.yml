@@ -29,8 +29,17 @@ jobs:
           fi
       - name: Guard literal newline escapes in TS and TSX markup
         run: |
-          if grep -R -n -F '>\n<' src --include='*.tsx' --include='*.ts' || grep -R -n -F '}\n{' src --include='*.tsx' --include='*.ts'; then
-            echo 'Literal \n escape found between JSX nodes.'
+          pattern='(>|\}|\))\\n[[:space:]]*(<|\{)'
+          fixture="$(mktemp)"
+          printf '%s\n' '</div>\n   <StatsBar />' > "$fixture"
+          if ! grep -nE "$pattern" "$fixture"; then
+            echo 'Guard self-test failed: expected fixture was not detected.'
+            rm -f "$fixture"
+            exit 1
+          fi
+          rm -f "$fixture"
+          if grep -RnE "$pattern" src --include='*.tsx' --include='*.ts'; then
+            echo 'Literal \\n escape found between JSX nodes.'
             exit 1
           fi
       - run: >-
