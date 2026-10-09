@@ -74,7 +74,7 @@ function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Sig
       <div className="flex-1 overflow-y-auto">
         <Section title="Trade Setup">
           <div className="grid grid-cols-2 gap-2">
-            <Value label="Preço atual" value={currentPrice == null ? "—" : "$" + formatPrice(currentPrice)} detail={distance(currentPrice)} />
+            <Value label="Preço atual" value={currentPrice == null ? "—" : "$" + formatPrice(currentPrice)} detail={priceAge == null ? "Binance · indisponível" : `Binance · há ${priceAge}s`} />
             <Value label="Entrada" value={signal.entry == null ? "—" : "$" + formatPrice(signal.entry)} detail={distance(signal.entry)} />
             <Value label="SL" value={signal.stop == null ? "—" : "$" + formatPrice(signal.stop)} detail={distance(signal.stop)} />
             <Value label="TP1" value={signal.target == null ? "—" : "$" + formatPrice(signal.target)} detail={distance(signal.target)} />
