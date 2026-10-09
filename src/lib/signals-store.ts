@@ -63,7 +63,10 @@ type State = {
 
 function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalUI): Signal {
   const createdMs = s.createdAt ? Date.parse(s.createdAt) : NaN;
-  const ageMin = Number.isFinite(createdMs) ? Math.max(0, Math.floor((Date.now() - createdMs) / 60_000)) : null;\n  const risk = s.entry != null && s.sl != null ? Math.abs(s.entry - s.sl) : 0;\n  const reward = s.entry != null && s.tp != null ? Math.abs(s.tp - s.entry) : 0;\n  const derivedRR = risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;
+  const ageMin = Number.isFinite(createdMs) ? Math.max(0, Math.floor((Date.now() - createdMs) / 60_000)) : null;
+  const risk = s.entry != null && s.sl != null ? Math.abs(s.entry - s.sl) : 0;
+  const reward = s.entry != null && s.tp != null ? Math.abs(s.tp - s.entry) : 0;
+  const derivedRR = risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;
   return {
     id: s.id,
     asset: s.symbol,
