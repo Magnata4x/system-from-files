@@ -5,10 +5,12 @@ const adapterMocks = vi.hoisted(() => ({
   getLastDiscardedCount: vi.fn(() => 0),
   getLastFailedPairs: vi.fn(() => [] as string[]),
 }));
-const { list, getLastDiscardedCount, getLastFailedPairs } = adapterMocks;
-
 vi.mock("@/adapters/backend/signal.adapter", () => ({
-  signalAdapter: { list, getLastDiscardedCount, getLastFailedPairs },
+  signalAdapter: {
+    list: adapterMocks.list,
+    getLastDiscardedCount: adapterMocks.getLastDiscardedCount,
+    getLastFailedPairs: adapterMocks.getLastFailedPairs,
+  },
   mapSignal: vi.fn(),
 }));
 
@@ -33,7 +35,7 @@ describe("signals-store — contrato S1", () => {
   });
 
   it("[] é sincronização válida e preenche lastSyncAt", async () => {
-    list.mockResolvedValueOnce([]);
+    adapterMocks.list.mockResolvedValueOnce([]);
     await useSignalsStore.getState().syncFromBackend();
     const state = useSignalsStore.getState();
     expect(state.sourceStatus).toBe("ok");
@@ -42,19 +44,19 @@ describe("signals-store — contrato S1", () => {
   });
 
   it("primeira falha fica unavailable", async () => {
-    list.mockRejectedValueOnce(new Error("backend down"));
+    adapterMocks.list.mockRejectedValueOnce(new Error("backend down"));
     await useSignalsStore.getState().syncFromBackend();
     expect(useSignalsStore.getState().sourceStatus).toBe("unavailable");
   });
 
   it("falha após sincronização válida fica stale e preserva dados", async () => {
-    list.mockResolvedValueOnce([{
+    adapterMocks.list.mockResolvedValueOnce([{
       id: "sig-1", symbol: "BTC/USDT", direction: "BUY", confidence: 80, entry: 100000,
       sl: null, tp: null, state: "active", tf: "4H", exchange: "binance", createdAt: new Date().toISOString(),
     }]);
     await useSignalsStore.getState().syncFromBackend();
     const before = useSignalsStore.getState().signals;
-    list.mockRejectedValueOnce(new Error("backend down"));
+    adapterMocks.list.mockRejectedValueOnce(new Error("backend down"));
     await useSignalsStore.getState().syncFromBackend();
     expect(useSignalsStore.getState().sourceStatus).toBe("stale");
     expect(useSignalsStore.getState().signals).toEqual(before);
