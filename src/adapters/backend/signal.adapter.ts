@@ -76,7 +76,7 @@ export function mapSignal(s: BackendSignal): SignalUI {
   }
 
   const side = s.side === "LONG" || s.side === "BUY" ? "BUY" : "SELL";
-  const state = s.status === "closed" || s.status === "pending" || s.status === "active" ? s.status : null;
+  const state = s.status === "active" ? "active" : null;
   return {
     id: s.id,
     symbol: s.pair,
