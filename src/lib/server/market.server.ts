@@ -38,6 +38,7 @@ export interface Ticker {
 
 export interface Kline {
   openTime: number
+  closeTime: number
   open: number
   high: number
   low: number
@@ -105,8 +106,9 @@ export async function getKlines(pair: string, interval = '4h', limit = 200): Pro
       throw new Error('Binance retornou histórico de candles vazio para ' + symbol)
     }
 
-    return raw.map((k, index) => {
+    const parsed = raw.map((k, index) => {
       const openTime = Number(k[0])
+      const closeTime = Number(k[6])
       const open = Number(k[1])
       const high = Number(k[2])
       const low = Number(k[3])
@@ -115,6 +117,7 @@ export async function getKlines(pair: string, interval = '4h', limit = 200): Pro
 
       if (
         !Number.isFinite(openTime) || openTime <= 0 ||
+        !Number.isFinite(closeTime) || closeTime < openTime ||
         !Number.isFinite(open) || open <= 0 ||
         !Number.isFinite(high) || high <= 0 ||
         !Number.isFinite(low) || low <= 0 ||
@@ -126,8 +129,13 @@ export async function getKlines(pair: string, interval = '4h', limit = 200): Pro
         throw new Error('Binance retornou candle inválido para ' + symbol + ' na posição ' + index)
       }
 
-      return { openTime, open, high, low, close, volume }
+      return { openTime, closeTime, open, high, low, close, volume }
     })
+    const closed = parsed.filter((candle) => candle.closeTime < Date.now())
+    if (closed.length === 0) {
+      throw new Error('Binance não retornou candles fechados para ' + symbol)
+    }
+    return closed
   })
 }
 
