@@ -31,7 +31,7 @@ export async function createSignalIntent(user: ApiUser, signalId: string, idempo
     .maybeSingle()
   if (existing.error) throw new ApiError('Não foi possível verificar a idempotência.', 500)
   if (existing.data) {
-    if (existing.data.signal_id !== signalId || existing.data.mode !== 'DEMO') {
+    if (existing.data.signal_id !== signalId) {
       throw new ApiError('Idempotency-Key já utilizada por outra intenção.', 409)
     }
     return { id: existing.data.id, signalId, status: existing.data.status, replay: true, orderSubmitted: false }
@@ -117,7 +117,7 @@ export async function createSignalIntent(user: ApiUser, signalId: string, idempo
     .insert({
       user_id: user.userId,
       idempotency_key: key,
-      mode: 'DEMO',
+      mode: config.executionMode,
       pair,
       side,
       quote_amount: 0,
