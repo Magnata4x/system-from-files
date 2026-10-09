@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const list = vi.fn();
 const getLastDiscardedCount = vi.fn(() => 0);
+const getLastFailedPairs = vi.fn(() => [] as string[]);
 
 vi.mock("@/adapters/backend/signal.adapter", () => ({
-  signalAdapter: { list, getLastDiscardedCount },
+  signalAdapter: { list, getLastDiscardedCount, getLastFailedPairs },
   mapSignal: vi.fn(),
 }));
 
