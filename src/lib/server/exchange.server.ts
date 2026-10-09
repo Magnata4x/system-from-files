@@ -176,7 +176,6 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
     .eq('environment', getBinanceEnvironment())
-    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data || !data.verified) throw new ApiError('Binance não conectada ou não verificada.', 409)
@@ -209,6 +208,7 @@ async function getStoredCredentials(supabase: Client, userId: string) {
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data || !data.verified) {
