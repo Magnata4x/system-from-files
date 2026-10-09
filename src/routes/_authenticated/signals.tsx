@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { TopBar } from "@/components/dashboard/top-bar";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { FilterBar } from "@/components/signals/filter-bar";
@@ -16,6 +16,7 @@ import { useSignalsStore, useFilteredSignals } from "@/lib/signals-store";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xEligibility } from "@/lib/bot4x-eligibility";
 import { DataStatusBadge } from "@/components/dashboard/data-status";
+import { formatDiscardedReasons } from "@/components/signals/card-grid";
 
 export const Route = createFileRoute("/_authenticated/signals")({
   head: () => ({
@@ -39,6 +40,9 @@ function SignalsPage() {
   const discardedCount = useSignalsStore((s) => s.discardedCount);
   const failedPairs = useSignalsStore((s) => s.failedPairs);
   const totalSignals = useSignalsStore((s) => s.signals.length);
+  const discardedByReason = useSignalsStore((s) => s.discardedByReason);
+  const emptyStatusUnavailable = useSignalsStore((s) => s.emptyStatusUnavailable);
+  const emptyStatusRequested = useRef(false);
   const pin = useSignalsStore((s) => s.pin);
   const bot4xOnly = useSignalsStore((s) => s.filters.bot4xOnly);
   const bot4xMode = useBot4xStore((s) => s.mode);
@@ -55,6 +59,41 @@ function SignalsPage() {
     init();
     return () => cleanup();
   }, [init, cleanup]);
+
+  useEffect(() => {
+    if (totalSignals > 0) {
+      emptyStatusRequested.current = false;
+      useSignalsStore.setState({ discardedByReason: null, emptyStatusUnavailable: false });
+      return;
+    }
+    if (sourceStatus !== "ok" || emptyStatusRequested.current) return;
+    emptyStatusRequested.current = true;
+    let cancelled = false;
+    void fetch("/api/signals/status")
+      .then(async (response) => {
+        if (!response.ok) {
+          if (!cancelled) useSignalsStore.setState({ emptyStatusUnavailable: true, discardedByReason: null });
+          return;
+        }
+        const payload = await response.json() as {
+          discardedByReason?: { sideways?: number; below_min_score?: number; source_error?: number };
+        };
+        if (cancelled) return;
+        const reasons = payload.discardedByReason;
+        useSignalsStore.setState({
+          discardedByReason: reasons ? {
+            sideways: Number(reasons.sideways) || 0,
+            below_min_score: Number(reasons.below_min_score) || 0,
+            source_error: Number(reasons.source_error) || 0,
+          } : null,
+          emptyStatusUnavailable: false,
+        });
+      })
+      .catch(() => {
+        if (!cancelled) useSignalsStore.setState({ emptyStatusUnavailable: true, discardedByReason: null });
+      });
+    return () => { cancelled = true; };
+  }, [sourceStatus, totalSignals]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -89,6 +128,13 @@ function SignalsPage() {
           <FilterBar />
           <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>
           <StatsBar signals={filtered} />
+          {totalSignals === 0 && sourceStatus === "ok" && (
+            <div role="status" className="px-5 py-2 text-xs text-muted-foreground">
+              {emptyStatusUnavailable
+                ? "Fonte de sinais indisponível. Não foi possível obter o motivo da lista vazia."
+                : formatDiscardedReasons(discardedByReason) ?? "Nenhum sinal válido foi gerado pelos critérios atuais."}
+            </div>
+          )}
           {bot4xOnly && filtered.length === 0 && sourceStatus === "ok" && <div role="status" className="px-5 py-2 text-xs text-amber-500">Nenhum sinal elegível para Bot4x: dados de manipulação/status ausentes podem bloquear EXECUTAR.</div>}
           {failedPairs.length > 0 && <div role="status" className="px-5 py-2 text-xs text-amber-500">Dados parciais: falha ao analisar {failedPairs.join(", ")}.</div>}
           {discardedCount > 0 && <div role="status" className="px-5 py-1 text-xs text-muted-foreground">{discardedCount} sinal(is) inválido(s) descartado(s) pela validação.</div>}
