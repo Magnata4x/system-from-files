@@ -1,4 +1,5 @@
-import { selectStats, useFilteredSignals } from "@/lib/signals-store";
+import { selectStats } from "@/lib/signals-store";
+import type { Signal } from "@/lib/signals-data";
 
 export function StatsBar() {
   const filtered = useFilteredSignals();
