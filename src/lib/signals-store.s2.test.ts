@@ -56,7 +56,7 @@ describe("signals-store S2.1 live refresh", () => {
     useSignalsStore.getState().cleanup();
     vi.useRealTimers();
     if (originalVisibility) Object.defineProperty(document, "visibilityState", originalVisibility);
-    else delete (document as Partial<Document>).visibilityState;
+    else Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
   });
 
   it("polls every 10 seconds without requiring an authenticated WebSocket", async () => {
