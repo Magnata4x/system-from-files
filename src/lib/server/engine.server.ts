@@ -201,7 +201,10 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
   signalGenerationInFlight = request
   try {
     const value = await request
-    signalGenerationCache = { expiresAt: Date.now() + SIGNAL_GENERATION_TTL_MS, value }
+    // Do not pin a fully failed market cycle for the full TTL.
+    if (value.failedPairs.length < value.analyzedPairs.length) {
+      signalGenerationCache = { expiresAt: Date.now() + SIGNAL_GENERATION_TTL_MS, value }
+    }
     return value
   } finally {
     if (signalGenerationInFlight === request) signalGenerationInFlight = null
