@@ -5,7 +5,7 @@ import { type Signal, type AssetClass } from "./signals-data";
 import { backendWs } from "@/adapters/backend/ws-client";
 
 export type ViewMode = "cards" | "table" | "radar";
-export type SortKey = "score" | "rr" | "age" | "volDelta";
+export type SortKey = "score" | "rr";
 export type SignalSourceStatus = "loading" | "ok" | "stale" | "unavailable";
 
 type SignalToast = { id: string; signal: Signal; createdAt: number };
@@ -41,6 +41,7 @@ type State = {
   lastSyncAt: number | null;
   sourceStatus: SignalSourceStatus;
   discardedCount: number;
+  failedPairs: string[];
   _intervalIds: Set<number>;
   _wsUnsub: (() => void) | null;
   syncFromBackend: () => Promise<void>;
@@ -63,6 +64,9 @@ type State = {
 function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalUI): Signal {
   const createdMs = s.createdAt ? Date.parse(s.createdAt) : NaN;
   const ageMin = Number.isFinite(createdMs) ? Math.max(0, Math.floor((Date.now() - createdMs) / 60_000)) : null;
+  const risk = s.entry != null && s.sl != null ? Math.abs(s.entry - s.sl) : 0;
+  const reward = s.entry != null && s.tp != null ? Math.abs(s.tp - s.entry) : 0;
+  const derivedRR = risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;
   return {
     id: s.id,
     asset: s.symbol,
@@ -74,7 +78,7 @@ function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalU
     entry: s.entry,
     stop: s.sl,
     target: s.tp,
-    rr: s.rr ?? null,
+    rr: derivedRR,
     riskPct: s.riskPct ?? null,
     volDelta: s.volDelta ?? null,
     confirms: s.confirms ?? null,
@@ -100,7 +104,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
   view: "cards", sort: "score", live: true, advOpen: false, streamOpen: false,
   pinnedId: null, hoverId: null, detailId: null, toasts: [], flashIds: [],
-  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, _intervalIds: new Set<number>(), _wsUnsub: null,
+  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], _intervalIds: new Set<number>(), _wsUnsub: null,
   setView: (v) => set({ view: v }),
   setSort: (s) => set({ sort: s }),
   setLive: (v) => set({ live: v }),
@@ -127,10 +131,12 @@ export const useSignalsStore = create<State>((set, get) => ({
         lastSyncAt: Date.now(),
         sourceStatus: "ok",
         discardedCount: signalAdapter.getLastDiscardedCount(),
+        failedPairs: signalAdapter.getLastFailedPairs(),
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
-      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable" }));
+      const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
+      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable", failedPairs: signalAdapter.getLastFailedPairs() }));
     }
   },
   init: () => {
@@ -165,7 +171,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
 }));
 
-function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKey): Signal[] {
+export function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKey): Signal[] {
   const exchSet = new Set(filters.exchanges);
   const setupKeys = Object.keys(filters.setups).filter((k) => filters.setups[k]);
   const list = signals.filter((s) => {
@@ -187,8 +193,7 @@ function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKe
   return [...list].sort((a, b) => {
     if (sort === "score") return b.score - a.score;
     if (sort === "rr") return (b.rr ?? -Infinity) - (a.rr ?? -Infinity);
-    if (sort === "age") return (a.ageMin ?? Infinity) - (b.ageMin ?? Infinity);
-    return (b.volDelta ?? -Infinity) - (a.volDelta ?? -Infinity);
+    return 0;
   });
 }
 

@@ -33,10 +33,12 @@ function SignalsPage() {
   const view = useSignalsStore((s) => s.view);
   const setView = useSignalsStore((s) => s.setView);
   const toggleAdv = useSignalsStore((s) => s.toggleAdv);
-  const setLive = useSignalsStore((s) => s.setLive);
-  const live = useSignalsStore((s) => s.live);
+
   const sourceStatus = useSignalsStore((s) => s.sourceStatus);
   const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);
+  const discardedCount = useSignalsStore((s) => s.discardedCount);
+  const failedPairs = useSignalsStore((s) => s.failedPairs);
+  const totalSignals = useSignalsStore((s) => s.signals.length);
   const pin = useSignalsStore((s) => s.pin);
   const bot4xOnly = useSignalsStore((s) => s.filters.bot4xOnly);
   const bot4xMode = useBot4xStore((s) => s.mode);
@@ -69,15 +71,13 @@ function SignalsPage() {
         toggleAdv();
       } else if (e.key.toLowerCase() === "g") {
         setView(view === "cards" ? "table" : view === "table" ? "radar" : "cards");
-      } else if (e.key.toLowerCase() === "l") {
-        setLive(!live);
       } else if (e.key === "Escape") {
         pin(null);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, live, toggleAdv, setView, setLive, pin]);
+  }, [view, toggleAdv, setView, pin]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -87,10 +87,14 @@ function SignalsPage() {
         <SignalStream />
         <div className="flex-1 min-w-0">
           <FilterBar />
-          <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>\n          <StatsBar />
+          <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>
+          <StatsBar signals={filtered} />
+          {bot4xOnly && filtered.length === 0 && sourceStatus === "ok" && <div role="status" className="px-5 py-2 text-xs text-amber-500">Nenhum sinal elegível para Bot4x: dados de manipulação/status ausentes podem bloquear EXECUTAR.</div>}
+          {failedPairs.length > 0 && <div role="status" className="px-5 py-2 text-xs text-amber-500">Dados parciais: falha ao analisar {failedPairs.join(", ")}.</div>}
+          {discardedCount > 0 && <div role="status" className="px-5 py-1 text-xs text-muted-foreground">{discardedCount} sinal(is) inválido(s) descartado(s) pela validação.</div>}
           <div className="flex">
             <main className="flex-1 min-w-0 p-5">
-              {view === "cards" && <CardGrid signals={filtered} />}
+              {view === "cards" && <CardGrid signals={filtered} sourceStatus={sourceStatus} totalSignals={totalSignals} />}
               {view === "table" && <TableView signals={filtered} />}
               {view === "radar" && <RadarMap signals={filtered} />}
             </main>

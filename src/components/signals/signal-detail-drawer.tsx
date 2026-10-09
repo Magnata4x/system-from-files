@@ -13,6 +13,8 @@ import { useBot4xStore } from "@/lib/bot4x-store";
 export function SignalDetailDrawer() {
   const detailId = useSignalsStore((s) => s.detailId);
   const close = useSignalsStore((s) => s.closeDetail);
+  const sourceStatus = useSignalsStore((s) => s.sourceStatus);
+  const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);
   const signal = useSignalsStore((s) => s.signals.find((x) => x.id === s.detailId) ?? null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -24,12 +26,12 @@ export function SignalDetailDrawer() {
   }, [detailId, close]);
   if (!mounted) return null;
   return createPortal(
-    <AnimatePresence>{detailId && signal && <DrawerBody key={signal.id} signal={signal} onClose={close} />}</AnimatePresence>,
+    <AnimatePresence>{detailId && signal && <DrawerBody key={signal.id} signal={signal} onClose={close} sourceStatus={sourceStatus} lastSyncAt={lastSyncAt} />}</AnimatePresence>,
     document.body,
   );
 }
 
-function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }) {
+function DrawerBody({ signal, onClose, sourceStatus, lastSyncAt }: { signal: Signal; onClose: () => void; sourceStatus: "loading" | "ok" | "stale" | "unavailable"; lastSyncAt: number | null }) {
   const isBuy = signal.direction === "BUY";
   const accent = isBuy ? "#1D9E75" : "#E24B4A";
   const mode = useBot4xStore((s) => s.mode);
@@ -56,7 +58,8 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
           <span className="text-[11px] text-muted-foreground">{formatAge(signal.ageMin)}</span>
           <ScoreBadge score={signal.score} size="lg" />
         </div>
-        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={signal.createdAt ? Date.parse(signal.createdAt) : null} status={signal.createdAt ? "ok" : "unavailable"} /></div>
+        <div className="mt-2"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} />
+          <div className="text-[10px] text-muted-foreground mt-1">Vela de: {signal.createdAt ? new Date(signal.createdAt).toLocaleString() : "—"}</div></div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
@@ -108,7 +111,7 @@ function DrawerBody({ signal, onClose }: { signal: Signal; onClose: () => void }
           <FooterBtn icon={<Bell className="size-3.5" />} label="Set Alert" />
           <FooterBtn icon={<Bookmark className="size-3.5" />} label="Save" />
           <FooterBtn icon={<Share2 className="size-3.5" />} label="Share" />
-          <button className="ml-auto h-9 px-4 rounded-md bg-[var(--brand-blue)] text-[12px] font-medium inline-flex items-center gap-1.5"><LineChart className="size-3.5" /> Open Chart</button>
+          <button disabled title="Indisponível nesta fase; será implementado na S5." className="ml-auto h-9 px-4 rounded-md bg-[var(--brand-blue)] text-muted-foreground opacity-50 cursor-not-allowed text-[12px] font-medium inline-flex items-center gap-1.5"><LineChart className="size-3.5" /> Open Chart</button>
         </div>
       </footer>
     </motion.aside>
@@ -122,5 +125,5 @@ function Value({ label, value }: { label: string; value: string }) {
   return <div className="rounded-md bg-card border border-border px-2.5 py-1.5"><div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div><div className="text-[12px] font-semibold tabular-nums mt-0.5">{value}</div></div>;
 }
 function FooterBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return <button className="h-9 px-3 rounded-md border border-border bg-card text-foreground text-[12px] inline-flex items-center gap-1.5">{icon}{label}</button>;
+  return <button disabled title="Indisponível nesta fase; será implementado na S5." className="h-9 px-3 rounded-md border border-border bg-card text-muted-foreground opacity-50 cursor-not-allowed text-[12px] inline-flex items-center gap-1.5">{icon}{label}</button>;
 }

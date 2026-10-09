@@ -1,4 +1,4 @@
-import { api, endpoints } from "./api.adapter";
+import { api, apiClient, endpoints } from "./api.adapter";
 
 export interface BackendSignal {
   id: string;
@@ -60,6 +60,13 @@ export function normalizeExchange(exchange: string | null | undefined): string |
   return normalized === "binance" ? "binance" : normalized || null;
 }
 
+export function deriveRiskReward(entry: number | null | undefined, stop: number | null | undefined, target: number | null | undefined): number | null {
+  if (![entry, stop, target].every((value) => typeof value === "number" && Number.isFinite(value) && value > 0)) return null;
+  const risk = Math.abs(entry! - stop!);
+  const reward = Math.abs(target! - entry!);
+  return risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;
+}
+
 export function mapSignal(s: BackendSignal): SignalUI {
   if (s.side !== "BUY" && s.side !== "SELL" && s.side !== "LONG" && s.side !== "SHORT") {
     throw new Error(`Sinal ${s.id} possui side inválido`);
@@ -69,7 +76,7 @@ export function mapSignal(s: BackendSignal): SignalUI {
   }
 
   const side = s.side === "LONG" || s.side === "BUY" ? "BUY" : "SELL";
-  const state = s.status === "closed" || s.status === "pending" || s.status === "active" ? s.status : null;
+  const state = s.status === "active" ? "active" : null;
   return {
     id: s.id,
     symbol: s.pair,
@@ -92,7 +99,7 @@ export function mapSignal(s: BackendSignal): SignalUI {
     session: s.session ?? null,
     riskPct: s.riskPct ?? null,
     volDelta: s.volDelta ?? null,
-    rr: s.rr ?? null,
+    rr: deriveRiskReward(s.entryPrice, s.stopLoss, s.takeProfit1),
     confirms: s.confirms ?? null,
     raw: s,
   };
@@ -109,13 +116,22 @@ export function mapSignalList(data: BackendSignal[]): { signals: SignalUI[]; dis
 }
 
 let lastDiscardedCount = 0;
+let lastFailedPairs: string[] = [];
 export const signalAdapter = {
   getLastDiscardedCount: () => lastDiscardedCount,
+  getLastFailedPairs: () => [...lastFailedPairs],
   async list(): Promise<SignalUI[]> {
-    const data = await api.get<BackendSignal[]>(endpoints.signals.list);
-    const mapped = mapSignalList(data ?? []);
-    lastDiscardedCount = mapped.discardedCount;
-    return mapped.signals;
+    try {
+      const response = await apiClient.get<BackendSignal[]>(endpoints.signals.list);
+      lastFailedPairs = String(response.headers["x-signals-failed-pairs"] ?? "").split(",").filter(Boolean);
+      const mapped = mapSignalList(response.data ?? []);
+      lastDiscardedCount = mapped.discardedCount;
+      return mapped.signals;
+    } catch (error) {
+      const response = (error as { response?: { headers?: Record<string, unknown> } }).response;
+      lastFailedPairs = String(response?.headers?.["x-signals-failed-pairs"] ?? "").split(",").filter(Boolean);
+      throw error;
+    }
   },
   async byId(id: string): Promise<SignalUI | null> {
     const data = await api.get<BackendSignal | null>(endpoints.signals.byId(id));
