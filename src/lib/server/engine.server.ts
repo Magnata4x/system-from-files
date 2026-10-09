@@ -1,7 +1,7 @@
 // Motores internos (portados do backend NestJS): sinais, manipulação,
 // risco, regime, DNA e calibrador. Tudo roda dentro do próprio app.
 import {
-  TARGET_PAIRS, atr, getClosedKlines, getMarketRegime, getTickers, rsi, toPair, type Kline,
+  TARGET_PAIRS, atr, getClosedKlines, getKlines, getMarketRegime, getTickers, rsi, toPair, type Kline,
 } from './market.server'
 
 // ── Sinais ────────────────────────────────────────────────────────────────
