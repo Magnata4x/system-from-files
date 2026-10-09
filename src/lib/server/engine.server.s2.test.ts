@@ -75,7 +75,7 @@ describe("S2 — motor de sinais determinístico", () => {
       pair,
       regime: pair === "BTC/USDT" ? "SIDEWAYS" : "BEARISH",
       strength: 0,
-      rsi: 50,
+      rsi: pair === "ETH/USDT" ? 30 : 50,
       volatility: 0,
       price: 200,
       emaFast: 200,
