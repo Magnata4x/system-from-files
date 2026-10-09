@@ -43,6 +43,8 @@ type State = {
   sourceStatus: SignalSourceStatus;
   discardedCount: number;
   failedPairs: string[];
+  discardedByReason: { sideways: number; below_min_score: number; source_error: number } | null;
+  emptyStatusUnavailable: boolean;
   _intervalIds: Set<number>;
   _wsUnsub: (() => void) | null;
   _listenerCleanup: (() => void)[];
@@ -110,7 +112,7 @@ export const useSignalsStore = create<State>((set, get) => ({
   },
   view: "cards", sort: "score", live: true, advOpen: false, streamOpen: false,
   pinnedId: null, hoverId: null, detailId: null, toasts: [], flashIds: [],
-  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], _intervalIds: new Set<number>(), _wsUnsub: null, _listenerCleanup: [],
+  lastSyncAt: null, sourceStatus: "loading", discardedCount: 0, failedPairs: [], discardedByReason: null, emptyStatusUnavailable: false, _intervalIds: new Set<number>(), _wsUnsub: null, _listenerCleanup: [],
   setView: (v) => set({ view: v }),
   setSort: (s) => set({ sort: s }),
   setLive: (v) => set({ live: v }),
