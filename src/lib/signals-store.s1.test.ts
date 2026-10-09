@@ -56,6 +56,8 @@ describe("signals-store — contrato S1", () => {
     }]);
     await useSignalsStore.getState().syncFromBackend();
     const before = useSignalsStore.getState().signals;
+    // The S2.1 contract marks a failed source stale only after 30 seconds without a successful sync.
+    useSignalsStore.setState({ lastSyncAt: Date.now() - 30_001 });
     adapterMocks.list.mockRejectedValueOnce(new Error("backend down"));
     await useSignalsStore.getState().syncFromBackend();
     expect(useSignalsStore.getState().sourceStatus).toBe("stale");
