@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getClosedKlines, getKlines, getTickers, MarketDataError, rsi, selectClosedCandles } from "./market.server"
+import { getKlines, getTickers, MarketDataError, rsi, selectClosedCandles } from "./market.server"
 
 const originalFetch = globalThis.fetch
 
 afterEach(() => {
   globalThis.fetch = originalFetch
   vi.restoreAllMocks()
+  vi.useRealTimers()
 })
 
 describe('real Binance market data flow', () => {
