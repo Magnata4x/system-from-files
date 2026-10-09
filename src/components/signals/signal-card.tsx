@@ -175,7 +175,8 @@ function PriceCell({ label, value, detail, color }: { label: string; value: stri
   return (
     <div className="rounded-md bg-background/40 border border-border px-2 py-1.5">
       <div className="text-[10px] text-muted-foreground uppercase">{label}</div>
-      <div className="text-[12px] font-semibold tabular-nums" style={{ color: color ?? "var(--foreground)" }}>{value}</div>\n      {detail && <div className="text-[9px] text-muted-foreground tabular-nums">{detail}</div>}
+      <div className="text-[12px] font-semibold tabular-nums" style={{ color: color ?? "var(--foreground)" }}>{value}</div>
+      {detail && <div className="text-[9px] text-muted-foreground tabular-nums">{detail}</div>}
     </div>
   );
 }
