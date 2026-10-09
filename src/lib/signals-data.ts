@@ -36,6 +36,21 @@ export function formatPrice(p: number): string {
   return p.toFixed(4);
 }
 
+
+export function calculateSignalDistancePct(
+  currentPrice: number | null | undefined,
+  levelPrice: number | null | undefined,
+  direction: "BUY" | "SELL",
+): number | null {
+  if (
+    currentPrice == null || levelPrice == null ||
+    !Number.isFinite(currentPrice) || !Number.isFinite(levelPrice) ||
+    currentPrice <= 0 || levelPrice <= 0
+  ) return null;
+  const directionSign = direction === "BUY" ? 1 : -1;
+  return Number((((levelPrice - currentPrice) / currentPrice) * directionSign * 100).toFixed(2));
+}
+
 export function formatAge(min: number | null): string {
   if (min == null || !Number.isFinite(min)) return "—";
   if (min < 1) return "agora";
