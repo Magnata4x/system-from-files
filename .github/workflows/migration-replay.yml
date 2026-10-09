@@ -1,0 +1,29 @@
+name: migration-replay
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/tests/**"
+      - ".github/workflows/migration-replay.yml"
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/tests/**"
+      - ".github/workflows/migration-replay.yml"
+
+jobs:
+  replay-empty-database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector
+      - name: Replay migrations from an empty database
+        run: supabase db reset
+      - name: Verify DB-3 function ACL
+        run: |
+          supabase db query --local --file supabase/tests/db3_reconcile_trade_outbox_acl.sql
