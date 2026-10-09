@@ -60,7 +60,14 @@ export function normalizeExchange(exchange: string | null | undefined): string |
   return normalized === "binance" ? "binance" : normalized || null;
 }
 
-export function deriveRiskReward(entry: number | null | undefined, stop: number | null | undefined, target: number | null | undefined): number | null {\n  if (![entry, stop, target].every((value) => typeof value === "number" && Number.isFinite(value) && value > 0)) return null;\n  const risk = Math.abs(entry! - stop!);\n  const reward = Math.abs(target! - entry!);\n  return risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;\n}\n\nexport function mapSignal(s: BackendSignal): SignalUI {
+export function deriveRiskReward(entry: number | null | undefined, stop: number | null | undefined, target: number | null | undefined): number | null {
+  if (![entry, stop, target].every((value) => typeof value === "number" && Number.isFinite(value) && value > 0)) return null;
+  const risk = Math.abs(entry! - stop!);
+  const reward = Math.abs(target! - entry!);
+  return risk > 0 && reward > 0 ? Number((reward / risk).toFixed(4)) : null;
+}
+
+export function mapSignal(s: BackendSignal): SignalUI {
   if (s.side !== "BUY" && s.side !== "SELL" && s.side !== "LONG" && s.side !== "SHORT") {
     throw new Error(`Sinal ${s.id} possui side inválido`);
   }
@@ -108,7 +115,8 @@ export function mapSignalList(data: BackendSignal[]): { signals: SignalUI[]; dis
   return { signals, discardedCount };
 }
 
-let lastDiscardedCount = 0;\nlet lastFailedPairs: string[] = [];
+let lastDiscardedCount = 0;
+let lastFailedPairs: string[] = [];
 export const signalAdapter = {
   getLastDiscardedCount: () => lastDiscardedCount,
   async list(): Promise<SignalUI[]> {
