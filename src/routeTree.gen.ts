@@ -66,6 +66,7 @@ import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiSentimentOverviewRouteImport } from './routes/api/sentiment/overview'
 import { Route as ApiSignalsIndexRouteImport } from './routes/api/signals/index'
+import { Route as ApiSignalsStatusRouteImport } from './routes/api/signals/status'
 import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
@@ -368,6 +369,11 @@ const ApiSentimentOverviewRoute = ApiSentimentOverviewRouteImport.update({
 const ApiSignalsIndexRoute = ApiSignalsIndexRouteImport.update({
   id: '/api/signals/',
   path: '/api/signals/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSignalsStatusRoute = ApiSignalsStatusRouteImport.update({
+  id: '/api/signals/status',
+  path: '/api/signals/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
@@ -700,6 +706,7 @@ export interface FileRouteTypes {
     | '/api/risk/status'
     | '/api/sentiment/overview'
     | '/api/signals/$id'
+    | '/api/signals/status'
     | '/api/prices/'
     | '/api/signals/'
     | '/calibrator/history/$id'
@@ -889,6 +896,7 @@ export interface RootRouteChildren {
   ApiRiskStatusRoute: typeof ApiRiskStatusRoute
   ApiSentimentOverviewRoute: typeof ApiSentimentOverviewRoute
   ApiSignalsIdRoute: typeof ApiSignalsIdRoute
+  ApiSignalsStatusRoute: typeof ApiSignalsStatusRoute
   ApiPricesIndexRoute: typeof ApiPricesIndexRoute
   ApiSignalsIndexRoute: typeof ApiSignalsIndexRoute
   ApiCalibratorFeedbackUserIdRoute: typeof ApiCalibratorFeedbackUserIdRoute
@@ -1309,6 +1317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSignalsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/signals/status': {
+      id: '/api/signals/status'
+      path: '/api/signals/status'
+      fullPath: '/api/signals/status'
+      preLoaderRoute: typeof ApiSignalsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/calibrator/history/$id': {
       id: '/_authenticated/calibrator/history/$id'
       path: '/$id'
@@ -1518,6 +1533,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRiskStatusRoute: ApiRiskStatusRoute,
   ApiSentimentOverviewRoute: ApiSentimentOverviewRoute,
   ApiSignalsIdRoute: ApiSignalsIdRoute,
+  ApiSignalsStatusRoute: ApiSignalsStatusRoute,
   ApiPricesIndexRoute: ApiPricesIndexRoute,
   ApiSignalsIndexRoute: ApiSignalsIndexRoute,
   ApiCalibratorFeedbackUserIdRoute: ApiCalibratorFeedbackUserIdRoute,
