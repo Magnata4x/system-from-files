@@ -29,7 +29,7 @@ jobs:
           fi
       - name: Guard literal newline escapes in TS and TSX markup
         run: |
-          if grep -R -n -E '>[[:space:]]*\\\\n[[:space:]]*<|}[[:space:]]*\\\\n[[:space:]]*{' src --include='*.tsx' --include='*.ts'; then
+          if grep -R -n -F '>\\n<' src --include='*.tsx' --include='*.ts' || grep -R -n -F '}\\n{' src --include='*.tsx' --include='*.ts'; then
             echo 'Literal \\n escape found between JSX nodes.'
             exit 1
           fi
