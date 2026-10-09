@@ -119,11 +119,19 @@ let lastDiscardedCount = 0;
 let lastFailedPairs: string[] = [];
 export const signalAdapter = {
   getLastDiscardedCount: () => lastDiscardedCount,
+  getLastFailedPairs: () => [...lastFailedPairs],
   async list(): Promise<SignalUI[]> {
-    const data = await api.get<BackendSignal[]>(endpoints.signals.list);
-    const mapped = mapSignalList(data ?? []);
-    lastDiscardedCount = mapped.discardedCount;
-    return mapped.signals;
+    try {
+      const response = await apiClient.get<BackendSignal[]>(endpoints.signals.list);
+      lastFailedPairs = String(response.headers["x-signals-failed-pairs"] ?? "").split(",").filter(Boolean);
+      const mapped = mapSignalList(response.data ?? []);
+      lastDiscardedCount = mapped.discardedCount;
+      return mapped.signals;
+    } catch (error) {
+      const response = (error as { response?: { headers?: Record<string, unknown> } }).response;
+      lastFailedPairs = String(response?.headers?.["x-signals-failed-pairs"] ?? "").split(",").filter(Boolean);
+      throw error;
+    }
   },
   async byId(id: string): Promise<SignalUI | null> {
     const data = await api.get<BackendSignal | null>(endpoints.signals.byId(id));
