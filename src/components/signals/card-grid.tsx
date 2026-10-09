@@ -19,7 +19,7 @@ export function signalEmptyMessage(status: SignalSourceStatus, totalSignals: num
   if (status === "loading") return "Carregando sinais da fonte de mercado…";
   if (status === "unavailable") return "Fonte de sinais indisponível. Tente novamente quando o serviço voltar."; 
   if (status === "stale") return "Fonte de sinais desatualizada. Os dados exibidos podem não refletir o mercado atual.";
-  if (totalSignals === 0) return "Nenhum sinal válido foi retornado pela fonte."; 
+  if (totalSignals === 0) return null; 
   return "Os filtros atuais excluíram todos os sinais. Ajuste os filtros para ver resultados.";
 }
 
