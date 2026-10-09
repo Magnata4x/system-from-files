@@ -33,8 +33,7 @@ function SignalsPage() {
   const view = useSignalsStore((s) => s.view);
   const setView = useSignalsStore((s) => s.setView);
   const toggleAdv = useSignalsStore((s) => s.toggleAdv);
-  const setLive = useSignalsStore((s) => s.setLive);
-  const live = useSignalsStore((s) => s.live);
+
   const sourceStatus = useSignalsStore((s) => s.sourceStatus);
   const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);
   const discardedCount = useSignalsStore((s) => s.discardedCount);
@@ -72,8 +71,6 @@ function SignalsPage() {
         toggleAdv();
       } else if (e.key.toLowerCase() === "g") {
         setView(view === "cards" ? "table" : view === "table" ? "radar" : "cards");
-      } else if (e.key.toLowerCase() === "l") {
-        setLive(!live);
       } else if (e.key === "Escape") {
         pin(null);
       }
