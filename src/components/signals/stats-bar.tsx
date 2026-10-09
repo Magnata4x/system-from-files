@@ -1,9 +1,8 @@
 import { selectStats } from "@/lib/signals-store";
 import type { Signal } from "@/lib/signals-data";
 
-export function StatsBar() {
-  const filtered = useFilteredSignals();
-  const s = selectStats(filtered);
+export function StatsBar({ signals }: { signals: Signal[] }) {
+  const s = selectStats(signals);
   const items = [
     { label: "Total", value: s.total },
     { label: "BUY", value: s.buy, color: "#1D9E75" },
