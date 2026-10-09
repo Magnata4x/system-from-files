@@ -78,14 +78,24 @@ function ViewLink({ id }: { id: string }) {
   );
 }
 
-function LivePriceCell({ asset, prices }: { asset: string; prices: Record<string, CoinPrice> }) {
-  const base = asset.split("/")[0];
-  const price = prices[base]?.price;
-  if (!price) return <span className="text-muted-foreground tabular-nums">—</span>;
+function LivePriceCell({ signal, prices }: { signal: Signal; prices: Record<string, CoinPrice> }) {
+  const base = signal.asset.split("/")[0];
+  const quote = prices[base ?? ""];
+  const price = quote?.price;
+  if (price == null || !Number.isFinite(price)) return <span className="text-muted-foreground tabular-nums">—</span>;
+  const fmtDistance = (level: number | null) => {
+    const pct = calculateSignalDistancePct(price, level, signal.direction);
+    return pct == null ? "—" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
+  };
+  const ageSeconds = Math.max(0, Math.floor((Date.now() - quote.lastUpdated.getTime()) / 1000));
   return (
-    <span className="tabular-nums text-foreground">
-      ${price.toLocaleString(undefined, { maximumFractionDigits: price > 100 ? 1 : 3 })}
-    </span>
+    <div className="min-w-[150px]">
+      <div className="tabular-nums text-foreground">${price.toLocaleString(undefined, { maximumFractionDigits: price > 100 ? 1 : 4 })}</div>
+      <div className="text-[9px] text-muted-foreground tabular-nums">
+        E {fmtDistance(signal.entry)} · SL {fmtDistance(signal.stop)} · TP1 {fmtDistance(signal.target)}
+      </div>
+      <div className="text-[9px] text-muted-foreground">Binance · há {ageSeconds}s</div>
+    </div>
   );
 }
 
