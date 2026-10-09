@@ -5,7 +5,7 @@ import { type Signal, formatPrice, formatAge } from "@/lib/signals-data";
 import { useSignalsStore } from "@/lib/signals-store";
 import { useBot4xStore } from "@/lib/bot4x-store";
 import { bot4xEligibility, ELIGIBILITY_META } from "@/lib/bot4x-eligibility";
-import { useLivePrices } from "@/hooks/useLivePrices";
+import { useLivePrices, type CoinPrice } from "@/hooks/useLivePrices";
 
 const PAGE = 20;
 
@@ -17,7 +17,7 @@ type ColDef = {
   key: ColKey;
   label: string;
   fixed?: boolean; // can't hide / reorder
-  render: (s: Signal, ctx: { idx: number; checked: boolean; toggle: () => void }) => React.ReactNode;
+  render: (s: Signal, ctx: { idx: number; checked: boolean; toggle: () => void; prices: Record<string, CoinPrice> }) => React.ReactNode;
 };
 
 const COLUMNS: Record<ColKey, ColDef> = {
@@ -32,7 +32,7 @@ const COLUMNS: Record<ColKey, ColDef> = {
   },
   num: { key: "num", label: "#", render: (_s, { idx }) => <span className="text-muted-foreground tabular-nums">{idx + 1}</span> },
   asset: { key: "asset", label: "Asset", render: (s) => <span className="font-semibold text-foreground">{s.asset}</span> },
-  price: { key: "price", label: "Price", render: (s) => <LivePriceCell asset={s.asset} /> },
+  price: { key: "price", label: "Preço", render: (s, { prices }) => <LivePriceCell asset={s.asset} prices={prices} /> },
   dir: {
     key: "dir", label: "Dir",
     render: (s) => {
@@ -78,8 +78,7 @@ function ViewLink({ id }: { id: string }) {
   );
 }
 
-function LivePriceCell({ asset }: { asset: string }) {
-  const { prices } = useLivePrices();
+function LivePriceCell({ asset, prices }: { asset: string; prices: Record<string, CoinPrice> }) {
   const base = asset.split("/")[0];
   const price = prices[base]?.price;
   if (!price) return <span className="text-muted-foreground tabular-nums">—</span>;
@@ -137,6 +136,7 @@ export function TableView({ signals }: { signals: Signal[] }) {
   const [ctx, setCtx] = useState<{ x: number; y: number; col: ColKey } | null>(null);
   const dragKey = useRef<ColKey | null>(null);
 
+  const { prices } = useLivePrices();
   const setHover = useSignalsStore((s) => s.setHover);
   const pin = useSignalsStore((s) => s.pin);
 
@@ -262,7 +262,7 @@ export function TableView({ signals }: { signals: Signal[] }) {
                     const pinned = cols.pinned.includes(k);
                     return (
                       <td key={k} className={`px-3 py-2 text-foreground ${pinned ? "bg-[color-mix(in_oklab,var(--brand-cyan)_6%,transparent)]" : ""}`}>
-                        {COLUMNS[k].render(s, { idx: page * PAGE + i, checked, toggle: () => toggle(s.id) })}
+                        {COLUMNS[k].render(s, { idx: page * PAGE + i, checked, toggle: () => toggle(s.id), prices })}
                       </td>
                     );
                   })}
