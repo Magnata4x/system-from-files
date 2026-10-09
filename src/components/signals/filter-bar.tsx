@@ -58,7 +58,7 @@ export function FilterBar() {
         <div className="relative">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as "score" | "rr" | "age" | "volDelta")}
+            onChange={(e) => setSort(e.target.value as "score" | "rr")}
             className="h-8 pl-3 pr-8 rounded-md bg-card border border-border text-[12px] text-foreground appearance-none focus:outline-none focus:border-[var(--brand-cyan)]"
           >
             <option value="score">Sort: Score</option>
