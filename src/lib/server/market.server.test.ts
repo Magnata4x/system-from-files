@@ -88,8 +88,9 @@ describe('real Binance market data flow', () => {
     })) as typeof fetch
 
     const pending = getKlines("DOGE/USDT", "30m", 9)
+    const rejection = expect(pending).rejects.toMatchObject({ name: "MarketDataError", code: "TIMEOUT" })
     await vi.runAllTimersAsync()
-    await expect(pending).rejects.toMatchObject({ name: "MarketDataError", code: "TIMEOUT" })
+    await rejection
     vi.useRealTimers()
   })
 })
