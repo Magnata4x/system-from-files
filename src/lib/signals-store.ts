@@ -183,7 +183,7 @@ export const useSignalsStore = create<State>((set, get) => ({
       try {
         const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
         set((state) => ({
-          sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt > STALE_AFTER_MS ? "stale" : state.sourceStatus,
+          sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt >= STALE_AFTER_MS ? "stale" : state.sourceStatus,
           failedPairs: signalAdapter.getLastFailedPairs(),
         }));
       } catch {
@@ -233,7 +233,7 @@ export const useSignalsStore = create<State>((set, get) => ({
       pollTimer = window.setInterval(() => {
         if (document.visibilityState !== "hidden") void get().syncFromBackend();
         const lastSyncAt = get().lastSyncAt;
-        if (lastSyncAt != null && Date.now() - lastSyncAt > STALE_AFTER_MS && get().sourceStatus === "ok") {
+        if (lastSyncAt != null && Date.now() - lastSyncAt >= STALE_AFTER_MS && get().sourceStatus === "ok") {
           set({ sourceStatus: "stale" });
         }
       }, POLL_INTERVAL_MS);
