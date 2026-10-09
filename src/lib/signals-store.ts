@@ -40,7 +40,8 @@ type State = {
   flashIds: string[];
   lastSyncAt: number | null;
   sourceStatus: SignalSourceStatus;
-  discardedCount: number;\n  failedPairs: string[];
+  discardedCount: number;
+  failedPairs: string[];
   _intervalIds: Set<number>;
   _wsUnsub: (() => void) | null;
   syncFromBackend: () => Promise<void>;
@@ -126,11 +127,13 @@ export const useSignalsStore = create<State>((set, get) => ({
         signals: mapped,
         lastSyncAt: Date.now(),
         sourceStatus: "ok",
-        discardedCount: signalAdapter.getLastDiscardedCount(),\n        failedPairs: signalAdapter.getLastFailedPairs(),
+        discardedCount: signalAdapter.getLastDiscardedCount(),
+        failedPairs: signalAdapter.getLastFailedPairs(),
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("[signals] syncFromBackend falhou:", err);
-      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable", failedPairs: (err as { response?: unknown }) && [] }));
+      const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
+      set((s) => ({ sourceStatus: s.lastSyncAt ? "stale" : "unavailable", failedPairs: signalAdapter.getLastFailedPairs() }));
     }
   },
   init: () => {
@@ -187,8 +190,7 @@ function computeFilteredSorted(signals: Signal[], filters: Filters, sort: SortKe
   return [...list].sort((a, b) => {
     if (sort === "score") return b.score - a.score;
     if (sort === "rr") return (b.rr ?? -Infinity) - (a.rr ?? -Infinity);
-    if (sort === "age") return (a.ageMin ?? Infinity) - (b.ageMin ?? Infinity);
-    return (b.volDelta ?? -Infinity) - (a.volDelta ?? -Infinity);
+    return 0;
   });
 }
 
