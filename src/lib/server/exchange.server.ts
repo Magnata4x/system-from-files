@@ -51,6 +51,7 @@ export async function decryptSecret(payload: string): Promise<string> {
 export interface ExchangeStatus {
   connected: boolean
   exchange: string
+  environment: BinanceEnvironment
   keyPreview: string
   verified: boolean
   verifiedAt: string | null
@@ -74,6 +75,7 @@ export function getBinanceBaseUrl(environment = getBinanceEnvironment()): string
 const EMPTY: ExchangeStatus = {
   connected: false,
   exchange: 'binance',
+  environment: 'demo',
   keyPreview: '',
   verified: false,
   verifiedAt: null,
@@ -83,14 +85,16 @@ const EMPTY: ExchangeStatus = {
 export async function getExchangeStatus(supabase: Client, userId: string): Promise<ExchangeStatus> {
   const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
-    .select('exchange, key_preview, verified, verified_at, last_error')
+    .select('exchange, environment, key_preview, verified, verified_at, last_error')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data) return EMPTY
   return {
     connected: true,
     exchange: data.exchange,
+    environment: data.environment as BinanceEnvironment,
     keyPreview: data.key_preview,
     verified: data.verified,
     verifiedAt: data.verified_at,
@@ -171,6 +175,8 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher, verified')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data || !data.verified) throw new ApiError('Binance não conectada ou não verificada.', 409)
@@ -312,6 +318,7 @@ export async function saveExchangeCredentials(
   const { error } = await getSupabaseAdmin().from('exchange_credentials').upsert(
     {
       user_id: userId,
+      environment: getBinanceEnvironment(),
       exchange,
       api_key_cipher: await encryptSecret(apiKey),
       api_secret_cipher: await encryptSecret(apiSecret),
@@ -320,7 +327,7 @@ export async function saveExchangeCredentials(
       verified_at: new Date().toISOString(),
       last_error: null,
     },
-    { onConflict: 'user_id' },
+    { onConflict: 'user_id,environment' },
   )
   if (error) throw new ApiError(error.message, 500)
 
@@ -351,6 +358,7 @@ export async function testExchangeCredentials(
       .from('exchange_credentials')
       .update({ verified: true, verified_at: new Date().toISOString(), last_error: null })
       .eq('user_id', userId)
+      .eq('environment', getBinanceEnvironment())
     return { ...(await getExchangeStatus(supabase, userId)), ...check }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Falha na verificação'
@@ -358,12 +366,13 @@ export async function testExchangeCredentials(
       .from('exchange_credentials')
       .update({ verified: false, last_error: message })
       .eq('user_id', userId)
+      .eq('environment', getBinanceEnvironment())
     throw new ApiError(message, 400)
   }
 }
 
 export async function deleteExchangeCredentials(supabase: Client, userId: string) {
-  const { error } = await getSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId)
+  const { error } = await getSupabaseAdmin().from('exchange_credentials').delete().eq('user_id', userId).eq('environment', getBinanceEnvironment())
   if (error) throw new ApiError(error.message, 500)
   await supabase.from('bot4x_configs').update({ api_key_set: false }).eq('user_id', userId)
   return EMPTY
