@@ -1,36 +1,34 @@
 -- FIX DB-01: Índices compostos ausentes na tabela `signals`.
 --
--- A query mais frequente do frontend é:
---   WHERE status = 'active' ORDER BY score DESC LIMIT N
--- Sem índice composto, o planner faz Bitmap Index Scan + sort O(N log N).
--- Com 100k+ sinais históricos isso degrada a latência em ~10x.
---
--- Usamos CONCURRENTLY para não bloquear reads/writes durante a criação.
--- NOTA: em Supabase local (`supabase db reset`) remova CONCURRENTLY pois
---       o modo de test não suporta; adicione de volta antes de aplicar em prod.
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_signals_status_score
+-- O replay do histórico executa cada migration em uma transação; por isso,
+-- estes índices não usam CONCURRENTLY. Para tabelas grandes em produção,
+-- avalie uma janela de manutenção separada para criação concorrente.
+CREATE INDEX IF NOT EXISTS idx_signals_status_score
   ON public.signals (status, score DESC)
   WHERE status = 'active';
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_signals_user_created
+CREATE INDEX IF NOT EXISTS idx_signals_user_created
   ON public.signals (user_id, created_at DESC)
   WHERE user_id IS NOT NULL;
 
 -- FIX DB-02: calibrator_runs.id é TEXT recebendo UUID — corrigir tipo.
--- Requer que a tabela não tenha foreign keys de outras tabelas apontando
--- para calibrator_runs.id. Verifique antes de aplicar em prod.
+-- Pré-condição: os valores existentes devem ser UUID válidos e não pode haver
+-- FKs incompatíveis apontando para calibrator_runs.id.
+-- Remover o DEFAULT antigo antes de mudar o tipo evita erro 42804.
 ALTER TABLE public.calibrator_runs
-  ALTER COLUMN id TYPE UUID USING id::UUID,
+  ALTER COLUMN id DROP DEFAULT;
+
+ALTER TABLE public.calibrator_runs
+  ALTER COLUMN id TYPE UUID USING id::UUID;
+
+ALTER TABLE public.calibrator_runs
   ALTER COLUMN id SET DEFAULT gen_random_uuid();
 
--- FIX DB-04: Trigger reset_daily_dna_metrics só dispara em UPDATE ativo.
--- Criar um pg_cron job para reset diário às 00:01 UTC para cobrir
--- usuários que ficaram inativos (sem UPDATE em dna_updated_at).
--- Requer pg_cron habilitado no projeto Supabase (Extensões > pg_cron).
+-- FIX DB-04: Reset diário de métricas para usuários inativos.
+-- Requer pg_cron habilitado (o Supabase local fornece a extensão).
 SELECT cron.schedule(
   'reset-daily-dna-metrics',
-  '1 0 * * *',  -- 00:01 UTC todo dia
+  '1 0 * * *',
   $$
     UPDATE public.profiles
     SET
