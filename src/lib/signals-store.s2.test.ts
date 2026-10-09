@@ -104,4 +104,18 @@ describe("signals-store S2.1 live refresh", () => {
     expect(useSignalsStore.getState().toasts).toHaveLength(0);
     expect(useSignalsStore.getState().flashIds).toHaveLength(0);
   });
+
+  it("marks a failed source stale after three cycles and returns to ok on success", async () => {
+    useSignalsStore.getState().init();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(useSignalsStore.getState().sourceStatus).toBe("ok");
+
+    adapter.list.mockRejectedValue(new Error("backend unavailable"));
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(useSignalsStore.getState().sourceStatus).toBe("stale");
+
+    adapter.list.mockResolvedValue([btc]);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(useSignalsStore.getState().sourceStatus).toBe("ok");
+  })
 });
