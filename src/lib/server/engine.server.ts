@@ -1,7 +1,7 @@
 // Motores internos (portados do backend NestJS): sinais, manipulação,
 // risco, regime, DNA e calibrador. Tudo roda dentro do próprio app.
 import {
-  TARGET_PAIRS, atr, getKlines, getMarketRegime, getTickers, rsi, toPair, type Kline,
+  TARGET_PAIRS, atr, getClosedKlines, getMarketRegime, getTickers, rsi, toPair, type Kline,
 } from './market.server'
 
 // ── Sinais ────────────────────────────────────────────────────────────────
@@ -92,20 +92,29 @@ function stableId(pair: string, bucket: number): string {
   return `${pair.replace('/', '-').toLowerCase()}-${bucket}`
 }
 
+export type SignalDiscardReason = "sideways" | "below_min_score" | "source_error"
+
+export interface SignalDiscard {
+  pair: string
+  reason: SignalDiscardReason
+  detail?: string
+}
+
 export interface SignalGenerationResult {
-  signals: BackendSignal[];
-  analyzedPairs: string[];
-  failedPairs: string[];
+  signals: BackendSignal[]
+  analyzedPairs: string[]
+  failedPairs: string[]
+  discarded: SignalDiscard[]
 }
 
 export async function generateSignalsDetailed(): Promise<SignalGenerationResult> {
   const analyzedPairs = [...TARGET_PAIRS];
   const results = await Promise.all(
-    TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null; failed: boolean }> => {
+    TARGET_PAIRS.map(async (pair): Promise<{ pair: string; signal: BackendSignal | null; failed: boolean; discard?: SignalDiscard }> => {
       try {
         const [regime, candles] = await Promise.all([
           getMarketRegime(pair),
-          getKlines(pair, '4h', 200),
+          getClosedKlines(pair, '4h', 200),
         ])
         assertSignalMarketData(pair, candles)
         const last = candles.at(-1)!
@@ -119,7 +128,12 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
         if (r < 30 || r > 70) score += 8
         if (regime.volatility > 0.4 && regime.volatility < 6) score += 6
         score = Math.max(0, Math.min(100, Math.round(score)))
-        if (regime.regime === 'SIDEWAYS' || score < 60) return { pair, signal: null, failed: false }
+        if (regime.regime === "SIDEWAYS") {
+          return { pair, signal: null, failed: false, discard: { pair, reason: "sideways" } }
+        }
+        if (score < 60) {
+          return { pair, signal: null, failed: false, discard: { pair, reason: "below_min_score" } }
+        }
 
         const side: 'BUY' | 'SELL' = regime.regime === 'BULLISH' ? 'BUY' : 'SELL'
         const dir = side === 'BUY' ? 1 : -1
@@ -153,15 +167,22 @@ export async function generateSignalsDetailed(): Promise<SignalGenerationResult>
         }
         assertOperationalSignal(signal)
         return { pair, signal, failed: false }
-      } catch {
-        return { pair, signal: null, failed: true }
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error)
+        return {
+          pair,
+          signal: null,
+          failed: true,
+          discard: { pair, reason: "source_error", detail },
+        }
       }
     }),
   )
-  const signals = results.flatMap((r) => r.signal ? [r.signal] : [])
-    .sort((a, b) => b.score - a.score)
-  const failedPairs = results.filter((r) => r.failed).map((r) => r.pair)
-  return { signals, analyzedPairs, failedPairs }
+  const signals = results.flatMap((result) => result.signal ? [result.signal] : [])
+    .sort((a, b) => b.score - a.score || a.pair.localeCompare(b.pair))
+  const failedPairs = results.filter((result) => result.failed).map((result) => result.pair)
+  const discarded = results.flatMap((result) => result.discard ? [result.discard] : [])
+  return { signals, analyzedPairs, failedPairs, discarded }
 }
 
 export async function generateSignals(): Promise<BackendSignal[]> {
