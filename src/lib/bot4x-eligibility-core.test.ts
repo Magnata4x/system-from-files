@@ -58,7 +58,8 @@ describe("shared Bot4x eligibility core", () => {
   });
 
   it("applies the medium manipulation score penalty and risk cap", () => {
-    expect(evaluateEligibility({ ...base, score: 95, manipulationRisk: "medium" }).eligible).toBe(true);
+    // 96 - 8 manipulation penalty = 88, the conservative profile minimum.
+    expect(evaluateEligibility({ ...base, score: 96, manipulationRisk: "medium" }).eligible).toBe(true);
     expect(evaluateEligibility({ ...base, score: 90, manipulationRisk: "medium" }).reason).toBe("score_below_minimum");
     expect(evaluateEligibility({ ...base, riskPct: 1.01 }).reason).toBe("risk_limit");
   });
