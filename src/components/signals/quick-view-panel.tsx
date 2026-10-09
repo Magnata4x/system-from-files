@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, Fixar, X } from "lucide-react";
+import { ChevronRight, ChevronLeft, Pin, X } from "lucide-react";
 import { ScoreBadge } from "@/components/dashboard/score-badge";
 import { useSignalsStore } from "@/lib/signals-store";
 import { formatPrice } from "@/lib/signals-data";
