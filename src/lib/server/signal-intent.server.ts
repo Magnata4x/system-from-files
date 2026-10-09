@@ -95,6 +95,10 @@ export async function createSignalIntent(user: ApiUser, signalId: string, idempo
   const maxRiskPct = Number(config.slPct)
   const circuitBreaker = String(config.circuitBreaker)
   const slotLimit = ACTIVE_INTENT_LIMIT
+  const quoteAmount = capital * Number(config.allocationPct || 0) / 100
+  if (!Number.isFinite(quoteAmount) || quoteAmount <= 0) {
+    throw new ApiError('Alocação operacional inválida; intenção bloqueada.', 409)
+  }
 
   const decision = evaluateEligibility({
     profile,
@@ -120,7 +124,7 @@ export async function createSignalIntent(user: ApiUser, signalId: string, idempo
       mode: config.executionMode,
       pair,
       side,
-      quote_amount: 0,
+      quote_amount: Number(quoteAmount.toFixed(8)),
       reason: 'signal-cross-page-command',
       readings: {
         signalId,
