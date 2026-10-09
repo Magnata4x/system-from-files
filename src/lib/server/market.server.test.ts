@@ -32,15 +32,34 @@ describe('real Binance market data flow', () => {
 
   it('rejects malformed candles instead of passing synthetic values downstream', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
-      [Date.now(), '100000', '101000', '99000', '100500', '0'],
+      [Date.now() - 14_400_000, '100000', '101000', '99000', '100500', '0', Date.now() - 1],
     ]), { status: 200 }))
 
     await expect(getKlines('BTC/USDT', '4h', 1)).resolves.toHaveLength(1)
 
     globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
-      [Date.now(), '100000', '101000', '99000', 'NaN', '10'],
+      [Date.now() - 14_400_000, '100000', '101000', '99000', 'NaN', '10', Date.now() - 1],
     ]), { status: 200 }))
     await expect(getKlines('BTC/USDT', '4h', 2)).rejects.toThrow('candle inválido')
+  })
+
+  it('excludes the currently forming candle using Binance closeTime', async () => {
+    const now = Date.now()
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
+      [now - 28_800_000, '100000', '101000', '99000', '100500', '10', now - 14_400_001],
+      [now - 14_400_000, '100500', '102000', '100000', '101000', '12', now + 1],
+    ]), { status: 200 }))
+
+    const result = await getKlines('ETH/USDT', '4h', 2)
+    expect(result).toHaveLength(1)
+    expect(result[0]?.closeTime).toBeLessThan(now)
+  })
+
+  it('rejects a candle payload without a valid closeTime', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify([
+      [Date.now() - 14_400_000, '100000', '101000', '99000', '100500', '10'],
+    ]), { status: 200 }))
+    await expect(getKlines('BNB/USDT', '4h', 1)).rejects.toThrow('candle inválido')
   })
 
   it('propagates Binance HTTP failures as unavailable market data', async () => {

@@ -5,6 +5,7 @@ import type { Kline } from './market.server'
 function candle(overrides: Partial<Kline> = {}): Kline {
   return {
     openTime: 1_700_000_000_000,
+    closeTime: 1_700_000_014_399,
     open: 100,
     high: 102,
     low: 99,
