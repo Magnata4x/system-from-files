@@ -30,13 +30,24 @@ interface CacheEntry {
   value: unknown
 }
 const cache = new Map<string, CacheEntry>()
+const inFlight = new Map<string, Promise<unknown>>()
 
 async function cached<T>(key: string, ttlMs: number, loader: () => Promise<T>): Promise<T> {
   const hit = cache.get(key)
   if (hit && hit.expires > Date.now()) return hit.value as T
-  const value = await loader()
-  cache.set(key, { expires: Date.now() + ttlMs, value })
-  return value
+
+  const pending = inFlight.get(key)
+  if (pending) return pending as Promise<T>
+
+  const request = loader()
+  inFlight.set(key, request)
+  try {
+    const value = await request
+    cache.set(key, { expires: Date.now() + ttlMs, value })
+    return value
+  } finally {
+    if (inFlight.get(key) === request) inFlight.delete(key)
+  }
 }
 
 export interface Ticker {
