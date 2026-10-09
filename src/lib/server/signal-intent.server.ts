@@ -81,7 +81,7 @@ export async function createSignalIntent(user: ApiUser, signalId: string, idempo
   const normalized = normalizePair(pair)
   const manip = matchingManipulation.find((item) => normalizePair(item.symbol) === normalized)
   const manipulationRisk: ManipulationRisk = manip
-    ? (manip.riskLevel === 'low' || manip.riskLevel === 'medium' || manip.riskLevel === 'high' ? manip.riskLevel : 'unavailable')
+    ? (String(manip.riskLevel).toLowerCase() === 'low' || String(manip.riskLevel).toLowerCase() === 'medium' || String(manip.riskLevel).toLowerCase() === 'high' ? String(manip.riskLevel).toLowerCase() as ManipulationRisk : 'unavailable')
     : 'unavailable'
 
   const capital = Number(config.activeCapital || config.totalCapital || 0)
