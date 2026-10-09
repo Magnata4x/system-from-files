@@ -115,4 +115,18 @@ describe("S2 — motor de sinais determinístico", () => {
     vi.useRealTimers()
   })
 
+
+  it("does not memoize an engine cycle when every market pair fails", async () => {
+    market.TARGET_PAIRS.splice(0, market.TARGET_PAIRS.length, "BTC/USDT")
+    market.getClosedKlines
+      .mockRejectedValueOnce(new Error("temporary market failure"))
+      .mockResolvedValueOnce(candlesWithOpenLast().slice(0, -1))
+
+    const failed = await generateSignalsDetailed()
+    expect(failed.failedPairs).toEqual(["BTC/USDT"])
+
+    const recovered = await generateSignalsDetailed()
+    expect(recovered.failedPairs).toEqual([])
+    expect(market.getClosedKlines).toHaveBeenCalledTimes(2)
+  })
 })
