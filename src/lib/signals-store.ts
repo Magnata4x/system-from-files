@@ -183,11 +183,11 @@ export const useSignalsStore = create<State>((set, get) => ({
       try {
         const { signalAdapter } = await import("@/adapters/backend/signal.adapter");
         set((state) => ({
-          sourceStatus: state.lastSyncAt ? "stale" : "unavailable",
+          sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt > STALE_AFTER_MS ? "stale" : state.sourceStatus,
           failedPairs: signalAdapter.getLastFailedPairs(),
         }));
       } catch {
-        set((state) => ({ sourceStatus: state.lastSyncAt ? "stale" : "unavailable" }));
+        set((state) => ({ sourceStatus: state.lastSyncAt == null ? "unavailable" : Date.now() - state.lastSyncAt > STALE_AFTER_MS ? "stale" : state.sourceStatus }));
       }
     }
   },
