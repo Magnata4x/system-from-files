@@ -93,4 +93,29 @@ describe('real Binance market data flow', () => {
     await rejection
     vi.useRealTimers()
   })
+
+  it("shares one in-flight fetch for concurrent identical cache keys", async () => {
+    const payload = [[1_700_000_000_000, "100", "102", "99", "101", "10"]]
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify(payload), { status: 200 }))
+
+    const [first, second] = await Promise.all([
+      getKlines("DOGE/USDT", "s2live", 37),
+      getKlines("DOGE/USDT", "s2live", 37),
+    ])
+
+    expect(first).toEqual(second)
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not cache failed market requests", async () => {
+    const payload = [[1_700_000_000_000, "100", "102", "99", "101", "10"]]
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(new Response("unavailable", { status: 503 }))
+      .mockResolvedValueOnce(new Response("unavailable", { status: 503 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(payload), { status: 200 }))
+
+    await expect(getKlines("DOGE/USDT", "s2retry", 38)).rejects.toThrow()
+    await expect(getKlines("DOGE/USDT", "s2retry", 38)).resolves.toHaveLength(1)
+    expect(globalThis.fetch).toHaveBeenCalledTimes(3)
+  })
 })
