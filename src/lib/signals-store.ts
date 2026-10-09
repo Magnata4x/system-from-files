@@ -78,7 +78,7 @@ function mapBackendSignal(s: import("@/adapters/backend/signal.adapter").SignalU
     entry: s.entry,
     stop: s.sl,
     target: s.tp,
-    rr: s.rr != null && Number.isFinite(s.rr) ? s.rr : derivedRR,
+    rr: derivedRR,
     riskPct: s.riskPct ?? null,
     volDelta: s.volDelta ?? null,
     confirms: s.confirms ?? null,
