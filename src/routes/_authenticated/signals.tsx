@@ -36,7 +36,7 @@ function SignalsPage() {
   const setLive = useSignalsStore((s) => s.setLive);
   const live = useSignalsStore((s) => s.live);
   const sourceStatus = useSignalsStore((s) => s.sourceStatus);
-  const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);
+  const lastSyncAt = useSignalsStore((s) => s.lastSyncAt);\n  const discardedCount = useSignalsStore((s) => s.discardedCount);\n  const failedPairs = useSignalsStore((s) => s.failedPairs);\n  const totalSignals = useSignalsStore((s) => s.signals.length);
   const pin = useSignalsStore((s) => s.pin);
   const bot4xOnly = useSignalsStore((s) => s.filters.bot4xOnly);
   const bot4xMode = useBot4xStore((s) => s.mode);
@@ -77,7 +77,7 @@ function SignalsPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, live, toggleAdv, setView, setLive, pin]);
+  }, [view, toggleAdv, setView, pin]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -90,7 +90,7 @@ function SignalsPage() {
           <div className="px-5 py-2 border-b border-border"><DataStatusBadge source="Signals · backend" updatedAt={lastSyncAt} status={sourceStatus} /></div>\n          <StatsBar />
           <div className="flex">
             <main className="flex-1 min-w-0 p-5">
-              {view === "cards" && <CardGrid signals={filtered} />}
+              {view === "cards" && <CardGrid signals={filtered} sourceStatus={sourceStatus} totalSignals={totalSignals} />}
               {view === "table" && <TableView signals={filtered} />}
               {view === "radar" && <RadarMap signals={filtered} />}
             </main>
