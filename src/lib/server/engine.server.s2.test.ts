@@ -31,6 +31,7 @@ function candlesWithOpenLast(): Kline[] {
 describe("S2 — motor de sinais determinístico", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    market.TARGET_PAIRS.splice(0, market.TARGET_PAIRS.length, "BTC/USDT", "ETH/USDT", "FAIL/USDT")
     market.atr.mockReturnValue(1)
     market.getClosedKlines.mockImplementation(async () => candlesWithOpenLast().slice(0, -1))
     market.getMarketRegime.mockResolvedValue({
