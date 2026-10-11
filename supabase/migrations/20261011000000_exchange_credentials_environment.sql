@@ -35,3 +35,15 @@ END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS exchange_credentials_user_environment_uidx
   ON public.exchange_credentials (user_id, environment);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.exchange_credentials'::regclass
+      AND contype = 'p'
+  ) THEN
+    ALTER TABLE public.exchange_credentials
+      ADD CONSTRAINT exchange_credentials_pkey PRIMARY KEY (user_id, environment);
+  END IF;
+END $$;
