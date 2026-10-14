@@ -384,7 +384,7 @@ function Bot4xPill() {
             <Stat label="Profile" value={profile.split("-")[0]} />
             <Stat
               label="PnL hoje"
-              value={pnlAvailable ? `${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%` : "—"}
+              value={pnlAvailable ? `${pnlValue >= 0 ? "+" : ""}${pnlValue.toFixed(2)}%` : "—"}
               color={pnlColor}
             />
           </div>
