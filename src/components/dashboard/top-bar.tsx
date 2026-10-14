@@ -327,13 +327,14 @@ function PriceItem({
 function Bot4xPill() {
   const mode = useBot4xStore((s) => s.mode);
   const profile = useBot4xStore((s) => s.profile);
-  const pnl = useBot4xStore((s) => s.dailyPnlPct);
+  const pnl = useDashboardStore((s) => s.risk?.dailyPnlPct);
   const orders = useBot4xStore((s) => s.orders);
   const effectiveMode = getEffectiveMode(mode);
 
-  const breaker = isBot4xCircuitBreakerTriggered(pnl);
-  const warn = pnl < -0.5 && !breaker;
-  const pnlColor = breaker ? "#E24B4A" : warn ? "#EF9F27" : pnl >= 0 ? "#1D9E75" : "#E24B4A";
+  const pnlAvailable = pnl != null && Number.isFinite(pnl);
+  const breaker = pnlAvailable && isBot4xCircuitBreakerTriggered(pnl);
+  const warn = pnlAvailable && pnl < -0.5 && !breaker;
+  const pnlColor = !pnlAvailable ? "var(--muted-foreground)" : breaker ? "#E24B4A" : warn ? "#EF9F27" : pnl >= 0 ? "#1D9E75" : "#E24B4A";
 
   return (
     <Popover>
@@ -341,7 +342,7 @@ function Bot4xPill() {
         <button
           className="hidden sm:flex items-center gap-2 px-2 h-8 rounded-md border text-[11.5px] font-medium tabular-nums transition-colors hover:bg-secondary"
           style={{ borderColor: `color-mix(in oklab, ${pnlColor} 35%, var(--border))` }}
-          title="Bot4x status"
+          title={effectiveMode === "REAL" ? "Bot4x · modo efetivo REAL" : "Simulado"}
         >
           <span
             className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
@@ -350,16 +351,15 @@ function Bot4xPill() {
                 effectiveMode === "REAL"
                   ? "color-mix(in oklab, #E24B4A 18%, transparent)"
                   : "color-mix(in oklab, #1D9E75 18%, transparent)",
-              color: mode === "REAL" ? "#E24B4A" : "#1D9E75",
-              border: `1px solid color-mix(in oklab, ${mode === "REAL" ? "#E24B4A" : "#1D9E75"} 35%, transparent)`,
+              color: effectiveMode === "REAL" ? "#E24B4A" : "#1D9E75",
+              border: `1px solid color-mix(in oklab, ${effectiveMode === "REAL" ? "#E24B4A" : "#1D9E75"} 35%, transparent)`,
             }}
           >
-            {mode}
+            {effectiveMode}
           </span>
           <Cpu className="size-3.5" style={{ color: pnlColor }} />
           <span style={{ color: pnlColor }}>
-            {pnl >= 0 ? "+" : ""}
-            {pnl.toFixed(2)}%
+            {pnlAvailable ? `${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%` : "—"}
           </span>
         </button>
       </PopoverTrigger>
@@ -375,7 +375,7 @@ function Bot4xPill() {
                 background: `color-mix(in oklab, ${pnlColor} 14%, transparent)`,
               }}
             >
-              {breaker ? "SHUTDOWN" : warn ? "WARNING" : "ACTIVE"}
+              {!pnlAvailable ? "RISK UNKNOWN" : breaker ? "SHUTDOWN" : warn ? "WARNING" : "ACTIVE"}
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-[11px]">
@@ -383,13 +383,13 @@ function Bot4xPill() {
             <Stat label="Profile" value={profile.split("-")[0]} />
             <Stat
               label="PnL hoje"
-              value={`${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%`}
+              value={pnlAvailable ? `${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%` : "—"}
               color={pnlColor}
             />
           </div>
           <div className="flex items-center justify-between text-[11px] text-muted-foreground">
             <span>Ordens abertas</span>
-            <span className="text-foreground font-medium tabular-nums">{orders.length}</span>
+            <span className="text-foreground font-medium tabular-nums">{effectiveMode === "REAL" ? orders.length : "—"}</span>
           </div>
           <Link
             to="/bot4x"
