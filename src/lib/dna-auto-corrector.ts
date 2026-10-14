@@ -7,9 +7,8 @@
 //  2) Calibrador (leverage, allocation %)
 //  3) Filtros de sinais (eleva scoreMin, ativa bot4xOnly)
 //
-// CORREÇÃO: as métricas diárias agora são persistidas em `profiles` no
-// Supabase. Antes o DNA operava 100% em memória Zustand — um reload zerava
-// tudo e o corrector perdia contexto de perda já acumulada na sessão.
+// Segurança: o cliente não persiste métricas operacionais DNA em `profiles`.
+// As correções locais só executam quando o backend confirma o modo efetivo REAL.
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
