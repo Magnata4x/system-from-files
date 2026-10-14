@@ -502,23 +502,6 @@ function relativeTime(ts: number) {
   return `${Math.floor(diff / 86400)}d atrás`;
 }
 
-/* ── legacy Ticker kept for safety ── */
-function Ticker({ symbol, price, change }: { symbol: string; price: number; change: number }) {
-  const up = change >= 0;
-  return (
-    <span className="flex items-center gap-1.5">
-      <span className="text-muted-foreground">{symbol}</span>
-      <span className="text-foreground tabular-nums">
-        ${price.toLocaleString(undefined, { maximumFractionDigits: price > 100 ? 0 : 2 })}
-      </span>
-      <span style={{ color: up ? "#1D9E75" : "#E24B4A" }}>
-        {up ? "+" : ""}
-        {change.toFixed(1)}%
-      </span>
-    </span>
-  );
-}
-
 function CopilotTopBarButton() {
   const open = useCopilotUI((s) => s.open);
   const toggle = useCopilotUI((s) => s.toggle);
