@@ -13,11 +13,9 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { getEffectiveMode, useBot4xStore } from "./bot4x-store";
 import { useSignalsStore } from "./signals-store";
 import { PROFILE_RISK_LADDER, type CalibProfile } from "./bot4x-data";
-import { logger } from "./logger";
 
 // ─── Cooldown por eixo ──────────────────────────────────────────────────────
 const COOLDOWN_MS = 60_000;
@@ -26,7 +24,6 @@ const lastApplied: Record<string, number> = {
   profile: 0,
   calib: 0,
   filters: 0,
-  persist: 0, // throttle de escrita no banco (mínimo 30s entre writes)
 };
 
 function canApply(axis: keyof typeof lastApplied): boolean {
@@ -67,49 +64,6 @@ function readSnapshot(): Snapshot {
   };
 }
 
-// ─── Persistência das métricas DNA no Supabase ─────────────────────────────
-// Throttle de 30s para não spammar o banco a cada ciclo de 30s.
-const PERSIST_THROTTLE_MS = 30_000;
-
-async function persistDnaMetrics(
-  userId: string,
-  snap: Snapshot,
-  dnaValues?: {
-    consistency?: number;
-    discipline?: number;
-    riskControl?: number;
-    timing?: number;
-    emotionalControl?: number;
-  },
-): Promise<void> {
-  if (Date.now() - lastApplied.persist < PERSIST_THROTTLE_MS) return;
-  lastApplied.persist = Date.now();
-
-  const row = {
-    operations_today: snap.operationsToday,
-    drawdown_today: snap.dailyPnlPct,
-    recent_losses: snap.recentLosses,
-    open_loss_pct: snap.openLossPct,
-    dna_updated_at: new Date().toISOString(),
-    ...(dnaValues?.consistency !== undefined && { dna_consistency: dnaValues.consistency }),
-    ...(dnaValues?.discipline !== undefined && { dna_discipline: dnaValues.discipline }),
-    ...(dnaValues?.riskControl !== undefined && { dna_risk_control: dnaValues.riskControl }),
-    ...(dnaValues?.timing !== undefined && { dna_timing: dnaValues.timing }),
-    ...(dnaValues?.emotionalControl !== undefined && {
-      dna_emotional_control: dnaValues.emotionalControl,
-    }),
-  };
-
-  const { error } = await supabase.from("profiles").update(row).eq("id", userId);
-
-  if (error) {
-    logger.error("[dna-auto-corrector] persistDnaMetrics error", {
-      userId,
-      error: error.message,
-    });
-  }
-}
-
 // ─── Log de correções em memória ────────────────────────────────────────────
 type CorrectionLog = {
   ts: number;
@@ -119,7 +73,7 @@ type CorrectionLog = {
 
 const recentCorrections: CorrectionLog[] = [];
 
-// ─── Core: executa correção e persiste ─────────────────────────────────────
+// ─── Core: executa correções locais somente em modo efetivo REAL ────────────
 export function runDnaAutoCorrection(userId?: string): CorrectionLog | null {
   const bot4xState = useBot4xStore.getState();
   // DEMO usa estado sintético: não pode corrigir perfis nem persistir métricas operacionais.
@@ -136,12 +90,6 @@ export function runDnaAutoCorrection(userId?: string): CorrectionLog | null {
         : snap.dailyPnlPct <= -0.5 || snap.recentLosses >= 3
           ? 1
           : 0;
-
-  // Sempre persistir métricas quando temos userId, mesmo sem correção ativa,
-  // para que um reload não perca o contexto de drawdown do dia.
-  if (userId) {
-    void persistDnaMetrics(userId, snap);
-  }
 
   if (tier === 0) return null;
 
@@ -206,12 +154,6 @@ export function runDnaAutoCorrection(userId?: string): CorrectionLog | null {
   recentCorrections.unshift(log);
   if (recentCorrections.length > 20) recentCorrections.pop();
 
-  // Persistir métricas imediatamente após uma correção (ignora throttle)
-  if (userId) {
-    lastApplied.persist = 0; // força write imediato
-    void persistDnaMetrics(userId, snap);
-  }
-
   const severity = tier === 3 ? "🚨 Crítico" : tier === 2 ? "⚠ Alto" : "Atenção";
   toast.warning(`DNA ajustou estratégia · ${severity}`, {
     description: `${reason}\n${changes.join(" · ")}`,
@@ -226,7 +168,7 @@ export function getRecentDnaCorrections(): CorrectionLog[] {
 }
 
 // ─── React hook — montar uma vez no layout autenticado ─────────────────────
-// CORREÇÃO: recebe userId para persistir métricas no banco após cada ciclo.
+// userId é mantido por compatibilidade com o hook; métricas não são gravadas pelo cliente.
 export function useDnaAutoCorrector(enabled = true, userId?: string) {
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastHistoryLen = useRef<number>(-1);
