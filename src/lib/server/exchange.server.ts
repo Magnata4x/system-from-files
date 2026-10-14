@@ -62,8 +62,10 @@ export type BinanceEnvironment = 'demo' | 'testnet' | 'production'
 
 export function getBinanceEnvironment(): BinanceEnvironment {
   const value = process.env['BINANCE_TRADING_ENV']?.trim().toLowerCase()
-  if (value === 'production' || value === 'testnet' || value === 'demo') return value
-  return 'demo'
+  // DEMO is a live execution flow against Binance Spot Testnet, never the public demo endpoint.
+  if (value === 'production') return 'production'
+  if (value === 'testnet' || value === 'demo' || !value) return 'testnet'
+  throw new ApiError('BINANCE_TRADING_ENV inválido; use testnet ou production.', 500)
 }
 
 export function getBinanceBaseUrl(environment = getBinanceEnvironment()): string {
@@ -75,7 +77,7 @@ export function getBinanceBaseUrl(environment = getBinanceEnvironment()): string
 const EMPTY: ExchangeStatus = {
   connected: false,
   exchange: 'binance',
-  environment: 'demo',
+  environment: 'testnet',
   keyPreview: '',
   verified: false,
   verifiedAt: null,
@@ -345,6 +347,7 @@ export async function testExchangeCredentials(
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data) throw new ApiError('Nenhuma credencial salva.', 404)
