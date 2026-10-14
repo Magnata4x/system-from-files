@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const supabaseFrom = vi.fn();
+const { supabaseFrom } = vi.hoisted(() => ({ supabaseFrom: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
