@@ -71,6 +71,8 @@ interface DashboardState {
 
 export type DashboardDataStatus = "loading" | "ok" | "stale" | "unavailable";
 
+export const SIGNALS_LIMIT = 12;
+
 export function calculateRiskReward(
   entry: number | null,
   stop: number | null,
@@ -140,12 +142,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const ids = new Set<number>();
 
     // Substitui a randomização client-side por pulls reais no backend.
-    // Os campos ainda não expostos pelo backend (heatmap, sentiment, etc.)
-    // permanecem no mock até existir um endpoint dedicado de dashboard.
+    // Campos sem endpoint dedicado permanecem indisponíveis; não gerar dados sintéticos.
     const pullRisk = async () => {
       try {
         const raw = await api.get<Record<string, unknown>>(endpoints.risk.status);
-        if (raw) {
+        if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
           set({
             risk: {
               level: (raw.level ?? raw.status) as string | undefined,
@@ -157,6 +158,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
             riskError: null,
             riskStale: false,
           });
+        } else {
+          set({ riskError: "Resposta vazia de risk/status", riskStale: get().risk != null });
         }
       } catch (err) {
         logger.warn("[dashboard] risk/status falhou", { error: err });
@@ -168,7 +171,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         const raw = await api.get<Record<string, unknown>>(
           `${endpoints.marketRegime.current}?pair=BTC/USDT`,
         );
-        if (raw) {
+        if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
           set({
             regime: {
               regime: (raw.regime ?? raw.state) as string | undefined,
@@ -179,6 +182,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
             regimeError: null,
             regimeStale: false,
           });
+        } else {
+          set({ regimeError: "Resposta vazia de market-regime/current", regimeStale: get().regime != null });
         }
       } catch (err) {
         logger.warn("[dashboard] market-regime/current falhou", { error: err });
@@ -188,7 +193,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const pullSignals = async () => {
       try {
         const list = await signalAdapter.list();
-        const mapped: Signal[] = list.slice(0, 12).map((s) => ({
+        const mapped: Signal[] = list.slice(0, SIGNALS_LIMIT).map((s) => ({
           id: s.id,
           asset: s.symbol,
           direction: s.direction,
