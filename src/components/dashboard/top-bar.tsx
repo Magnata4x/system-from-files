@@ -332,9 +332,10 @@ function Bot4xPill() {
   const effectiveMode = getEffectiveMode(mode);
 
   const pnlAvailable = pnl != null && Number.isFinite(pnl);
-  const breaker = pnlAvailable && isBot4xCircuitBreakerTriggered(pnl);
-  const warn = pnlAvailable && pnl < -0.5 && !breaker;
-  const pnlColor = !pnlAvailable ? "var(--muted-foreground)" : breaker ? "#E24B4A" : warn ? "#EF9F27" : pnl >= 0 ? "#1D9E75" : "#E24B4A";
+  const pnlValue = pnl ?? 0;
+  const breaker = pnlAvailable && isBot4xCircuitBreakerTriggered(pnlValue);
+  const warn = pnlAvailable && pnlValue < -0.5 && !breaker;
+  const pnlColor = !pnlAvailable ? "var(--muted-foreground)" : breaker ? "#E24B4A" : warn ? "#EF9F27" : pnlValue >= 0 ? "#1D9E75" : "#E24B4A";
 
   return (
     <Popover>
@@ -359,7 +360,7 @@ function Bot4xPill() {
           </span>
           <Cpu className="size-3.5" style={{ color: pnlColor }} />
           <span style={{ color: pnlColor }}>
-            {pnlAvailable ? `${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}%` : "—"}
+            {pnlAvailable ? `${pnlValue >= 0 ? "+" : ""}${pnlValue.toFixed(2)}%` : "—"}
           </span>
         </button>
       </PopoverTrigger>
