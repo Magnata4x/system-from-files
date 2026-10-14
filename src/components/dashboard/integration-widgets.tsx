@@ -171,7 +171,8 @@ export function Bot4xSummaryWidget() {
   const RISK_MAX_AGE_MS = 60_000;
   const riskFresh = riskUpdatedAt != null && !riskStale && Date.now() - riskUpdatedAt < RISK_MAX_AGE_MS;
   const riskAvailable = pnl != null && Number.isFinite(pnl) && riskFresh;
-  const breaker = pnl != null && Number.isFinite(pnl) && riskFresh ? isBot4xCircuitBreakerTriggered(pnl) : false;
+  const pnlValue = pnl ?? 0;
+  const breaker = riskAvailable ? isBot4xCircuitBreakerTriggered(pnlValue) : false;
   const effectiveMode = getEffectiveMode(mode);
   const realMode = effectiveMode === "REAL";
   return (
@@ -185,9 +186,9 @@ export function Bot4xSummaryWidget() {
         <div>
           <div
             className="text-[18px] font-semibold"
-            style={{ color: breaker ? "#E24B4A" : !riskAvailable ? "var(--muted-foreground)" : pnl >= 0 ? "#1D9E75" : "#EF9F27" }}
+            style={{ color: breaker ? "#E24B4A" : !riskAvailable ? "var(--muted-foreground)" : pnlValue >= 0 ? "#1D9E75" : "#EF9F27" }}
           >
-            {riskAvailable ? (pnl >= 0 ? "+" : "") + pnl.toFixed(2) + "%" : "—"}
+            {riskAvailable ? (pnlValue >= 0 ? "+" : "") + pnlValue.toFixed(2) + "%" : "—"}
           </div>
           <div className={`mt-1 flex items-center gap-1.5 text-[10.5px] ${breaker ? "text-[#E24B4A] font-medium" : realMode ? "text-[#1D9E75] font-medium" : "text-muted-foreground"}`}>
             <Activity className="size-3" />
