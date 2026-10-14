@@ -50,6 +50,9 @@ const signals: SignalsMock = {
 };
 
 vi.mock("../bot4x-store", () => ({
+  // Os testes de severidade/cooldown exercitam o corretor no modo REAL.
+  // O teste específico de bloqueio DEMO cobre o gate em outro arquivo.
+  getEffectiveMode: () => "REAL",
   useBot4xStore: {
     getState: () => bot4x,
     subscribe: vi.fn(() => () => {}),

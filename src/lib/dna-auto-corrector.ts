@@ -14,7 +14,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useBot4xStore } from "./bot4x-store";
+import { getEffectiveMode, useBot4xStore } from "./bot4x-store";
 import { useSignalsStore } from "./signals-store";
 import { PROFILE_RISK_LADDER, type CalibProfile } from "./bot4x-data";
 import { logger } from "./logger";
@@ -121,8 +121,10 @@ const recentCorrections: CorrectionLog[] = [];
 
 // ─── Core: executa correção e persiste ─────────────────────────────────────
 export function runDnaAutoCorrection(userId?: string): CorrectionLog | null {
-  const snap = readSnapshot();
   const bot4xState = useBot4xStore.getState();
+  // DEMO usa estado sintético: não pode corrigir perfis nem persistir métricas operacionais.
+  if (getEffectiveMode(bot4xState.mode) !== "REAL") return null;
+  const snap = readSnapshot();
   const signalsState = useSignalsStore.getState();
 
   // Severity tiers por critério de perda de capital.
