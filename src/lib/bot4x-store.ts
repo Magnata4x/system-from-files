@@ -15,7 +15,7 @@ import { bot4xAdapter, type BackendBot4xVerifiedHistory } from "@/adapters/backe
 import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
-import { loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
+import { loadTrades } from "./bot4x-trades-db";
 import { logger } from "./logger";
 import { loadConfig, saveConfig } from "./bot4x-config-db";
 import type { CalibProfile as CalibProfileType } from "./bot4x-data";
