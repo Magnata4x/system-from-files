@@ -117,18 +117,26 @@ export async function loadConfig(userId: string): Promise<Bot4xConfigRow | null>
   };
 }
 
-export async function saveConfig(userId: string, config: Partial<Bot4xConfigRow>): Promise<void> {
+// A API client-side só pode persistir preferências. Estado operacional é do backend.
+export type Bot4xClientConfigPatch = Partial<Pick<Bot4xConfigRow,
+  | "executionMode"
+  | "profile"
+  | "leverage"
+  | "slPct"
+  | "tpPct"
+  | "allocationPct"
+  | "totalCapital"
+  | "preferredPairs"
+  | "avoidPairs"
+>>;
+
+export async function saveConfig(userId: string, config: Bot4xClientConfigPatch): Promise<void> {
   const row = {
     user_id: userId,
     updated_at: new Date().toISOString(),
-    ...(config.active !== undefined && { active: config.active }),
     ...(config.executionMode !== undefined && { execution_mode: config.executionMode }),
     ...(config.profile !== undefined && { profile: config.profile }),
     ...(config.leverage !== undefined && { leverage: config.leverage }),
-    ...(config.activeCapital !== undefined && { active_capital: config.activeCapital }),
-    ...(config.circuitBreaker !== undefined && { circuit_breaker: config.circuitBreaker }),
-    ...(config.dailyPnl !== undefined && { daily_pnl: config.dailyPnl }),
-    ...(config.openSlots !== undefined && { open_slots: config.openSlots }),
     // Novas colunas com nomes corretos (ARCH-02).
     ...(config.slPct !== undefined && { sl_pct: config.slPct }),
     ...(config.tpPct !== undefined && { tp_pct: config.tpPct }),
