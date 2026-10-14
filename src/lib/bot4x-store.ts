@@ -15,7 +15,7 @@ import { bot4xAdapter, type BackendBot4xVerifiedHistory } from "@/adapters/backe
 import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
-import { saveTrade, loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
+import { loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
 import { logger } from "./logger";
 import { loadConfig, saveConfig } from "./bot4x-config-db";
 import type { CalibProfile as CalibProfileType } from "./bot4x-data";
@@ -389,12 +389,8 @@ export const useBot4xStore = create<State>()(
                 hour: new Date().getHours(),
               }));
 
-              if (newTrades.length > 0) {
-                const uid = get().userId;
-                if (uid) {
-                  newTrades.forEach((t) => saveTrade(uid, t));
-                }
-              }
+              // Trades geradas pelo simulador DEMO são somente locais; não persistir
+              // resultados sintéticos em bot4x_trades (ledger compartilhado).
 
 
 
