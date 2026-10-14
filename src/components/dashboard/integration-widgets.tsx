@@ -171,7 +171,7 @@ export function Bot4xSummaryWidget() {
   const RISK_MAX_AGE_MS = 60_000;
   const riskFresh = riskUpdatedAt != null && !riskStale && Date.now() - riskUpdatedAt < RISK_MAX_AGE_MS;
   const riskAvailable = pnl != null && Number.isFinite(pnl) && riskFresh;
-  const breaker = riskAvailable ? isBot4xCircuitBreakerTriggered(pnl) : false;
+  const breaker = pnl != null && Number.isFinite(pnl) && riskFresh ? isBot4xCircuitBreakerTriggered(pnl) : false;
   const effectiveMode = getEffectiveMode(mode);
   const realMode = effectiveMode === "REAL";
   return (
