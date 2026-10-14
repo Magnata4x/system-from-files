@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ScoreBadge } from "./score-badge";
 import { useCountUp } from "@/lib/use-count-up";
 import { useMarketData } from "@/lib/market-data-store";
-import { useDashboardStore, selectManipulationStatus, selectSignalsStatus } from "@/lib/dashboard-store";
+import { useDashboardStore, selectManipulationStatus, selectSignalsStatus, SIGNALS_LIMIT } from "@/lib/dashboard-store";
 import { DataStatusBadge } from "./data-status";
 
 export function MetricCards() {
@@ -44,7 +44,7 @@ export function MetricCards() {
       : signalsError
         ? "Última leitura válida · " + high + " high score (≥80)"
         : signals.length
-          ? high + " high score (≥80)"
+          ? (signals.length >= SIGNALS_LIMIT ? `${SIGNALS_LIMIT} mais recentes · ` : "") + high + " high score (≥80)"
           : "Nenhum sinal ativo";
   const manipSub = manipLoading
     ? "Carregando…"
@@ -61,7 +61,7 @@ export function MetricCards() {
         icon={<Activity className="size-4" />}
         color="#378ADD"
         label="Active Signals"
-        count={signalsLoading ? undefined : signals.length}
+        count={signalsLoading || (signalsError && signals.length === 0) ? undefined : signals.length}
         sub={signalSub}
         source="Internal API"
         status={signalStatus}
@@ -96,7 +96,8 @@ export function MetricCards() {
         icon={<AlertTriangle className="size-4" />}
         color="#E24B4A"
         label="Manipulation Alerts"
-        count={manip.length}
+        count={manipLoading || (manipError && manip.length === 0) ? undefined : manip.length}
+        value={manipLoading || (manipError && manip.length === 0) ? "—" : undefined}
         sub={manipSub}
         source="Internal API"
         status={manipStale ? "stale" : manipStatus}
