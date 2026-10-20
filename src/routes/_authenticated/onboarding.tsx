@@ -34,14 +34,36 @@ function OnboardingPage() {
   const [goal, setGoal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [profileCheckError, setProfileCheckError] = useState(false);
+  const [retryProfileCheck, setRetryProfileCheck] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      if (!user) return;
-      const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", user.id).maybeSingle();
-      if (data?.onboarding_completed) navigate({ to: "/dashboard" });
+    if (!user) return;
+    let cancelled = false;
+    setProfileCheckError(false);
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error) {
+          setProfileCheckError(true);
+          return;
+        }
+        if (data?.onboarding_completed === true) {
+          navigate({ to: "/dashboard", replace: true });
+        }
+      } catch {
+        if (!cancelled) setProfileCheckError(true);
+      }
     })();
-  }, [user, navigate]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, navigate, retryProfileCheck]);
 
   const canContinue = step === 0 ? !!experience : step === 1 ? markets.length > 0 : !!goal;
 
@@ -160,6 +182,18 @@ function OnboardingPage() {
       </main>
 
       <footer className="px-6 py-5 border-t border-border">
+        {profileCheckError && (
+          <div role="alert" className="max-w-2xl mx-auto mb-3 text-sm text-destructive">
+            Não foi possível verificar seu perfil. Tente novamente antes de continuar.
+            <button
+              type="button"
+              onClick={() => setRetryProfileCheck((attempt) => attempt + 1)}
+              className="ml-2 underline"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
         {saveError && <p role="alert" className="max-w-2xl mx-auto mb-3 text-sm text-destructive">{saveError}</p>}
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
@@ -172,7 +206,7 @@ function OnboardingPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={next}
-              disabled={!canContinue || saving}
+              disabled={!canContinue || saving || profileCheckError}
               className="h-11 px-6 rounded-lg text-sm font-medium text-primary-foreground flex items-center gap-2 disabled:opacity-50 transition-opacity hover:opacity-90"
               style={{ background: "var(--brand-blue)" }}
             >
