@@ -69,20 +69,25 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthGate() {
   const { session, loading } = useAuth();
+  const { serverUserId } = Route.useRouteContext();
   const navigate = useNavigate();
   const location = useLocation();
   const [profileCheck, setProfileCheck] = useState<"checking" | "ready" | "error">("checking");
   const [retryProfileCheck, setRetryProfileCheck] = useState(0);
+  const userId = session?.user.id;
   const onboardingExempt =
     location.pathname === "/onboarding" || location.pathname === "/bot4x/onboarding";
+  // Server verification is authoritative only for the same authenticated user.
+  // SSR without a bearer falls back to the client-side profile check.
+  const needsClientCheck = !onboardingExempt && (!serverUserId || serverUserId !== userId);
 
   useEffect(() => {
     if (loading) return;
-    if (!session) {
+    if (!userId) {
       navigate({ to: "/login", replace: true });
       return;
     }
-    if (onboardingExempt) {
+    if (!needsClientCheck) {
       setProfileCheck("ready");
       return;
     }
@@ -94,7 +99,7 @@ function AuthGate() {
         const { data, error } = await supabase
           .from("profiles")
           .select("onboarding_completed")
-          .eq("id", session.user.id)
+          .eq("id", userId)
           .maybeSingle();
         if (cancelled) return;
         if (error) {
@@ -114,7 +119,7 @@ function AuthGate() {
     return () => {
       cancelled = true;
     };
-  }, [loading, session, navigate, onboardingExempt, retryProfileCheck]);
+  }, [loading, userId, needsClientCheck, navigate, retryProfileCheck]);
 
   if (profileCheck === "error") {
     return (
