@@ -33,6 +33,7 @@ function OnboardingPage() {
   const [markets, setMarkets] = useState<string[]>([]);
   const [goal, setGoal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -45,17 +46,28 @@ function OnboardingPage() {
   const canContinue = step === 0 ? !!experience : step === 1 ? markets.length > 0 : !!goal;
 
   async function finish() {
-    if (!user) return;
+    if (!user || saving) return;
     setSaving(true);
-    await supabase.from("profiles").upsert({
-      id: user.id,
-      email: user.email,
-      experience,
-      markets,
-      goal,
-      onboarding_completed: true,
-    });
-    navigate({ to: "/dashboard" });
+    setSaveError(null);
+    try {
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        email: user.email,
+        experience,
+        markets,
+        goal,
+        onboarding_completed: true,
+      });
+      if (error) {
+        setSaveError("Não foi possível salvar seu onboarding. Tente novamente.");
+        return;
+      }
+      navigate({ to: "/dashboard", replace: true });
+    } catch {
+      setSaveError("Não foi possível salvar seu onboarding. Tente novamente.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   const next = () => {
@@ -148,6 +160,7 @@ function OnboardingPage() {
       </main>
 
       <footer className="px-6 py-5 border-t border-border">
+        {saveError && <p role="alert" className="max-w-2xl mx-auto mb-3 text-sm text-destructive">{saveError}</p>}
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={() => { if (step > 0) { setDirection(-1); setStep(step - 1); } }}
