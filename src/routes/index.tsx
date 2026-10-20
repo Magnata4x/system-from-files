@@ -28,20 +28,21 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { session, loading } = useAuth();
+  const userId = session?.user.id;
   const navigate = useNavigate();
   const [lookupError, setLookupError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (loading) return;
-    if (!session) {
+    if (!userId) {
       navigate({ to: "/login", replace: true });
       return;
     }
 
     let cancelled = false;
     setLookupError(false);
-    void lookupOnboarding(session.user.id).then((result) => {
+    void lookupOnboarding(userId).then((result) => {
       if (cancelled) return;
       if (result === "error") {
         setLookupError(true);
@@ -56,7 +57,7 @@ function Index() {
     return () => {
       cancelled = true;
     };
-  }, [loading, session, navigate, attempt]);
+  }, [loading, userId, navigate, attempt]);
 
   if (lookupError) {
     return (
@@ -74,8 +75,9 @@ function Index() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Loader2 className="size-6 animate-spin text-muted-foreground" />
+    <div role="status" className="min-h-screen flex items-center justify-center bg-background">
+      <span className="sr-only">Verificando seu perfil…</span>
+      <Loader2 aria-hidden="true" className="size-6 animate-spin text-muted-foreground" />
     </div>
   );
 }
