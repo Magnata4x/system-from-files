@@ -62,7 +62,6 @@ function OnboardingPage() {
     if (step < 2) { setDirection(1); setStep(step + 1); }
     else finish();
   };
-  const skip = () => navigate({ to: "/dashboard" });
 
   return (
     <div className="min-h-screen bg-background bg-dot-grid flex flex-col">
@@ -158,7 +157,6 @@ function OnboardingPage() {
             ← Back
           </button>
           <div className="flex items-center gap-4">
-            <button onClick={skip} className="text-sm text-muted-foreground hover:text-foreground">Skip</button>
             <button
               onClick={next}
               disabled={!canContinue || saving}
