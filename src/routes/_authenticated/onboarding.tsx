@@ -93,8 +93,9 @@ function OnboardingPage() {
 
   if (gate === "checking") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      <div role="status" className="min-h-screen flex items-center justify-center bg-background">
+        <span className="sr-only">Verificando seu perfil…</span>
+        <Loader2 aria-hidden="true" className="size-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
