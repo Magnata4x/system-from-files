@@ -89,8 +89,18 @@ export async function getExchangeStatus(supabase: Client, userId: string): Promi
     .eq('user_id', userId)
     .eq('environment', getBinanceEnvironment())
     .maybeSingle()
-  if (error) throw new ApiError(error.message, 500)
-  if (!data) return EMPTY
+  if (error) {
+    // Do not silently fall back to an environment-agnostic query: that could
+    // return credentials from the wrong Binance environment.
+    if (error.code === '42703' || error.code === 'PGRST204') {
+      throw new ApiError(
+        'Schema do banco desatualizado: aplique a migration 20261011000000_exchange_credentials_environment antes de consultar credenciais.',
+        503,
+      )
+    }
+    throw new ApiError('Não foi possível consultar as credenciais da exchange.', 503)
+  }
+  if (!data) return { ...EMPTY, environment: getBinanceEnvironment() }
   return {
     connected: true,
     exchange: data.exchange,
