@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate, useLocation, Outlet, redirect } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { Bot4xCompactPill } from "@/components/global/bot4x-compact-pill";
 import { Bot4xGlobalNotifier } from "@/components/global/bot4x-notifier";
@@ -16,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAuthSession, getOnboardingStatus } from "@/lib/server-auth";
 import { OfflineBanner } from "@/components/offline-banner";
 import { MarketDataProvider } from "@/lib/market-data-store";
+import { useOnboardingGate } from "@/hooks/useOnboardingGate";
 
 
 // PERF-01: code-split widgets pesados. CopilotPanel só monta após o
@@ -72,54 +72,19 @@ function AuthGate() {
   const { serverUserId } = Route.useRouteContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const [profileCheck, setProfileCheck] = useState<"checking" | "ready" | "error">("checking");
-  const [retryProfileCheck, setRetryProfileCheck] = useState(0);
   const userId = session?.user.id;
   const onboardingExempt =
     location.pathname === "/onboarding" || location.pathname === "/bot4x/onboarding";
   // Server verification is authoritative only for the same authenticated user.
   // SSR without a bearer falls back to the client-side profile check.
   const needsClientCheck = !onboardingExempt && (!serverUserId || serverUserId !== userId);
-
-  useEffect(() => {
-    if (loading) return;
-    if (!userId) {
-      navigate({ to: "/login", replace: true });
-      return;
-    }
-    if (!needsClientCheck) {
-      setProfileCheck("ready");
-      return;
-    }
-
-    let cancelled = false;
-    setProfileCheck("checking");
-    void (async () => {
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", userId)
-          .maybeSingle();
-        if (cancelled) return;
-        if (error) {
-          setProfileCheck("error");
-          return;
-        }
-        if (data?.onboarding_completed !== true) {
-          navigate({ to: "/onboarding", replace: true });
-          return;
-        }
-        setProfileCheck("ready");
-      } catch {
-        if (!cancelled) setProfileCheck("error");
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, userId, needsClientCheck, navigate, retryProfileCheck]);
+  const { state: profileCheck, retry: retryProfileCheck } = useOnboardingGate({
+    loading,
+    userId,
+    needsClientCheck,
+    onSignedOut: () => navigate({ to: "/login", replace: true }),
+    onIncomplete: () => navigate({ to: "/onboarding", replace: true }),
+  });
 
   if (profileCheck === "error") {
     return (
@@ -127,7 +92,7 @@ function AuthGate() {
         <p className="text-sm text-muted-foreground">Não foi possível verificar seu perfil. Tente novamente.</p>
         <button
           type="button"
-          onClick={() => setRetryProfileCheck((attempt) => attempt + 1)}
+          onClick={retryProfileCheck}
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Tentar novamente
