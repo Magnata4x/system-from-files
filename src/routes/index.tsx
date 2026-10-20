@@ -33,10 +33,29 @@ function Index() {
   useEffect(() => {
     if (loading) return;
     if (!session) { navigate({ to: "/login" }); return; }
-    (async () => {
-      const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", session.user.id).maybeSingle();
-      navigate({ to: data?.onboarding_completed ? "/dashboard" : "/onboarding" });
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        // Let the authenticated guard surface a retryable verification error;
+        // a failed profile read must not be interpreted as incomplete onboarding.
+        if (error) {
+          navigate({ to: "/dashboard", replace: true });
+          return;
+        }
+        navigate({ to: data?.onboarding_completed === true ? "/dashboard" : "/onboarding", replace: true });
+      } catch {
+        if (!cancelled) navigate({ to: "/dashboard", replace: true });
+      }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [loading, session, navigate]);
 
   return (
