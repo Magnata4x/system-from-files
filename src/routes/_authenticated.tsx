@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useLocation, Outlet, redirect } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { Bot4xCompactPill } from "@/components/global/bot4x-compact-pill";
 import { Bot4xGlobalNotifier } from "@/components/global/bot4x-notifier";
@@ -69,12 +70,68 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthGate() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [profileCheck, setProfileCheck] = useState<"checking" | "ready" | "error">("checking");
+  const [retryProfileCheck, setRetryProfileCheck] = useState(0);
+  const onboardingExempt =
+    location.pathname === "/onboarding" || location.pathname === "/bot4x/onboarding";
 
   useEffect(() => {
-    if (!loading && !session) navigate({ to: "/login" });
-  }, [loading, session, navigate]);
+    if (loading) return;
+    if (!session) {
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+    if (onboardingExempt) {
+      setProfileCheck("ready");
+      return;
+    }
 
-  if (loading || !session) {
+    let cancelled = false;
+    setProfileCheck("checking");
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error) {
+          setProfileCheck("error");
+          return;
+        }
+        if (data?.onboarding_completed !== true) {
+          navigate({ to: "/onboarding", replace: true });
+          return;
+        }
+        setProfileCheck("ready");
+      } catch {
+        if (!cancelled) setProfileCheck("error");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, session, navigate, onboardingExempt, retryProfileCheck]);
+
+  if (profileCheck === "error") {
+    return (
+      <div role="alert" className="min-h-screen flex flex-col items-center justify-center gap-3 bg-background px-4 text-center">
+        <p className="text-sm text-muted-foreground">Não foi possível verificar seu perfil. Tente novamente.</p>
+        <button
+          type="button"
+          onClick={() => setRetryProfileCheck((attempt) => attempt + 1)}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
+  if (loading || !session || (!onboardingExempt && profileCheck !== "ready")) {
     // UX-01: skeleton que aproxima o shell (sidebar + topbar + conteúdo)
     // em vez de spinner de tela cheia — reduz CLS e flash visual.
     return (
