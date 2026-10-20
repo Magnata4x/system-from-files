@@ -72,10 +72,25 @@ function LoginPage() {
   }, [loading, session]);
 
   async function routeAfterLogin() {
-    const uid = (await supabase.auth.getUser()).data.user?.id;
-    if (!uid) return;
-    const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", uid).maybeSingle();
-    navigate({ to: data?.onboarding_completed ? "/dashboard" : "/onboarding" });
+    try {
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      const uid = authData.user?.id;
+      if (authError || !uid) return;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", uid)
+        .maybeSingle();
+      // A failed read is not evidence that onboarding is incomplete. Send the
+      // user through the authenticated guard, which can show a retryable error.
+      if (error) {
+        navigate({ to: "/dashboard", replace: true });
+        return;
+      }
+      navigate({ to: data?.onboarding_completed === true ? "/dashboard" : "/onboarding", replace: true });
+    } catch {
+      navigate({ to: "/dashboard", replace: true });
+    }
   }
 
   return (
