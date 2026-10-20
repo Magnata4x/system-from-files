@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { lookupOnboarding } from "@/lib/onboarding-status";
 
 export type OnboardingGateState = "checking" | "ready" | "error";
 
@@ -39,27 +39,18 @@ export function useOnboardingGate({
 
     let cancelled = false;
     setState("checking");
-    void (async () => {
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", userId)
-          .maybeSingle();
-        if (cancelled) return;
-        if (error) {
-          setState("error");
-          return;
-        }
-        if (data?.onboarding_completed !== true) {
-          callbacks.current.onIncomplete();
-          return;
-        }
-        setState("ready");
-      } catch {
-        if (!cancelled) setState("error");
+    void lookupOnboarding(userId).then((result) => {
+      if (cancelled) return;
+      if (result === "error") {
+        setState("error");
+        return;
       }
-    })();
+      if (result === "incomplete") {
+        callbacks.current.onIncomplete();
+        return;
+      }
+      setState("ready");
+    });
 
     return () => {
       cancelled = true;

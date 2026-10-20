@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { lookupOnboarding } from "@/lib/onboarding-status";
 import { useAuth } from "@/lib/auth";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -34,19 +35,33 @@ function OnboardingPage() {
   const [goal, setGoal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [gate, setGate] = useState<"checking" | "incomplete" | "error">("checking");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      if (!user) return;
-      const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", user.id).maybeSingle();
-      if (data?.onboarding_completed) navigate({ to: "/dashboard" });
-    })();
-  }, [user, navigate]);
+    const userId = user?.id;
+    if (!userId) return;
+
+    let cancelled = false;
+    setGate("checking");
+    void lookupOnboarding(userId).then((result) => {
+      if (cancelled) return;
+      if (result === "completed") {
+        navigate({ to: "/dashboard", replace: true });
+        return;
+      }
+      setGate(result);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, attempt, navigate]);
 
   const canContinue = step === 0 ? !!experience : step === 1 ? markets.length > 0 : !!goal;
 
   async function finish() {
-    if (!user || saving) return;
+    if (gate !== "incomplete" || !user || saving) return;
     setSaving(true);
     setSaveError(null);
     try {
@@ -71,9 +86,33 @@ function OnboardingPage() {
   }
 
   const next = () => {
+    if (gate !== "incomplete") return;
     if (step < 2) { setDirection(1); setStep(step + 1); }
     else finish();
   };
+
+  if (gate === "checking") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (gate === "error") {
+    return (
+      <div role="alert" className="min-h-screen flex flex-col items-center justify-center gap-3 bg-background px-4 text-center">
+        <p className="text-sm text-muted-foreground">Não foi possível verificar seu perfil. Tente novamente.</p>
+        <button
+          type="button"
+          onClick={() => setAttempt((value) => value + 1)}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background bg-dot-grid flex flex-col">

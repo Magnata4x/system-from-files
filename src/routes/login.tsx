@@ -67,16 +67,10 @@ function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
 
   useEffect(() => {
-    if (!loading && session) routeAfterLogin();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, session]);
-
-  async function routeAfterLogin() {
-    const uid = (await supabase.auth.getUser()).data.user?.id;
-    if (!uid) return;
-    const { data } = await supabase.from("profiles").select("onboarding_completed").eq("id", uid).maybeSingle();
-    navigate({ to: data?.onboarding_completed ? "/dashboard" : "/onboarding" });
-  }
+    if (!loading && session) {
+      navigate({ to: "/", replace: true });
+    }
+  }, [loading, session, navigate]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background bg-dot-grid px-4 py-10 relative overflow-hidden">
