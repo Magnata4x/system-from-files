@@ -12,7 +12,7 @@ import { useMarketContext } from "@/hooks/useMarketContext";
 import { useCopilotUI } from "@/lib/copilot-ui-store";
 import { useStoreCleanup } from "@/hooks/useStoreCleanup";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAuthSession } from "@/lib/server-auth";
+import { getAuthSession, getOnboardingStatus } from "@/lib/server-auth";
 import { OfflineBanner } from "@/components/offline-banner";
 import { MarketDataProvider } from "@/lib/market-data-store";
 
@@ -36,16 +36,29 @@ export const Route = createFileRoute("/_authenticated")({
   //   abaixo cobre esse caso (defense in depth).
   // TODO(seg): migrar sessão para cookie httpOnly para conseguir bloquear
   // o shell já no SSR sem causar redirect-loop em usuários autenticados.
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const auth = await getAuthSession();
     if (auth.isAuthenticated) {
+      // O setup do Bot4x é independente do onboarding geral da conta.
+      // Essas rotas precisam ficar fora do guard para evitar redirect loops.
+      const onboardingExempt =
+        location.pathname === "/onboarding" ||
+        location.pathname === "/bot4x/onboarding";
+
+      if (!onboardingExempt) {
+        const onboarding = await getOnboardingStatus();
+        if (!onboarding.completed) {
+          throw redirect({ to: "/onboarding", replace: true });
+        }
+      }
+
       return { serverUserId: auth.userId };
     }
     // Sem bearer: pode ser SSR sem cookie de sessão. Não redireciona aqui
     // para evitar loop; AuthGate trata no client.
     if (typeof window !== "undefined") {
       // No client com bearer ausente/ inválido: redireciona.
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/login", replace: true });
     }
     return { serverUserId: undefined as string | undefined };
   },
