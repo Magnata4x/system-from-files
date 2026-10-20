@@ -83,7 +83,16 @@ export async function handleApi(
   } catch (err) {
     const status = err instanceof ApiError ? err.status : 500
     const message = err instanceof Error ? err.message : 'Erro interno'
-    if (status >= 500) console.error('[api]', message)
+    if (status >= 500) {
+      const errorDetails = err instanceof Error
+        ? { name: err.name, message: err.message, stack: err.stack }
+        : { message: String(err) }
+      console.error('[api]', {
+        path: new URL(request.url).pathname,
+        status,
+        ...errorDetails,
+      })
+    }
     return jsonResponse({ statusCode: status, message }, status)
   }
 }
