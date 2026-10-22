@@ -355,6 +355,7 @@ export async function testExchangeCredentials(
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data) throw new ApiError('Nenhuma credencial salva.', 404)
