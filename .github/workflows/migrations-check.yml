@@ -11,6 +11,6 @@ jobs:
   duplicates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Detect duplicate migration files
         run: bash scripts/check-duplicate-migrations.sh
