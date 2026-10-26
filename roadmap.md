@@ -31,3 +31,10 @@
 - [ ] Cadastrar `MARKETAUX_API_TOKEN` exclusivamente nos Secrets do projeto
 - [ ] Consumir notícias reais do Marketaux no Dashboard com cache server-side de 5 minutos
 - [ ] Validar disponibilidade da credencial no runtime, tipos e build sem expor o token
+
+## DEMO no Binance Spot Testnet
+- [x] Migration de ambiente das credenciais aplicada (coluna `environment` em exchange_credentials)
+- [x] Secrets do servidor configurados: BINANCE_TRADING_ENV=testnet e BOT4X_DEMO_AUTO_EXECUTION=true
+- [x] Simulador local DEMO removido do store; DEMO e REAL leem somente o backend operacional e o ledger verificado
+- [x] Monitor validado no navegador: ciclo DEMO·TESTNET com mercado real, sem operações fictícias
+- [ ] Usuário cadastra as chaves Testnet em Configurações → API Keys (a linha antiga ficou no ambiente "demo") para liberar os envios DEMO
