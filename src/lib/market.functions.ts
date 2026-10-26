@@ -123,7 +123,13 @@ async function loadPricesAndGlobal(): Promise<{
 }
 
 async function loadFearGreed(): Promise<FearGreedDTO | null> {
-  const res = await fetch("https://api.alternative.me/fng/?limit=7");
+  let res: Response;
+  try {
+    res = await fetch("https://api.alternative.me/fng/?limit=7");
+  } catch (error) {
+    console.warn("[market] Fear & Greed failed:", error);
+    return null;
+  }
   if (!res.ok) return null;
   const payload = (await res.json()) as {
     data?: Array<{ value: string; value_classification: string; timestamp?: string }>;
