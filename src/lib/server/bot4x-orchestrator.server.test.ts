@@ -36,9 +36,15 @@ describe('Fase 46 — execução DEMO pelo Orchestrator', () => {
     expect(automaticExecutionRoute('REAL', 'BTC/USDT')).toBe('REAL_BLOCKED')
   })
 
-  it('não encaminha pares diferentes de BTCUSDT ao executor DEMO', () => {
+  it('executor genérico aceita qualquer par USDT em DEMO', () => {
     process.env.BOT4X_DEMO_AUTO_EXECUTION = 'true'
-    expect(automaticExecutionRoute('DEMO', 'ETH/USDT')).toBe('NONE')
+    expect(automaticExecutionRoute('DEMO', 'ETH/USDT')).toBe('DEMO_TESTNET')
+    expect(automaticExecutionRoute('DEMO', 'SOL/USDT')).toBe('DEMO_TESTNET')
+  })
+
+  it('não encaminha pares não-USDT ao executor DEMO', () => {
+    process.env.BOT4X_DEMO_AUTO_EXECUTION = 'true'
+    expect(automaticExecutionRoute('DEMO', 'BTC/BRL')).toBe('NONE')
   })
 
   it('gera a mesma idempotency key para o mesmo sinal', () => {

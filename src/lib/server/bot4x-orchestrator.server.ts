@@ -237,6 +237,7 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
     candidates,
     blocked,
     ignored,
+    exitsSubmitted,
     decisions,
   };
 
