@@ -168,6 +168,29 @@ async function verify(apiKey: string, apiSecret: string, environment: BinanceEnv
   }
 }
 
+const ENV_LABEL: Record<BinanceEnvironment, string> = {
+  testnet: 'Spot Testnet (testnet.binance.vision)',
+  demo: 'Demo Trading (demo.binance.com)',
+  production: 'Binance real (binance.com)',
+}
+
+/** Testa a chave nos outros ambientes apenas para diagnóstico; nada é salvo. */
+async function diagnoseKeyEnvironment(apiKey: string, apiSecret: string, target: BinanceEnvironment): Promise<string> {
+  const others = (['testnet', 'demo', 'production'] as BinanceEnvironment[]).filter((e) => e !== target)
+  for (const env of others) {
+    try {
+      await verify(apiKey, apiSecret, env)
+      return `Esta chave pertence ao ambiente ${ENV_LABEL[env]}, mas o sistema está configurado para ${ENV_LABEL[target]}. Gere a chave em ${ENV_LABEL[target]}.`
+    } catch (e) {
+      if (env === 'production' && e instanceof ApiError && e.code === -2015) {
+        // Pode ser chave real com restrição de IP — o servidor não tem IP fixo.
+      }
+    }
+  }
+  return `Chave não aceita em ${ENV_LABEL[target]}. Verifique: (1) a chave foi gerada em ${ENV_LABEL[target]}; (2) a restrição de IP está DESATIVADA ("Unrestricted") — o servidor não usa IP fixo; (3) a permissão de Spot Trading/Reading está ativa; (4) copie key e secret sem espaços.`
+}
+
+
 /** Lê o saldo Spot em USDT sem expor as credenciais ou outros ativos. */
 export async function getUsdtBalance(supabase: Client, userId: string): Promise<UsdtBalance> {
   const { data, error } = await getSupabaseAdmin()
@@ -320,10 +343,17 @@ export async function saveExchangeCredentials(
   if (exchange !== 'binance') throw new ApiError('Somente Binance é suportada no momento.', 400)
 
   let check: { canTrade: boolean; balances: { asset: string; free: number }[] }
+  const targetEnv = getBinanceEnvironment()
   try {
-    check = await verify(apiKey, apiSecret, getBinanceEnvironment())
+    check = await verify(apiKey, apiSecret, targetEnv)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Falha ao validar credenciais'
+    const code = err instanceof ApiError ? err.code : undefined
+    // -2015/-2014: chave não reconhecida neste ambiente. Diagnostica (sem salvar)
+    // se a chave pertence a outro ambiente Binance, para orientar o usuário.
+    if (code === -2015 || code === -2014 || code === -1022) {
+      throw new ApiError(await diagnoseKeyEnvironment(apiKey, apiSecret, targetEnv), 400)
+    }
     throw new ApiError(message, 400)
   }
 
