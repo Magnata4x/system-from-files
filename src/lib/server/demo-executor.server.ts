@@ -53,9 +53,9 @@ export function computeDemoEntryQuoteQty(input: {
 /** Arredonda uma quantidade para baixo no stepSize do filtro LOT_SIZE. */
 export function floorToStep(qty: number, stepSize: number): number {
   if (!Number.isFinite(qty) || !Number.isFinite(stepSize) || stepSize <= 0) return 0
-  const steps = Math.floor(qty / stepSize)
-  const precision = Math.max(0, Math.round(-Math.log10(stepSize)))
-  return Number((steps * stepSize).toFixed(precision))
+  const steps = Math.floor(qty / stepSize + 1e-9)
+  const decimals = (String(stepSize).split('.')[1] ?? '').length
+  return Number((steps * stepSize).toFixed(Math.min(decimals, 12)))
 }
 
 export interface ExchangeSymbolFilters {
