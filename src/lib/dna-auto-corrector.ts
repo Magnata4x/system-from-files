@@ -48,8 +48,17 @@ type Snapshot = {
   operationsToday: number;
 };
 
-function readSnapshot(): Snapshot {
+// Métricas só são confiáveis quando vieram do backend verificado há pouco.
+// Em REAL, dailyPnlPct e history do store são alimentados pela telemetria e
+// pelo ledger verificado do servidor; o serverTime prova origem e frescor.
+const METRICS_MAX_AGE_MS = 60_000;
+
+function readVerifiedSnapshot(): Snapshot | null {
   const s = useBot4xStore.getState();
+  const serverTime = s.todayStats.serverTime;
+  if (!serverTime) return null;
+  const age = Date.now() - new Date(serverTime).getTime();
+  if (!Number.isFinite(age) || age < 0 || age > METRICS_MAX_AGE_MS) return null;
   const last5 = s.history.slice(0, 5);
   const recentLosses = last5.filter((t) => (t.pnlPct ?? 0) < 0).length;
   const openLossPct = s.orders
@@ -77,7 +86,10 @@ export function runDnaAutoCorrection(userId?: string): CorrectionLog | null {
   const bot4xState = useBot4xStore.getState();
   // DEMO usa estado sintético: não pode corrigir perfis nem persistir métricas operacionais.
   if (getEffectiveMode(bot4xState.mode) !== "REAL") return null;
-  const snap = readSnapshot();
+  // Sem métricas verificadas e recentes do servidor, nenhuma correção é
+  // aplicada — estado local antigo ou divergente não dispara decisões.
+  const snap = readVerifiedSnapshot();
+  if (!snap) return null;
   const signalsState = useSignalsStore.getState();
 
   // Severity tiers por critério de perda de capital.

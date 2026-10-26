@@ -45,5 +45,11 @@
 - [x] Timeout de 10s nas chamadas assinadas à Binance e deduplicação binanceSigned/binanceSignedRequest
 - [x] Ledger distingue ordem automática do orquestrador (auto-demo-order) da manual (manual-demo-order)
 - [x] package-lock.json sincronizado com @lovable.dev/vite-tanstack-config 2.26.5 (npm ci no CI)
-- [ ] Executor genérico com saídas SL/TP, PnL e filtros LOT_SIZE/MIN_NOTIONAL (fase posterior)
-- [ ] Gatilho do ciclo via POST com agendamento no servidor (hoje roda via GET com o Monitor aberto)
+- [x] Executor genérico DEMO: sizing por perfil/slot, filtros LOT_SIZE/NOTIONAL, SELL Spot com saldo real, saídas SL/TP a mercado e PnL via reconciliação FIFO do ledger
+- [x] Ciclo agendado no servidor: pg_cron a cada 5 min → POST /api/public/hooks/bot4x-cycle (idempotente, 288 execuções/dia)
+
+## Auditoria P1/P2 — separação REAL/Testnet e dados verificados
+- [x] P1 crítico: updateConfig exige credencial de produção verificada para ativar REAL (+ 4 testes negativos)
+- [x] P1 alto: endpoint Binance derivado do ambiente da credencial carregada, sem fallback para produção
+- [x] P1 alto: DNA Auto-Corrector exige métricas verificadas do servidor com serverTime fresco (≤60s); não corrige com dados locais desatualizados
+- [x] P2: selectManipulationStatus prioriza manipStale (dados antigos nunca aparecem como "ok")

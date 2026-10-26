@@ -76,6 +76,7 @@ import { Route as ApiCalibratorRunUserIdRouteImport } from './routes/api/calibra
 import { Route as ApiCalibratorStateUserIdRouteImport } from './routes/api/calibrator/state.$userId'
 import { Route as ApiDnaProfileUserIdRouteImport } from './routes/api/dna/profile/$userId'
 import { Route as ApiManipulationSnapshotPairRouteImport } from './routes/api/manipulation/snapshot.$pair'
+import { Route as ApiPublicHooksBot4xCycleRouteImport } from './routes/api/public/hooks/bot4x-cycle'
 import { Route as ApiSentimentAssetSymbolRouteImport } from './routes/api/sentiment/asset.$symbol'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
@@ -427,6 +428,12 @@ const ApiManipulationSnapshotPairRoute =
     path: '/api/manipulation/snapshot/$pair',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBot4xCycleRoute =
+  ApiPublicHooksBot4xCycleRouteImport.update({
+    id: '/api/public/hooks/bot4x-cycle',
+    path: '/api/public/hooks/bot4x-cycle',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiSentimentAssetSymbolRoute = ApiSentimentAssetSymbolRouteImport.update({
   id: '/api/sentiment/asset/$symbol',
   path: '/api/sentiment/asset/$symbol',
@@ -506,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/public/hooks/bot4x-cycle': typeof ApiPublicHooksBot4xCycleRoute
   '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -576,6 +584,7 @@ export interface FileRoutesByTo {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/public/hooks/bot4x-cycle': typeof ApiPublicHooksBot4xCycleRoute
   '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -648,6 +657,7 @@ export interface FileRoutesById {
   '/api/calibrator/state/$userId': typeof ApiCalibratorStateUserIdRoute
   '/api/dna/profile/$userId': typeof ApiDnaProfileUserIdRoute
   '/api/manipulation/snapshot/$pair': typeof ApiManipulationSnapshotPairRoute
+  '/api/public/hooks/bot4x-cycle': typeof ApiPublicHooksBot4xCycleRoute
   '/api/sentiment/asset/$symbol': typeof ApiSentimentAssetSymbolRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -720,6 +730,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/public/hooks/bot4x-cycle'
     | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/public/hooks/bot4x-cycle'
     | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   id:
@@ -861,6 +873,7 @@ export interface FileRouteTypes {
     | '/api/calibrator/state/$userId'
     | '/api/dna/profile/$userId'
     | '/api/manipulation/snapshot/$pair'
+    | '/api/public/hooks/bot4x-cycle'
     | '/api/sentiment/asset/$symbol'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
@@ -910,6 +923,7 @@ export interface RootRouteChildren {
   ApiCalibratorStateUserIdRoute: typeof ApiCalibratorStateUserIdRoute
   ApiDnaProfileUserIdRoute: typeof ApiDnaProfileUserIdRoute
   ApiManipulationSnapshotPairRoute: typeof ApiManipulationSnapshotPairRoute
+  ApiPublicHooksBot4xCycleRoute: typeof ApiPublicHooksBot4xCycleRoute
   ApiSentimentAssetSymbolRoute: typeof ApiSentimentAssetSymbolRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
@@ -1385,6 +1399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiManipulationSnapshotPairRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/bot4x-cycle': {
+      id: '/api/public/hooks/bot4x-cycle'
+      path: '/api/public/hooks/bot4x-cycle'
+      fullPath: '/api/public/hooks/bot4x-cycle'
+      preLoaderRoute: typeof ApiPublicHooksBot4xCycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/sentiment/asset/$symbol': {
       id: '/api/sentiment/asset/$symbol'
       path: '/api/sentiment/asset/$symbol'
@@ -1547,6 +1568,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCalibratorStateUserIdRoute: ApiCalibratorStateUserIdRoute,
   ApiDnaProfileUserIdRoute: ApiDnaProfileUserIdRoute,
   ApiManipulationSnapshotPairRoute: ApiManipulationSnapshotPairRoute,
+  ApiPublicHooksBot4xCycleRoute: ApiPublicHooksBot4xCycleRoute,
   ApiSentimentAssetSymbolRoute: ApiSentimentAssetSymbolRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }

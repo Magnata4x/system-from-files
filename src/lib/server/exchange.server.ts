@@ -116,23 +116,27 @@ export async function getExchangeStatus(
   }
 }
 
-/** Assina uma chamada privada da Binance com método e parâmetros explícitos. */
+/** Assina uma chamada privada da Binance com método e parâmetros explícitos.
+ *  O endpoint é derivado do ambiente da credencial carregada — nunca do
+ *  ambiente global sozinho — para que uma chave de testnet nunca seja
+ *  enviada à produção (e vice-versa). */
 async function binanceSignedRequest(
   apiKey: string, apiSecret: string, method: 'GET' | 'POST', path: string, params: Record<string, string>,
+  environment: BinanceEnvironment,
 ) {
   const query = new URLSearchParams({ ...params, timestamp: String(Date.now()), recvWindow: '10000' }).toString()
   const key = await crypto.subtle.importKey('raw', enc.encode(apiSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
   const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
-  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey }, signal: AbortSignal.timeout(10_000) })
+  const res = await fetch(getBinanceBaseUrl(environment) + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey }, signal: AbortSignal.timeout(10_000) })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
   return body
 }
 
 /** Assina e chama um endpoint privado da Binance (HMAC SHA-256). */
-async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
-  return binanceSignedRequest(apiKey, apiSecret, 'GET', path, {})
+async function binanceSigned(apiKey: string, apiSecret: string, path: string, environment: BinanceEnvironment) {
+  return binanceSignedRequest(apiKey, apiSecret, 'GET', path, {}, environment)
 }
 
 export interface VerifyResult extends ExchangeStatus {
@@ -149,8 +153,8 @@ export interface UsdtBalance {
   updatedAt: string
 }
 
-async function verify(apiKey: string, apiSecret: string) {
-  const account = (await binanceSigned(apiKey, apiSecret, '/v3/account')) as {
+async function verify(apiKey: string, apiSecret: string, environment: BinanceEnvironment) {
+  const account = (await binanceSigned(apiKey, apiSecret, '/v3/account', environment)) as {
     canTrade?: boolean
     balances?: { asset: string; free: string }[]
   }
@@ -179,6 +183,7 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
     await decryptSecret(data.api_key_cipher),
     await decryptSecret(data.api_secret_cipher),
     '/v3/account',
+    getBinanceEnvironment(),
   )) as { balances?: Array<{ asset: string; free: string; locked: string }> }
   const balance = account.balances?.find((item) => item.asset === 'USDT')
   const free = Number(balance?.free ?? 0)
@@ -199,35 +204,47 @@ export interface VerifiedBinanceAccount {
 }
 
 async function getStoredCredentials(supabase: Client, userId: string) {
+  const expectedEnvironment = getBinanceEnvironment()
   const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
-    .select('api_key_cipher, api_secret_cipher, verified')
+    .select('api_key_cipher, api_secret_cipher, verified, environment')
     .eq('user_id', userId)
-    .eq('environment', getBinanceEnvironment())
+    .eq('environment', expectedEnvironment)
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data || !data.verified) {
     throw new ApiError('Binance não conectada ou não verificada.', 409)
   }
+  // Defesa em profundidade: a credencial carregada deve pertencer ao ambiente
+  // operacional atual. Divergência recusa a operação — sem fallback.
+  if (data.environment !== expectedEnvironment) {
+    throw new ApiError('Credencial de ambiente divergente do ambiente operacional.', 409)
+  }
   return {
     apiKey: await decryptSecret(data.api_key_cipher),
     apiSecret: await decryptSecret(data.api_secret_cipher),
+    environment: data.environment as BinanceEnvironment,
   }
 }
 
-/** Envia uma ordem MARKET somente após a validação server-side. */
+/** Envia uma ordem MARKET somente após a validação server-side.
+ *  BUY usa quoteOrderQty (valor em USDT); SELL usa quantity (quantidade do
+ *  ativo), pois no Spot a venda consome o saldo do ativo base. */
 export async function submitVerifiedBinanceMarketOrder(
   supabase: Client, userId: string,
-  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number; clientOrderId: string },
+  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty?: number; quantity?: number; clientOrderId: string },
 ) {
   const credentials = await getStoredCredentials(supabase, userId)
-  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', {
+  const params: Record<string, string> = {
     symbol: input.symbol,
     side: input.side,
     type: 'MARKET',
-    quoteOrderQty: input.quoteOrderQty.toFixed(2),
     newClientOrderId: input.clientOrderId,
-  })
+  }
+  if (input.quoteOrderQty !== undefined) params.quoteOrderQty = input.quoteOrderQty.toFixed(2)
+  else if (input.quantity !== undefined) params.quantity = String(input.quantity)
+  else throw new ApiError('Ordem sem valor (quoteOrderQty) ou quantidade.', 400)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', params, credentials.environment)
 }
 
 /** Consulta o estado de uma ordem Spot existente na Binance. */
@@ -240,7 +257,7 @@ export async function getVerifiedBinanceOrder(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
     symbol: input.symbol,
     orderId: String(input.orderId),
-  })
+  }, credentials.environment)
 }
 
 /** Consulta uma ordem Spot pelo clientOrderId. Somente leitura e usada para recuperar intents pendentes. */
@@ -253,7 +270,7 @@ export async function getVerifiedBinanceOrderByClientOrderId(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
     symbol: input.symbol,
     origClientOrderId: input.clientOrderId,
-  })
+  }, credentials.environment)
 }
 
 /** Consulta os fills reais de uma ordem Spot já existente. Somente leitura. */
@@ -266,7 +283,7 @@ export async function getVerifiedBinanceTrades(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/myTrades', {
     symbol: input.symbol,
     orderId: String(input.orderId),
-  })
+  }, credentials.environment)
 }
 
 export async function getVerifiedBinanceAccount(
@@ -274,7 +291,7 @@ export async function getVerifiedBinanceAccount(
   userId: string,
 ): Promise<VerifiedBinanceAccount> {
   const credentials = await getStoredCredentials(supabase, userId)
-  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/v3/account')) as {
+  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/v3/account', credentials.environment)) as {
     canTrade?: boolean
     balances?: Array<{ asset: string; free: string; locked: string }>
   }
@@ -304,7 +321,7 @@ export async function saveExchangeCredentials(
 
   let check: { canTrade: boolean; balances: { asset: string; free: number }[] }
   try {
-    check = await verify(apiKey, apiSecret)
+    check = await verify(apiKey, apiSecret, getBinanceEnvironment())
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Falha ao validar credenciais'
     throw new ApiError(message, 400)
@@ -349,7 +366,7 @@ export async function testExchangeCredentials(
   const apiSecret = await decryptSecret(data.api_secret_cipher)
 
   try {
-    const check = await verify(apiKey, apiSecret)
+    const check = await verify(apiKey, apiSecret, getBinanceEnvironment())
     await supabase
       .from('exchange_credentials')
       .update({ verified: true, verified_at: new Date().toISOString(), last_error: null })

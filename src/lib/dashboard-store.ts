@@ -103,6 +103,8 @@ export function selectSignalsStatus(s: DashboardState): DashboardDataStatus {
 export function selectManipulationStatus(s: DashboardState): DashboardDataStatus {
   if (s.manipLoading && s.manipAlerts.length === 0) return "loading";
   if (s.manipError && s.manipAlerts.length === 0) return "unavailable";
+  // Dados antigos de uma consulta que falhou nunca são "ok": prioriza stale.
+  if (s.manipStale) return "stale";
   return "ok";
 }
 
