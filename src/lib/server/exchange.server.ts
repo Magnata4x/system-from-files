@@ -153,8 +153,8 @@ export interface UsdtBalance {
   updatedAt: string
 }
 
-async function verify(apiKey: string, apiSecret: string) {
-  const account = (await binanceSigned(apiKey, apiSecret, '/v3/account')) as {
+async function verify(apiKey: string, apiSecret: string, environment: BinanceEnvironment) {
+  const account = (await binanceSigned(apiKey, apiSecret, '/v3/account', environment)) as {
     canTrade?: boolean
     balances?: { asset: string; free: string }[]
   }
@@ -183,6 +183,7 @@ export async function getUsdtBalance(supabase: Client, userId: string): Promise<
     await decryptSecret(data.api_key_cipher),
     await decryptSecret(data.api_secret_cipher),
     '/v3/account',
+    getBinanceEnvironment(),
   )) as { balances?: Array<{ asset: string; free: string; locked: string }> }
   const balance = account.balances?.find((item) => item.asset === 'USDT')
   const free = Number(balance?.free ?? 0)
@@ -203,35 +204,47 @@ export interface VerifiedBinanceAccount {
 }
 
 async function getStoredCredentials(supabase: Client, userId: string) {
+  const expectedEnvironment = getBinanceEnvironment()
   const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
-    .select('api_key_cipher, api_secret_cipher, verified')
+    .select('api_key_cipher, api_secret_cipher, verified, environment')
     .eq('user_id', userId)
-    .eq('environment', getBinanceEnvironment())
+    .eq('environment', expectedEnvironment)
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data || !data.verified) {
     throw new ApiError('Binance não conectada ou não verificada.', 409)
   }
+  // Defesa em profundidade: a credencial carregada deve pertencer ao ambiente
+  // operacional atual. Divergência recusa a operação — sem fallback.
+  if (data.environment !== expectedEnvironment) {
+    throw new ApiError('Credencial de ambiente divergente do ambiente operacional.', 409)
+  }
   return {
     apiKey: await decryptSecret(data.api_key_cipher),
     apiSecret: await decryptSecret(data.api_secret_cipher),
+    environment: data.environment as BinanceEnvironment,
   }
 }
 
-/** Envia uma ordem MARKET somente após a validação server-side. */
+/** Envia uma ordem MARKET somente após a validação server-side.
+ *  BUY usa quoteOrderQty (valor em USDT); SELL usa quantity (quantidade do
+ *  ativo), pois no Spot a venda consome o saldo do ativo base. */
 export async function submitVerifiedBinanceMarketOrder(
   supabase: Client, userId: string,
-  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty: number; clientOrderId: string },
+  input: { symbol: string; side: 'BUY' | 'SELL'; quoteOrderQty?: number; quantity?: number; clientOrderId: string },
 ) {
   const credentials = await getStoredCredentials(supabase, userId)
-  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', {
+  const params: Record<string, string> = {
     symbol: input.symbol,
     side: input.side,
     type: 'MARKET',
-    quoteOrderQty: input.quoteOrderQty.toFixed(2),
     newClientOrderId: input.clientOrderId,
-  })
+  }
+  if (input.quoteOrderQty !== undefined) params.quoteOrderQty = input.quoteOrderQty.toFixed(2)
+  else if (input.quantity !== undefined) params.quantity = String(input.quantity)
+  else throw new ApiError('Ordem sem valor (quoteOrderQty) ou quantidade.', 400)
+  return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'POST', '/v3/order', params, credentials.environment)
 }
 
 /** Consulta o estado de uma ordem Spot existente na Binance. */
