@@ -2,7 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateSignals, type BackendSignal } from "./engine.server";
 import { CIRCUIT_BREAKER_LOSS_PCT, PROFIT_LOCK_TARGET_PCT } from "./engine.server";
 import { mapConfig } from "./bot4x.server";
-import { executeAuthorizedSixDollarBtcDemoOrder } from "./order.server";
+import { executeDemoSignalEntry, manageDemoOpenPositions } from "./demo-executor.server";
 
 type Bot4xMode = "DEMO" | "REAL";
 
@@ -20,7 +20,8 @@ export function demoAutoExecutionEnabled(): boolean {
 
 export function automaticExecutionRoute(mode: Bot4xMode, pair: string): AutomaticExecutionRoute {
   if (mode === "REAL") return "REAL_BLOCKED";
-  if (pair.replace("/", "").toUpperCase() === "BTCUSDT" && demoAutoExecutionEnabled()) return "DEMO_TESTNET";
+  const normalized = pair.replace("/", "").toUpperCase();
+  if (normalized.endsWith("USDT") && demoAutoExecutionEnabled()) return "DEMO_TESTNET";
   return "NONE";
 }
 
@@ -42,6 +43,7 @@ export interface Bot4xCycleResult {
   candidates: number;
   blocked: number;
   ignored: number;
+  exitsSubmitted: number;
   decisions: Array<{
     userId: string;
     pair: string;
@@ -93,6 +95,7 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
 
   const signals = await generateSignals();
   const decisions: Bot4xCycleResult["decisions"] = [];
+  let exitsSubmitted = 0;
 
   for (const row of configRows ?? []) {
     const config = mapConfig(row);
@@ -166,16 +169,13 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
       if (decision === "EXECUTION_CANDIDATE" && config.executionMode === "DEMO") {
         const route = automaticExecutionRoute(config.executionMode as Bot4xMode, signal.pair);
         if (route === "NONE") {
-          reason = signal.pair.replace("/", "").toUpperCase() === "BTCUSDT"
-            ? "demo_auto_execution_disabled"
-            : "demo_executor_supports_btcusdt_only";
+          reason = "demo_auto_execution_disabled";
         } else if (route === "DEMO_TESTNET") {
           try {
-            await executeAuthorizedSixDollarBtcDemoOrder(supabaseAdmin, config.userId, {
-              side: signal.side,
-              confirmed: true,
+            await executeDemoSignalEntry(supabaseAdmin, config.userId, {
+              signal,
               idempotencyKey: demoIdempotencyKey(signal),
-              reason: 'auto-demo-order',
+              reason: "auto-demo-order",
             });
             executionSubmitted = true;
             reason = "demo_execution_submitted_to_binance_testnet";
@@ -206,6 +206,21 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
       .from("bot4x_configs")
       .update({ open_slots: openSlots })
       .eq("user_id", config.userId);
+
+    // Saídas SL/TP das posições DEMO abertas (somente Testnet). Falhas de
+    // saída não derrubam o ciclo — a posição é reavaliada no próximo ciclo.
+    try {
+      const exits = await manageDemoOpenPositions(supabaseAdmin, config.userId);
+      exitsSubmitted += exits.exitsSubmitted;
+      if (exits.errors.length > 0) {
+        console.error("[Bot4x orchestrator] demo exit errors", { userId: config.userId, errors: exits.errors });
+      }
+    } catch (error) {
+      console.error("[Bot4x orchestrator] demo exit sweep failed", {
+        userId: config.userId,
+        error: error instanceof Error ? error.message : error,
+      });
+    }
   }
 
   const finishedAt = new Date().toISOString();
