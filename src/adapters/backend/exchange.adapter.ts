@@ -13,7 +13,12 @@ export interface ExchangeStatusUI {
 }
 
 export const exchangeAdapter = {
-  status: () => api.get<ExchangeStatusUI>(endpoints.exchange.credentials),
+  status: (environment?: "demo" | "testnet" | "production") =>
+    api.get<ExchangeStatusUI>(
+      environment
+        ? `${endpoints.exchange.credentials}?environment=${environment}`
+        : endpoints.exchange.credentials,
+    ),
   save: (payload: { exchange?: string; apiKey: string; apiSecret: string }) =>
     api.post<ExchangeStatusUI>(endpoints.exchange.credentials, payload),
   test: () => api.post<ExchangeStatusUI>(endpoints.exchange.test, {}),

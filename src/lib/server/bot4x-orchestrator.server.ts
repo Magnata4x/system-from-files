@@ -175,6 +175,7 @@ export async function runBot4xOrchestratorCycle(userId?: string): Promise<Bot4xC
               side: signal.side,
               confirmed: true,
               idempotencyKey: demoIdempotencyKey(signal),
+              reason: 'auto-demo-order',
             });
             executionSubmitted = true;
             reason = "demo_execution_submitted_to_binance_testnet";

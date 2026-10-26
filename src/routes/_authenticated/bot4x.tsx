@@ -39,8 +39,8 @@ function Bot4xPage() {
   const breakerTriggered = useBot4xStore((s) => s.dailyPnlPct <= -1.5);
   const [tab, setTab] = useState<Tab>("painel");
   const exchange = useQuery({
-    queryKey: ["exchange", "status"],
-    queryFn: exchangeAdapter.status,
+    queryKey: ["exchange", "status", "production"],
+    queryFn: () => exchangeAdapter.status("production"),
     staleTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,

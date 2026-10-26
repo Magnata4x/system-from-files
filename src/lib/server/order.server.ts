@@ -19,6 +19,7 @@ interface AuthorizedOrderExecutionInput {
   side: RealOrderSide
   confirmed: boolean
   idempotencyKey: string
+  reason?: string
 }
 
 export async function executeAuthorizedSixDollarBtcDemoOrder(
@@ -96,7 +97,7 @@ export async function executeAuthorizedSixDollarBtcDemoOrder(
       pair: 'BTCUSDT',
       side: input.side,
       quote_amount: 6,
-      reason: 'manual-demo-order',
+      reason: input.reason ?? 'manual-demo-order',
       readings: { environment: getBinanceEnvironment(), confirmed: true, profile: config.profile, leverage: config.leverage },
       status: 'pending',
       confirmed_at: new Date().toISOString(),

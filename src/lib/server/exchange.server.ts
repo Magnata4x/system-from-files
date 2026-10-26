@@ -82,12 +82,16 @@ const EMPTY: ExchangeStatus = {
   lastError: null,
 }
 
-export async function getExchangeStatus(supabase: Client, userId: string): Promise<ExchangeStatus> {
+export async function getExchangeStatus(
+  supabase: Client,
+  userId: string,
+  environment: BinanceEnvironment = getBinanceEnvironment(),
+): Promise<ExchangeStatus> {
   const { data, error } = await getSupabaseAdmin()
     .from('exchange_credentials')
     .select('exchange, environment, key_preview, verified, verified_at, last_error')
     .eq('user_id', userId)
-    .eq('environment', getBinanceEnvironment())
+    .eq('environment', environment)
     .maybeSingle()
   if (error) {
     // Do not silently fall back to an environment-agnostic query: that could
@@ -100,7 +104,7 @@ export async function getExchangeStatus(supabase: Client, userId: string): Promi
     }
     throw new ApiError('Não foi possível consultar as credenciais da exchange.', 503)
   }
-  if (!data) return { ...EMPTY, environment: getBinanceEnvironment() }
+  if (!data) return { ...EMPTY, environment }
   return {
     connected: true,
     exchange: data.exchange,
@@ -120,7 +124,7 @@ async function binanceSignedRequest(
   const key = await crypto.subtle.importKey('raw', enc.encode(apiSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
   const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
-  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey } })
+  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey }, signal: AbortSignal.timeout(10_000) })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
   return body
@@ -128,26 +132,7 @@ async function binanceSignedRequest(
 
 /** Assina e chama um endpoint privado da Binance (HMAC SHA-256). */
 async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
-  const query = `timestamp=${Date.now()}&recvWindow=10000`
-  const key = await crypto.subtle.importKey(
-    'raw',
-    enc.encode(apiSecret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
-  const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
-  const signature = Array.from(sigBytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-  const res = await fetch(`${getBinanceBaseUrl()}${path}?${query}&signature=${signature}`, {
-    headers: { 'X-MBX-APIKEY': apiKey },
-  })
-  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
-  if (!res.ok) {
-    throw new ApiError(String(body['msg'] ?? `Binance respondeu ${res.status}`), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
-  }
-  return body
+  return binanceSignedRequest(apiKey, apiSecret, 'GET', path, {})
 }
 
 export interface VerifyResult extends ExchangeStatus {
@@ -355,6 +340,7 @@ export async function testExchangeCredentials(
     .from('exchange_credentials')
     .select('api_key_cipher, api_secret_cipher')
     .eq('user_id', userId)
+    .eq('environment', getBinanceEnvironment())
     .maybeSingle()
   if (error) throw new ApiError(error.message, 500)
   if (!data) throw new ApiError('Nenhuma credencial salva.', 404)
