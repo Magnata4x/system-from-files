@@ -257,7 +257,7 @@ export async function getVerifiedBinanceOrder(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
     symbol: input.symbol,
     orderId: String(input.orderId),
-  })
+  }, credentials.environment)
 }
 
 /** Consulta uma ordem Spot pelo clientOrderId. Somente leitura e usada para recuperar intents pendentes. */
@@ -270,7 +270,7 @@ export async function getVerifiedBinanceOrderByClientOrderId(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/order', {
     symbol: input.symbol,
     origClientOrderId: input.clientOrderId,
-  })
+  }, credentials.environment)
 }
 
 /** Consulta os fills reais de uma ordem Spot já existente. Somente leitura. */
@@ -283,7 +283,7 @@ export async function getVerifiedBinanceTrades(
   return binanceSignedRequest(credentials.apiKey, credentials.apiSecret, 'GET', '/v3/myTrades', {
     symbol: input.symbol,
     orderId: String(input.orderId),
-  })
+  }, credentials.environment)
 }
 
 export async function getVerifiedBinanceAccount(
@@ -291,7 +291,7 @@ export async function getVerifiedBinanceAccount(
   userId: string,
 ): Promise<VerifiedBinanceAccount> {
   const credentials = await getStoredCredentials(supabase, userId)
-  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/v3/account')) as {
+  const account = (await binanceSigned(credentials.apiKey, credentials.apiSecret, '/v3/account', credentials.environment)) as {
     canTrade?: boolean
     balances?: Array<{ asset: string; free: string; locked: string }>
   }
@@ -321,7 +321,7 @@ export async function saveExchangeCredentials(
 
   let check: { canTrade: boolean; balances: { asset: string; free: number }[] }
   try {
-    check = await verify(apiKey, apiSecret)
+    check = await verify(apiKey, apiSecret, getBinanceEnvironment())
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Falha ao validar credenciais'
     throw new ApiError(message, 400)
@@ -366,7 +366,7 @@ export async function testExchangeCredentials(
   const apiSecret = await decryptSecret(data.api_secret_cipher)
 
   try {
-    const check = await verify(apiKey, apiSecret)
+    const check = await verify(apiKey, apiSecret, getBinanceEnvironment())
     await supabase
       .from('exchange_credentials')
       .update({ verified: true, verified_at: new Date().toISOString(), last_error: null })
