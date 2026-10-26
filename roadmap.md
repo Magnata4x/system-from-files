@@ -38,3 +38,12 @@
 - [x] Simulador local DEMO removido do store; DEMO e REAL leem somente o backend operacional e o ledger verificado
 - [x] Monitor validado no navegador: ciclo DEMO·TESTNET com mercado real, sem operações fictícias
 - [ ] Usuário cadastra as chaves Testnet em Configurações → API Keys (a linha antiga ficou no ambiente "demo") para liberar os envios DEMO
+
+## Auditoria 88608717 — correções aplicadas
+- [x] testExchangeCredentials filtra por ambiente (revalidação não mistura demo/testnet/production)
+- [x] Modo REAL só destrava com credencial de produção verificada (?environment=production); testnet não libera mais o rótulo REAL
+- [x] Timeout de 10s nas chamadas assinadas à Binance e deduplicação binanceSigned/binanceSignedRequest
+- [x] Ledger distingue ordem automática do orquestrador (auto-demo-order) da manual (manual-demo-order)
+- [x] package-lock.json sincronizado com @lovable.dev/vite-tanstack-config 2.26.5 (npm ci no CI)
+- [ ] Executor genérico com saídas SL/TP, PnL e filtros LOT_SIZE/MIN_NOTIONAL (fase posterior)
+- [ ] Gatilho do ciclo via POST com agendamento no servidor (hoje roda via GET com o Monitor aberto)
