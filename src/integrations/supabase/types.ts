@@ -391,6 +391,7 @@ export type Database = {
           api_key_cipher: string
           api_secret_cipher: string
           created_at: string
+          environment: string
           exchange: string
           key_preview: string
           last_error: string | null
@@ -403,6 +404,7 @@ export type Database = {
           api_key_cipher: string
           api_secret_cipher: string
           created_at?: string
+          environment?: string
           exchange?: string
           key_preview: string
           last_error?: string | null
@@ -415,6 +417,7 @@ export type Database = {
           api_key_cipher?: string
           api_secret_cipher?: string
           created_at?: string
+          environment?: string
           exchange?: string
           key_preview?: string
           last_error?: string | null
