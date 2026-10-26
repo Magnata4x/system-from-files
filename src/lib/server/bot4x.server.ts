@@ -105,9 +105,11 @@ export async function updateConfig(
   const requestedMode = patch.executionMode === 'REAL' ? 'REAL' : patch.executionMode === 'DEMO' ? 'DEMO' : current.executionMode
   const enablingReal = patch.executionMode === 'REAL' || (patch.active === true && current.executionMode === 'REAL')
   if (enablingReal) {
-    const exchange = await getExchangeStatus(supabase, userId)
+    // REAL só é liberado por credencial de PRODUÇÃO verificada — nunca por
+    // credencial de testnet/demo, independente do BINANCE_TRADING_ENV global.
+    const exchange = await getExchangeStatus(supabase, userId, 'production')
     if (!exchange.verified) {
-      throw new ApiError('Modo REAL exige credencial Binance verificada.', 409)
+      throw new ApiError('Modo REAL exige credencial Binance de produção verificada.', 409)
     }
     if (requestedMode === 'REAL' && exchange.exchange !== 'binance') {
       throw new ApiError('Modo REAL exige Binance.', 409)
