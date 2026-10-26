@@ -70,9 +70,9 @@ type MockedAuth = typeof supabase.auth & {
 const mockAuth = supabase.auth as MockedAuth;
 
 describe("bot4x-store — fonte única de verdade", () => {
-  it("usa backend operacional em REAL e mantém DEMO como fonte sintética isolada", () => {
+  it("usa backend operacional em DEMO e REAL — nenhuma fonte sintética", () => {
     expect(getBot4xDataSource("REAL")).toBe("BACKEND_OPERATIONAL");
-    expect(getBot4xDataSource("DEMO")).toBe("DEMO_SYNTHETIC");
+    expect(getBot4xDataSource("DEMO")).toBe("BACKEND_OPERATIONAL");
   });
 
   it("limpa estado operacional local antes de entrar em REAL", () => {
