@@ -68,6 +68,7 @@ describe("runDnaAutoCorrection — confiança operacional", () => {
       history: [],
       orders: [],
       userId: null,
+      todayStats: { trades: 0, wins: 0, losses: 0, open: 0, pnl: 0, serverTime: null },
     });
   });
 
@@ -82,9 +83,15 @@ describe("runDnaAutoCorrection — confiança operacional", () => {
     expect(supabaseFrom).not.toHaveBeenCalled();
   });
 
-  it("aplica correção quando o modo efetivo foi verificado como REAL", () => {
+  it("aplica correção em REAL com métricas verificadas e recentes do servidor", () => {
     setExchangeVerified(true);
-    useBot4xStore.setState({ mode: "REAL", dailyPnlPct: -2, profile: "agressivo", leverage: 3 });
+    useBot4xStore.setState({
+      mode: "REAL",
+      dailyPnlPct: -2,
+      profile: "agressivo",
+      leverage: 3,
+      todayStats: { trades: 2, wins: 0, losses: 2, open: 0, pnl: -4, serverTime: new Date().toISOString() },
+    });
     const state = useBot4xStore.getState();
     const setProfile = vi.spyOn(state, "setProfile");
     const setLeverage = vi.spyOn(state, "setLeverage");
@@ -94,5 +101,31 @@ describe("runDnaAutoCorrection — confiança operacional", () => {
     expect(result).not.toBeNull();
     expect(setProfile).toHaveBeenCalled();
     expect(setLeverage).toHaveBeenCalled();
+  });
+
+  it("não aplica correção em REAL sem métricas verificadas do servidor", () => {
+    setExchangeVerified(true);
+    useBot4xStore.setState({ mode: "REAL", dailyPnlPct: -2, profile: "agressivo", leverage: 3 });
+    const state = useBot4xStore.getState();
+    const setProfile = vi.spyOn(state, "setProfile");
+
+    expect(runDnaAutoCorrection()).toBeNull();
+    expect(setProfile).not.toHaveBeenCalled();
+  });
+
+  it("não aplica correção em REAL com métricas desatualizadas", () => {
+    setExchangeVerified(true);
+    useBot4xStore.setState({
+      mode: "REAL",
+      dailyPnlPct: -2,
+      profile: "agressivo",
+      leverage: 3,
+      todayStats: { trades: 2, wins: 0, losses: 2, open: 0, pnl: -4, serverTime: new Date(Date.now() - 120_000).toISOString() },
+    });
+    const state = useBot4xStore.getState();
+    const setProfile = vi.spyOn(state, "setProfile");
+
+    expect(runDnaAutoCorrection()).toBeNull();
+    expect(setProfile).not.toHaveBeenCalled();
   });
 });
