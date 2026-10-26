@@ -116,23 +116,27 @@ export async function getExchangeStatus(
   }
 }
 
-/** Assina uma chamada privada da Binance com método e parâmetros explícitos. */
+/** Assina uma chamada privada da Binance com método e parâmetros explícitos.
+ *  O endpoint é derivado do ambiente da credencial carregada — nunca do
+ *  ambiente global sozinho — para que uma chave de testnet nunca seja
+ *  enviada à produção (e vice-versa). */
 async function binanceSignedRequest(
   apiKey: string, apiSecret: string, method: 'GET' | 'POST', path: string, params: Record<string, string>,
+  environment: BinanceEnvironment,
 ) {
   const query = new URLSearchParams({ ...params, timestamp: String(Date.now()), recvWindow: '10000' }).toString()
   const key = await crypto.subtle.importKey('raw', enc.encode(apiSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   const sigBytes = new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(query)))
   const signature = Array.from(sigBytes).map((b) => b.toString(16).padStart(2, '0')).join('')
-  const res = await fetch(getBinanceBaseUrl() + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey }, signal: AbortSignal.timeout(10_000) })
+  const res = await fetch(getBinanceBaseUrl(environment) + path + '?' + query + '&signature=' + signature, { method, headers: { 'X-MBX-APIKEY': apiKey }, signal: AbortSignal.timeout(10_000) })
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) throw new ApiError(String(body['msg'] ?? ('Binance respondeu ' + res.status)), res.status, typeof body['code'] === 'number' ? body['code'] : undefined)
   return body
 }
 
 /** Assina e chama um endpoint privado da Binance (HMAC SHA-256). */
-async function binanceSigned(apiKey: string, apiSecret: string, path: string) {
-  return binanceSignedRequest(apiKey, apiSecret, 'GET', path, {})
+async function binanceSigned(apiKey: string, apiSecret: string, path: string, environment: BinanceEnvironment) {
+  return binanceSignedRequest(apiKey, apiSecret, 'GET', path, {}, environment)
 }
 
 export interface VerifyResult extends ExchangeStatus {
