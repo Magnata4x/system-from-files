@@ -113,11 +113,10 @@ describe("runDnaAutoCorrection — confiança operacional", () => {
       leverage: 3,
       todayStats: { trades: 0, wins: 0, losses: 0, open: 0, pnl: 0, serverTime: null },
     });
-    const state = useBot4xStore.getState();
-    const setProfile = vi.spyOn(state, "setProfile");
 
     expect(runDnaAutoCorrection()).toBeNull();
-    expect(setProfile).not.toHaveBeenCalled();
+    expect(useBot4xStore.getState().profile).toBe("agressivo");
+    expect(useBot4xStore.getState().leverage).toBe(3);
   });
 
   it("não aplica correção em REAL com métricas desatualizadas", () => {
@@ -129,10 +128,9 @@ describe("runDnaAutoCorrection — confiança operacional", () => {
       leverage: 3,
       todayStats: { trades: 2, wins: 0, losses: 2, open: 0, pnl: -4, serverTime: new Date(Date.now() - 120_000).toISOString() },
     });
-    const state = useBot4xStore.getState();
-    const setProfile = vi.spyOn(state, "setProfile");
 
     expect(runDnaAutoCorrection()).toBeNull();
-    expect(setProfile).not.toHaveBeenCalled();
+    expect(useBot4xStore.getState().profile).toBe("agressivo");
+    expect(useBot4xStore.getState().leverage).toBe(3);
   });
 });
