@@ -18,7 +18,7 @@ export function SettingsExchangeKeys() {
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
 
-  const status = useQuery({ queryKey: ["exchange", "status"], queryFn: exchangeAdapter.status });
+  const status = useQuery({ queryKey: ["exchange", "status"], queryFn: () => exchangeAdapter.status() });
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["exchange", "status"] });
   };
