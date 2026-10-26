@@ -249,7 +249,9 @@ export const useBot4xStore = create<State>()(
         if (uid) {
           void (async () => {
             try {
-              const status = await api.get<{ verified?: boolean }>("/exchange/credentials");
+              // REAL só destrava com credencial de produção verificada —
+              // credencial de testnet nunca libera o rótulo REAL.
+              const status = await api.get<{ verified?: boolean }>("/exchange/credentials?environment=production");
               const verified = status?.verified === true;
               setExchangeVerified(verified);
 
