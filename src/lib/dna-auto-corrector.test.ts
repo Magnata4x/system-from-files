@@ -57,6 +57,7 @@ import { runDnaAutoCorrection } from "./dna-auto-corrector";
 
 describe("runDnaAutoCorrection — confiança operacional", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     setExchangeVerified(false);
     supabaseFrom.mockClear();
     useBot4xStore.setState({
