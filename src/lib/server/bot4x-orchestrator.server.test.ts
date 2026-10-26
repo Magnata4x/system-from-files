@@ -1,8 +1,14 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { automaticExecutionRoute, demoAutoExecutionEnabled, demoIdempotencyKey } from './bot4x-orchestrator.server'
 import type { BackendSignal } from './engine.server'
 
 describe('Fase 46 — execução DEMO pelo Orchestrator', () => {
+  // Isola a variável de ambiente: o ambiente de execução pode tê-la ativa
+  // (ex.: servidor configurado para autoexecução DEMO), mas cada teste
+  // controla explicitamente o valor que quer exercitar.
+  beforeEach(() => {
+    delete process.env.BOT4X_DEMO_AUTO_EXECUTION
+  })
   afterEach(() => {
     delete process.env.BOT4X_DEMO_AUTO_EXECUTION
   })

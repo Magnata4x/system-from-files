@@ -66,8 +66,8 @@ import { Route as ApiRiskEvaluateRouteImport } from './routes/api/risk/evaluate'
 import { Route as ApiRiskStatusRouteImport } from './routes/api/risk/status'
 import { Route as ApiSentimentOverviewRouteImport } from './routes/api/sentiment/overview'
 import { Route as ApiSignalsIndexRouteImport } from './routes/api/signals/index'
-import { Route as ApiSignalsStatusRouteImport } from './routes/api/signals/status'
 import { Route as ApiSignalsIdRouteImport } from './routes/api/signals/$id'
+import { Route as ApiSignalsStatusRouteImport } from './routes/api/signals/status'
 import { Route as AuthenticatedCalibratorHistoryIdRouteImport } from './routes/_authenticated/calibrator.history.$id'
 import { Route as ApiBot4xExecutionsExportRouteImport } from './routes/api/bot4x/executions.export'
 import { Route as ApiCalibratorFeedbackUserIdRouteImport } from './routes/api/calibrator/feedback.$userId'
@@ -371,14 +371,14 @@ const ApiSignalsIndexRoute = ApiSignalsIndexRouteImport.update({
   path: '/api/signals/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSignalsStatusRoute = ApiSignalsStatusRouteImport.update({
-  id: '/api/signals/status',
-  path: '/api/signals/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiSignalsIdRoute = ApiSignalsIdRouteImport.update({
   id: '/api/signals/$id',
   path: '/api/signals/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSignalsStatusRoute = ApiSignalsStatusRouteImport.update({
+  id: '/api/signals/status',
+  path: '/api/signals/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCalibratorHistoryIdRoute =
@@ -495,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/api/risk/status': typeof ApiRiskStatusRoute
   '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/signals/status': typeof ApiSignalsStatusRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
@@ -564,6 +565,7 @@ export interface FileRoutesByTo {
   '/api/risk/status': typeof ApiRiskStatusRoute
   '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/signals/status': typeof ApiSignalsStatusRoute
   '/api/prices': typeof ApiPricesIndexRoute
   '/api/signals': typeof ApiSignalsIndexRoute
   '/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
@@ -635,6 +637,7 @@ export interface FileRoutesById {
   '/api/risk/status': typeof ApiRiskStatusRoute
   '/api/sentiment/overview': typeof ApiSentimentOverviewRoute
   '/api/signals/$id': typeof ApiSignalsIdRoute
+  '/api/signals/status': typeof ApiSignalsStatusRoute
   '/api/prices/': typeof ApiPricesIndexRoute
   '/api/signals/': typeof ApiSignalsIndexRoute
   '/_authenticated/calibrator/history/$id': typeof AuthenticatedCalibratorHistoryIdRoute
@@ -776,6 +779,7 @@ export interface FileRouteTypes {
     | '/api/risk/status'
     | '/api/sentiment/overview'
     | '/api/signals/$id'
+    | '/api/signals/status'
     | '/api/prices'
     | '/api/signals'
     | '/calibrator/history/$id'
@@ -846,6 +850,7 @@ export interface FileRouteTypes {
     | '/api/risk/status'
     | '/api/sentiment/overview'
     | '/api/signals/$id'
+    | '/api/signals/status'
     | '/api/prices/'
     | '/api/signals/'
     | '/_authenticated/calibrator/history/$id'
