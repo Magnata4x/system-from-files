@@ -7,15 +7,11 @@ import {
   type Side,
   type Tick,
   type Trade,
-  makeTick,
-  genHistory,
 } from "./bot4x-data";
-import { PROFILES } from "./bot4x-data";
 import { bot4xAdapter, type BackendBot4xVerifiedHistory } from "@/adapters/backend/bot4x.adapter";
 import { api } from "@/adapters/backend/api.adapter";
 import { backendWs } from "@/adapters/backend/ws-client";
 import { supabase } from "@/integrations/supabase/client";
-import { loadTrades, saveTradeWithOutbox } from "./bot4x-trades-db";
 import { logger } from "./logger";
 import { loadConfig, saveConfig } from "./bot4x-config-db";
 import type { CalibProfile as CalibProfileType } from "./bot4x-data";
@@ -40,13 +36,13 @@ export function getEffectiveMode(persistedMode: ExecMode): ExecMode {
 }
 
 // ─── DATA SOURCE CONTRACT ────────────────────────────────────────────────────
-// O store continua suportando DEMO sintético, mas essa fonte nunca pode
-// atravessar a fronteira operacional. Em REAL, o backend/orquestrador e o
-// ledger verificado são a única fonte operacional.
-export type Bot4xDataSource = "DEMO_SYNTHETIC" | "BACKEND_OPERATIONAL";
+// DEMO e REAL usam exclusivamente o backend operacional: DEMO executa ordens
+// reais no Binance Spot Testnet e REAL permanece gated. Nenhuma operação
+// fictícia é criada em nenhum modo — o ledger verificado é a única fonte.
+export type Bot4xDataSource = "BACKEND_OPERATIONAL";
 
-export function getBot4xDataSource(mode: ExecMode): Bot4xDataSource {
-  return mode === "REAL" ? "BACKEND_OPERATIONAL" : "DEMO_SYNTHETIC";
+export function getBot4xDataSource(_mode: ExecMode): Bot4xDataSource {
+  return "BACKEND_OPERATIONAL";
 }
 
 export function getRealModeStateReset(): Pick<State, "orders" | "ticks" | "ticksProcessed" | "history"> {
@@ -139,16 +135,6 @@ type State = {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-function genCtxTick(get: () => State): Tick {
-  const s = get();
-  return makeTick({
-    profile: PROFILES[s.profile],
-    slotsUsed: s.orders.length,
-    busyPairs: s.orders.map((o) => o.pair),
-    shutdown: s.dailyPnlPct <= -1.5,
-  });
-}
-
 function mapBackendProfile(p: string | undefined): CalibProfile {
   if (p === "calibradoRSI") return "rsi";
   if (p === "calibradoAiScore") return "aiscore";
@@ -195,13 +181,6 @@ export function verifiedHistoryToTrade(e: BackendBot4xVerifiedHistory, accumulat
 let wsUnsubs: Array<() => void> = [];
 let realPoller: ReturnType<typeof setInterval> | undefined;
 
-// Preços reais do backend interno (/api/prices) usados para semear o painel.
-async function fetchLivePrices(): Promise<Record<string, number>> {
-  const list = await api.get<Array<{ symbol: string; price: number }>>("/prices");
-  const map: Record<string, number> = {};
-  for (const t of list ?? []) if (t?.symbol) map[t.symbol] = Number(t.price);
-  return map;
-}
 
 // ─── STORE ────────────────────────────────────────────────────────────────────
 
